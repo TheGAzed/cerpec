@@ -13,7 +13,7 @@ void destroy_stack(stack_s * stack, const destroy_fn destroy) {
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->count || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
 
     for (char * e = stack->elements; e < (char*)(stack->elements) + (stack->count * stack->size); e += stack->size) {
         destroy(e, stack->size);
@@ -29,7 +29,7 @@ void clear_stack(stack_s * stack, const destroy_fn destroy) {
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->count || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
 
     for (char * e = stack->elements; e < (char*)(stack->elements) + (stack->count * stack->size); e += stack->size) {
         destroy(e, stack->size);
@@ -73,7 +73,7 @@ void push_stack(stack_s * stack, const void * buffer) {
     assert((LENGTH_MAX >> 1) >= stack->capacity && "[ERROR] Capacity can't exceed maximum size");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->count || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
 
     if (stack->size == stack->capacity) {
         stack->capacity <<= 1;
@@ -93,7 +93,7 @@ void pop_stack(stack_s * stack, void * buffer) {
     assert(stack->elements && "[ERROR] Elements array can't be NULL.");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->count || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
 
     stack->count--;
     memcpy(buffer, stack->elements + (stack->count * stack->size), stack->size);
