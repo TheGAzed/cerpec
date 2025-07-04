@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-stack_s create_stack(const length_t size) {
+stack_s create_stack(const size_t size) {
+    assert(size && "[ERROR] Paremeter can't be zero.");
+
     const stack_s stack = {
         .capacity = STACK_CHUNK, .count = 0, .size = size,
         .elements = malloc((STACK_CHUNK) * (size))
@@ -20,6 +22,7 @@ void destroy_stack(stack_s * stack, const destroy_fn destroy) {
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
     assert(stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->count <= stack->capacity && "[ERROR] Count exceeds capacity.");
 
     for (char * e = stack->elements; e < (char*)(stack->elements) + (stack->count * stack->size); e += stack->size) {
         destroy(e, stack->size);
@@ -37,16 +40,13 @@ void clear_stack(stack_s * stack, const destroy_fn destroy) {
     assert(stack->size && "[ERROR] Element's size can't be zero.");
     assert(stack->elements && "[ERROR] Invalid elements pointer state.");
     assert(stack->count <= stack->capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack->capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack->count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     for (char * e = stack->elements; e < (char*)(stack->elements) + (stack->count * stack->size); e += stack->size) {
         destroy(e, stack->size);
     }
-    free(stack->elements);
+    stack->elements = realloc(stack->elements, STACK_CHUNK * (stack->size));
 
     stack->capacity = stack->count = 0;
-    stack->elements = NULL;
 }
 
 stack_s copy_stack(const stack_s stack, const copy_fn copy) {
@@ -55,8 +55,6 @@ stack_s copy_stack(const stack_s stack, const copy_fn copy) {
     assert(stack.size && "[ERROR] Element's size can't be zero.");
     assert(stack.elements && "[ERROR] Invalid elements pointer state.");
     assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     const stack_s replica = {
         .capacity = stack.capacity, .count = 0, .elements = malloc((size_t)(stack.capacity * stack.size)), .size = stack.size,
@@ -76,8 +74,6 @@ bool is_empty_stack(const stack_s stack) {
     assert(stack.size && "[ERROR] Element's size can't be zero.");
     assert(stack.elements && "[ERROR] Invalid elements pointer state.");
     assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     return !(stack.count);
 }
@@ -85,13 +81,11 @@ bool is_empty_stack(const stack_s stack) {
 void push_stack(stack_s * stack, const void * buffer) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert((LENGTH_MAX - STACK_CHUNK) >= stack->capacity && "[ERROR] Capacity can't exceed maximum size");
+    assert((((size_t)(-1)) - STACK_CHUNK) >= stack->capacity && "[ERROR] Capacity can't exceed maximum size");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
     assert(stack->elements && "[ERROR] Invalid elements pointer state.");
     assert(stack->count <= stack->capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack->capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack->count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     if (stack->size == stack->capacity) {
         stack->capacity += STACK_CHUNK;
@@ -113,8 +107,6 @@ void pop_stack(stack_s * stack, void * buffer) {
     assert(stack->size && "[ERROR] Element's size can't be zero.");
     assert(stack->elements && "[ERROR] Invalid elements pointer state.");
     assert(stack->count <= stack->capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack->capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack->count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     stack->count--;
     memcpy(buffer, stack->elements + (stack->count * stack->size), stack->size);
@@ -135,8 +127,6 @@ void peep_stack(const stack_s stack, void * buffer) {
     assert(stack.size && "[ERROR] Element's size can't be zero.");
     assert(stack.elements && "[ERROR] Invalid elements pointer state.");
     assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     memcpy(buffer, stack.elements + ((stack.count - 1) * stack.size), stack.size);
 }
@@ -147,12 +137,9 @@ void foreach_stack(const stack_s stack, const operate_fn operate, void * argumen
     assert(stack.size && "[ERROR] Element's size can't be zero.");
     assert(stack.elements && "[ERROR] Invalid elements pointer state.");
     assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
-    for (char * e = stack.elements; e < (char*)(stack.elements) + (stack.count * stack.size); e += stack.size) {
-        operate(e, stack.size, arguments);
-    }
+    char * elements = stack.elements;
+    for (char * e = elements; e < elements + (stack.count * stack.size) && operate(e, stack.size, arguments); e += stack.size) {}
 }
 
 void map_stack(const stack_s stack, const manage_fn manage, void * arguments) {
@@ -161,10 +148,6 @@ void map_stack(const stack_s stack, const manage_fn manage, void * arguments) {
     assert(stack.size && "[ERROR] Element's size can't be zero.");
     assert(stack.elements && "[ERROR] Invalid elements pointer state.");
     assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
-    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
-    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     manage(stack.elements, stack.count, stack.size, arguments);
 }
-
-

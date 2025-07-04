@@ -9,10 +9,10 @@
 
 typedef struct stack {
     void * elements;
-    length_t size, count, capacity;
+    size_t size, count, capacity;
 } stack_s;
 
-stack_s create_stack(const length_t size);
+stack_s create_stack(const size_t size);
 void destroy_stack(stack_s * stack, const destroy_fn destroy);
 void clear_stack(stack_s * stack, const destroy_fn destroy);
 stack_s copy_stack(const stack_s stack, const copy_fn copy);

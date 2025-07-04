@@ -1,1 +1,4 @@
-target_sources(${PROJECT_NAME} PRIVATE sequence/stack.c)
+target_sources(${PROJECT_NAME}
+        PRIVATE sequence/stack.c
+        PRIVATE sequence/queue.c
+)

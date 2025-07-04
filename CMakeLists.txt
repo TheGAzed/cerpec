@@ -11,7 +11,7 @@ if (NOT DEFINED IS_CERPEC_TESTING)
 endif ()
 
 if (IS_CERPEC_TESTING)
-    #add_subdirectory(test)
+    add_subdirectory(test)
 
     if (EXISTS "${CMAKE_SOURCE_DIR}/experiment")
         add_subdirectory(experiment)
