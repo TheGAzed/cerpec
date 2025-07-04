@@ -5,7 +5,13 @@
 #include <string.h>
 
 stack_s create_stack(const length_t size) {
-    return (stack_s) { .size = size, 0 };
+    const stack_s stack = {
+        .capacity = STACK_CHUNK, .count = 0, .size = size,
+        .elements = malloc((STACK_CHUNK) * (size))
+    };
+    assert(stack.elements && "[ERROR] Memory allocation failed.");
+
+    return stack;
 }
 
 void destroy_stack(stack_s * stack, const destroy_fn destroy) {
@@ -13,7 +19,7 @@ void destroy_stack(stack_s * stack, const destroy_fn destroy) {
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->elements && "[ERROR] Invalid elements pointer state.");
 
     for (char * e = stack->elements; e < (char*)(stack->elements) + (stack->count * stack->size); e += stack->size) {
         destroy(e, stack->size);
@@ -29,7 +35,10 @@ void clear_stack(stack_s * stack, const destroy_fn destroy) {
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->count <= stack->capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack->capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack->count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     for (char * e = stack->elements; e < (char*)(stack->elements) + (stack->count * stack->size); e += stack->size) {
         destroy(e, stack->size);
@@ -44,7 +53,10 @@ stack_s copy_stack(const stack_s stack, const copy_fn copy) {
     assert(copy && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack.size && "[ERROR] Element's size can't be zero.");
-    assert(!stack.capacity || stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     const stack_s replica = {
         .capacity = stack.capacity, .count = 0, .elements = malloc((size_t)(stack.capacity * stack.size)), .size = stack.size,
@@ -62,7 +74,10 @@ stack_s copy_stack(const stack_s stack, const copy_fn copy) {
 
 bool is_empty_stack(const stack_s stack) {
     assert(stack.size && "[ERROR] Element's size can't be zero.");
-    assert(!stack.capacity || stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     return !(stack.count);
 }
@@ -70,13 +85,16 @@ bool is_empty_stack(const stack_s stack) {
 void push_stack(stack_s * stack, const void * buffer) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert((LENGTH_MAX >> 1) >= stack->capacity && "[ERROR] Capacity can't exceed maximum size");
+    assert((LENGTH_MAX - STACK_CHUNK) >= stack->capacity && "[ERROR] Capacity can't exceed maximum size");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->count <= stack->capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack->capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack->count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     if (stack->size == stack->capacity) {
-        stack->capacity <<= 1;
+        stack->capacity += STACK_CHUNK;
         stack->elements = realloc(stack->elements, (size_t)(stack->capacity * stack->size));
         assert(stack->elements && "[ERROR] Memory allocation failed.");
     }
@@ -93,14 +111,16 @@ void pop_stack(stack_s * stack, void * buffer) {
     assert(stack->elements && "[ERROR] Elements array can't be NULL.");
 
     assert(stack->size && "[ERROR] Element's size can't be zero.");
-    assert(!stack->capacity || stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack->count <= stack->capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack->capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack->count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     stack->count--;
     memcpy(buffer, stack->elements + (stack->count * stack->size), stack->size);
 
-    const length_t half_capacity = stack->capacity >> 1;
-    if (stack->count == half_capacity) {
-        stack->capacity = half_capacity;
+    if (stack->count == stack->capacity - (STACK_CHUNK) && stack->count) {
+        stack->capacity -= STACK_CHUNK;
         stack->elements = realloc(stack->elements, (size_t)(stack->capacity * stack->size));
         assert(!stack->capacity || stack->elements && "[ERROR] Memory allocation failed.");
     }
@@ -113,7 +133,10 @@ void peep_stack(const stack_s stack, void * buffer) {
     assert(stack.elements && "[ERROR] Elements array can't be NULL.");
 
     assert(stack.size && "[ERROR] Element's size can't be zero.");
-    assert(!stack.count || stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     memcpy(buffer, stack.elements + ((stack.count - 1) * stack.size), stack.size);
 }
@@ -122,7 +145,10 @@ void foreach_stack(const stack_s stack, const operate_fn operate, void * argumen
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack.size && "[ERROR] Element's size can't be zero.");
-    assert(!stack.count || stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     for (char * e = stack.elements; e < (char*)(stack.elements) + (stack.count * stack.size); e += stack.size) {
         operate(e, stack.size, arguments);
@@ -133,7 +159,10 @@ void map_stack(const stack_s stack, const manage_fn manage, void * arguments) {
     assert(manage && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack.size && "[ERROR] Element's size can't be zero.");
-    assert(!stack.count || stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.elements && "[ERROR] Invalid elements pointer state.");
+    assert(stack.count <= stack.capacity && "[ERROR] Count exceeds capacity.");
+    assert(stack.capacity <= LENGTH_MAX && "[ERROR] Invalid capacity length.");
+    assert(stack.count <= LENGTH_MAX && "[ERROR] Invalid count length.");
 
     manage(stack.elements, stack.count, stack.size, arguments);
 }

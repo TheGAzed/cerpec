@@ -3,14 +3,19 @@
 
 #include <stdbool.h>
 
-#if defined(FAST_LENGTH)
+// define length type as unsigned int instead of size_t, which can improve performance since memory is tailored to int
+#if defined(FAST_CERPEC_LENGTH)
 #   include <limits.h>
-typedef unsigned int length_t;
+typedef unsigned length_t;
 #   define LENGTH_MAX UINT_MAX
 #else
 #include <stddef.h>
 typedef size_t length_t;
 #   define LENGTH_MAX ((length_t)(-1))
+#endif
+
+#if !defined(CERPEC_CHUNK)
+#   define CERPEC_CHUNK 256
 #endif
 
 typedef void   (*destroy_fn) (void * element, const length_t size);

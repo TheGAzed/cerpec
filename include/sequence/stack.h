@@ -3,6 +3,10 @@
 
 #include <cerpec.h>
 
+#if !defined(STACK_CHUNK)
+#   define STACK_CHUNK CERPEC_CHUNK
+#endif
+
 typedef struct stack {
     void * elements;
     length_t size, count, capacity;
