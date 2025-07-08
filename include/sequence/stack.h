@@ -8,8 +8,8 @@
 #endif
 
 typedef struct stack {
-    void * elements;
-    size_t size, count, capacity;
+    char * elements;
+    size_t size, length, capacity;
 } stack_s;
 
 stack_s create_stack(const size_t size);

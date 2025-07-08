@@ -8,13 +8,13 @@
 #endif
 
 struct queue_node {
-    void * elements;
+    char elements[QUEUE_CHUNK];
     struct queue_node * next;
 };
 
 typedef struct queue {
     struct queue_node * tail;
-    size_t size, count, current;
+    size_t size, current, length;
 } queue_s;
 
 queue_s create_queue(const size_t size);
