@@ -11,6 +11,10 @@ if (NOT DEFINED IS_CERPEC_TESTING)
 endif ()
 
 if (IS_CERPEC_TESTING)
+    add_subdirectory(external)
+
+    include(CTest)
+    enable_testing()
     add_subdirectory(test)
 
     if (EXISTS "${CMAKE_SOURCE_DIR}/experiment")

@@ -1,0 +1,3 @@
+[submodule "external/greatest"]
+	path = external/greatest
+	url = git@github.com:silentbicycle/greatest.git

@@ -7,7 +7,7 @@
 queue_s create_queue(const size_t size) {
     assert(size && "[ERROR] Size can't be zero.");
 
-    return (queue_s) { .size = size };
+    return (queue_s) { .size = size, 0 };
 }
 
 void destroy_queue(queue_s * queue, const destroy_fn destroy) {
@@ -26,6 +26,8 @@ void destroy_queue(queue_s * queue, const destroy_fn destroy) {
 
         struct queue_node * temp = previous->next;
         previous->next = previous->next->next;
+
+        free(temp->elements);
         free(temp);
     }
 
@@ -48,6 +50,8 @@ void clear_queue(queue_s * queue, const destroy_fn destroy) {
 
         struct queue_node * temp = previous->next;
         previous->next = previous->next->next;
+
+        free(temp->elements);
         free(temp);
     }
 
@@ -70,6 +74,9 @@ queue_s copy_queue(const queue_s queue, const copy_fn copy) {
     while (remaining) {
         last_added = (*current_copy) = malloc(sizeof(struct queue_node));
         assert((*current_copy) && "[ERROR] Memory allocation failed");
+
+        last_added->elements = malloc(QUEUE_CHUNK * queue.size);
+        assert(last_added->elements && "[ERROR] Memory allocation failed.");
 
         (*current_copy)->next = queue_copy.tail; // make current/last node's next pointer point to tail
         current_queue = current_queue->next;
@@ -100,7 +107,6 @@ void peek_queue(const queue_s queue, void * buffer) {
     assert(buffer && "[ERROR] Parameter is NULL.");
 
     assert(queue.tail && "[INVALID] Tail can't be NULL");
-    assert(queue.tail->next && "[INVALID] Tail's next (head) can't be NULL");
     assert(queue.size && "[INVALID] Size can't be zero.");
 
     memcpy(buffer, queue.tail->next->elements + (queue.current * queue.size), queue.size);
@@ -116,19 +122,22 @@ void enqueue(queue_s * queue, const void * buffer) {
     // index where the next element will be enqueued
     const size_t next_index = (queue->current + queue->length) % QUEUE_CHUNK;
     if (!next_index) { // if head list array is full (is divisible) adds new list element to head
-        struct queue_node * temp = malloc(sizeof(struct queue_node));
-        assert(temp && "[ERROR] Memory allocation failed");
+        struct queue_node * node = malloc(sizeof(struct queue_node));
+        assert(node && "[ERROR] Memory allocation failed");
+
+        node->elements = malloc(QUEUE_CHUNK * queue->size);
+        assert(node->elements && "[ERROR] Memory allocation failed.");
 
         if (queue->tail == NULL) {
-            temp->next = temp; // create initial circle
+            node->next = node; // create initial circle
         } else {
-            temp->next = queue->tail->next; // make temp's next node head node
-            queue->tail->next = temp; // make previous tail's next node point to temp
+            node->next = queue->tail->next; // make temp's next node head node
+            queue->tail->next = node; // make previous tail's next node point to temp
         }
-        queue->tail = temp;
+        queue->tail = node;
     }
 
-    memcpy(queue->tail->elements + (next_index * queue->size), &buffer, queue->size);
+    memcpy(queue->tail->elements + (next_index * queue->size), buffer, queue->size);
     queue->length++;
 }
 
@@ -146,12 +155,17 @@ void dequeue(queue_s * queue, void * buffer) {
     queue->current = (queue->current + 1) % QUEUE_CHUNK; // set current to next index in node array
 
     if (!queue->length) { // if queue is empty after extracting element thne free memory and reset everything to zero
+        free(queue->tail->elements); // free empty tail/head node
         free(queue->tail); // free empty tail/head node
+
+        queue->current = 0; // if queue is empty make current index 0 to not break enqueue operation
         queue->tail = NULL; // set tail to NULL
     } else if (queue->current == 0) { // else if current index circles back, free start list element and shift to next
-        struct queue_node * temp = queue->tail->next; // get empty head node
+        struct queue_node * head = queue->tail->next; // get empty head node
         queue->tail->next = queue->tail->next->next; // set new head node to its next node
-        free(temp); // free previous head node
+
+        free(head->elements); // free previous head node elements
+        free(head); // free previous head node
     }
 }
 
