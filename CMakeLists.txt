@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 
 project(CERPEC)
-add_library(${PROJECT_NAME})
+add_library(CERPEC)
 
 add_subdirectory(include)
 add_subdirectory(source)

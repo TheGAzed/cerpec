@@ -26,10 +26,8 @@ bool increment(void * element, const size_t size, void * value) {
 }
 
 bool print(void * element, const size_t size, void * format) {
-    (void)(size);
-    test_t * e = element;
-
-    printf(format, (*e)); fflush(stdout);
+    //printf(format, (*(test_t*)element)); fflush(stdout);
+    (void)(element); (void)(format); (void)(size);
 
     return true;
 }
