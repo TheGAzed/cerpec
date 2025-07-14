@@ -1,9 +1,11 @@
 target_sources(CERPEC
-        PRIVATE sequence/stack.c
-        PRIVATE sequence/queue.c
-        PRIVATE sequence/deque.c
+        PRIVATE sequence/istack.c
+        PRIVATE sequence/iqueue.c
+        PRIVATE sequence/ideque.c
 
-        PRIVATE tree/bsearch_tree.c
-        PRIVATE tree/avl_tree.c
-        PRIVATE tree/red_black_tree.c
+        PRIVATE list/istraight_list.c
+
+        PRIVATE tree/ibsearch_tree.c
+        PRIVATE tree/iavl_tree.c
+        PRIVATE tree/irb_tree.c
 )
