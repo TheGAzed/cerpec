@@ -4,6 +4,7 @@ target_sources(CERPEC
         PRIVATE sequence/ideque.c
 
         PRIVATE list/istraight_list.c
+        PRIVATE list/icircular_list.c
 
         PRIVATE tree/ibsearch_tree.c
         PRIVATE tree/iavl_tree.c

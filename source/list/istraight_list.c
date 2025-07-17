@@ -62,8 +62,9 @@ istraight_list_s copy_istraight_list(const istraight_list_s list, const copy_fn 
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     for (size_t i = list.head, * r = &(replica.head), index = 0; NIL != i; i = list.next[i], r = replica.next + index, index++) {
-        replica.next[index] = NIL;
         (*r) = index;
+        replica.next[index] = NIL;
+
         copy(replica.elements + (index * replica.size), list.elements + (i * list.size));
     }
 
@@ -152,7 +153,7 @@ void remove_first_istraight_list(istraight_list_s * restrict list, const void * 
         }
 
         if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
-            list->capacity += ISTRAIGHT_LIST_CHUNK;
+            list->capacity -= ISTRAIGHT_LIST_CHUNK;
             _istraight_list_resize(list);
         }
     }
@@ -188,7 +189,7 @@ void remove_at_istraight_list(istraight_list_s * restrict list, const size_t ind
     }
 
     if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
-        list->capacity += ISTRAIGHT_LIST_CHUNK;
+        list->capacity -= ISTRAIGHT_LIST_CHUNK;
         _istraight_list_resize(list);
     }
 }
@@ -210,6 +211,7 @@ void reverse_istraight_list(istraight_list_s * list) {
 void splice_istraight_list(istraight_list_s * restrict destination, istraight_list_s * restrict source, const size_t index) {
     assert(destination && "[ERROR] Paremeter can't be NULL.");
     assert(source && "[ERROR] Paremeter can't be NULL.");
+    assert(index < destination->length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(destination->size && "[INVALID] Size can't be zero.");
     assert(destination->length <= destination->capacity && "[INVALID] Length exceeds capacity.");
@@ -266,6 +268,7 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Index can't be more than or equal length.");
     assert(length <= list->length && "[ERROR] Size can't be more than length.");
+    assert(length && "[ERROR] Can't split empty list.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
@@ -285,7 +288,7 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     assert(split.elements && "[ERROR] Memory allocation failed.");
     assert(split.next && "[ERROR] Memory allocation failed.");
 
-    for (size_t * s = &(split.head); split.length < length; (*node) = list->next[(*node)]) {
+    for (size_t * s = &(split.head); split.length < length; (*node) = list->next[(*node)], s = split.next + (*s)) {
         split.next[(*s)] = (*s);
         (*s) = split.length;
 
@@ -305,7 +308,7 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     assert((!replica_capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     node = &(list->head);
-    for (size_t * r = &(replica.head); replica.length < replica_length; (*node) = list->next[(*node)]) {
+    for (size_t * r = &(replica.head); replica.length < replica_length; (*node) = list->next[(*node)], r = replica.next + (*r)) {
         split.next[(*r)] = (*r);
         (*r) = replica.length;
 
@@ -333,7 +336,9 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
 
     size_t * neg = &(negative.head), * pos = &(positive.head);
     for (size_t i = list->head, pos_idx = 0, neg_idx = 0; NIL != i; i = list->next[i]) {
-        if (filter(list->elements + (i * list->size), arguments)) {
+        const char * element = list->elements + (i * list->size);
+
+        if (filter(element, arguments)) {
             (*pos) = pos_idx++;
             if (positive.length == positive.capacity) {
                 positive.capacity += ISTRAIGHT_LIST_CHUNK;
@@ -341,7 +346,7 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
             }
             positive.next[(*pos)] = NIL;
 
-            memcpy(positive.elements + ((*pos) * positive.size), list->elements + (i * list->size), list->size);
+            memcpy(positive.elements + ((*pos) * positive.size), element, list->size);
             positive.length++;
 
             pos = positive.next + (*pos);
@@ -353,7 +358,7 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
             }
             negative.next[(*neg)] = NIL;
 
-            memcpy(negative.elements + ((*neg) * negative.size), list->elements + (i * list->size), list->size);
+            memcpy(negative.elements + ((*neg) * negative.size), element, list->size);
             negative.length++;
 
             neg = negative.next + (*neg);

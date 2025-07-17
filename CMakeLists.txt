@@ -6,11 +6,11 @@ add_library(CERPEC)
 add_subdirectory(include)
 add_subdirectory(source)
 
-if (NOT DEFINED IS_CERPEC_TESTING)
-    set(IS_CERPEC_TESTING TRUE)
+if (NOT DEFINED IS_CERPEC_TEST)
+    set(IS_CERPEC_TEST TRUE)
 endif ()
 
-if (IS_CERPEC_TESTING)
+if (IS_CERPEC_TEST)
     add_subdirectory(external)
 
     include(CTest)
