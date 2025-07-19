@@ -22,9 +22,20 @@ void _irb_tree_right_rotate(irb_tree_s * tree, const size_t node);
 /// @param v Second subtree.
 void _irb_tree_transplant(irb_tree_s * tree, const size_t u, const size_t v);
 
-///
+/// Finds the minimum node in subtree.
+/// @param tree Structure to search.
+/// @param node Root of subtree.
+/// @return Minimum node.
 size_t _irb_tree_minimum(const irb_tree_s tree, const size_t node);
+
+/// Red black tree fixup function for tree insert.
+/// @param tree Structure to fixup.
+/// @param node Node to start fixup upwards.
 void _irb_tree_insert_fixup(irb_tree_s * tree, const size_t node);
+
+/// Red black tree fixup function for tree removal.
+/// @param tree Structure to fixup.
+/// @param node Node to start fixup upwards.
 void _irb_tree_remove_fixup(irb_tree_s * tree, const size_t node);
 
 /// Fills the hole left after removing an element in the tree's arrays, puts rightmost element into hole.

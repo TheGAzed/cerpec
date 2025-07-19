@@ -27,7 +27,7 @@ void _iavl_tree_right_rotate(iavl_tree_s * tree, const size_t node);
 /// @param node Index of node to start rebalancing upwards.
 void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node);
 
-/// Binary search tree node removal fixup.
+/// AVL tree node removal fixup.
 /// @param tree Structure to fix.
 /// @param node Index reference to removed node.
 /// @return Index of hole left behind by fixup.
@@ -363,7 +363,7 @@ void remove_min_iavl_tree(iavl_tree_s * tree, void * buffer) {
     }
 }
 
-void inorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * args) {
+void inorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -377,7 +377,7 @@ void inorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * 
             node = tree.node[IAVL_TREE_LEFT][node];
         }
 
-        if (!operate(tree.elements + (node * tree.size), args)) {
+        if (!operate(tree.elements + (node * tree.size), arguments)) {
             break;
         }
 
@@ -401,7 +401,7 @@ void inorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * 
     }
 }
 
-void preorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * args) {
+void preorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -418,7 +418,7 @@ void preorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void *
         stack.elements[stack.length++] = tree.root;
     }
 
-    while (stack.length && operate(tree.elements + (stack.elements[stack.length - 1] * tree.size), args)) {
+    while (stack.length && operate(tree.elements + (stack.elements[stack.length - 1] * tree.size), arguments)) {
         const size_t node = stack.elements[--stack.length];
 
         const size_t right_child = tree.node[IAVL_TREE_RIGHT][node];
@@ -435,7 +435,7 @@ void preorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void *
     free(stack.elements);
 }
 
-void postorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * args) {
+void postorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -462,7 +462,7 @@ void postorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void 
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!operate(tree.elements + (node * tree.size), args)) {
+                if (!operate(tree.elements + (node * tree.size), arguments)) {
                     break;
                 }
 
@@ -474,7 +474,7 @@ void postorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void 
     free(stack.elements);
 }
 
-void level_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * args) {
+void level_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -492,7 +492,7 @@ void level_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * ar
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && operate(tree.elements + (queue.elements[queue.current] * tree.size), args)) {
+    while (queue.length && operate(tree.elements + (queue.elements[queue.current] * tree.size), arguments)) {
         // pop index
         const size_t node = queue.elements[queue.current++];
         queue.length--;

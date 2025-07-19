@@ -333,7 +333,7 @@ void remove_min_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
     }
 }
 
-void inorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * args) {
+void inorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -347,7 +347,7 @@ void inorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate,
             node = tree.node[IBSEARCH_TREE_LEFT][node];
         }
 
-        if (!operate(tree.elements + (node * tree.size), args)) {
+        if (!operate(tree.elements + (node * tree.size), arguments)) {
             break;
         }
 
@@ -371,7 +371,7 @@ void inorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate,
     }
 }
 
-void preorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * args) {
+void preorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -388,7 +388,7 @@ void preorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate
         stack.elements[stack.length++] = tree.root;
     }
 
-    while (stack.length && operate(tree.elements + (stack.elements[stack.length - 1] * tree.size), args)) {
+    while (stack.length && operate(tree.elements + (stack.elements[stack.length - 1] * tree.size), arguments)) {
         const size_t node = stack.elements[--stack.length];
 
         const size_t right_child = tree.node[IBSEARCH_TREE_RIGHT][node];
@@ -405,7 +405,7 @@ void preorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate
     free(stack.elements);
 }
 
-void postorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * args) {
+void postorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -432,7 +432,7 @@ void postorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operat
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!operate(tree.elements + (node * tree.size), args)) {
+                if (!operate(tree.elements + (node * tree.size), arguments)) {
                     break;
                 }
 
@@ -444,7 +444,7 @@ void postorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operat
     free(stack.elements);
 }
 
-void level_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * args) {
+void level_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -462,7 +462,7 @@ void level_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, v
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && operate(tree.elements + (queue.elements[queue.current] * tree.size), args)) {
+    while (queue.length && operate(tree.elements + (queue.elements[queue.current] * tree.size), arguments)) {
         // pop index
         const size_t node = queue.elements[queue.current++];
         queue.length--;
