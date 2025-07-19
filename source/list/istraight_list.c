@@ -267,8 +267,7 @@ void splice_istraight_list(istraight_list_s * restrict destination, istraight_li
 istraight_list_s split_istraight_list(istraight_list_s * list, const size_t index, const size_t length) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Index can't be more than or equal length.");
-    assert(length <= list->length && "[ERROR] Size can't be more than length.");
-    assert(length && "[ERROR] Can't split empty list.");
+    assert(index + length <= list->length && "[ERROR] Size can't be more than length.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
@@ -283,14 +282,14 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     istraight_list_s split = {
         .capacity = split_capacity, .empty = NIL, .head = NIL, .length = 0, .size = list->size,
         .elements = malloc(split_capacity * list->size),
-        .next = malloc(split_capacity * list->size),
+        .next = malloc(split_capacity * sizeof(size_t)),
     };
-    assert(split.elements && "[ERROR] Memory allocation failed.");
-    assert(split.next && "[ERROR] Memory allocation failed.");
+    assert((!split_capacity || split.elements) && "[ERROR] Memory allocation failed.");
+    assert((!split_capacity || split.next) && "[ERROR] Memory allocation failed.");
 
     for (size_t * s = &(split.head); split.length < length; (*node) = list->next[(*node)], s = split.next + (*s)) {
-        split.next[(*s)] = (*s);
         (*s) = split.length;
+        split.next[(*s)] = NIL;
 
         memcpy(split.elements + (split.length * split.size), list->elements + ((*node) * list->size), list->size);
         split.length++;
@@ -302,15 +301,15 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     istraight_list_s replica = {
         .capacity = replica_capacity, .empty = NIL, .head = NIL, .length = 0, .size = list->size,
         .elements = malloc(replica_capacity * list->size),
-        .next = malloc(replica_capacity * list->size),
+        .next = malloc(replica_capacity * sizeof(size_t)),
     };
     assert((!replica_capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica_capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     node = &(list->head);
     for (size_t * r = &(replica.head); replica.length < replica_length; (*node) = list->next[(*node)], r = replica.next + (*r)) {
-        split.next[(*r)] = (*r);
         (*r) = replica.length;
+        replica.next[(*r)] = NIL;
 
         memcpy(replica.elements + (replica.length * replica.size), list->elements + ((*node) * list->size), list->size);
         replica.length++;
@@ -339,29 +338,31 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
         const char * element = list->elements + (i * list->size);
 
         if (filter(element, arguments)) {
-            (*pos) = pos_idx++;
+            (*pos) = pos_idx;
             if (positive.length == positive.capacity) {
                 positive.capacity += ISTRAIGHT_LIST_CHUNK;
                 _istraight_list_resize(&positive);
             }
-            positive.next[(*pos)] = NIL;
+            positive.next[pos_idx] = NIL;
 
-            memcpy(positive.elements + ((*pos) * positive.size), element, list->size);
+            memcpy(positive.elements + (pos_idx * positive.size), element, list->size);
             positive.length++;
 
-            pos = positive.next + (*pos);
+            pos = positive.next + pos_idx;
+            pos_idx++;
         } else {
-            (*neg) = neg_idx++;
+            (*neg) = neg_idx;
             if (negative.length == negative.capacity) {
                 negative.capacity += ISTRAIGHT_LIST_CHUNK;
                 _istraight_list_resize(&negative);
             }
-            negative.next[(*neg)] = NIL;
+            negative.next[neg_idx] = NIL;
 
-            memcpy(negative.elements + ((*neg) * negative.size), element, list->size);
+            memcpy(negative.elements + (neg_idx * negative.size), element, list->size);
             negative.length++;
 
-            neg = negative.next + (*neg);
+            neg = negative.next + neg_idx;
+            neg_idx++;
         }
     }
     free(list->elements);

@@ -23,7 +23,7 @@ bool increment(void * element, void * value) {
 }
 
 bool print(void * element, void * format) {
-    //printf(format, (*(test_t*)element)); fflush(stdout);
+    printf(format, (*(test_t*)element));
     (void)(element); (void)(format);
 
     return true;

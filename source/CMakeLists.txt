@@ -5,6 +5,7 @@ target_sources(CERPEC
 
         PRIVATE list/istraight_list.c
         PRIVATE list/icircular_list.c
+        PRIVATE list/idouble_list.c
 
         PRIVATE tree/ibsearch_tree.c
         PRIVATE tree/iavl_tree.c

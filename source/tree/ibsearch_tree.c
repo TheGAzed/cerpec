@@ -492,7 +492,7 @@ void _ibsearch_tree_fill_hole(ibsearch_tree_s * tree, const size_t hole) {
     tree->node[IBSEARCH_TREE_LEFT][hole] = tree->node[IBSEARCH_TREE_RIGHT][hole] = tree->parent[hole] = hole;
 
     // replace removed element with rightmost array one (or fill hole with valid element)
-    memcpy(tree->elements + (hole * tree->size), tree->elements + (tree->length * tree->size), tree->size);
+    memmove(tree->elements + (hole * tree->size), tree->elements + (tree->length * tree->size), tree->size);
     tree->elements[hole] = tree->elements[tree->length];
     tree->node[IBSEARCH_TREE_LEFT][hole] = tree->node[IBSEARCH_TREE_LEFT][tree->length];
     tree->node[IBSEARCH_TREE_RIGHT][hole] = tree->node[IBSEARCH_TREE_RIGHT][tree->length];

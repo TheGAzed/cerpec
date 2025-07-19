@@ -219,7 +219,7 @@ void remove_at_icircular_list(icircular_list_s * list, const size_t index, void 
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
     assert(list->length && "[ERROR] Can't get element from empty list.");
-    assert(index <= list->length && "[ERROR] Paremeter can't be greater than length.");
+    assert(index < list->length && "[ERROR] Paremeter can't be greater than or equal length.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
@@ -282,13 +282,14 @@ void reverse_icircular_list(icircular_list_s * list) {
 
 void shift_next_icircular_list(icircular_list_s * list, const size_t shift) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
+    assert(list->length && "[ERROR] Can't shift empty list.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // shift tail node by iterating shift number of times
-    for (size_t i = 0; list->length && i < shift; ++i) {
+    for (size_t i = 0; i < shift; ++i) {
         list->tail = list->next[list->tail];
     }
 }
@@ -377,7 +378,6 @@ icircular_list_s split_icircular_list(icircular_list_s * list, const size_t inde
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Index can't be more than or equal length.");
     assert(length <= list->length && "[ERROR] Size can't be more than length.");
-    assert(length && "[ERROR] Can't split empty list.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
@@ -394,10 +394,10 @@ icircular_list_s split_icircular_list(icircular_list_s * list, const size_t inde
     const size_t split_capacity = split_mod ? length - split_mod + ICIRCULAR_LIST_CHUNK : length;
     icircular_list_s split = {
         .capacity = split_capacity, .empty = NIL, .tail = 0, .length = length, .size = list->size,
-        .elements = malloc(split_capacity * list->size), .next = malloc(split_capacity * list->size),
+        .elements = malloc(split_capacity * list->size), .next = malloc(split_capacity * sizeof(size_t)),
     };
-    assert(split.elements && "[ERROR] Memory allocation failed.");
-    assert(split.next && "[ERROR] Memory allocation failed.");
+    assert((!split_capacity || split.elements) && "[ERROR] Memory allocation failed.");
+    assert((!split_capacity || split.next) && "[ERROR] Memory allocation failed.");
 
     // copy list elements into split list starting from index node (also redirect list's removed nodes)
     for (size_t * s = &(split.tail); split.length < length; previous = list->next[previous], s = split.next + (*s)) {
@@ -406,14 +406,13 @@ icircular_list_s split_icircular_list(icircular_list_s * list, const size_t inde
         list->next[previous] = list->next[current]; // redirect removed node
 
         // append removed node into split list
-        (*s) = split.length;
+        (*s) = split.tail = split.length;
         split.next[(*s)] = 0;
 
         // copy list's removed node into split list
         memcpy(split.elements + ((*s) * split.size), list->elements + (current * list->size), list->size);
         split.length++;
     }
-    split.tail = split.length - 1; // since nodes are added from head split's tail index must become its length - 1
 
     // if list's tail gets split into new list, then change tail to node after last split
     if ((index <= list->length - 1) && (index + length >= list->length - 1)) {
@@ -426,7 +425,7 @@ icircular_list_s split_icircular_list(icircular_list_s * list, const size_t inde
     const size_t replica_capacity = replica_mod ? replica_length - replica_mod + ICIRCULAR_LIST_CHUNK : replica_length;
     icircular_list_s replica = {
         .capacity = replica_capacity, .empty = NIL, .tail = 0, .length = 0, .size = list->size,
-        .elements = malloc(replica_capacity * list->size), .next = malloc(replica_capacity * list->size),
+        .elements = malloc(replica_capacity * list->size), .next = malloc(replica_capacity * sizeof(size_t)),
     };
     assert((!replica_capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica_capacity || replica.next) && "[ERROR] Memory allocation failed.");
@@ -457,50 +456,54 @@ icircular_list_s extract_icircular_list(icircular_list_s * list, const filter_fn
     assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // create temporary lists to save filtered elements
     icircular_list_s negative = { .empty = NIL, .tail = 0, .size = list->size, };
     icircular_list_s positive = { .empty = NIL, .tail = 0, .size = list->size, };
 
+    // iterate over each element in list while calling filter function
     size_t * neg = &(negative.tail), * pos = &(positive.tail);
     size_t previous = list->tail;
     for (size_t i = 0, pos_idx = 0, neg_idx = 0; i < list->length; ++i) {
-        const size_t current = list->next[previous];
+        const size_t current = list->next[previous]; // get current node
 
-        const char * element = list->elements + (current * list->size);
-        if (filter(element, arguments)) {
-            (*pos) = pos_idx++;
-            if (positive.length == positive.capacity) {
+        const char * element = list->elements + (current * list->size); // save current element
+        if (filter(element, arguments)) { // if element is valid push into positive list
+            (*pos) = pos_idx;
+            if (positive.length == positive.capacity) { // expand capacity if needed
                 positive.capacity += ICIRCULAR_LIST_CHUNK;
                 _icircular_list_resize(&positive);
             }
-
-            memcpy(positive.elements + ((*pos) * positive.size), element, list->size);
+            positive.next[pos_idx] = 0; // make list circular
+            // copy element into list
+            memcpy(positive.elements + (pos_idx * positive.size), element, list->size);
             positive.length++;
 
-            pos = positive.next + (*pos);
-        } else {
-            (*neg) = neg_idx++;
-            if (negative.length == negative.capacity) {
+            pos = positive.next + pos_idx; // go to positive next node
+            pos_idx++;
+        } else { // else push into negative list
+            (*neg) = neg_idx;
+            if (negative.length == negative.capacity) { // expand capacity if needed
                 negative.capacity += ICIRCULAR_LIST_CHUNK;
                 _icircular_list_resize(&negative);
             }
-
-            memcpy(negative.elements + ((*neg) * negative.size), element, list->size);
+            negative.next[neg_idx] = 0; // make list circular
+            // copy element into list
+            memcpy(negative.elements + (neg_idx * negative.size), element, list->size);
             negative.length++;
 
-            neg = negative.next + (*neg);
+            neg = negative.next + neg_idx; // go to negative next node
+            neg_idx++;
         }
 
-        previous = current;
+        previous = current; // go to next previous node
     }
+    // redirect tail node
     positive.tail = positive.length ? positive.length - 1 : 0;
-    positive.next[positive.tail] = 0;
-
     negative.tail = negative.length ? negative.length - 1 : 0;
-    negative.next[negative.tail] = 0;
 
+    // change list into negative and return positive one
     free(list->elements);
     free(list->next);
-
     (*list) = negative;
 
     return positive;
@@ -513,12 +516,12 @@ void foreach_icircular_list(const icircular_list_s list, const operate_fn operat
     assert(!(list.capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
-    for (size_t i = 0, previous = list.tail; i < list.length; ++i) {
-        const size_t current = list.next[previous];
+    // iterate over each element calling operate function
+    for (size_t i = 0, current = list.tail; i < list.length; ++i) {
+        current = list.next[current];
         if (!operate(list.elements + (current * list.size), arguments)) {
             break;
         }
-        previous = current;
     }
 }
 
@@ -532,18 +535,19 @@ void map_icircular_list(const icircular_list_s list, const manage_fn manage, voi
     char * elements = malloc(list.length * list.size);
     assert((!list.length || elements) && "[ERROR] Memory allocation failed.");
 
-    for (size_t i = 0, previous = list.tail; i < list.length; ++i) {
-        const size_t current = list.next[previous];
+    // push list elements into elements array inorder
+    for (size_t i = 0, current = list.tail; i < list.length; ++i) {
+        current = list.next[current];
         memcpy(elements + (i * list.size), list.elements + (current * list.size), list.size);
-        previous = current;
     }
 
+    // manage elements
     manage(list.elements, list.length, arguments);
 
-    for (size_t i = 0, previous = list.tail; i < list.length; ++i) {
-        const size_t current = list.next[previous];
+    // copy elements back into list
+    for (size_t i = 0, current = list.tail; i < list.length; ++i) {
+        current = list.next[current];
         memcpy(list.elements + (current * list.size), elements + (i * list.size), list.size);
-        previous = current;
     }
 
     free(elements);
