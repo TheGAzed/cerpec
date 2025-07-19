@@ -19,13 +19,14 @@ void destroy_istraight_list(istraight_list_s * list, const destroy_fn destroy) {
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // iterate over each node and destroy its element
     for (size_t i = list->head; i != NIL; i = list->next[i]) {
         destroy(list->elements + (i * list->size));
     }
     free(list->elements);
     free(list->next);
 
-    memset(list, 0, sizeof(istraight_list_s));
+    memset(list, 0, sizeof(istraight_list_s)); // set everything to zero/invalid
 }
 
 void clear_istraight_list(istraight_list_s * list, const destroy_fn destroy) {
@@ -35,12 +36,14 @@ void clear_istraight_list(istraight_list_s * list, const destroy_fn destroy) {
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // iterate over each node and destroy its element
     for (size_t i = list->head; NIL != i; i = list->next[i]) {
         destroy(list->elements + (i * list->size));
     }
     free(list->elements);
     free(list->next);
 
+    // clear (NOT destroy) list
     list->elements = NULL;
     list->next = NULL;
     list->length = list->capacity = 0;
@@ -53,6 +56,7 @@ istraight_list_s copy_istraight_list(const istraight_list_s list, const copy_fn 
     assert(list.size && "[INVALID] Size can't be zero.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
+    // create copy/replica list
     istraight_list_s replica = {
         .capacity = list.capacity, .empty = NIL, .head = NIL, .length = list.length, .size = list.size,
         .elements = malloc(list.capacity * list.size),
@@ -61,6 +65,7 @@ istraight_list_s copy_istraight_list(const istraight_list_s list, const copy_fn 
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
+    // copy each element into replica (aslo make new list hole-less)
     for (size_t i = list.head, * r = &(replica.head), index = 0; NIL != i; i = list.next[i], r = replica.next + index, index++) {
         (*r) = index;
         replica.next[index] = NIL;
@@ -75,7 +80,7 @@ bool is_empty_istraight_list(const istraight_list_s list) {
     assert(list.size && "[INVALID] Size can't be zero.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
-    return !list.length;
+    return !(list.length);
 }
 
 void insert_at_istraight_list(istraight_list_s * restrict list, const void * restrict element, const size_t index) {
@@ -87,42 +92,49 @@ void insert_at_istraight_list(istraight_list_s * restrict list, const void * res
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // if list can't fit elements expand it
     if (list->length == list->capacity) {
         list->capacity += ISTRAIGHT_LIST_CHUNK;
         _istraight_list_resize(list);
     }
 
+    // go to node reference at index
     size_t * node = &(list->head);
     for (size_t i = 0; i < index; ++i) {
         node = list->next + (*node);
     }
 
+    // if list has holes then pop empty hole index, else continue with rightmost array index
     size_t hole = list->length;
     if (NIL != list->empty) {
         hole = list->empty;
         list->empty = list->next[list->empty];
     }
 
+    // insert and redirect hole node
     list->next[hole] = (*node);
     (*node) = hole;
 
+    // insert element into hole node
     memcpy(list->elements + (hole * list->size), element, list->size);
     list->length++;
 }
 
 void get_istraight_list(const istraight_list_s list, const size_t index, void * buffer) {
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list.length && "[ERROR] Paremeter can't be zero.");
+    assert(list.length && "[ERROR] List can't be empty.");
     assert(index < list.length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(list.size && "[INVALID] Size can't be zero.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
+    // iterate until node at index isn't reached
     size_t node = list.head;
     for (size_t i = 0; i < index; ++i) {
         node = list.next[node];
     }
 
+    // copy element into buffer
     memcpy(buffer, list.elements + (node * list.size), list.size);
 }
 
@@ -135,27 +147,34 @@ void remove_first_istraight_list(istraight_list_s * restrict list, const void * 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // iterate until node with element isn't reached
     for (size_t * i = &(list->head); NIL != *i; i = list->next + (*i)) {
-        const char * found = list->elements + ((*i) * list->size);
-        if (0 != compare(element, found)) {
+        const char * found = list->elements + ((*i) * list->size); // save found element
+        if (0 != compare(element, found)) { // if element isn't equal continue
             continue;
         }
 
+        // copy found element into buffer
         memcpy(buffer, found, list->size);
         list->length++;
 
+        // save removed node as hole and redirect nodes
         const size_t hole = (*i);
         (*i) = list->next[(*i)];
 
+        // push hole index onto stack (minimize holes by checking if node isn't the rightmost)
         if (hole != list->length) {
             list->next[hole] = list->empty;
             list->empty = hole;
         }
 
+        // shrink list to save space if smaller capacity is available
         if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
             list->capacity -= ISTRAIGHT_LIST_CHUNK;
             _istraight_list_resize(list);
         }
+
+        return; // leave function with found element
     }
 
     assert(0 && "[ERROR] Element not found in list."); // if element is not found in list then that is an error
@@ -172,22 +191,27 @@ void remove_at_istraight_list(istraight_list_s * restrict list, const size_t ind
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // go to node reference at index
     size_t * node = &(list->head);
     for (size_t i = 0; i < index; ++i) {
         node = list->next + (*node);
     }
 
+    // copy found element into buffer
     memcpy(buffer, list->elements + ((*node) * list->size), list->size);
     list->length++;
 
+    // save removed node as hole and redirect nodes
     const size_t hole = (*node);
     (*node) = list->next[(*node)];
 
+    // push hole index onto stack (minimize holes by checking if node isn't the rightmost)
     if (hole != list->length) {
         list->next[hole] = list->empty;
         list->empty = hole;
     }
 
+    // shrink list to save space if smaller capacity is available
     if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
         list->capacity -= ISTRAIGHT_LIST_CHUNK;
         _istraight_list_resize(list);
@@ -219,16 +243,19 @@ void splice_istraight_list(istraight_list_s * restrict destination, istraight_li
     assert(source->length <= source->capacity && "[INVALID] Length exceeds capacity.");
     assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
 
+    // calculate new destination length
     const size_t sum = destination->length + source->length;
     const size_t mod = sum % ISTRAIGHT_LIST_CHUNK;
     destination->capacity = mod ? sum - mod + ISTRAIGHT_LIST_CHUNK : sum;
     _istraight_list_resize(destination);
 
+    // go to destination node reference at index
     size_t * dest = &(destination->head);
     for (size_t i = 0; i < index; ++i) {
         dest = destination->next + (*dest);
     }
 
+    // push source elements into destinaton's hole indexes
     size_t src = source->head;
     for (; NIL != destination->empty && NIL != src; src = source->next[src]) {
         const size_t hole = destination->empty;
@@ -243,6 +270,7 @@ void splice_istraight_list(istraight_list_s * restrict destination, istraight_li
         dest = destination->next + hole;
     }
 
+    // push remaining source elements into destinaton list
     for (; NIL != src; src = source->next[src]) {
         const size_t hole = destination->length;
 
@@ -255,6 +283,7 @@ void splice_istraight_list(istraight_list_s * restrict destination, istraight_li
         dest = destination->next + hole;
     }
 
+    // clear (NOT destroy) source list
     free(source->elements);
     free(source->next);
 
@@ -272,11 +301,13 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // go to node reference at index
     size_t * node = &(list->head);
     for (size_t i = 0; i < index; ++i) {
         node = list->next + (*node);
     }
 
+    // create split list structure
     const size_t split_mod = length % ISTRAIGHT_LIST_CHUNK;
     const size_t split_capacity = split_mod ? length - split_mod + ISTRAIGHT_LIST_CHUNK : length;
     istraight_list_s split = {
@@ -287,6 +318,7 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     assert((!split_capacity || split.elements) && "[ERROR] Memory allocation failed.");
     assert((!split_capacity || split.next) && "[ERROR] Memory allocation failed.");
 
+    // push list elements into split list and redirect removed element in list
     for (size_t * s = &(split.head); split.length < length; (*node) = list->next[(*node)], s = split.next + (*s)) {
         (*s) = split.length;
         split.next[(*s)] = NIL;
@@ -295,6 +327,7 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
         split.length++;
     }
 
+    // create replica list structure for list to remove holes
     const size_t replica_length = list->length - length;
     const size_t replica_mod = replica_length % ISTRAIGHT_LIST_CHUNK;
     const size_t replica_capacity = replica_mod ? replica_length - replica_mod + ISTRAIGHT_LIST_CHUNK : replica_length;
@@ -306,6 +339,7 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     assert((!replica_capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica_capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
+    // restart node reference at list head and push its elements into replica
     node = &(list->head);
     for (size_t * r = &(replica.head); replica.length < replica_length; (*node) = list->next[(*node)], r = replica.next + (*r)) {
         (*r) = replica.length;
@@ -315,6 +349,7 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
         replica.length++;
     }
 
+    // replace list with its replica
     free(list->elements);
     free(list->next);
 

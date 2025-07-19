@@ -178,6 +178,8 @@ void remove_first_idouble_list(idouble_list_s * restrict list, const void * rest
             list->capacity -= IDOUBLE_LIST_CHUNK;
             _idouble_list_resize(list);
         }
+
+        return;
     }
 
     assert(false && "[ERROR] Element not found in list.");
@@ -221,6 +223,8 @@ void remove_last_idouble_list(idouble_list_s * restrict list, const void * restr
             list->capacity -= IDOUBLE_LIST_CHUNK;
             _idouble_list_resize(list);
         }
+
+        return;
     }
 
     assert(false && "[ERROR] Element not found in list.");

@@ -208,6 +208,8 @@ void remove_first_icircular_list(icircular_list_s * restrict list, const void * 
             list->capacity -= ICIRCULAR_LIST_CHUNK;
             _icircular_list_resize(list);
         }
+
+        return; // leave function with found element
     }
 
     assert(0 && "[ERROR] Element not found in list."); // if element is not found in list then that is an error
@@ -393,14 +395,14 @@ icircular_list_s split_icircular_list(icircular_list_s * list, const size_t inde
     const size_t split_mod = length % ICIRCULAR_LIST_CHUNK;
     const size_t split_capacity = split_mod ? length - split_mod + ICIRCULAR_LIST_CHUNK : length;
     icircular_list_s split = {
-        .capacity = split_capacity, .empty = NIL, .tail = 0, .length = length, .size = list->size,
+        .capacity = split_capacity, .empty = NIL, .tail = 0, .length = 0, .size = list->size,
         .elements = malloc(split_capacity * list->size), .next = malloc(split_capacity * sizeof(size_t)),
     };
     assert((!split_capacity || split.elements) && "[ERROR] Memory allocation failed.");
     assert((!split_capacity || split.next) && "[ERROR] Memory allocation failed.");
 
     // copy list elements into split list starting from index node (also redirect list's removed nodes)
-    for (size_t * s = &(split.tail); split.length < length; previous = list->next[previous], s = split.next + (*s)) {
+    for (size_t * s = &(split.tail); split.length < length; s = split.next + (*s)) {
         const size_t current = list->next[previous]; // save current node index
 
         list->next[previous] = list->next[current]; // redirect removed node
