@@ -299,7 +299,7 @@ void shift_next_icircular_list(icircular_list_s * list, const size_t shift) {
 void splice_icircular_list(icircular_list_s * restrict destination, icircular_list_s * restrict source, const size_t index) {
     assert(destination && "[ERROR] Paremeter can't be NULL.");
     assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index < destination->length && "[ERROR] Paremeter can't be greater than length.");
+    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(destination->size && "[INVALID] Size can't be zero.");
     assert(!(destination->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
@@ -308,6 +308,8 @@ void splice_icircular_list(icircular_list_s * restrict destination, icircular_li
     assert(!(source->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(source->length <= source->capacity && "[INVALID] Length exceeds capacity.");
     assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
+
+    const size_t dest_length = destination->length;
 
     const size_t sum = destination->length + source->length;
     const size_t mod = sum % ICIRCULAR_LIST_CHUNK;
@@ -362,7 +364,7 @@ void splice_icircular_list(icircular_list_s * restrict destination, icircular_li
     }
 
     // if index points to last/tail node (elemetn were appended), change tail to last added source node
-    if (index == destination->tail) {
+    if (index == dest_length) {
         destination->tail = dest_prev;
     }
 

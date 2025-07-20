@@ -33,3 +33,26 @@ void sort(void * array, const size_t length, void * compare) {
     struct compare const * cmp = compare;
     qsort(array, length, sizeof(test_t), cmp->compare_element);
 }
+
+bool odd(const void * element, void * nil) {
+    (void)(nil);
+    return (*(test_t*)element) % 2;
+}
+
+bool even(const void * element, void * nil) {
+    (void)(nil);
+    return !((*(test_t*)element) % 2);
+}
+
+bool prime(const void * element, void * nil) {
+    (void)(nil);
+
+    const test_t number = (*(test_t*)element);
+    for (int i = 2; i < number; i++) {
+        if (number % i == 0 && i != number) {
+            return false;
+        }
+    }
+
+    return number > 1;
+}

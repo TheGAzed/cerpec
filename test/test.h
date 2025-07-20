@@ -14,6 +14,9 @@ void destroy(void * element);
 bool increment(void * element, void * value);
 bool print(void * element, void * format);
 void sort(void * array, const size_t length, void * compare);
+bool odd(const void * element, void * nil);
+bool even(const void * element, void * nil);
+bool prime(const void * element, void * nil);
 
 int compare(const void * a, const void * b);
 int compare_reverse(const void * a, const void * b);

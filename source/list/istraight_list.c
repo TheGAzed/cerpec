@@ -235,7 +235,7 @@ void reverse_istraight_list(istraight_list_s * list) {
 void splice_istraight_list(istraight_list_s * restrict destination, istraight_list_s * restrict source, const size_t index) {
     assert(destination && "[ERROR] Paremeter can't be NULL.");
     assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index < destination->length && "[ERROR] Paremeter can't be greater than length.");
+    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(destination->size && "[INVALID] Size can't be zero.");
     assert(destination->length <= destination->capacity && "[INVALID] Length exceeds capacity.");
@@ -311,7 +311,8 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     const size_t split_mod = length % ISTRAIGHT_LIST_CHUNK;
     const size_t split_capacity = split_mod ? length - split_mod + ISTRAIGHT_LIST_CHUNK : length;
     istraight_list_s split = {
-        .capacity = split_capacity, .empty = NIL, .head = NIL, .length = 0, .size = list->size,
+        .capacity = split_capacity, .empty = NIL, .head = NIL, .size = list->size,
+
         .elements = malloc(split_capacity * list->size),
         .next = malloc(split_capacity * sizeof(size_t)),
     };
@@ -332,7 +333,8 @@ istraight_list_s split_istraight_list(istraight_list_s * list, const size_t inde
     const size_t replica_mod = replica_length % ISTRAIGHT_LIST_CHUNK;
     const size_t replica_capacity = replica_mod ? replica_length - replica_mod + ISTRAIGHT_LIST_CHUNK : replica_length;
     istraight_list_s replica = {
-        .capacity = replica_capacity, .empty = NIL, .head = NIL, .length = 0, .size = list->size,
+        .capacity = replica_capacity, .empty = NIL, .head = NIL, .size = list->size,
+
         .elements = malloc(replica_capacity * list->size),
         .next = malloc(replica_capacity * sizeof(size_t)),
     };

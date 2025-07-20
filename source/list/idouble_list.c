@@ -46,7 +46,7 @@ void clear_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
     free(list->node[IDOUBLE_LIST_NEXT]);
     free(list->node[IDOUBLE_LIST_PREV]);
 
-    list->node[IDOUBLE_LIST_NEXT] = list->node[IDOUBLE_LIST_NEXT] = NULL;
+    list->node[IDOUBLE_LIST_NEXT] = list->node[IDOUBLE_LIST_PREV] = NULL;
     list->elements = NULL;
     list->capacity = list->head = 0;
 }
@@ -313,7 +313,7 @@ void shift_prev_idouble_list(idouble_list_s * list, const size_t shift) {
 void splice_idouble_list(idouble_list_s * restrict destination, idouble_list_s * restrict source, const size_t index) {
     assert(destination && "[ERROR] Paremeter can't be NULL.");
     assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index < destination->length && "[ERROR] Paremeter can't be greater than length.");
+    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
     assert(destination != source && "[ERROR] Paremeters can't be the same.");
 
     assert(destination->size && "[INVALID] Size can't be zero.");
@@ -349,7 +349,7 @@ void splice_idouble_list(idouble_list_s * restrict destination, idouble_list_s *
         const size_t last_destination  = destination->node[IDOUBLE_LIST_PREV][current];
 
         const size_t first_source = source->head + destination->length;
-        const size_t last_source  = source->node[IDOUBLE_LIST_PREV][source->head] + destination->size;
+        const size_t last_source  = source->node[IDOUBLE_LIST_PREV][source->head] + destination->length;
 
         destination->node[IDOUBLE_LIST_NEXT][last_destination] = first_source;
         destination->node[IDOUBLE_LIST_PREV][first_source] = last_destination;
@@ -369,9 +369,9 @@ void splice_idouble_list(idouble_list_s * restrict destination, idouble_list_s *
     free(source->elements);
     free(source->node[IDOUBLE_LIST_NEXT]);
     free(source->node[IDOUBLE_LIST_PREV]);
-    source->node[IDOUBLE_LIST_NEXT] = source->node[IDOUBLE_LIST_NEXT] = NULL;
+    source->node[IDOUBLE_LIST_NEXT] = source->node[IDOUBLE_LIST_PREV] = NULL;
     source->elements = NULL;
-    source->capacity = source->head = 0;
+    source->length = source->capacity = source->head = 0;
 }
 
 idouble_list_s split_idouble_list(idouble_list_s * list, const size_t index, const size_t length) {
@@ -397,7 +397,7 @@ idouble_list_s split_idouble_list(idouble_list_s * list, const size_t index, con
         .node[IDOUBLE_LIST_NEXT] = malloc(split_capacity * sizeof(size_t)),
         .node[IDOUBLE_LIST_PREV] = malloc(split_capacity * sizeof(size_t)),
 
-        .head = 0, .size = list->size, .length = 0
+        .head = 0, .size = list->size, .length = 0, .capacity = split_capacity,
     };
     assert((!split.capacity || split.elements) && "[ERROR] Memory allocation failed.");
     assert((!split.capacity || split.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
@@ -551,9 +551,9 @@ void _idouble_list_resize(idouble_list_s * list) {
     list->node[IDOUBLE_LIST_NEXT] = realloc(list->node[IDOUBLE_LIST_NEXT], list->capacity * sizeof(size_t));
     list->node[IDOUBLE_LIST_PREV] = realloc(list->node[IDOUBLE_LIST_PREV], list->capacity * sizeof(size_t));
 
-    assert(list->elements && "[ERROR] Memory allocation failed.");
-    assert(list->node[IDOUBLE_LIST_NEXT] && "[ERROR] Memory allocation failed.");
-    assert(list->node[IDOUBLE_LIST_PREV] && "[ERROR] Memory allocation failed.");
+    assert((!list->capacity || list->elements) && "[ERROR] Memory allocation failed.");
+    assert((!list->capacity || list->node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
+    assert((!list->capacity || list->node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
 }
 
 void _idouble_list_fill_hole(idouble_list_s * list, const size_t hole) {
