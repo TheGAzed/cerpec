@@ -156,7 +156,7 @@ void remove_first_istraight_list(istraight_list_s * restrict list, const void * 
 
         // copy found element into buffer
         memcpy(buffer, found, list->size);
-        list->length++;
+        list->length--;
 
         // save removed node as hole and redirect nodes
         const size_t hole = (*i);
@@ -199,7 +199,7 @@ void remove_at_istraight_list(istraight_list_s * restrict list, const size_t ind
 
     // copy found element into buffer
     memcpy(buffer, list->elements + ((*node) * list->size), list->size);
-    list->length++;
+    list->length--;
 
     // save removed node as hole and redirect nodes
     const size_t hole = (*node);

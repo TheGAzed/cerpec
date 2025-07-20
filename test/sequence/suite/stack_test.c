@@ -2,11 +2,11 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.capacity);
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", sizeof(test_t), test.size);
+    ASSERT_EQm("[ERROR] Expected capacity to be zero.", sizeof(int), test.size);
     ASSERT_NEQm("[ERROR] Expected capacity to be zero.", 0, test.size);
     ASSERT_EQm("[ERROR] Expected capacity to be NULL.", NULL, test.elements);
 
@@ -16,13 +16,13 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
     destroy_istack(&test, destroy);
 
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.capacity);
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.length);
-    ASSERT_NEQm("[ERROR] Expected capacity to be zero.", sizeof(test_t), test.size);
+    ASSERT_NEQm("[ERROR] Expected capacity to be zero.", sizeof(int), test.size);
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.size);
     ASSERT_EQm("[ERROR] Expected capacity to be NULL.", NULL, test.elements);
 
@@ -30,12 +30,12 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
     clear_istack(&test, destroy);
 
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", sizeof(test_t), test.size);
+    ASSERT_EQm("[ERROR] Expected capacity to be zero.", sizeof(int), test.size);
     ASSERT_NEQm("[ERROR] Expected capacity to be zero.", 0, test.size);
 
     destroy_istack(&test, destroy);
@@ -44,9 +44,9 @@ TEST CLEAR_01(void) {
 }
 
 TEST PUSH_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK - 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
     }
 
@@ -56,9 +56,9 @@ TEST PUSH_01(void) {
 }
 
 TEST PUSH_02(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
     }
 
@@ -68,9 +68,9 @@ TEST PUSH_02(void) {
 }
 
 TEST PUSH_03(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK + 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
     }
 
@@ -80,12 +80,12 @@ TEST PUSH_03(void) {
 }
 
 TEST PEEP_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK - 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peep_istack(test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -96,12 +96,12 @@ TEST PEEP_01(void) {
 }
 
 TEST PEEP_02(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peep_istack(test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -112,12 +112,12 @@ TEST PEEP_02(void) {
 }
 
 TEST PEEP_03(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK + 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peep_istack(test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -128,14 +128,14 @@ TEST PEEP_03(void) {
 }
 
 TEST POP_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK - 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
     }
 
-    for (test_t i = ISTACK_CHUNK - 2; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -146,14 +146,14 @@ TEST POP_01(void) {
 }
 
 TEST POP_02(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
     }
 
-    for (test_t i = ISTACK_CHUNK - 1; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -164,14 +164,14 @@ TEST POP_02(void) {
 }
 
 TEST POP_03(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK + 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
     }
 
-    for (test_t i = ISTACK_CHUNK; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -182,17 +182,17 @@ TEST POP_03(void) {
 }
 
 TEST FOREACH_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK - 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_istack(test, increment, &value);
 
-    for (test_t i = ISTACK_CHUNK - 2; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -203,17 +203,17 @@ TEST FOREACH_01(void) {
 }
 
 TEST FOREACH_02(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_istack(test, increment, &value);
 
-    for (test_t i = ISTACK_CHUNK - 1; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -224,17 +224,17 @@ TEST FOREACH_02(void) {
 }
 
 TEST FOREACH_03(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK + 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_istack(test, increment, &value);
 
-    for (test_t i = ISTACK_CHUNK; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -245,17 +245,17 @@ TEST FOREACH_03(void) {
 }
 
 TEST MAP_01(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK - 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
     }
 
     struct compare cmp = { .compare_element = compare, };
     map_istack(test, sort, &cmp);
 
-    for (test_t i = ISTACK_CHUNK - 2; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -266,17 +266,17 @@ TEST MAP_01(void) {
 }
 
 TEST MAP_02(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
     }
 
     struct compare cmp = { .compare_element = compare, };
     map_istack(test, sort, &cmp);
 
-    for (test_t i = ISTACK_CHUNK - 1; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -287,17 +287,17 @@ TEST MAP_02(void) {
 }
 
 TEST MAP_03(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK + 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
     }
 
     struct compare cmp = { .compare_element = compare, };
     map_istack(test, sort, &cmp);
 
-    for (test_t i = ISTACK_CHUNK; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = ISTACK_CHUNK; i >= 0; --i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -308,17 +308,17 @@ TEST MAP_03(void) {
 }
 
 TEST MAP_04(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK - 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
     map_istack(test, sort, &cmp);
 
-    for (test_t i = 0; i < ISTACK_CHUNK - 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -329,17 +329,17 @@ TEST MAP_04(void) {
 }
 
 TEST MAP_05(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
     map_istack(test, sort, &cmp);
 
-    for (test_t i = 0; i < ISTACK_CHUNK; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
@@ -350,17 +350,17 @@ TEST MAP_05(void) {
 }
 
 TEST MAP_06(void) {
-    istack_s test = create_istack(sizeof(test_t));
+    istack_s test = create_istack(sizeof(int));
 
-    for (test_t i = 0; i < ISTACK_CHUNK + 1; ++i) {
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
     map_istack(test, sort, &cmp);
 
-    for (test_t i = 0; i < ISTACK_CHUNK + 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
+        int a = 0;
         pop_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }

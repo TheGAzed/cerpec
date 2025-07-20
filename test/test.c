@@ -7,23 +7,28 @@ void destroy(void * element) {
     (void)(element);
 }
 
+void * copy(void * destination, const void * source) {
+    (*(int*)destination) = (*(int*)source);
+    return destination;
+}
+
 int compare(const void * a, const void * b) {
-    return (*(test_t*)(a)) - (*(test_t*)(b));
+    return (*(int*)(a)) - (*(int*)(b));
 }
 
 int compare_reverse(const void * a, const void * b) {
-    return (*(test_t*)(b)) - (*(test_t*)(a));
+    return (*(int*)(b)) - (*(int*)(a));
 }
 
 bool increment(void * element, void * value) {
-    test_t * e = element, * v = value;
+    int * e = element, * v = value;
     (*e) += (*v);
 
     return true;
 }
 
 bool print(void * element, void * format) {
-    printf(format, (*(test_t*)element));
+    printf(format, (*(int*)element));
     (void)(element); (void)(format);
 
     return true;
@@ -31,23 +36,23 @@ bool print(void * element, void * format) {
 
 void sort(void * array, const size_t length, void * compare) {
     struct compare const * cmp = compare;
-    qsort(array, length, sizeof(test_t), cmp->compare_element);
+    qsort(array, length, sizeof(int), cmp->compare_element);
 }
 
 bool odd(const void * element, void * nil) {
     (void)(nil);
-    return (*(test_t*)element) % 2;
+    return (*(int*)element) % 2;
 }
 
 bool even(const void * element, void * nil) {
     (void)(nil);
-    return !((*(test_t*)element) % 2);
+    return !((*(int*)element) % 2);
 }
 
 bool prime(const void * element, void * nil) {
     (void)(nil);
 
-    const test_t number = (*(test_t*)element);
+    const int number = (*(int*)element);
     for (int i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
             return false;

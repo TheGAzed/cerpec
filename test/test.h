@@ -4,13 +4,12 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef int test_t;
-
 struct compare {
     int (*compare_element)(const void *, const void *);
 };
 
 void destroy(void * element);
+void * copy(void * destination, const void * source);
 bool increment(void * element, void * value);
 bool print(void * element, void * format);
 void sort(void * array, const size_t length, void * compare);

@@ -71,8 +71,8 @@ idouble_list_s copy_idouble_list(const idouble_list_s list, const copy_fn copy) 
     for (size_t i = 0; i < list.length; ++i) {
         copy(replica.elements + (i * replica.size), list.elements + (i * list.size));
     }
-    memcpy(replica.node[IDOUBLE_LIST_NEXT], list.node[IDOUBLE_LIST_NEXT], list.length * list.size);
-    memcpy(replica.node[IDOUBLE_LIST_PREV], list.node[IDOUBLE_LIST_PREV], list.length * list.size);
+    memcpy(replica.node[IDOUBLE_LIST_NEXT], list.node[IDOUBLE_LIST_NEXT], list.length * sizeof(size_t));
+    memcpy(replica.node[IDOUBLE_LIST_PREV], list.node[IDOUBLE_LIST_PREV], list.length * sizeof(size_t));
 
     return replica;
 }

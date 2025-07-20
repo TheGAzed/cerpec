@@ -2,10 +2,10 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
     ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(test_t), test.size);
+    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
     ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
     ASSERT_EQm("[ERROR] Expected head to be NULL.", NULL, test.head);
 
@@ -15,12 +15,12 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
     destroy_ideque(&test, destroy);
 
     ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_NEQm("[ERROR] Expected size to be zero.", sizeof(test_t), test.size);
+    ASSERT_NEQm("[ERROR] Expected size to be zero.", sizeof(int), test.size);
     ASSERT_EQm("[ERROR] Expected size to be zero.", 0, test.size);
     ASSERT_EQm("[ERROR] Expected head to be NULL.", NULL, test.head);
 
@@ -28,12 +28,12 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
     clear_ideque(&test, destroy);
 
     ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(test_t), test.size);
+    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
     ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
 
     destroy_ideque(&test, destroy);
@@ -42,9 +42,9 @@ TEST CLEAR_01(void) {
 }
 
 TEST ENQUEUE_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
@@ -54,9 +54,9 @@ TEST ENQUEUE_FRONT_01(void) {
 }
 
 TEST ENQUEUE_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
@@ -66,9 +66,9 @@ TEST ENQUEUE_FRONT_02(void) {
 }
 
 TEST ENQUEUE_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
@@ -78,9 +78,9 @@ TEST ENQUEUE_FRONT_03(void) {
 }
 
 TEST ENQUEUE_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
@@ -90,9 +90,9 @@ TEST ENQUEUE_BACK_01(void) {
 }
 
 TEST ENQUEUE_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
@@ -102,9 +102,9 @@ TEST ENQUEUE_BACK_02(void) {
 }
 
 TEST ENQUEUE_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
@@ -114,12 +114,12 @@ TEST ENQUEUE_BACK_03(void) {
 }
 
 TEST PEEK_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_front_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
@@ -130,12 +130,12 @@ TEST PEEK_FRONT_01(void) {
 }
 
 TEST PEEK_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_front_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
@@ -146,12 +146,12 @@ TEST PEEK_FRONT_02(void) {
 }
 
 TEST PEEK_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_front_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
@@ -162,12 +162,12 @@ TEST PEEK_FRONT_03(void) {
 }
 
 TEST PEEK_FRONT_04(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_front_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
@@ -178,12 +178,12 @@ TEST PEEK_FRONT_04(void) {
 }
 
 TEST PEEK_FRONT_05(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_front_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
@@ -194,12 +194,12 @@ TEST PEEK_FRONT_05(void) {
 }
 
 TEST PEEK_FRONT_06(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_front_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
@@ -210,12 +210,12 @@ TEST PEEK_FRONT_06(void) {
 }
 
 TEST PEEK_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_back_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
@@ -226,12 +226,12 @@ TEST PEEK_BACK_01(void) {
 }
 
 TEST PEEK_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_back_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
@@ -242,12 +242,12 @@ TEST PEEK_BACK_02(void) {
 }
 
 TEST PEEK_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_back_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
@@ -258,12 +258,12 @@ TEST PEEK_BACK_03(void) {
 }
 
 TEST PEEK_BACK_04(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_back_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
@@ -274,12 +274,12 @@ TEST PEEK_BACK_04(void) {
 }
 
 TEST PEEK_BACK_05(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_back_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
@@ -290,12 +290,12 @@ TEST PEEK_BACK_05(void) {
 }
 
 TEST PEEK_BACK_06(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
 
-        test_t a = 0;
+        int a = 0;
         peek_back_ideque(test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
@@ -306,15 +306,15 @@ TEST PEEK_BACK_06(void) {
 }
 
 TEST DEQUEUE_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    for (test_t i = IDEQUE_CHUNK - 2; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = IDEQUE_CHUNK - 2; i >= 0; --i) {
+        int a = 0;
         dequeue_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -325,15 +325,15 @@ TEST DEQUEUE_FRONT_01(void) {
 }
 
 TEST DEQUEUE_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    for (test_t i = IDEQUE_CHUNK - 1; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = IDEQUE_CHUNK - 1; i >= 0; --i) {
+        int a = 0;
         dequeue_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -344,15 +344,15 @@ TEST DEQUEUE_FRONT_02(void) {
 }
 
 TEST DEQUEUE_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    for (test_t i = IDEQUE_CHUNK; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = IDEQUE_CHUNK; i >= 0; --i) {
+        int a = 0;
         dequeue_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -363,15 +363,15 @@ TEST DEQUEUE_FRONT_03(void) {
 }
 
 TEST DEQUEUE_FRONT_04(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        int a = 0;
         dequeue_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -382,15 +382,15 @@ TEST DEQUEUE_FRONT_04(void) {
 }
 
 TEST DEQUEUE_FRONT_05(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        int a = 0;
         dequeue_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -401,15 +401,15 @@ TEST DEQUEUE_FRONT_05(void) {
 }
 
 TEST DEQUEUE_FRONT_06(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        int a = 0;
         dequeue_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -420,15 +420,15 @@ TEST DEQUEUE_FRONT_06(void) {
 }
 
 TEST DEQUEUE_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -439,15 +439,15 @@ TEST DEQUEUE_BACK_01(void) {
 }
 
 TEST DEQUEUE_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -458,15 +458,15 @@ TEST DEQUEUE_BACK_02(void) {
 }
 
 TEST DEQUEUE_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -477,15 +477,15 @@ TEST DEQUEUE_BACK_03(void) {
 }
 
 TEST DEQUEUE_BACK_04(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
-    for (test_t i = IDEQUE_CHUNK - 2; i >= 0; --i) {
-        test_t a = 0;
+    for (int i = IDEQUE_CHUNK - 2; i >= 0; --i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -496,15 +496,15 @@ TEST DEQUEUE_BACK_04(void) {
 }
 
 TEST DEQUEUE_BACK_05(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
-    for (test_t i = IDEQUE_CHUNK - 1; i >= 0; --i)  {
-        test_t a = 0;
+    for (int i = IDEQUE_CHUNK - 1; i >= 0; --i)  {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -515,15 +515,15 @@ TEST DEQUEUE_BACK_05(void) {
 }
 
 TEST DEQUEUE_BACK_06(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
     }
 
-    for (test_t i = IDEQUE_CHUNK; i >= 0; --i)  {
-        test_t a = 0;
+    for (int i = IDEQUE_CHUNK; i >= 0; --i)  {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
     }
@@ -534,17 +534,17 @@ TEST DEQUEUE_BACK_06(void) {
 }
 
 TEST FOREACH_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_front_ideque(test, increment, &value);
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -555,17 +555,17 @@ TEST FOREACH_FRONT_01(void) {
 }
 
 TEST FOREACH_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_front_ideque(test, increment, &value);
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -576,17 +576,17 @@ TEST FOREACH_FRONT_02(void) {
 }
 
 TEST FOREACH_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_front_ideque(test, increment, &value);
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -597,17 +597,17 @@ TEST FOREACH_FRONT_03(void) {
 }
 
 TEST FOREACH_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_back_ideque(test, increment, &value);
 
-    for (test_t i = 0; i < IDEQUE_CHUNK - 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -618,17 +618,17 @@ TEST FOREACH_BACK_01(void) {
 }
 
 TEST FOREACH_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_back_ideque(test, increment, &value);
 
-    for (test_t i = 0; i < IDEQUE_CHUNK; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
@@ -639,17 +639,17 @@ TEST FOREACH_BACK_02(void) {
 }
 
 TEST FOREACH_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(test_t));
+    ideque_s test = create_ideque(sizeof(int));
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
     }
 
-    test_t value = 1;
+    int value = 1;
     foreach_back_ideque(test, increment, &value);
 
-    for (test_t i = 0; i < IDEQUE_CHUNK + 1; ++i) {
-        test_t a = 0;
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }

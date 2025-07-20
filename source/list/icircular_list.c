@@ -71,8 +71,8 @@ icircular_list_s copy_icircular_list(const icircular_list_s list, const copy_fn 
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     // for each element in list copy it into the replica while keeping circularity and making replica hole-less
-    for (size_t i = 0, l = list.tail, * r = &(replica.tail); i < list.length; ++i, l = list.next[l], r = replica.next + (*r)) {
-        (*r) = i;
+    for (size_t l = list.tail, * r = &(replica.tail); replica.length < list.length; l = list.next[l], r = replica.next + (*r)) {
+        (*r) = replica.length++;
         replica.next[(*r)] = replica.tail;
 
         copy(replica.elements + ((*r) * replica.size), list.elements + (l * list.size));
