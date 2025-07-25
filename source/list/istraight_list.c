@@ -464,7 +464,10 @@ void _istraight_list_resize(istraight_list_s * list) {
     free(list->elements);
     list->elements = elements;
 
-    for (size_t i = 0, * current = &(list->head); i < list->length; ++i, current = list->next + i) {
+    list->next = realloc(list->next, list->capacity * sizeof(size_t));
+    assert((!list->capacity || list->next) && "[ERROR] Memory allocation failed.");
+
+    for (size_t i = 0, * current = &(list->head); i < list->length; current = list->next + i, i++) {
         (*current) = i;
         list->next[i] = NIL;
     }

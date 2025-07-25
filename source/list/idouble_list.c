@@ -408,7 +408,7 @@ idouble_list_s split_idouble_list(idouble_list_s * list, const size_t index, con
     while (split.length < length) {
         (*split_current) = split.length; // set head and next nodes to next index
         split.node[IDOUBLE_LIST_PREV][split.length] = split.length - 1; // set previous node indexes to one minus current
-        split.node[IDOUBLE_LIST_PREV][0] = length; // set first node's prev to last element in list
+        split.node[IDOUBLE_LIST_PREV][0] = length - 1; // set first node's prev to last element in list
 
         memcpy(split.elements + (split.length * split.size), list->elements + (current * list->size), list->size);
         split.length++;
@@ -450,7 +450,8 @@ idouble_list_s extract_idouble_list(idouble_list_s * list, const filter_fn filte
     idouble_list_s positive = { .size = list->size, };
 
     size_t * pos = &(positive.head);
-    for (size_t i = 0, current = list->head; i < list->length; ++i) {
+    const size_t length = list->length; // list length may change
+    for (size_t i = 0, current = list->head; i < length; ++i) {
         const char * element = list->elements + (current * list->size);
 
         if (!filter(element, arguments)) { // if no extraction go to next list node and continue

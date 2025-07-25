@@ -8,3 +8,4 @@ add_library(TEST test.c)
 target_include_directories(TEST PUBLIC .)
 
 add_subdirectory(sequence)
+add_subdirectory(list)

@@ -65,7 +65,7 @@ icircular_list_s copy_icircular_list(const icircular_list_s list, const copy_fn 
     icircular_list_s replica = {
         .empty = NIL, .size = list.size, .capacity = list.capacity, .tail = 0, .length = 0,
         .elements = malloc(list.capacity * list.size),
-        .next = malloc(list.capacity * list.size),
+        .next = malloc(list.capacity * sizeof(size_t)),
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
@@ -578,7 +578,10 @@ void _icircular_list_resize(icircular_list_s * list) {
     free(list->elements);
     list->elements = elements;
 
-    for (size_t i = 0, * current = &(list->tail); i < list->length; ++i, current = list->next + i) {
+    list->next = realloc(list->next, list->capacity * sizeof(size_t));
+    assert((!list->capacity || list->next) && "[ERROR] Memory allocation failed.");
+
+    for (size_t i = 0, * current = &(list->tail); i < list->length; current = list->next + i, i++) {
         (*current) = i;
         list->next[i] = list->tail;
     }
