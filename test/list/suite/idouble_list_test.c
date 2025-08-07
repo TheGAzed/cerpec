@@ -396,6 +396,132 @@ TEST REVERSE_03(void) {
     PASS();
 }
 
+TEST SHIFT_NEXT_01(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        int t = 0;
+        get_idouble_list(test, 0, &t);
+        ASSERT_EQ(i, t);
+
+        shift_next_idouble_list(&test, 1);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST SHIFT_NEXT_02(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        int t = 0;
+        get_idouble_list(test, 0, &t);
+        ASSERT_EQ(i, t);
+
+        shift_next_idouble_list(&test, 1);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST SHIFT_NEXT_03(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        int t = 0;
+        get_idouble_list(test, 0, &t);
+        ASSERT_EQ(i, t);
+
+        shift_next_idouble_list(&test, 1);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST SHIFT_PREV_01(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        shift_prev_idouble_list(&test, 1);
+
+        int t = 0;
+        get_idouble_list(test, 0, &t);
+        ASSERT_EQ(IDOUBLE_LIST_CHUNK - 1 - 1 - i, t);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST SHIFT_PREV_02(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        shift_prev_idouble_list(&test, 1);
+
+        int t = 0;
+        get_idouble_list(test, 0, &t);
+        ASSERT_EQ(IDOUBLE_LIST_CHUNK - 1 - i, t);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST SHIFT_PREV_03(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        shift_prev_idouble_list(&test, 1);
+
+        int t = 0;
+        get_idouble_list(test, 0, &t);
+        ASSERT_EQ(IDOUBLE_LIST_CHUNK + 1 - 1 - i, t);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
 TEST SPLICE_01(void) {
     idouble_list_s one = create_idouble_list(sizeof(int));
     idouble_list_s two = create_idouble_list(sizeof(int));
@@ -768,6 +894,8 @@ SUITE (idouble_list_test) {
     RUN_TEST(REMOVE_FIRST_01); RUN_TEST(REMOVE_FIRST_02); RUN_TEST(REMOVE_FIRST_03);
     RUN_TEST(REMOVE_AT_01); RUN_TEST(REMOVE_AT_02); RUN_TEST(REMOVE_AT_03);
     RUN_TEST(REVERSE_01); RUN_TEST(REVERSE_02); RUN_TEST(REVERSE_03);
+    RUN_TEST(SHIFT_NEXT_01); RUN_TEST(SHIFT_NEXT_02); RUN_TEST(SHIFT_NEXT_03);
+    RUN_TEST(SHIFT_PREV_01); RUN_TEST(SHIFT_PREV_02); RUN_TEST(SHIFT_PREV_03);
     RUN_TEST(SPLICE_01); RUN_TEST(SPLICE_02); RUN_TEST(SPLICE_03);
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02); RUN_TEST(SPLIT_03);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02); RUN_TEST(EXTRACT_03);

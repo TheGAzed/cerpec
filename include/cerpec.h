@@ -11,6 +11,7 @@
 
 typedef void   (*destroy_fn) (void * element);
 typedef void * (*copy_fn)    (void * destination, const void * source);
+typedef size_t (*hash_fn)    (const void * element);
 typedef int    (*compare_fn) (const void * a, const void * b);
 typedef bool   (*filter_fn)  (const void * element, void * arguments);
 typedef bool   (*operate_fn) (void * element, void * arguments);

@@ -399,6 +399,69 @@ TEST REVERSE_03(void) {
     PASS();
 }
 
+TEST SHIFT_NEXT_01(void) {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
+        insert_at_icircular_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
+        int t = 0;
+        get_icircular_list(test, 0, &t);
+        ASSERT_EQ(i, t);
+
+        shift_next_icircular_list(&test, 1);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
+TEST SHIFT_NEXT_02(void) {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
+        insert_at_icircular_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
+        int t = 0;
+        get_icircular_list(test, 0, &t);
+        ASSERT_EQ(i, t);
+
+        shift_next_icircular_list(&test, 1);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
+TEST SHIFT_NEXT_03(void) {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {
+        insert_at_icircular_list(&test, &i, test.length);
+    }
+
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {
+        int t = 0;
+        get_icircular_list(test, 0, &t);
+        ASSERT_EQ(i, t);
+
+        shift_next_icircular_list(&test, 1);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
 TEST SPLICE_01(void) {
     icircular_list_s one = create_icircular_list(sizeof(int));
     icircular_list_s two = create_icircular_list(sizeof(int));
@@ -708,6 +771,7 @@ SUITE (icircular_list_test) {
     RUN_TEST(REMOVE_FIRST_01); RUN_TEST(REMOVE_FIRST_02); RUN_TEST(REMOVE_FIRST_03);
     RUN_TEST(REMOVE_AT_01); RUN_TEST(REMOVE_AT_02); RUN_TEST(REMOVE_AT_03);
     RUN_TEST(REVERSE_01); RUN_TEST(REVERSE_02); RUN_TEST(REVERSE_03);
+    RUN_TEST(SHIFT_NEXT_01); RUN_TEST(SHIFT_NEXT_02); RUN_TEST(SHIFT_NEXT_03);
     RUN_TEST(SPLICE_01); RUN_TEST(SPLICE_02); RUN_TEST(SPLICE_03);
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02); RUN_TEST(SPLIT_03);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02); RUN_TEST(EXTRACT_03);

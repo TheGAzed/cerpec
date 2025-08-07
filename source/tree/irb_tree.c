@@ -141,7 +141,7 @@ irb_tree_s copy_irb_tree(const irb_tree_s tree, const copy_fn copy) {
         .capacity = tree.capacity, .root = tree.root, .length = tree.length, .compare = tree.compare, .size = tree.size,
     };
 
-    // since teh structure always has one additional NIL node malloc must be checked even if capacity is zero
+    // since the structure always has one additional NIL node malloc must be checked even if capacity is zero
     assert(tree.elements && "[ERROR] Memory allocation failed.");
     assert(tree.color && "[ERROR] Memory allocation failed.");
     assert(tree.parent && "[ERROR] Memory allocation failed.");

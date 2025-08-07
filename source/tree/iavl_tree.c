@@ -111,10 +111,10 @@ iavl_tree_s copy_iavl_tree(const iavl_tree_s tree, const copy_fn copy) {
 
         .capacity = tree.capacity, .root = tree.root, .length = tree.length, .compare = tree.compare, .size = tree.size,
     };
-    assert((!tree.capacity || tree.elements) && "[ERROR] Memory allocation failed.");
-    assert((!tree.capacity || tree.parent) && "[ERROR] Memory allocation failed.");
-    assert((!tree.capacity || tree.node[IAVL_TREE_LEFT]) && "[ERROR] Memory allocation failed.");
-    assert((!tree.capacity || tree.node[IAVL_TREE_RIGHT]) && "[ERROR] Memory allocation failed.");
+    assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
+    assert((!replica.capacity || replica.parent) && "[ERROR] Memory allocation failed.");
+    assert((!replica.capacity || replica.node[IAVL_TREE_LEFT]) && "[ERROR] Memory allocation failed.");
+    assert((!replica.capacity || replica.node[IAVL_TREE_RIGHT]) && "[ERROR] Memory allocation failed.");
 
     for (size_t i = 0; i < tree.length; ++i) {
         copy(replica.elements + (i * tree.size), tree.elements + (i * tree.size));
