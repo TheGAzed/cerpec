@@ -12,7 +12,7 @@ ihash_set_s create_ihash_set(const size_t size, const hash_fn hash) {
     assert(hash && "[ERROR] Parameter can't be NULL.");
     assert(size && "[ERROR] Parameter can't be zero.");
 
-    return (ihash_set_s) { .size = size, .hash = hash, .empty = NIL, };
+    return (ihash_set_s) { .size = size, .hash = hash, .empty = NIL, }; // set empty list to NIL
 }
 
 void destroy_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
@@ -20,17 +20,19 @@ void destroy_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
     assert(set->size && "[INVALID] Parameter can't be zero.");
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
+    // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->capacity; ++i) {
         for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
             destroy(set->elements + (n * set->size));
         }
     }
 
+    // free arrays
     free(set->head);
     free(set->elements);
     free(set->next);
 
-    memset(set, 0, sizeof(ihash_set_s));
+    memset(set, 0, sizeof(ihash_set_s)); // set everything to zero/false
 }
 
 void clear_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
@@ -38,16 +40,19 @@ void clear_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
     assert(set->size && "[INVALID] Parameter can't be zero.");
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
+    // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->capacity; ++i) {
         for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
             destroy(set->elements + (n * set->size));
         }
     }
 
+    // free arrays
     free(set->head);
     free(set->elements);
     free(set->next);
 
+    // only clear set (keep the set usable)
     set->empty = NIL;
     set->capacity = set->length = 0;
     set->head = NULL;
@@ -62,6 +67,7 @@ ihash_set_s copy_ihash_set(const ihash_set_s set, const copy_fn copy) {
     assert(set.size && "[INVALID] Parameter can't be zero.");
     assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
+    // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
     const ihash_set_s replica = {
         .capacity = set.capacity, .empty = NIL, .hash = set.hash, .length = set.length, .size = set.size,
         .elements = malloc(set.capacity * set.size),
@@ -72,16 +78,17 @@ ihash_set_s copy_ihash_set(const ihash_set_s set, const copy_fn copy) {
     assert((!replica.capacity || replica.head) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
+    // for each index, if each index is valid node then push it into replica
     for (size_t i = 0, hole = 0; i < set.capacity; ++i) {
-        replica.head[i] = NIL; // set replica heads to invalid
+        replica.head[i] = NIL; // initially set replica heads to invalid
 
         // if set has elements in head then push them into replica heads (like a stack)
-        for (size_t n = set.head[i]; NIL != n; n = set.next[n]) {
+        for (size_t n = set.head[i]; NIL != n; n = set.next[n], hole++) {
             copy(replica.elements + (hole * replica.size), set.elements + (n * set.size));
 
+            // node index redirection
             replica.next[hole] = replica.head[i];
             replica.head[i] = hole;
-            hole++;
         }
     }
 
@@ -93,7 +100,7 @@ bool is_empty_ihash_set(const ihash_set_s set) {
     assert(set.size && "[INVALID] Parameter can't be zero.");
     assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    return !(set.length);
+    return !(set.length); // if 0 return 'true'
 }
 
 void insert_ihash_set(ihash_set_s * set, const void * element) {
@@ -104,6 +111,7 @@ void insert_ihash_set(ihash_set_s * set, const void * element) {
     assert(set->size && "[INVALID] Parameter can't be zero.");
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
+    // resize (expand) if set can't contain new element
     if (set->length == set->capacity) {
         _ihash_set_resize(set, set->capacity + IHASH_SET_CHUNK);
     }
@@ -117,15 +125,18 @@ void insert_ihash_set(ihash_set_s * set, const void * element) {
         assert(hash != set->hash(set->elements + (n * set->size)) && "[ERROR] Element already in set.");
     }
 
+    // get hole/empty index
     size_t hole = set->length;
-    if (NIL != set->empty) {
+    if (NIL != set->empty) { // if empty has a valid index then pop it and set it as hole
         hole = set->empty;
         set->empty = set->next[set->empty];
     }
 
+    // node index redirection
     set->next[hole] = set->head[index];
     set->head[index] = hole;
 
+    // copy element into elements array
     memcpy(set->elements + (hole * set->size), element, set->size);
     set->length++;
 }
@@ -143,28 +154,33 @@ void remove_ihash_set(ihash_set_s * set, const void * element, void * buffer) {
     const size_t hash = set->hash(element);
     const size_t index = hash % set->capacity;
 
+    // for each node at index check if element is contained
     for (size_t * n = set->head + index; NIL != (*n); n = set->next + (*n)) {
         const char * current = set->elements + ((*n) + set->size);
         if (hash != set->hash(current)) { // if not equal contionue
             continue;
         } // else remove found element and return
 
+        // copy removed element into buffer
         memcpy(buffer, current, set->size);
         set->length--;
 
+        // redirect node using pointer magic
         const size_t hole = (*n);
         (*n) = set->next[(*n)];
 
+        // if hole isn't last index in array append it into empty stack
         if (hole != set->length) {
             set->next[hole] = set->empty;
             set->empty = hole;
         }
 
+        // resize (expand) if set can contain a smaller capacity of elements
         if (set->capacity - IHASH_SET_CHUNK == set->length) {
             _ihash_set_resize(set, set->capacity - IHASH_SET_CHUNK);
         }
 
-        return;
+        return; // return to avoid assertion and termination at the end of function if element wasn't found
     }
 
     assert(false && "[ERROR] Structure does not contain element.");
@@ -182,6 +198,7 @@ bool contains_ihash_set(const ihash_set_s set, const void * element) {
     const size_t hash = set.hash(element);
     const size_t index = hash % set.capacity;
 
+    // for each node at index check if element is contained and return true or false
     for (size_t n = set.head[index]; NIL != n; n = set.next[n]) {
         if (hash == set.hash(set.elements + (n * set.size))) {
             return true;
@@ -271,7 +288,7 @@ ihash_set_s intersect_ihash_set(const ihash_set_s set_one, const ihash_set_s set
 
     ihash_set_s set_intersect = { .size = set_one.size, .hash = set_one.hash, .empty = NIL, };
     for (size_t i = 0, hole = set_intersect.length; i < minimum.capacity; ++i) {
-        for (size_t min = minimum.head[i]; NIL!= min; min = minimum.next[min]) {
+        for (size_t min = minimum.head[i]; NIL != min; min = minimum.next[min]) {
             // get element and set its found flag to false
             const char * element = minimum.elements + (min * minimum.size);
             bool contains = false;
@@ -377,7 +394,7 @@ ihash_set_s exclude_ihash_set(const ihash_set_s set_one, const ihash_set_s set_t
 
     ihash_set_s set_exclude = { .size = set_one.size, .hash = set_one.hash, .empty = NIL, };
     for (size_t i = 0, hole = set_exclude.length; i < set_one.capacity; ++i) {
-        for (size_t one = set_one.head[i]; NIL!= one; one = set_one.next[one]) {
+        for (size_t one = set_one.head[i]; NIL != one; one = set_one.next[one]) {
             // get element and set its found flag to false
             const char * element = set_one.elements + (one * set_one.size);
             bool contains = false;
@@ -413,7 +430,7 @@ ihash_set_s exclude_ihash_set(const ihash_set_s set_one, const ihash_set_s set_t
     }
 
     for (size_t i = 0, hole = set_exclude.length; i < set_one.capacity; ++i) {
-        for (size_t two = set_two.head[i]; NIL!= two; two = set_two.next[two]) {
+        for (size_t two = set_two.head[i]; NIL != two; two = set_two.next[two]) {
             // get element and set its found flag to false
             const char * element = set_two.elements + (two * set_two.size);
             bool contains = false;
@@ -464,7 +481,7 @@ bool is_subset_ihash_set(const ihash_set_s super, const ihash_set_s sub) {
     assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     for (size_t i = 0; i < sub.capacity; ++i) {
-        for (size_t s = sub.head[i]; NIL!= s; s = sub.next[s]) {
+        for (size_t s = sub.head[i]; NIL != s; s = sub.next[s]) {
             // get element and set its found flag to false
             const char * element = sub.elements + (s * sub.size);
             bool contains = false;
@@ -502,7 +519,7 @@ bool is_proper_subset_ihash_set(const ihash_set_s super, const ihash_set_s sub) 
     assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     for (size_t i = 0; i < sub.capacity; ++i) {
-        for (size_t s = sub.head[i]; NIL!= s; s = sub.next[s]) {
+        for (size_t s = sub.head[i]; NIL != s; s = sub.next[s]) {
             // get element and set its found flag to false
             const char * element = sub.elements + (s * sub.size);
             bool contains = false;
@@ -575,8 +592,8 @@ void foreach_ihash_set(const ihash_set_s set, const operate_fn operate, void * a
     assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     for (size_t i = 0; i < set.capacity; ++i) {
-        for (size_t s = set.head[i]; NIL!= s; s = set.next[s]) {
-            if (!operate(set.elements + (s * set.size), arguments)) {
+        for (size_t n = set.head[i]; NIL != n; n = set.next[n]) {
+            if (!operate(set.elements + (n * set.size), arguments)) {
                 return;
             }
         }

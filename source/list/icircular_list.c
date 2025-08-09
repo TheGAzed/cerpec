@@ -6,10 +6,13 @@
 
 #define NIL ((size_t)(-1))
 
-void _icircular_list_resize(icircular_list_s * list);
+/// @brief Resizes structure to new size.
+/// @param list Strcuture to resize.
+/// @param size New size to be used.
+void _icircular_list_resize(icircular_list_s * list, const size_t size);
 
 icircular_list_s create_icircular_list(const size_t size) {
-    return (icircular_list_s) { .empty = NIL, .size = size, .tail = 0 };
+    return (icircular_list_s) { .empty = NIL, .size = size };
 }
 
 void destroy_icircular_list(icircular_list_s * list, const destroy_fn destroy) {
@@ -100,8 +103,7 @@ void insert_at_icircular_list(icircular_list_s * restrict list, const void * res
 
     // if length has reached capacity increase capacity linearly and call resize function to expand nodes
     if (list->length == list->capacity) {
-        list->capacity += ICIRCULAR_LIST_CHUNK;
-        _icircular_list_resize(list);
+        _icircular_list_resize(list, list->capacity + ICIRCULAR_LIST_CHUNK);
     }
 
     // get the empty node index either from underlying stack or next empty index in array (i.e. length)
@@ -205,8 +207,7 @@ void remove_first_icircular_list(icircular_list_s * restrict list, const void * 
 
         // if length has reached smaller capacity decrease capacity and resize the list
         if (list->length == list->capacity - ICIRCULAR_LIST_CHUNK) {
-            list->capacity -= ICIRCULAR_LIST_CHUNK;
-            _icircular_list_resize(list);
+            _icircular_list_resize(list, list->capacity - ICIRCULAR_LIST_CHUNK);
         }
 
         return; // leave function with found element
@@ -255,8 +256,7 @@ void remove_at_icircular_list(icircular_list_s * list, const size_t index, void 
 
     // if length has reached smaller capacity decrease capacity and resize the list
     if (list->length == list->capacity - ICIRCULAR_LIST_CHUNK) {
-        list->capacity -= ICIRCULAR_LIST_CHUNK;
-        _icircular_list_resize(list);
+        _icircular_list_resize(list, list->capacity - ICIRCULAR_LIST_CHUNK);
     }
 }
 
@@ -313,8 +313,7 @@ void splice_icircular_list(icircular_list_s * restrict destination, icircular_li
 
     const size_t sum = destination->length + source->length;
     const size_t mod = sum % ICIRCULAR_LIST_CHUNK;
-    destination->capacity = mod ? sum - mod + ICIRCULAR_LIST_CHUNK : sum;
-    _icircular_list_resize(destination);
+    _icircular_list_resize(destination, mod ? sum - mod + ICIRCULAR_LIST_CHUNK : sum);
 
     size_t dest_prev = destination->tail;
     // iterate to previous node from index
@@ -474,8 +473,7 @@ icircular_list_s extract_icircular_list(icircular_list_s * list, const filter_fn
         if (filter(element, arguments)) { // if element is valid push into positive list
             (*pos) = pos_idx;
             if (positive.length == positive.capacity) { // expand capacity if needed
-                positive.capacity += ICIRCULAR_LIST_CHUNK;
-                _icircular_list_resize(&positive);
+                _icircular_list_resize(&positive, positive.capacity + ICIRCULAR_LIST_CHUNK);
             }
             positive.next[pos_idx] = 0; // make list circular
             // copy element into list
@@ -487,8 +485,7 @@ icircular_list_s extract_icircular_list(icircular_list_s * list, const filter_fn
         } else { // else push into negative list
             (*neg) = neg_idx;
             if (negative.length == negative.capacity) { // expand capacity if needed
-                negative.capacity += ICIRCULAR_LIST_CHUNK;
-                _icircular_list_resize(&negative);
+                _icircular_list_resize(&negative, negative.capacity + ICIRCULAR_LIST_CHUNK);
             }
             negative.next[neg_idx] = 0; // make list circular
             // copy element into list
@@ -557,7 +554,9 @@ void map_icircular_list(const icircular_list_s list, const manage_fn manage, voi
     free(elements);
 }
 
-void _icircular_list_resize(icircular_list_s * list) {
+void _icircular_list_resize(icircular_list_s * list, const size_t size) {
+    list->capacity = size;
+
     // if list expands or hole stack is empty then just expand/shrink the list and return
     if (list->capacity != list->length || NIL == list->empty) {
         list->elements = realloc(list->elements, list->capacity * list->size);

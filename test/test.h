@@ -16,6 +16,7 @@ void sort(void * array, const size_t length, void * compare);
 bool odd(const void * element, void * nil);
 bool even(const void * element, void * nil);
 bool prime(const void * element, void * nil);
+size_t hash(const void * element);
 
 int compare(const void * a, const void * b);
 int compare_reverse(const void * a, const void * b);

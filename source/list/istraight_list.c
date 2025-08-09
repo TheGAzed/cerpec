@@ -6,7 +6,10 @@
 
 #define NIL ((size_t)(-1))
 
-void _istraight_list_resize(istraight_list_s * list);
+/// @brief Resizes structure to new size.
+/// @param list Strcuture to resize.
+/// @param size New size to be used.
+void _istraight_list_resize(istraight_list_s * list, const size_t size);
 
 istraight_list_s create_istraight_list(const size_t size) {
     return (istraight_list_s) { .head = NIL, .empty = NIL, .size = size };
@@ -94,8 +97,7 @@ void insert_at_istraight_list(istraight_list_s * restrict list, const void * res
 
     // if list can't fit elements expand it
     if (list->length == list->capacity) {
-        list->capacity += ISTRAIGHT_LIST_CHUNK;
-        _istraight_list_resize(list);
+        _istraight_list_resize(list, list->capacity + ISTRAIGHT_LIST_CHUNK);
     }
 
     // go to node reference at index
@@ -170,8 +172,7 @@ void remove_first_istraight_list(istraight_list_s * restrict list, const void * 
 
         // shrink list to save space if smaller capacity is available
         if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
-            list->capacity -= ISTRAIGHT_LIST_CHUNK;
-            _istraight_list_resize(list);
+            _istraight_list_resize(list, list->capacity - ISTRAIGHT_LIST_CHUNK);
         }
 
         return; // leave function with found element
@@ -213,8 +214,7 @@ void remove_at_istraight_list(istraight_list_s * restrict list, const size_t ind
 
     // shrink list to save space if smaller capacity is available
     if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
-        list->capacity -= ISTRAIGHT_LIST_CHUNK;
-        _istraight_list_resize(list);
+        _istraight_list_resize(list, list->capacity - ISTRAIGHT_LIST_CHUNK);
     }
 }
 
@@ -246,8 +246,7 @@ void splice_istraight_list(istraight_list_s * restrict destination, istraight_li
     // calculate new destination length
     const size_t sum = destination->length + source->length;
     const size_t mod = sum % ISTRAIGHT_LIST_CHUNK;
-    destination->capacity = mod ? sum - mod + ISTRAIGHT_LIST_CHUNK : sum;
-    _istraight_list_resize(destination);
+    _istraight_list_resize(destination, mod ? sum - mod + ISTRAIGHT_LIST_CHUNK : sum);
 
     // go to destination node reference at index
     size_t * dest = &(destination->head);
@@ -296,6 +295,7 @@ void splice_istraight_list(istraight_list_s * restrict destination, istraight_li
 istraight_list_s split_istraight_list(istraight_list_s * list, const size_t index, const size_t length) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Index can't be more than or equal length.");
+    assert(length <= list->length && "[ERROR] Paremeter can't be greater than length.");
     assert(index + length <= list->length && "[ERROR] Size can't be more than length.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
@@ -377,8 +377,7 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
         if (filter(element, arguments)) {
             (*pos) = pos_idx;
             if (positive.length == positive.capacity) {
-                positive.capacity += ISTRAIGHT_LIST_CHUNK;
-                _istraight_list_resize(&positive);
+                _istraight_list_resize(&positive, positive.capacity + ISTRAIGHT_LIST_CHUNK);
             }
             positive.next[pos_idx] = NIL;
 
@@ -390,8 +389,7 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
         } else {
             (*neg) = neg_idx;
             if (negative.length == negative.capacity) {
-                negative.capacity += ISTRAIGHT_LIST_CHUNK;
-                _istraight_list_resize(&negative);
+                _istraight_list_resize(&negative, negative.capacity + ISTRAIGHT_LIST_CHUNK);
             }
             negative.next[neg_idx] = NIL;
 
@@ -443,7 +441,9 @@ void map_istraight_list(const istraight_list_s list, const manage_fn manage, voi
     free(elements);
 }
 
-void _istraight_list_resize(istraight_list_s * list) {
+void _istraight_list_resize(istraight_list_s * list, const size_t size) {
+    list->capacity = size;
+
     // if list expands or hole stack is empty then just expand/shrink the list and return
     if (list->capacity != list->length || NIL == list->empty) {
         list->elements = realloc(list->elements, list->capacity * list->size);

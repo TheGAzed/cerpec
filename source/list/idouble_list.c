@@ -4,11 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-void _idouble_list_resize(idouble_list_s * list);
+/// @brief Resizes structure to new size.
+/// @param list Strcuture to resize.
+/// @param size New size to be used.
+void _idouble_list_resize(idouble_list_s * list, const size_t size);
+
+/// @brief Fills hole/empty node index with last array-based node and fixes/redirects siblings.
+/// @param list Strcuture to fill.
+/// @param hole Index of hole node.
 void _idouble_list_fill_hole(idouble_list_s * list, const size_t hole);
 
 idouble_list_s create_idouble_list(const size_t size) {
-    return (idouble_list_s) { .size = size, .head = 0 };
+    return (idouble_list_s) { .size = size };
 }
 
 void destroy_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
@@ -19,15 +26,18 @@ void destroy_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // call destroy function for each element in list
     for (size_t current = list->head; list->length; list->length--) {
         destroy(list->elements + (current * list->size));
         current = list->node[IDOUBLE_LIST_NEXT][current];
     }
+
+    // free list's node arrays
     free(list->elements);
     free(list->node[IDOUBLE_LIST_NEXT]);
     free(list->node[IDOUBLE_LIST_PREV]);
 
-    memset(list, 0, sizeof(idouble_list_s));
+    memset(list, 0, sizeof(idouble_list_s)); // set list to zero/make it invalid
 }
 
 void clear_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
@@ -38,14 +48,18 @@ void clear_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // call destroy function for each element in list
     for (size_t current = list->head; list->length; list->length--) {
         destroy(list->elements + (current * list->size));
         current = list->node[IDOUBLE_LIST_NEXT][current];
     }
+
+    // free list's node arrays
     free(list->elements);
     free(list->node[IDOUBLE_LIST_NEXT]);
     free(list->node[IDOUBLE_LIST_PREV]);
 
+    // make list clear, but still usable
     list->node[IDOUBLE_LIST_NEXT] = list->node[IDOUBLE_LIST_PREV] = NULL;
     list->elements = NULL;
     list->capacity = list->head = 0;
@@ -58,7 +72,8 @@ idouble_list_s copy_idouble_list(const idouble_list_s list, const copy_fn copy) 
     assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
-    idouble_list_s replica = {
+    // allocate and set replica of list
+    const idouble_list_s replica = {
         .capacity = list.capacity, .head = list.head, .length = list.length, .size = list.size,
         .node[IDOUBLE_LIST_NEXT] = malloc(list.capacity * sizeof(size_t)),
         .node[IDOUBLE_LIST_PREV] = malloc(list.capacity * sizeof(size_t)),
@@ -68,6 +83,7 @@ idouble_list_s copy_idouble_list(const idouble_list_s list, const copy_fn copy) 
     assert((!replica.capacity || replica.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
 
+    // copy nodes (elements and indexes) into list
     for (size_t i = 0; i < list.length; ++i) {
         copy(replica.elements + (i * replica.size), list.elements + (i * list.size));
     }
@@ -95,11 +111,12 @@ void insert_at_idouble_list(idouble_list_s * restrict list, const void * restric
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // if list is full resize (expand) it
     if (list->length == list->capacity) {
-        list->capacity += IDOUBLE_LIST_CHUNK;
-        _idouble_list_resize(list);
+        _idouble_list_resize(list, list->capacity + IDOUBLE_LIST_CHUNK);
     }
 
+    // determine closest direction to index and go there
     size_t current = list->head;
     const size_t real_index = index <= (list->length >> 1) ? index : list->length - index;
     const bool node_index = real_index == index ? IDOUBLE_LIST_NEXT : IDOUBLE_LIST_PREV;
@@ -108,19 +125,20 @@ void insert_at_idouble_list(idouble_list_s * restrict list, const void * restric
     }
 
     list->node[IDOUBLE_LIST_NEXT][list->length] = current;
-    if (list->length) {
+    if (list->length) { // if list is not empty perform complex insertion
         list->node[IDOUBLE_LIST_PREV][list->length] = list->node[IDOUBLE_LIST_PREV][current];
 
         list->node[IDOUBLE_LIST_NEXT][list->node[IDOUBLE_LIST_PREV][current]] = list->length;
         list->node[IDOUBLE_LIST_PREV][current] = list->length;
-    } else {
+    } else { // else list is empty and thus needs only a simple redirection to itself
         list->node[IDOUBLE_LIST_PREV][list->length] = current;
     }
 
-    if (!index) {
+    if (!index) { // if index is zero then list's head must become last empty array node
         list->head = list->length;
     }
 
+    // copy element into list by pushing it as last array node
     memcpy(list->elements + (list->length * list->size), element, list->size);
     list->length++;
 }
@@ -133,6 +151,7 @@ void get_idouble_list(const idouble_list_s list, const size_t index, void * buff
     assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
+    // determine closest direction to index and go there
     size_t current = list.head;
     const size_t real_index = index <= (list.length >> 1) ? index : list.length - index;
     const bool node_index = real_index == index ? IDOUBLE_LIST_NEXT : IDOUBLE_LIST_PREV;
@@ -140,6 +159,7 @@ void get_idouble_list(const idouble_list_s list, const size_t index, void * buff
         current = list.node[node_index][current];
     }
 
+    // copy retrieved element into buffer
     memcpy(buffer, list.elements + (current * list.size), list.size);
 }
 
@@ -159,29 +179,33 @@ void remove_first_idouble_list(idouble_list_s * restrict list, const void * rest
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // for each element in list travel forward
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDOUBLE_LIST_NEXT][current]) {
         const char * found = list->elements + (current * list->size);
-        if (0 != compare(element, found)) {
+        if (0 != compare(element, found)) { // if element isn't found continue
             continue;
-        }
+        } // else remove element and return successfully
 
+        // copy removed element into buffer
         memcpy(buffer, found, list->size);
         list->length--;
 
+        // if current is head then change head to next node
         if (current == list->head) {
             list->head = list->node[IDOUBLE_LIST_NEXT][current];
         }
 
         _idouble_list_fill_hole(list, current);
 
+        // if smaller capacity exists then resize (shrink) list
         if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            list->capacity -= IDOUBLE_LIST_CHUNK;
-            _idouble_list_resize(list);
+            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
         }
 
         return;
     }
 
+    // if element wasn't found indicate error
     assert(false && "[ERROR] Element not found in list.");
     exit(EXIT_FAILURE);
 }
@@ -202,31 +226,35 @@ void remove_last_idouble_list(idouble_list_s * restrict list, const void * restr
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // for each element in list travel backwards
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
         current = list->node[IDOUBLE_LIST_PREV][current];
 
         const char * found = list->elements + (current * list->size);
-        if (0 != compare(element, found)) {
+        if (0 != compare(element, found)) { // if element isn't found continue
             continue;
-        }
+        } // else remove element and return successfully
 
+        // copy removed element into buffer
         memcpy(buffer, found, list->size);
         list->length--;
 
+        // if current is head then change head to next node
         if (current == list->head) {
             list->head = list->node[IDOUBLE_LIST_NEXT][current];
         }
 
         _idouble_list_fill_hole(list, current);
 
+        // if smaller capacity exists then resize (shrink) list
         if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            list->capacity -= IDOUBLE_LIST_CHUNK;
-            _idouble_list_resize(list);
+            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
         }
 
         return;
     }
 
+    // if element wasn't found indicate error
     assert(false && "[ERROR] Element not found in list.");
     exit(EXIT_FAILURE);
 }
@@ -241,6 +269,7 @@ void remove_at_idouble_list(idouble_list_s * restrict list, const size_t index, 
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // determine closest direction to index and go there
     size_t current = list->head;
     const size_t real_index = index <= (list->length >> 1) ? index : list->length - index;
     const bool node_index = real_index == index ? IDOUBLE_LIST_NEXT : IDOUBLE_LIST_PREV;
@@ -248,18 +277,20 @@ void remove_at_idouble_list(idouble_list_s * restrict list, const size_t index, 
         current = list->node[node_index][current];
     }
 
+    // copy removed node element into buffer
     memcpy(buffer, list->elements + (current * list->size), list->size);
     list->length--;
 
+    // if current is head then change head to next node
     if (current == list->head) {
         list->head = list->node[IDOUBLE_LIST_NEXT][current];
     }
 
     _idouble_list_fill_hole(list, current);
 
+    // if smaller capacity exists then resize (shrink) list
     if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-        list->capacity -= IDOUBLE_LIST_CHUNK;
-        _idouble_list_resize(list);
+        _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
     }
 }
 
@@ -274,6 +305,7 @@ void reverse_idouble_list(idouble_list_s * list) {
     for (size_t i = 0; i < list->length; ++i) {
         list->head = current;
 
+        // swap next and previous node indexes
         const size_t next = list->node[IDOUBLE_LIST_NEXT][current];
         list->node[IDOUBLE_LIST_NEXT][current] = list->node[IDOUBLE_LIST_PREV][current];
         list->node[IDOUBLE_LIST_PREV][current] = next;
@@ -326,11 +358,12 @@ void splice_idouble_list(idouble_list_s * restrict destination, idouble_list_s *
 
     assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
 
+    // calculate new capacity of destination list and resize it
     const size_t sum = destination->length + source->length;
     const size_t mod = sum % IDOUBLE_LIST_CHUNK;
-    destination->capacity = mod ? sum - mod + IDOUBLE_LIST_CHUNK : sum;
-    _idouble_list_resize(destination);
+    _idouble_list_resize(destination, mod ? sum - mod + IDOUBLE_LIST_CHUNK : sum);
 
+    // determine closest direction to index and go there
     size_t current = destination->head;
     const size_t real_index = index <= (destination->length >> 1) ? index : destination->length - index;
     const bool node_index = real_index == index ? IDOUBLE_LIST_NEXT : IDOUBLE_LIST_PREV;
@@ -338,12 +371,14 @@ void splice_idouble_list(idouble_list_s * restrict destination, idouble_list_s *
         current = destination->node[node_index][current];
     }
 
+    // just copy source's elements and indexes relative to destination's node array (just increment them by length)
     memcpy(destination->elements + (destination->length * destination->size), source->elements, source->length * source->size);
     for (size_t i = 0; i < source->length; ++i) {
         destination->node[IDOUBLE_LIST_NEXT][destination->length + i] = source->node[IDOUBLE_LIST_NEXT][i] + destination->length;
         destination->node[IDOUBLE_LIST_PREV][destination->length + i] = source->node[IDOUBLE_LIST_PREV][i] + destination->length;
     }
 
+    // redirect destination nodes if it and source had any
     if (destination->length && source->length) {
         const size_t first_destination = current;
         const size_t last_destination  = destination->node[IDOUBLE_LIST_PREV][current];
@@ -369,6 +404,7 @@ void splice_idouble_list(idouble_list_s * restrict destination, idouble_list_s *
     free(source->elements);
     free(source->node[IDOUBLE_LIST_NEXT]);
     free(source->node[IDOUBLE_LIST_PREV]);
+
     source->node[IDOUBLE_LIST_NEXT] = source->node[IDOUBLE_LIST_PREV] = NULL;
     source->elements = NULL;
     source->length = source->capacity = source->head = 0;
@@ -377,11 +413,13 @@ void splice_idouble_list(idouble_list_s * restrict destination, idouble_list_s *
 idouble_list_s split_idouble_list(idouble_list_s * list, const size_t index, const size_t length) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+    assert(length <= list->length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
+    // determine closest direction to index and go there
     size_t current = list->head;
     const size_t real_index = index <= (list->length >> 1) ? index : list->length - index;
     const bool node_index = real_index == index ? IDOUBLE_LIST_NEXT : IDOUBLE_LIST_PREV;
@@ -403,7 +441,7 @@ idouble_list_s split_idouble_list(idouble_list_s * list, const size_t index, con
     assert((!split.capacity || split.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
     assert((!split.capacity || split.node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
 
-    // push list elements into split list
+    // push list elements into split list (includes pointer magic)
     size_t * split_current = &(split.head);
     while (split.length < length) {
         (*split_current) = split.length; // set head and next nodes to next index
@@ -423,8 +461,7 @@ idouble_list_s split_idouble_list(idouble_list_s * list, const size_t index, con
 
         // shrink list if smaller chunk is available
         if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            list->capacity -= IDOUBLE_LIST_CHUNK;
-            _idouble_list_resize(list);
+            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
         }
 
         split_current = split.node[IDOUBLE_LIST_NEXT] + (split.length - 1);
@@ -432,6 +469,7 @@ idouble_list_s split_idouble_list(idouble_list_s * list, const size_t index, con
     }
     (*split_current) = 0;
 
+    // if split list contains head node change list's head to current (or last non removed) node
     if (!index || (index >= list->length)) {
         list->head = current;
     }
@@ -461,12 +499,12 @@ idouble_list_s extract_idouble_list(idouble_list_s * list, const filter_fn filte
 
         (*pos) = positive.length; // set head and next nodes to next index
         if (positive.length == positive.capacity) { // expand capacity if needed
-            positive.capacity += IDOUBLE_LIST_CHUNK;
-            _idouble_list_resize(&positive);
+            _idouble_list_resize(&positive, positive.capacity + IDOUBLE_LIST_CHUNK);
         }
         positive.node[IDOUBLE_LIST_PREV][positive.length] = positive.length - 1; // set previous node indexes to one minus current
         positive.node[IDOUBLE_LIST_PREV][0] = positive.length; // set first node's prev to positive length
 
+        // remove element from main list and add it to positive one
         memcpy(positive.elements + (positive.length * positive.size), element, list->size);
         positive.length++;
         list->length--;
@@ -480,8 +518,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * list, const filter_fn filte
 
         // shrink list if smaller chunk is available
         if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            list->capacity -= IDOUBLE_LIST_CHUNK;
-            _idouble_list_resize(list);
+            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
         }
 
         pos = positive.node[IDOUBLE_LIST_NEXT] + (positive.length - 1);
@@ -499,6 +536,7 @@ void foreach_next_idouble_list(const idouble_list_s list, const operate_fn opera
     assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
+    // for each forward element in list call operate function and break if it returns false
     for (size_t i = 0, current = list.head; i < list.length; ++i, current = list.node[IDOUBLE_LIST_NEXT][current]) {
         if (!operate(list.elements + (current * list.size), arguments)) {
             break;
@@ -513,6 +551,7 @@ void foreach_prev_idouble_list(const idouble_list_s list, const operate_fn opera
     assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
 
+    // for each backward element in list call operate function and break if it returns false
     for (size_t i = 0, current = list.head; i < list.length; ++i) {
         current = list.node[IDOUBLE_LIST_PREV][current];
         if (!operate(list.elements + (current * list.size), arguments)) {
@@ -547,7 +586,9 @@ void map_idouble_list(const idouble_list_s list, const manage_fn manage, void * 
     free(elements);
 }
 
-void _idouble_list_resize(idouble_list_s * list) {
+void _idouble_list_resize(idouble_list_s * list, const size_t size) {
+    list->capacity = size;
+
     list->elements = realloc(list->elements, list->capacity * list->size);
     list->node[IDOUBLE_LIST_NEXT] = realloc(list->node[IDOUBLE_LIST_NEXT], list->capacity * sizeof(size_t));
     list->node[IDOUBLE_LIST_PREV] = realloc(list->node[IDOUBLE_LIST_PREV], list->capacity * sizeof(size_t));

@@ -61,3 +61,7 @@ bool prime(const void * element, void * nil) {
 
     return number > 1;
 }
+
+size_t hash(const void * element) {
+    return (size_t)(*(int*)(element));
+}

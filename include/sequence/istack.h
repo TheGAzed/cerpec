@@ -40,18 +40,18 @@ istack_s copy_istack(const istack_s stack, const copy_fn copy);
 bool is_empty_istack(const istack_s stack);
 
 /// @brief Pushes a single element to the top of the structure.
-/// @param stack Structure to enqueue into.
-/// @param element Element buffer to enqueue.
+/// @param stack Structure to push into.
+/// @param element Element buffer to push.
 void push_istack(istack_s * stack, const void * element);
 
 /// @brief Pops a single element from the top of the structure.
-/// @param stack Structure to dequeue from.
-/// @param buffer Element buffer to save dequeue.
+/// @param stack Structure to pop from.
+/// @param buffer Element buffer to save pop.
 void pop_istack(istack_s * stack, void * buffer);
 
 /// @brief Peeps a single element from the top of the structure.
 /// @param stack Structure to peep.
-/// @param buffer Element buffer to save peek.
+/// @param buffer Element buffer to save peep.
 void peep_istack(const istack_s stack, void * buffer);
 
 /// @brief Iterates over each element in structure starting from the beginning.
