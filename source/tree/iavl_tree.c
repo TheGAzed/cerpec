@@ -40,7 +40,8 @@ void _iavl_tree_fill_hole(iavl_tree_s * tree, const size_t hole);
 
 /// Resizes (reallocates) tree parameter arrays based on changed capacity.
 /// @param tree Structure to resize.
-void _iavl_tree_resize(iavl_tree_s * tree);
+/// @param size New size.
+void _iavl_tree_resize(iavl_tree_s * tree, const size_t size);
 
 iavl_tree_s create_iavl_tree(const size_t size, const compare_fn compare) {
     assert(compare && "[ERROR] Parameter can't be NULL.");
@@ -144,8 +145,7 @@ void insert_iavl_tree(iavl_tree_s * tree, const void * element) {
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     if (tree->length == tree->capacity) {
-        tree->capacity += IAVL_TREE_CHUNK;
-        _iavl_tree_resize(tree);
+        _iavl_tree_resize(tree, tree->capacity + IAVL_TREE_CHUNK);
     }
 
     size_t previous = NIL; // initially invalid for the head case when tree is empty
@@ -211,13 +211,11 @@ void remove_iavl_tree(iavl_tree_s * tree, const void * element, void * buffer) {
     _iavl_tree_rebalance(tree, (*node));
 
     if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        tree->capacity -= IAVL_TREE_CHUNK;
-        _iavl_tree_resize(tree);
+        _iavl_tree_resize(tree, tree->length);
     }
 }
 
 bool contains_iavl_tree(const iavl_tree_s tree, const void * element) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
     assert(element && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -227,7 +225,6 @@ bool contains_iavl_tree(const iavl_tree_s tree, const void * element) {
     assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
     assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
     assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
 
     for (size_t node = tree.root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -319,8 +316,7 @@ void remove_max_iavl_tree(iavl_tree_s * tree, void * buffer) {
     _iavl_tree_rebalance(tree, (*maximum_node));
 
     if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        tree->capacity -= IAVL_TREE_CHUNK;
-        _iavl_tree_resize(tree);
+        _iavl_tree_resize(tree, tree->length);
     }
 }
 
@@ -358,8 +354,7 @@ void remove_min_iavl_tree(iavl_tree_s * tree, void * buffer) {
     _iavl_tree_rebalance(tree, (*minimum_node));
 
     if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        tree->capacity -= IAVL_TREE_CHUNK;
-        _iavl_tree_resize(tree);
+        _iavl_tree_resize(tree, tree->length);
     }
 }
 
@@ -474,7 +469,7 @@ void postorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void 
     free(stack.elements);
 }
 
-void level_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
+void level_order_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -685,7 +680,9 @@ void _iavl_tree_fill_hole(iavl_tree_s * tree, const size_t hole) {
     }
 }
 
-void _iavl_tree_resize(iavl_tree_s * tree) {
+void _iavl_tree_resize(iavl_tree_s * tree, const size_t size) {
+    tree->capacity = size;
+
     tree->elements = realloc(tree->elements, tree->capacity * tree->size);
     tree->height = realloc(tree->height, tree->capacity * sizeof(size_t));
     tree->parent = realloc(tree->parent, tree->capacity * sizeof(size_t));

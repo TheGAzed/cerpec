@@ -22,7 +22,7 @@ typedef struct infinite_binary_search_tree {
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @param compare Function pointer to compare elements.
-/// @return Stack structure.
+/// @return Tree structure.
 ibsearch_tree_s create_ibsearch_tree(const size_t size, const compare_fn compare);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
@@ -109,6 +109,6 @@ void postorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operat
 /// @param tree Structure to traverse.
 /// @param operate Function pointer to operate on each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void level_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments);
+void level_order_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments);
 
 #endif // IBSEARCH_TREE_H

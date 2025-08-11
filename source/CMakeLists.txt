@@ -8,6 +8,7 @@ target_sources(CERPEC
         PRIVATE list/idouble_list.c
 
         PRIVATE set/ihash_set.c
+        PRIVATE set/irb_set.c
 
         PRIVATE tree/ibsearch_tree.c
         PRIVATE tree/iavl_tree.c

@@ -6,7 +6,10 @@
 
 #define NIL (size_t)(-1)
 
-void _ihash_set_resize(ihash_set_s * set, const size_t capacity);
+/// Resizes (reallocates) set parameter arrays based on changed capacity.
+/// @param set Structure to resize.
+/// @param size New size.
+void _ihash_set_resize(ihash_set_s * set, const size_t size);
 
 ihash_set_s create_ihash_set(const size_t size, const hash_fn hash) {
     assert(hash && "[ERROR] Parameter can't be NULL.");
@@ -600,7 +603,7 @@ void foreach_ihash_set(const ihash_set_s set, const operate_fn operate, void * a
     }
 }
 
-void _ihash_set_resize(ihash_set_s * set, const size_t capacity) {
+void _ihash_set_resize(ihash_set_s * set, const size_t size) {
     char * elements = malloc(set->length * set->size);
     assert((!set->length || elements) && "[ERROR] Memory allocation failed.");
 
@@ -610,7 +613,7 @@ void _ihash_set_resize(ihash_set_s * set, const size_t capacity) {
         }
     }
 
-    set->capacity = capacity;
+    set->capacity = size;
     set->elements = realloc(set->elements, set->capacity * set->size);
     set->head     = realloc(set->head, set->capacity * sizeof(size_t));
     set->next     = realloc(set->next, set->capacity * sizeof(size_t));

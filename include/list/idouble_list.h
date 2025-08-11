@@ -19,7 +19,7 @@ typedef struct infinite_double_list {
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
-/// @return Stack structure.
+/// @return List structure.
 idouble_list_s create_idouble_list(const size_t size);
 
 /// @brief Destroys a structure and its elements, and makes it unusable.

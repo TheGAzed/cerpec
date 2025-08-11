@@ -14,7 +14,7 @@ typedef struct infinite_stack {
 } istack_s;
 
 /// @brief Creates an empty structure.
-/// @param size Size of a single element
+/// @param size Size of a single element.
 /// @return Stack structure.
 istack_s create_istack(const size_t size);
 

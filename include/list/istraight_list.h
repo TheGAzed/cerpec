@@ -17,7 +17,7 @@ typedef struct infinite_straight_list {
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
-/// @return Stack structure.
+/// @return List structure.
 istraight_list_s create_istraight_list(const size_t size);
 
 /// @brief Destroys a structure and its elements, and makes it unusable.

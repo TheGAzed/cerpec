@@ -45,7 +45,8 @@ void _irb_tree_fill_hole(irb_tree_s * tree, const size_t hole);
 
 /// Resizes (reallocates) tree parameter arrays based on changed capacity.
 /// @param tree Structure to resize.
-void _irb_tree_resize(irb_tree_s * tree);
+/// @param size New size.
+void _irb_tree_resize(irb_tree_s * tree, const size_t size);
 
 irb_tree_s create_irb_tree(const size_t size, const compare_fn compare) {
     assert(compare && "[ERROR] Parameter can't be NULL.");
@@ -165,7 +166,7 @@ bool is_empty_irb_tree(const irb_tree_s tree) {
     assert(tree.size && "[INVALID] Parameter can't be zero.");
     assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    return !tree.length;
+    return !(tree.length);
 }
 
 void insert_irb_tree(irb_tree_s * tree, const void * element) {
@@ -177,8 +178,7 @@ void insert_irb_tree(irb_tree_s * tree, const void * element) {
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     if (tree->length == tree->capacity) {
-        tree->capacity += IRB_TREE_CHUNK;
-        _irb_tree_resize(tree);
+        _irb_tree_resize(tree, tree->capacity + IRB_TREE_CHUNK);
     }
 
     size_t previous = NIL; // initially invalid for the head case when tree is empty
@@ -259,7 +259,6 @@ void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
             _irb_tree_transplant(tree, current, tree->node[IRB_TREE_RIGHT][current]);
             tree->node[IRB_TREE_RIGHT][current] = tree->node[IRB_TREE_RIGHT][node];
             tree->parent[tree->node[IRB_TREE_RIGHT][current]] = current;
-            child == NIL ? tree->parent[current] : tree->parent[node];
         }
         _irb_tree_transplant(tree, node, current);
         tree->node[IRB_TREE_LEFT][current] = tree->node[IRB_TREE_LEFT][node];
@@ -274,8 +273,7 @@ void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
     _irb_tree_fill_hole(tree, node);
 
     if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
-        tree->capacity -= IRB_TREE_CHUNK;
-        _irb_tree_resize(tree);
+        _irb_tree_resize(tree, tree->length);
     }
 }
 
@@ -389,7 +387,6 @@ void remove_max_irb_tree(irb_tree_s * tree, void * buffer) {
             _irb_tree_transplant(tree, current, tree->node[IRB_TREE_RIGHT][current]);
             tree->node[IRB_TREE_RIGHT][current] = tree->node[IRB_TREE_RIGHT][maximum_node];
             tree->parent[tree->node[IRB_TREE_RIGHT][current]] = current;
-            child == NIL ? tree->parent[current] : tree->parent[maximum_node];
         }
         _irb_tree_transplant(tree, maximum_node, current);
         tree->node[IRB_TREE_LEFT][current] = tree->node[IRB_TREE_LEFT][maximum_node];
@@ -404,8 +401,7 @@ void remove_max_irb_tree(irb_tree_s * tree, void * buffer) {
     _irb_tree_fill_hole(tree, maximum_node);
 
     if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
-        tree->capacity -= IRB_TREE_CHUNK;
-        _irb_tree_resize(tree);
+        _irb_tree_resize(tree, tree->length);
     }
 }
 
@@ -450,7 +446,6 @@ void remove_min_irb_tree(irb_tree_s * tree, void * buffer) {
             _irb_tree_transplant(tree, current, tree->node[IRB_TREE_RIGHT][current]);
             tree->node[IRB_TREE_RIGHT][current] = tree->node[IRB_TREE_RIGHT][minimum_node];
             tree->parent[tree->node[IRB_TREE_RIGHT][current]] = current;
-            child == NIL ? tree->parent[current] : tree->parent[minimum_node];
         }
         _irb_tree_transplant(tree, minimum_node, current);
         tree->node[IRB_TREE_LEFT][current] = tree->node[IRB_TREE_LEFT][minimum_node];
@@ -465,8 +460,7 @@ void remove_min_irb_tree(irb_tree_s * tree, void * buffer) {
     _irb_tree_fill_hole(tree, minimum_node);
 
     if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
-        tree->capacity -= IRB_TREE_CHUNK;
-        _irb_tree_resize(tree);
+        _irb_tree_resize(tree, tree->length);
     }
 }
 
@@ -581,7 +575,7 @@ void postorder_irb_tree(const irb_tree_s tree, const operate_fn operate, void * 
     free(stack.elements);
 }
 
-void level_irb_tree(const irb_tree_s tree, const operate_fn operate, void * arguments) {
+void level_order_irb_tree(const irb_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -837,7 +831,8 @@ void _irb_tree_fill_hole(irb_tree_s * tree, const size_t hole) {
     }
 }
 
-void _irb_tree_resize(irb_tree_s * tree) {
+void _irb_tree_resize(irb_tree_s * tree, const size_t size) {
+    tree->capacity = size;
     const size_t resize = tree->capacity + 1;
 
     tree->elements = realloc(tree->elements, resize * tree->size);

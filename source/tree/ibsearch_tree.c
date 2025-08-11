@@ -19,7 +19,7 @@ void _ibsearch_tree_fill_hole(ibsearch_tree_s * tree, const size_t hole);
 
 /// Resizes (reallocates) tree parameter arrays based on changed capacity.
 /// @param tree Structure to resize.
-void _ibsearch_tree_resize(ibsearch_tree_s * tree);
+void _ibsearch_tree_resize(ibsearch_tree_s * tree, const size_t size);
 
 ibsearch_tree_s create_ibsearch_tree(const size_t size, const compare_fn compare) {
     assert(compare && "[ERROR] Parameter can't be NULL.");
@@ -119,8 +119,7 @@ void insert_ibsearch_tree(ibsearch_tree_s * tree, const void * element) {
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     if (tree->length == tree->capacity) {
-        tree->capacity += IBSEARCH_TREE_CHUNK;
-        _ibsearch_tree_resize(tree);
+        _ibsearch_tree_resize(tree, tree->capacity + IBSEARCH_TREE_CHUNK);
     }
 
     size_t previous = NIL; // initially invalid for the head case when tree is empty
@@ -183,13 +182,11 @@ void remove_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * b
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
-        tree->capacity -= IBSEARCH_TREE_CHUNK;
-        _ibsearch_tree_resize(tree);
+        _ibsearch_tree_resize(tree, tree->length);
     }
 }
 
 bool contains_ibsearch_tree(const ibsearch_tree_s tree, const void * element) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
     assert(element && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -199,7 +196,6 @@ bool contains_ibsearch_tree(const ibsearch_tree_s tree, const void * element) {
     assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
     assert(tree.node[IBSEARCH_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
     assert(tree.node[IBSEARCH_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
 
     for (size_t node = tree.root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -290,8 +286,7 @@ void remove_max_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
-        tree->capacity -= IBSEARCH_TREE_CHUNK;
-        _ibsearch_tree_resize(tree);
+        _ibsearch_tree_resize(tree, tree->length);
     }
 }
 
@@ -328,8 +323,7 @@ void remove_min_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
-        tree->capacity -= IBSEARCH_TREE_CHUNK;
-        _ibsearch_tree_resize(tree);
+        _ibsearch_tree_resize(tree, tree->length);
     }
 }
 
@@ -444,7 +438,7 @@ void postorder_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operat
     free(stack.elements);
 }
 
-void level_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments) {
+void level_order_ibsearch_tree(const ibsearch_tree_s tree, const operate_fn operate, void * arguments) {
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
     assert(tree.compare && "[INVALID] Parameter can't be NULL.");
@@ -551,7 +545,9 @@ size_t _ibsearch_tree_remove_fixup(const ibsearch_tree_s tree, size_t * node) {
     return hole;
 }
 
-void _ibsearch_tree_resize(ibsearch_tree_s * tree) {
+void _ibsearch_tree_resize(ibsearch_tree_s * tree, const size_t size) {
+    tree->capacity = size;
+
     tree->elements = realloc(tree->elements, tree->capacity * tree->size);
     tree->parent = realloc(tree->parent, tree->capacity * sizeof(size_t));
     tree->node[IBSEARCH_TREE_LEFT] = realloc(tree->node[IBSEARCH_TREE_LEFT], tree->capacity * sizeof(size_t));
