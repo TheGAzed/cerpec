@@ -212,7 +212,7 @@ void meld_ibinary_heap(ibinary_heap_s * restrict destination, ibinary_heap_s * r
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // for each element at half index call
-    const size_t start = (destination->length / 2) - 1;
+    const size_t start = (destination->length / 2) - 1; // value may underflow when length is less than two
     for (size_t i = 0; destination->length > 1 && i <= start; ++i) {
         const size_t reverse = start - i;
         _ibinary_heapify_down(*destination, reverse, temporary);
@@ -230,7 +230,7 @@ void patch_ibinary_heap(const ibinary_heap_s heap) {
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // for each element at half index
-    const size_t start = (heap.size / 2) - 1;
+    const size_t start = (heap.length / 2) - 1; // value may underflow when length is less than two
     for (size_t i = 0; heap.length > 1 && i <= start; ++i) {
         const size_t reverse = start - i;
         _ibinary_heapify_down(heap, reverse, temporary);
