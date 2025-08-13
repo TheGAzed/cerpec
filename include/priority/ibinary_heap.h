@@ -56,10 +56,20 @@ void pop_ibinary_heap(ibinary_heap_s * heap, void * buffer);
 /// @param buffer Element buffer to save peep.
 void peep_ibinary_heap(const ibinary_heap_s heap, void * buffer);
 
+/// @brief Replace element at array index with parameter.
+/// @param heap Structure to replace element in.
+/// @param index Array index to element in structure.
+/// @param element Element buffer to replace with.
+/// @param buffer Element buffer to save replaced.
 void replace_ibinary_heap(const ibinary_heap_s heap, const size_t index, const void * element, void * buffer);
 
+/// @brief Melds (combines) second structure into first while keeping properties.
+/// @param destination First structure to meld elements into.
+/// @param source Second structure to meld elements from.
 void meld_ibinary_heap(ibinary_heap_s * restrict destination, ibinary_heap_s * restrict source);
 
+/// @brief Patches up structure if its properties were broken.
+/// @param heap Structure to patch.
 void patch_ibinary_heap(const ibinary_heap_s heap);
 
 /// @brief Iterates over each element in structure starting from the beginning.
