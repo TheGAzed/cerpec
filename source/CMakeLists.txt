@@ -9,6 +9,8 @@ target_sources(CERPEC
 
         PRIVATE priority/ibinary_heap.c
 
+        PRIVATE table/ihash_table.c
+
         PRIVATE set/ihash_set.c
         PRIVATE set/irb_set.c
 

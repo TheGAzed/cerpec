@@ -604,21 +604,28 @@ void foreach_ihash_set(const ihash_set_s set, const operate_fn operate, void * a
 }
 
 void _ihash_set_resize(ihash_set_s * set, const size_t size) {
-    char * elements = malloc(set->length * set->size);
-    assert((!set->length || elements) && "[ERROR] Memory allocation failed.");
+    char * elements = NULL;
+    if (size != set->length) {
+        elements = realloc(set->elements, set->capacity * set->size);
+        assert(elements && "[ERROR] Memory allocation failed.");
+    } else {
+        elements = malloc(size * set->size);
 
-    for (size_t i = 0; i < set->capacity; ++i) {
-        for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
-            memcpy(elements, set->elements + (n * set->size), set->size);
+        for (size_t i = 0; i < set->capacity; ++i) {
+            for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
+                memcpy(elements, set->elements + (n * set->size), set->size);
+            }
         }
+        assert((!set->capacity || set->elements) && "[ERROR] Memory allocation failed.");
+
+        free(set->elements);
     }
 
     set->capacity = size;
-    set->elements = realloc(set->elements, set->capacity * set->size);
     set->head     = realloc(set->head, set->capacity * sizeof(size_t));
     set->next     = realloc(set->next, set->capacity * sizeof(size_t));
+    set->elements = elements;
 
-    assert((!set->capacity || set->elements) && "[ERROR] Memory allocation failed.");
     assert((!set->capacity || set->head) && "[ERROR] Memory allocation failed.");
     assert((!set->capacity || set->next) && "[ERROR] Memory allocation failed.");
 
