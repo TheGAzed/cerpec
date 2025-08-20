@@ -6,7 +6,7 @@
 
 #define NIL (size_t)(-1)
 
-/// Resizes (reallocates) set parameter arrays based on changed capacity.
+/// @brief Resizes (reallocates) set parameter arrays based on changed capacity.
 /// @param set Structure to resize.
 /// @param size New size.
 void _ihash_set_resize(ihash_set_s * set, const size_t size);
@@ -19,6 +19,8 @@ ihash_set_s create_ihash_set(const size_t size, const hash_fn hash) {
 }
 
 void destroy_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+
     assert(set->hash && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
@@ -39,6 +41,8 @@ void destroy_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
 }
 
 void clear_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+
     assert(set->hash && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");

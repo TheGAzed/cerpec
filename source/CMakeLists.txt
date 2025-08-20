@@ -13,6 +13,7 @@ target_sources(CERPEC
 
         PRIVATE set/ihash_set.c
         PRIVATE set/irb_set.c
+        PRIVATE set/ibitwise_set.c
 
         PRIVATE tree/ibsearch_tree.c
         PRIVATE tree/iavl_tree.c
