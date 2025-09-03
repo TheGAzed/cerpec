@@ -110,7 +110,7 @@ void clear_irb_tree(irb_tree_s * tree, const destroy_fn destroy) {
     }
 
     tree->elements = realloc(tree->elements, tree->size);
-    tree->color = realloc(tree->elements, sizeof(bool));
+    tree->color = realloc(tree->color, sizeof(bool));
     tree->parent = realloc(tree->parent, sizeof(size_t));
     tree->node[IRB_TREE_LEFT] = realloc(tree->node[IRB_TREE_LEFT], sizeof(size_t));
     tree->node[IRB_TREE_RIGHT] = realloc(tree->node[IRB_TREE_RIGHT], sizeof(size_t));
@@ -196,6 +196,7 @@ void insert_irb_tree(irb_tree_s * tree, const void * element) {
     tree->parent[(*node)] = previous; // make child's parent into parent
     // make child's left and right indexes invalid
     tree->node[IRB_TREE_LEFT][(*node)] = tree->node[IRB_TREE_RIGHT][(*node)] = NIL;
+    tree->color[(*node)] = IRED_TREE_COLOR;
 
     memcpy(tree->elements + ((*node) * tree->size), element, tree->size);
     tree->length++;
@@ -237,9 +238,6 @@ void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
         exit(EXIT_FAILURE);
     }
 
-    memcpy(buffer, tree->elements + (node * tree->size), tree->size);
-    tree->length--;
-
     size_t current = node, child = NIL;
     bool original_color = tree->color[current];
     if (NIL == tree->node[IRB_TREE_LEFT][node]) {
@@ -269,6 +267,13 @@ void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
     if (IBLACK_TREE_COLOR == original_color) {
         _irb_tree_remove_fixup(tree, child);
     }
+
+    // fix NIL node
+    tree->color[NIL] = IBLACK_TREE_COLOR;
+    tree->parent[NIL] = tree->node[IRB_TREE_LEFT][NIL] = tree->node[IRB_TREE_RIGHT][NIL] = NIL;
+
+    memcpy(buffer, tree->elements + (node * tree->size), tree->size);
+    tree->length--;
 
     _irb_tree_fill_hole(tree, node);
 
@@ -365,9 +370,6 @@ void remove_max_irb_tree(irb_tree_s * tree, void * buffer) {
         maximum_node = i;
     }
 
-    memcpy(buffer, tree->elements + (maximum_node * tree->size), tree->size);
-    tree->length--;
-
     size_t current = maximum_node, child = NIL;
     bool original_color = tree->color[current];
     if (NIL == tree->node[IRB_TREE_LEFT][maximum_node]) {
@@ -398,6 +400,13 @@ void remove_max_irb_tree(irb_tree_s * tree, void * buffer) {
         _irb_tree_remove_fixup(tree, child);
     }
 
+    // fix NIL node
+    tree->color[NIL] = IBLACK_TREE_COLOR;
+    tree->parent[NIL] = tree->node[IRB_TREE_LEFT][NIL] = tree->node[IRB_TREE_RIGHT][NIL] = NIL;
+
+    memcpy(buffer, tree->elements + (maximum_node * tree->size), tree->size);
+    tree->length--;
+
     _irb_tree_fill_hole(tree, maximum_node);
 
     if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
@@ -423,9 +432,6 @@ void remove_min_irb_tree(irb_tree_s * tree, void * buffer) {
     for (size_t i = tree->node[IRB_TREE_LEFT][minimum_node]; NIL != i; i = tree->node[IRB_TREE_LEFT][i]) {
         minimum_node = i;
     }
-
-    memcpy(buffer, tree->elements + (minimum_node * tree->size), tree->size);
-    tree->length--;
 
     size_t current = minimum_node, child = NIL;
     bool original_color = tree->color[current];
@@ -456,6 +462,13 @@ void remove_min_irb_tree(irb_tree_s * tree, void * buffer) {
     if (IBLACK_TREE_COLOR == original_color) {
         _irb_tree_remove_fixup(tree, child);
     }
+
+    // fix NIL node
+    tree->color[NIL] = IBLACK_TREE_COLOR;
+    tree->parent[NIL] = tree->node[IRB_TREE_LEFT][NIL] = tree->node[IRB_TREE_RIGHT][NIL] = NIL;
+
+    memcpy(buffer, tree->elements + (minimum_node * tree->size), tree->size);
+    tree->length--;
 
     _irb_tree_fill_hole(tree, minimum_node);
 
@@ -725,9 +738,8 @@ void _irb_tree_insert_fixup(irb_tree_s * tree, const size_t node) {
 
 void _irb_tree_remove_fixup(irb_tree_s * tree, const size_t node) {
     size_t child = node;
-
     while (child != tree->root && IBLACK_TREE_COLOR == tree->color[child]) {
-        if (child == tree->parent[child]) {
+        if (child == tree->node[IRB_TREE_LEFT][tree->parent[child]]) {
             size_t sibling = tree->node[IRB_TREE_RIGHT][tree->parent[child]];
             if (IRED_TREE_COLOR == tree->color[sibling]) {
                 tree->color[sibling] = IBLACK_TREE_COLOR;
@@ -773,7 +785,7 @@ void _irb_tree_remove_fixup(irb_tree_s * tree, const size_t node) {
                 child = tree->parent[child];
             } else {
                 if (IBLACK_TREE_COLOR == tree->color[tree->node[IRB_TREE_LEFT][sibling]]) {
-                    tree->color[tree->node[IRB_TREE_LEFT][sibling]] = IBLACK_TREE_COLOR;
+                    tree->color[tree->node[IRB_TREE_RIGHT][sibling]] = IBLACK_TREE_COLOR;
                     tree->color[sibling] = IRED_TREE_COLOR;
                     _irb_tree_left_rotate(tree, sibling);
                     sibling = tree->node[IRB_TREE_LEFT][tree->parent[child]];
@@ -788,15 +800,12 @@ void _irb_tree_remove_fixup(irb_tree_s * tree, const size_t node) {
         }
     }
 
-    // fix NIL node
-    tree->color[NIL] = IBLACK_TREE_COLOR;
-    tree->parent[NIL] = tree->node[IRB_TREE_LEFT][NIL] = tree->node[IRB_TREE_RIGHT][NIL] = NIL;
-
     tree->color[child] = IBLACK_TREE_COLOR;
 }
 
 void _irb_tree_fill_hole(irb_tree_s * tree, const size_t hole) {
-    if (tree->length && tree->root == tree->length) { // if head node is last array element then change index to removed one
+    const size_t last = tree->length + 1;
+    if (tree->length && tree->root == last) { // if head node is last array element then change index to removed one
         tree->root = hole;
     }
 
@@ -804,28 +813,28 @@ void _irb_tree_fill_hole(irb_tree_s * tree, const size_t hole) {
     tree->node[IRB_TREE_LEFT][hole] = tree->node[IRB_TREE_RIGHT][hole] = tree->parent[hole] = hole;
 
     // replace removed element with rightmost array one (or fill hole with valid element)
-    memmove(tree->elements + (hole * tree->size), tree->elements + (tree->length * tree->size), tree->size);
-    tree->elements[hole] = tree->elements[tree->length];
-    tree->node[IRB_TREE_LEFT][hole] = tree->node[IRB_TREE_LEFT][tree->length];
-    tree->node[IRB_TREE_RIGHT][hole] = tree->node[IRB_TREE_RIGHT][tree->length];
-    tree->parent[hole] = tree->parent[tree->length];
+    memmove(tree->elements + (hole * tree->size), tree->elements + (last * tree->size), tree->size);
+    tree->node[IRB_TREE_LEFT][hole] = tree->node[IRB_TREE_LEFT][last];
+    tree->node[IRB_TREE_RIGHT][hole] = tree->node[IRB_TREE_RIGHT][last];
+    tree->parent[hole] = tree->parent[last];
+    tree->color[hole] = tree->color[last];
 
     // redirect left child of rightmost array node if they don't overlap with removed index
-    const size_t left_last = tree->node[IRB_TREE_LEFT][tree->length];
+    const size_t left_last = tree->node[IRB_TREE_LEFT][last];
     if (NIL != left_last) {
         tree->parent[left_last] = hole;
     }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
-    const size_t right_last = tree->node[IRB_TREE_RIGHT][tree->length];
+    const size_t right_last = tree->node[IRB_TREE_RIGHT][last];
     if (NIL != right_last) {
         tree->parent[right_last] = hole;
     }
 
     // redirect parent of rightmost array node if they don't overlap with removed index
-    const size_t parent_last = tree->parent[tree->length];
+    const size_t parent_last = tree->parent[last];
     if (NIL != parent_last) {
-        const int comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
+        const int comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size));
         const size_t node_index = comparison <= 0 ? IRB_TREE_LEFT : IRB_TREE_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }

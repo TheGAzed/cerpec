@@ -34,6 +34,13 @@ bool print(void * element, void * format) {
     return true;
 }
 
+bool nothing(void * element, void * argument) {
+    (void)(element);
+    (void)(argument);
+
+    return true;
+}
+
 void sort(void * array, const size_t length, void * compare) {
     struct compare const * cmp = compare;
     qsort(array, length, sizeof(int), cmp->compare_element);

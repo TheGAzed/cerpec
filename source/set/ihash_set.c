@@ -610,7 +610,7 @@ void foreach_ihash_set(const ihash_set_s set, const operate_fn operate, void * a
 void _ihash_set_resize(ihash_set_s * set, const size_t size) {
     char * elements = NULL;
     if (size != set->length) {
-        elements = realloc(set->elements, set->capacity * set->size);
+        elements = realloc(set->elements, size * set->size);
         assert(elements && "[ERROR] Memory allocation failed.");
     } else {
         elements = malloc(size * set->size);

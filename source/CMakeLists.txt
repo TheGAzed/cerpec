@@ -18,4 +18,6 @@ target_sources(CERPEC
         PRIVATE tree/ibsearch_tree.c
         PRIVATE tree/iavl_tree.c
         PRIVATE tree/irb_tree.c
+
+        PRIVATE misc/itrie.c
 )

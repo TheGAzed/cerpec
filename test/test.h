@@ -12,6 +12,7 @@ void destroy(void * element);
 void * copy(void * destination, const void * source);
 bool increment(void * element, void * value);
 bool print(void * element, void * format);
+bool nothing(void * element, void * argument);
 void sort(void * array, const size_t length, void * compare);
 bool odd(const void * element, void * nil);
 bool even(const void * element, void * nil);

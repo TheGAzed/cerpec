@@ -571,7 +571,7 @@ void _iavl_tree_right_rotate(iavl_tree_s * tree, const size_t node) {
 }
 
 void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node) {
-    for (size_t n = node, p = tree->parent[n]; NIL != n; n = p, p = tree->parent[n]) {
+    for (size_t n = node; NIL != n && NIL != tree->parent[n]; n = tree->parent[n]) {
         // calculate left child's height
         const size_t left = tree->node[IAVL_TREE_LEFT][n];
         const size_t left_height = _iavl_tree_get_height((*tree), left);
@@ -604,7 +604,7 @@ void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node) {
             const size_t left_grand_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_LEFT][left]);
             const size_t right_grand_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_RIGHT][left]);
 
-            if (left_grand_height > right_grand_height) {
+            if (left_grand_height < right_grand_height) {
                 _iavl_tree_left_rotate(tree, left);
             }
             _iavl_tree_right_rotate(tree, n);
@@ -628,7 +628,7 @@ size_t _iavl_tree_remove_fixup(const iavl_tree_s tree, size_t * node) {
     }
 
     const size_t hole = left_depth > right_depth ? (*left_node) : (*right_node);
-    memcpy(tree.elements + (*node), tree.elements + hole, tree.size);
+    memmove(tree.elements + ((*node) * tree.size), tree.elements + (hole * tree.size), tree.size);
     if (left_depth > right_depth) {
         if (NIL != tree.node[IAVL_TREE_LEFT][(*left_node)]) { // if right child exists cut off parent
             tree.parent[tree.node[IAVL_TREE_LEFT][(*left_node)]] = tree.parent[(*left_node)];
@@ -654,7 +654,6 @@ void _iavl_tree_fill_hole(iavl_tree_s * tree, const size_t hole) {
 
     // replace removed element with rightmost array one (or fill hole with valid element)
     memmove(tree->elements + (hole * tree->size), tree->elements + (tree->length * tree->size), tree->size);
-    tree->elements[hole] = tree->elements[tree->length];
     tree->node[IAVL_TREE_LEFT][hole] = tree->node[IAVL_TREE_LEFT][tree->length];
     tree->node[IAVL_TREE_RIGHT][hole] = tree->node[IAVL_TREE_RIGHT][tree->length];
     tree->parent[hole] = tree->parent[tree->length];
