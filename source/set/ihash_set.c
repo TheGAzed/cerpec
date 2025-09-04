@@ -163,8 +163,8 @@ void remove_ihash_set(ihash_set_s * set, const void * element, void * buffer) {
 
     // for each node at index check if element is contained
     for (size_t * n = set->head + index; NIL != (*n); n = set->next + (*n)) {
-        const char * current = set->elements + ((*n) + set->size);
-        if (hash != set->hash(current)) { // if not equal contionue
+        const char * current = set->elements + ((*n) * set->size);
+        if (hash != set->hash(current)) { // if not equal continue
             continue;
         } // else remove found element and return
 
@@ -184,7 +184,7 @@ void remove_ihash_set(ihash_set_s * set, const void * element, void * buffer) {
 
         // resize (expand) if set can contain a smaller capacity of elements
         if (set->capacity - IHASH_SET_CHUNK == set->length) {
-            _ihash_set_resize(set, set->capacity - IHASH_SET_CHUNK);
+            _ihash_set_resize(set, set->length);
         }
 
         return; // return to avoid assertion and termination at the end of function if element wasn't found
@@ -200,6 +200,10 @@ bool contains_ihash_set(const ihash_set_s set, const void * element) {
     assert(set.hash && "[INVALID] Parameter can't be NULL.");
     assert(set.size && "[INVALID] Parameter can't be zero.");
     assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+
+    if (!set.length) {
+        return false;
+    }
 
     // calculate hash value and index in array
     const size_t hash = set.hash(element);
@@ -609,15 +613,15 @@ void foreach_ihash_set(const ihash_set_s set, const operate_fn operate, void * a
 
 void _ihash_set_resize(ihash_set_s * set, const size_t size) {
     char * elements = NULL;
-    if (size != set->length) {
+    if (size != set->length) { // just expand set's elements as they're continuous in memory
         elements = realloc(set->elements, size * set->size);
         assert(elements && "[ERROR] Memory allocation failed.");
-    } else {
+    } else { // else the set shrinks and elements must be pushed into new array continuously
         elements = malloc(size * set->size);
 
-        for (size_t i = 0; i < set->capacity; ++i) {
+        for (size_t i = 0, index = 0; i < set->capacity; ++i) {
             for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
-                memcpy(elements, set->elements + (n * set->size), set->size);
+                memcpy(elements + ((index++) * set->size), set->elements + (n * set->size), set->size);
             }
         }
         assert((!set->capacity || set->elements) && "[ERROR] Memory allocation failed.");

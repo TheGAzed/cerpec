@@ -115,7 +115,7 @@ void clear_irb_set(irb_set_s * set, const destroy_fn destroy) {
 
     // shrink arrays to hold only one node
     set->elements = realloc(set->elements, set->size);
-    set->color = realloc(set->elements, sizeof(bool));
+    set->color = realloc(set->color, sizeof(bool));
     set->parent = realloc(set->parent, sizeof(size_t));
     set->node[IRB_SET_LEFT] = realloc(set->node[IRB_SET_LEFT], sizeof(size_t));
     set->node[IRB_SET_RIGHT] = realloc(set->node[IRB_SET_RIGHT], sizeof(size_t));
@@ -150,20 +150,25 @@ irb_set_s copy_irb_set(const irb_set_s set, const copy_fn copy) {
     };
 
     // since the structure always has one additional NIL node malloc must be checked even if capacity is zero
-    assert(set.elements && "[ERROR] Memory allocation failed.");
-    assert(set.color && "[ERROR] Memory allocation failed.");
-    assert(set.parent && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(replica.elements && "[ERROR] Memory allocation failed.");
+    assert(replica.color && "[ERROR] Memory allocation failed.");
+    assert(replica.parent && "[ERROR] Memory allocation failed.");
+    assert(replica.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
+    assert(replica.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+
+    // set NIL node since the set uses special NIL nodes
+    replica.color[NIL] = IBLACK_SET_COLOR;
+    replica.parent[NIL] = replica.node[IRB_SET_LEFT][NIL] = replica.node[IRB_SET_RIGHT][NIL] = NIL;
 
     // copy elements and indexes straight to replica
-    for (size_t i = 0; i < set.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < set.length + 1; ++i) {
         copy(replica.elements + (i * set.size), set.elements + (i * set.size));
     }
-    memcpy(replica.color, set.color, set.length * sizeof(bool));
-    memcpy(replica.parent, set.parent, set.length * sizeof(size_t));
-    memcpy(replica.node[IRB_SET_LEFT], set.node[IRB_SET_LEFT], set.length * sizeof(size_t));
-    memcpy(replica.node[IRB_SET_RIGHT], set.node[IRB_SET_RIGHT], set.length * sizeof(size_t));
+    memcpy(replica.color + 1, set.color + 1, set.length * sizeof(bool));
+    memcpy(replica.parent + 1, set.parent + 1, set.length * sizeof(size_t));
+    memcpy(replica.node[IRB_SET_LEFT] + 1, set.node[IRB_SET_LEFT] + 1, set.length * sizeof(size_t));
+    memcpy(replica.node[IRB_SET_RIGHT] + 1, set.node[IRB_SET_RIGHT] + 1, set.length * sizeof(size_t));
 
     return replica;
 }
@@ -203,6 +208,7 @@ void insert_irb_set(irb_set_s * set, const void * element) {
     set->parent[(*node)] = previous; // make child's parent into parent
     // make child's left and right indexes invalid
     set->node[IRB_SET_LEFT][(*node)] = set->node[IRB_SET_RIGHT][(*node)] = NIL;
+    set->color[(*node)] = IRED_SET_COLOR;
 
     // copy element into structure
     memcpy(set->elements + ((*node) * set->size), element, set->size);
@@ -245,10 +251,6 @@ void remove_irb_set(irb_set_s * set, const void * element, void * buffer) {
         exit(EXIT_FAILURE);
     }
 
-    // copy found element into buffer for removal
-    memcpy(buffer, set->elements + (node * set->size), set->size);
-    set->length--;
-
     size_t current = node, child = NIL;
     bool original_color = set->color[current];
     if (NIL == set->node[IRB_SET_LEFT][node]) {
@@ -278,6 +280,14 @@ void remove_irb_set(irb_set_s * set, const void * element, void * buffer) {
     if (IBLACK_SET_COLOR == original_color) {
         _irb_set_remove_fixup(set, child);
     }
+
+    // fix NIL node
+    set->color[NIL] = IBLACK_SET_COLOR;
+    set->parent[NIL] = set->node[IRB_SET_LEFT][NIL] = set->node[IRB_SET_RIGHT][NIL] = NIL;
+
+    // copy found element into buffer for removal
+    memcpy(buffer, set->elements + (node * set->size), set->size);
+    set->length--;
 
     _irb_set_fill_hole(set, node);
 
@@ -332,7 +342,8 @@ irb_set_s union_irb_set(const irb_set_s set_one, const irb_set_s set_two, const 
     irb_set_s set_union = copy_irb_set(maximum, copy);
 
     // for each element in minimum set
-    for (size_t i = 0; i < minimum.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < minimum.length + 1; ++i) {
         const char * element = minimum.elements + (i * minimum.size);
         bool contains = false;
         for (size_t node = maximum.root; NIL != node;) {
@@ -371,6 +382,7 @@ irb_set_s union_irb_set(const irb_set_s set_one, const irb_set_s set_two, const 
         set_union.parent[(*node)] = previous; // make child's parent into parent
         // make child's left and right indexes invalid
         set_union.node[IRB_SET_LEFT][(*node)] = set_union.node[IRB_SET_RIGHT][(*node)] = NIL;
+        set_union.color[(*node)] = IRED_SET_COLOR;
 
         copy(set_union.elements + ((*node) * set_union.size), element);
         set_union.length++;
@@ -401,7 +413,8 @@ irb_set_s intersect_irb_set(const irb_set_s set_one, const irb_set_s set_two, co
     irb_set_s set_intersect = create_irb_set(set_one.size, set_one.compare);
 
     // for each element in minimum set
-    for (size_t i = 0; i < minimum.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < minimum.length + 1; ++i) {
         const char * element = minimum.elements + (i * minimum.size);
         bool contains = false;
         for (size_t node = maximum.root; NIL != node;) {
@@ -440,6 +453,7 @@ irb_set_s intersect_irb_set(const irb_set_s set_one, const irb_set_s set_two, co
         set_intersect.parent[(*node)] = previous; // make child's parent into parent
         // make child's left and right indexes invalid
         set_intersect.node[IRB_SET_LEFT][(*node)] = set_intersect.node[IRB_SET_RIGHT][(*node)] = NIL;
+        set_intersect.color[(*node)] = IRED_SET_COLOR;
 
         copy(set_intersect.elements + ((*node) * set_intersect.size), element);
         set_intersect.length++;
@@ -466,7 +480,8 @@ irb_set_s subtract_irb_set(const irb_set_s minuend, const irb_set_s subtrahend, 
     irb_set_s set_subtract = create_irb_set(minuend.size, minuend.compare);
 
     // for each element in minimum set
-    for (size_t i = 0; i < minuend.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < minuend.length + 1; ++i) {
         const char * element = minuend.elements + (i * minuend.size);
         bool contains = false;
         for (size_t node = subtrahend.root; NIL != node;) {
@@ -505,6 +520,7 @@ irb_set_s subtract_irb_set(const irb_set_s minuend, const irb_set_s subtrahend, 
         set_subtract.parent[(*node)] = previous; // make child's parent into parent
         // make child's left and right indexes invalid
         set_subtract.node[IRB_SET_LEFT][(*node)] = set_subtract.node[IRB_SET_RIGHT][(*node)] = NIL;
+        set_subtract.color[(*node)] = IRED_SET_COLOR;
 
         copy(set_subtract.elements + ((*node) * set_subtract.size), element);
         set_subtract.length++;
@@ -531,7 +547,8 @@ irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, cons
     irb_set_s set_exclude = create_irb_set(set_one.size, set_one.compare);
 
     // for each element in set one
-    for (size_t i = 0; i < set_one.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < set_one.length + 1; ++i) {
         const char * element = set_one.elements + (i * set_one.size);
         bool contains = false;
         for (size_t node = set_two.root; NIL != node;) {
@@ -570,6 +587,7 @@ irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, cons
         set_exclude.parent[(*node)] = previous; // make child's parent into parent
         // make child's left and right indexes invalid
         set_exclude.node[IRB_SET_LEFT][(*node)] = set_exclude.node[IRB_SET_RIGHT][(*node)] = NIL;
+        set_exclude.color[(*node)] = IRED_SET_COLOR;
 
         copy(set_exclude.elements + ((*node) * set_exclude.size), element);
         set_exclude.length++;
@@ -578,7 +596,8 @@ irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, cons
     }
 
     // for each element in set two
-    for (size_t i = 0; i < set_two.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < set_two.length + 1; ++i) {
         const char * element = set_two.elements + (i * set_two.size);
         bool contains = false;
         for (size_t node = set_one.root; NIL != node;) {
@@ -617,6 +636,7 @@ irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, cons
         set_exclude.parent[(*node)] = previous; // make child's parent into parent
         // make child's left and right indexes invalid
         set_exclude.node[IRB_SET_LEFT][(*node)] = set_exclude.node[IRB_SET_RIGHT][(*node)] = NIL;
+        set_exclude.color[(*node)] = IRED_SET_COLOR;
 
         copy(set_exclude.elements + ((*node) * set_exclude.size), element);
         set_exclude.length++;
@@ -639,7 +659,8 @@ bool is_subset_irb_set(const irb_set_s super, const irb_set_s sub) {
     assert(sub.size && "[INVALID] Parameter can't be zero.");
     assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < sub.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < sub.length + 1; ++i) {
         const char * element = sub.elements + (i * sub.size);
         bool contains = false;
         for (size_t node = super.root; NIL != node;) {
@@ -674,7 +695,8 @@ bool is_proper_subset_irb_set(const irb_set_s super, const irb_set_s sub) {
     assert(sub.size && "[INVALID] Parameter can't be zero.");
     assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < sub.length; ++i) {
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < sub.length + 1; ++i) {
         const char * element = sub.elements + (i * sub.size);
         bool contains = false;
         for (size_t node = super.root; NIL != node;) {
@@ -711,7 +733,9 @@ bool is_disjoint_irb_set(const irb_set_s set_one, const irb_set_s set_two) {
 
     const irb_set_s minimum = set_one.length < set_two.length ? set_one : set_two;
     const irb_set_s maximum = set_one.length >= set_two.length ? set_one : set_two;
-    for (size_t i = 0; i < minimum.length; ++i) {
+
+    // start at 1 since NIL is at zero and elements start beyond NIL
+    for (size_t i = 1; i < minimum.length + 1; ++i) {
         const char * element = minimum.elements + (i * minimum.size);
         bool contains = false;
         for (size_t node = maximum.root; NIL != node;) {
@@ -855,7 +879,6 @@ void _irb_set_insert_fixup(irb_set_s * set, const size_t node) {
 
 void _irb_set_remove_fixup(irb_set_s * set, const size_t node) {
     size_t child = node;
-
     while (child != set->root && IBLACK_SET_COLOR == set->color[child]) {
         if (child == set->parent[child]) {
             size_t sibling = set->node[IRB_SET_RIGHT][set->parent[child]];
@@ -918,15 +941,12 @@ void _irb_set_remove_fixup(irb_set_s * set, const size_t node) {
         }
     }
 
-    // fix NIL node
-    set->color[NIL] = IBLACK_SET_COLOR;
-    set->parent[NIL] = set->node[IRB_SET_LEFT][NIL] = set->node[IRB_SET_RIGHT][NIL] = NIL;
-
     set->color[child] = IBLACK_SET_COLOR;
 }
 
 void _irb_set_fill_hole(irb_set_s * set, const size_t hole) {
-    if (set->length && set->root == set->length) { // if head node is last array element then change index to removed one
+    const size_t last = set->length + 1;
+    if (set->length && set->root == last) { // if head node is last array element then change index to removed one
         set->root = hole;
     }
 
@@ -934,28 +954,27 @@ void _irb_set_fill_hole(irb_set_s * set, const size_t hole) {
     set->node[IRB_SET_LEFT][hole] = set->node[IRB_SET_RIGHT][hole] = set->parent[hole] = hole;
 
     // replace removed element with rightmost array one (or fill hole with valid element)
-    memmove(set->elements + (hole * set->size), set->elements + (set->length * set->size), set->size);
-    set->elements[hole] = set->elements[set->length];
-    set->node[IRB_SET_LEFT][hole] = set->node[IRB_SET_LEFT][set->length];
-    set->node[IRB_SET_RIGHT][hole] = set->node[IRB_SET_RIGHT][set->length];
-    set->parent[hole] = set->parent[set->length];
+    memmove(set->elements + (hole * set->size), set->elements + (last * set->size), set->size);
+    set->node[IRB_SET_LEFT][hole] = set->node[IRB_SET_LEFT][last];
+    set->node[IRB_SET_RIGHT][hole] = set->node[IRB_SET_RIGHT][last];
+    set->parent[hole] = set->parent[last];
 
     // redirect left child of rightmost array node if they don't overlap with removed index
-    const size_t left_last = set->node[IRB_SET_LEFT][set->length];
+    const size_t left_last = set->node[IRB_SET_LEFT][last];
     if (NIL != left_last) {
         set->parent[left_last] = hole;
     }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
-    const size_t right_last = set->node[IRB_SET_RIGHT][set->length];
+    const size_t right_last = set->node[IRB_SET_RIGHT][last];
     if (NIL != right_last) {
         set->parent[right_last] = hole;
     }
 
     // redirect parent of rightmost array node if they don't overlap with removed index
-    const size_t parent_last = set->parent[set->length];
+    const size_t parent_last = set->parent[last];
     if (NIL != parent_last) {
-        const int comparison = set->compare(set->elements + (set->length * set->size), set->elements + (parent_last * set->size));
+        const int comparison = set->compare(set->elements + (last * set->size), set->elements + (parent_last * set->size));
         const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
         set->node[node_index][parent_last] = hole;
     }
