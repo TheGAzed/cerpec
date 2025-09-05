@@ -165,10 +165,10 @@ irb_set_s copy_irb_set(const irb_set_s set, const copy_fn copy) {
     for (size_t i = 1; i < set.length + 1; ++i) {
         copy(replica.elements + (i * set.size), set.elements + (i * set.size));
     }
-    memcpy(replica.color + 1, set.color + 1, set.length * sizeof(bool));
-    memcpy(replica.parent + 1, set.parent + 1, set.length * sizeof(size_t));
-    memcpy(replica.node[IRB_SET_LEFT] + 1, set.node[IRB_SET_LEFT] + 1, set.length * sizeof(size_t));
-    memcpy(replica.node[IRB_SET_RIGHT] + 1, set.node[IRB_SET_RIGHT] + 1, set.length * sizeof(size_t));
+    memcpy(replica.color, set.color, (set.length + 1) * sizeof(bool));
+    memcpy(replica.parent, set.parent, (set.length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRB_SET_LEFT], set.node[IRB_SET_LEFT], (set.length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRB_SET_RIGHT], set.node[IRB_SET_RIGHT], (set.length + 1) * sizeof(size_t));
 
     return replica;
 }

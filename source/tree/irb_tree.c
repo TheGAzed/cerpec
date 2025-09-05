@@ -156,10 +156,10 @@ irb_tree_s copy_irb_tree(const irb_tree_s tree, const copy_fn copy) {
     for (size_t i = 1; i < tree.length + 1; ++i) {
         copy(replica.elements + (i * tree.size), tree.elements + (i * tree.size));
     }
-    memcpy(replica.color + 1, tree.color + 1, tree.length * sizeof(bool));
-    memcpy(replica.parent + 1, tree.parent + 1, tree.length * sizeof(size_t));
-    memcpy(replica.node[IRB_TREE_LEFT] + 1, tree.node[IRB_TREE_LEFT] + 1, tree.length * sizeof(size_t));
-    memcpy(replica.node[IRB_TREE_RIGHT] + 1, tree.node[IRB_TREE_RIGHT] + 1, tree.length * sizeof(size_t));
+    memcpy(replica.color, tree.color, (tree.length + 1) * sizeof(bool));
+    memcpy(replica.parent, tree.parent, (tree.length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRB_TREE_LEFT], tree.node[IRB_TREE_LEFT], (tree.length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRB_TREE_RIGHT], tree.node[IRB_TREE_RIGHT], (tree.length + 1) * sizeof(size_t));
 
     return replica;
 }

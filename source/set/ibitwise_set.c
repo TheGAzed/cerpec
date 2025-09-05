@@ -49,7 +49,7 @@ ibitwise_set_s copy_ibitwise_set(const ibitwise_set_s set) {
     // create replica structure
     const ibitwise_set_s replica = {
         .capacity = set.capacity, .length = set.length,
-        .bits = malloc(set.capacity * sizeof(unsigned)),
+        .bits = malloc(set.capacity / CHAR_BIT),
     };
     assert((!replica.capacity || replica.bits) && "[ERROR] Memory allocation failed.");
 
@@ -70,12 +70,13 @@ void insert_ibitwise_set(ibitwise_set_s * set, const size_t index) {
 
     // calculate bits array index and bit at parameter index
     const size_t idx = index / BIT_COUNT;
-    const unsigned relative = (unsigned)(index) % BIT_COUNT;
+    const unsigned relative = (unsigned)(index % BIT_COUNT);
     const unsigned bit = 1U << (BIT_COUNT - relative - 1);
 
     // expand set if index is beyond capacity
-    if (idx >= set->capacity) {
-        const size_t capacity = idx - (size_t)relative + IBITWISE_SET_CHUNK;
+    if (index >= set->capacity) {
+        const size_t mod = index % IBITWISE_SET_CHUNK;
+        const size_t capacity = (index - mod) + IBITWISE_SET_CHUNK;
         _ibitwise_set_resize(set, capacity);
     }
 
@@ -127,7 +128,7 @@ bool contains_ibitwise_set(const ibitwise_set_s set, const size_t index) {
     const unsigned relative = (unsigned)(index % BIT_COUNT);
     const unsigned bit = 1U << (BIT_COUNT - relative - 1);
 
-    return (bool)(set.bits[idx] & bit); // return ANDed bit as a boolean
+    return (index < set.capacity) && (bool)(set.bits[idx] & bit); // return ANDed bit as a boolean
 }
 
 ibitwise_set_s union_ibitwise_set(const ibitwise_set_s set_one, const ibitwise_set_s set_two) {
@@ -161,7 +162,7 @@ ibitwise_set_s intersect_ibitwise_set(const ibitwise_set_s set_one, const ibitwi
     ibitwise_set_s set_intersect = copy_ibitwise_set(min);
     set_intersect.length = 0;
     for (size_t i = 0; i < min.capacity / BIT_COUNT; ++i) {
-        set_intersect.bits[i] |= max.bits[i];
+        set_intersect.bits[i] &= max.bits[i];
         set_intersect.length += (size_t)_ibitwise_set_popcount(set_intersect.bits[i]);
     }
 
@@ -229,7 +230,7 @@ ibitwise_set_s exclude_ibitwise_set(const ibitwise_set_s set_one, const ibitwise
     ibitwise_set_s set_exclude = copy_ibitwise_set(maximum);
     set_exclude.length = 0;
     for (size_t i = 0; i < minimum.capacity / BIT_COUNT; ++i) {
-        set_exclude.bits[i] ^= maximum.bits[i];
+        set_exclude.bits[i] ^= minimum.bits[i];
         set_exclude.length += (size_t)_ibitwise_set_popcount(set_exclude.bits[i]);
     }
 
@@ -266,7 +267,7 @@ bool is_subset_ibitwise_set(const ibitwise_set_s super, const ibitwise_set_s sub
     }
 
     // if subset has bits set beyond superset then it also isn't a subset
-    for (; i < sub.capacity; ++i) {
+    for (; i < sub.capacity / BIT_COUNT; ++i) {
         if (sub.bits[i]) {
             return false;
         }
@@ -288,13 +289,13 @@ bool is_proper_subset_ibitwise_set(const ibitwise_set_s super, const ibitwise_se
     }
 
     // if subset has bits set beyond superset then it also isn't a subset
-    for (; i < sub.capacity; ++i) {
+    for (; i < sub.capacity / BIT_COUNT; ++i) {
         if (sub.bits[i]) {
             return false;
         }
     }
 
-    return (sub.length == super.length);
+    return (sub.length != super.length);
 }
 
 bool is_disjoint_ibitwise_set(const ibitwise_set_s set_one, const ibitwise_set_s set_two) {
@@ -342,8 +343,11 @@ int _ibitwise_set_popcount(const unsigned bits) {
 }
 
 void _ibitwise_set_resize(ibitwise_set_s * set, const size_t size) {
-    set->capacity = size;
+    set->bits = realloc(set->bits, size / CHAR_BIT);
+    for (size_t i = set->capacity / BIT_COUNT; i < size / BIT_COUNT; ++i) {
+        set->bits[i] = 0;
+    }
 
-    set->bits = realloc(set->bits, set->capacity / CHAR_BIT);
+    set->capacity = size;
     assert((!set->capacity || set->bits) && "[ERROR] Memory allocation failed.");
 }
