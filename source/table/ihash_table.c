@@ -220,6 +220,11 @@ bool contains_key_ihash_table(const ihash_table_s table, const void * key) {
     assert(table.value_size && "[INVALID] Parameter can't be zero.");
     assert(table.length <= table.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
+    // early return to avoid 'x mod 0' by capacity
+    if (!table.capacity) {
+        return false;
+    }
+
     // calculate hash values and index in array
     const size_t hash = table.hash(key);
     const size_t index = hash % table.capacity;

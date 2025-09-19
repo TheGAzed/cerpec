@@ -201,7 +201,8 @@ bool contains_ihash_set(const ihash_set_s set, const void * element) {
     assert(set.size && "[INVALID] Parameter can't be zero.");
     assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    if (!set.length) {
+    // early return to avoid 'x mod 0' by capacity
+    if (!set.capacity) {
         return false;
     }
 
@@ -613,7 +614,7 @@ void foreach_ihash_set(const ihash_set_s set, const operate_fn operate, void * a
 
 void _ihash_set_resize(ihash_set_s * set, const size_t size) {
     char * elements = NULL;
-    if (size != set->length) { // just expand set's elements as they're continuous in memory
+    if (size > set->capacity) { // just expand set's elements as they're continuous in memory
         elements = realloc(set->elements, size * set->size);
         assert(elements && "[ERROR] Memory allocation failed.");
     } else { // else the set shrinks and elements must be pushed into new array continuously

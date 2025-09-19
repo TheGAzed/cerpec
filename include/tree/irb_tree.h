@@ -61,35 +61,90 @@ void insert_irb_tree(irb_tree_s * tree, const void * element);
 /// @param buffer Buffer to save removed element.
 void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer);
 
-/// @brief Checks if element is contained in structure.
+/// @brief Checks if element is contained.
 /// @param tree Structure to remove from.
 /// @param element Element buffer to search.
 /// @return 'true' if contained, 'false' if not.
 bool contains_irb_tree(const irb_tree_s tree, const void * element);
 
-/// @brief Gets the maximum element in structure.
+/// @brief Gets the maximum element.
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save element.
 /// @note Maximum element as specified by compare fucntion pointer.
 void get_max_irb_tree(const irb_tree_s tree, void * buffer);
 
-/// @brief Gets the minimum element in structure.
+/// @brief Gets the minimum element.
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save element.
 /// @note Minimum element as specified by compare fucntion pointer.
 void get_min_irb_tree(const irb_tree_s tree, void * buffer);
 
-/// @brief Gets and removes the maximum element in structure.
+/// @brief Gets and removes the maximum element.
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save removed element.
 /// @note Maximum element as specified by compare fucntion pointer.
 void remove_max_irb_tree(irb_tree_s * tree, void * buffer);
 
-/// @brief Gets and removes the minimum element in structure.
+/// @brief Gets and removes the minimum element.
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save removed element.
 /// @note Minimum element as specified by compare fucntion pointer.
 void remove_min_irb_tree(irb_tree_s * tree, void * buffer);
+
+/// @brief Gets the floor based on parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save element.
+void get_floor_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets the ceil based on parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save element.
+void get_ceil_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the floor element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_floor_irb_tree(irb_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the ceil element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_ceil_irb_tree(irb_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets the in-order successor of parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void get_successor_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets the in-order predecessor of parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void get_predecessor_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the in-order successor element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_successor_irb_tree(irb_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the in-order predecessor element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_predecessor_irb_tree(irb_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets and replaces the previous instance of element with new parameter one.
+/// @param tree Structure to get from.
+/// @param latter Latter buffer to search by.
+/// @param former Former buffer to save replaced element.
+/// @note Both 'former' and 'latter' must be equal based on comparison function pointer.
+void update_irb_tree(const irb_tree_s tree, const void * latter, void * former);
 
 /// @brief Performs an in-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.

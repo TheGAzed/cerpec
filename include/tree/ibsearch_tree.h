@@ -87,6 +87,61 @@ void remove_max_ibsearch_tree(ibsearch_tree_s * tree, void * buffer);
 /// @note Minimum element as specified by compare fucntion pointer.
 void remove_min_ibsearch_tree(ibsearch_tree_s * tree, void * buffer);
 
+/// @brief Gets the floor based on parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save element.
+void get_floor_ibsearch_tree(const ibsearch_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets the ceil based on parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save element.
+void get_ceil_ibsearch_tree(const ibsearch_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the floor element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_floor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the ceil element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_ceil_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets the in-order successor of parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void get_successor_ibsearch_tree(const ibsearch_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets the in-order predecessor of parameter element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void get_predecessor_ibsearch_tree(const ibsearch_tree_s tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the in-order successor element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_successor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets and removes the in-order predecessor element.
+/// @param tree Structure to get from.
+/// @param element Element buffer to search.
+/// @param buffer Buffer to save removed element.
+void remove_predecessor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer);
+
+/// @brief Gets and replaces the previous instance of element with new parameter one.
+/// @param tree Structure to get from.
+/// @param latter Latter buffer to search by.
+/// @param former Former buffer to save replaced element.
+/// @note Both 'former' and 'latter' must be equal based on comparison function pointer.
+void update_ibsearch_tree(const ibsearch_tree_s tree, const void * latter, void * former);
+
 /// @brief Performs an in-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param operate Function pointer to operate on each element reference using generic arguments.
