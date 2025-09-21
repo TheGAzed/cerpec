@@ -814,6 +814,15 @@ size_t * _iavl_tree_ceil(iavl_tree_s * tree, const void * element) {
 
 size_t * _iavl_tree_successor(iavl_tree_s * tree, const void * element) {
     size_t * successor = NULL;
+
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IAVL_TREE_RIGHT][tree->root]) {
+        for (successor = tree->node[IAVL_TREE_RIGHT] + tree->root; NIL != *(tree->node[IAVL_TREE_LEFT] + (*successor));) {
+            successor = tree->node[IAVL_TREE_LEFT] + (*successor);
+        }
+
+        return successor;
+    }
+
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
         const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
@@ -834,6 +843,15 @@ size_t * _iavl_tree_predecessor(iavl_tree_s * tree, const void * element) {
         const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
         if (comparison > 0) {
             predecessor = n;
+        } else if (!comparison) {
+            if (NIL != *(tree->node[IAVL_TREE_LEFT] + (*n))) {
+                for (predecessor = tree->node[IAVL_TREE_LEFT] + (*n); NIL != *(tree->node[IAVL_TREE_RIGHT] + (*predecessor));) {
+                    predecessor = tree->node[IAVL_TREE_RIGHT] + (*predecessor);
+                }
+
+                return predecessor;
+            }
+            break;
         }
 
         n = comparison < 0 ? tree->node[IAVL_TREE_LEFT] + (*n) : tree->node[IAVL_TREE_RIGHT] + (*n);

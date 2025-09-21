@@ -1113,6 +1113,15 @@ size_t _irb_tree_ceil(const irb_tree_s tree, const void * element) {
 
 size_t _irb_tree_successor(const irb_tree_s tree, const void * element) {
     size_t successor = NIL;
+
+    if (!tree.compare(element, tree.elements + (tree.root * tree.size)) && NIL != tree.node[IRB_TREE_RIGHT][tree.root]) {
+        for (successor = tree.node[IRB_TREE_RIGHT][tree.root]; NIL != tree.node[IRB_TREE_LEFT][successor];) {
+            successor = tree.node[IRB_TREE_LEFT][successor];
+        }
+
+        return successor;
+    }
+
     for (size_t n = tree.root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
         const int comparison = tree.compare(element, tree.elements + (n * tree.size));
@@ -1133,6 +1142,15 @@ size_t _irb_tree_predecessor(const irb_tree_s tree, const void * element) {
         const int comparison = tree.compare(element, tree.elements + (n * tree.size));
         if (comparison > 0) {
             predecessor = n;
+        } else if (!comparison) {
+            if (NIL != tree.node[IRB_TREE_LEFT][n]) {
+                for (predecessor = tree.node[IRB_TREE_LEFT][n]; NIL != tree.node[IRB_TREE_RIGHT][predecessor];) {
+                    predecessor = tree.node[IRB_TREE_RIGHT][predecessor];
+                }
+
+                return predecessor;
+            }
+            break;
         }
 
         n = comparison < 0 ? tree.node[IRB_TREE_LEFT][n] : tree.node[IRB_TREE_RIGHT][n];

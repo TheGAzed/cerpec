@@ -753,7 +753,7 @@ size_t * _ibsearch_tree_floor(ibsearch_tree_s * tree, const void * element) {
             floor = n;
         }
 
-        n = comparison < 0 ? tree->node[IBSEARCH_TREE_LEFT] + (*n) : tree->node[IBSEARCH_TREE_RIGHT] + (*n);
+        n = comparison < 0 ? (tree->node[IBSEARCH_TREE_LEFT] + (*n)) : (tree->node[IBSEARCH_TREE_RIGHT] + (*n));
     }
 
     return floor;
@@ -780,6 +780,15 @@ size_t * _ibsearch_tree_ceil(ibsearch_tree_s * tree, const void * element) {
 
 size_t * _ibsearch_tree_successor(ibsearch_tree_s * tree, const void * element) {
     size_t * successor = NULL;
+
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IBSEARCH_TREE_RIGHT][tree->root]) {
+        for (successor = tree->node[IBSEARCH_TREE_RIGHT] + tree->root; NIL != *(tree->node[IBSEARCH_TREE_LEFT] + (*successor));) {
+            successor = tree->node[IBSEARCH_TREE_LEFT] + (*successor);
+        }
+
+        return successor;
+    }
+
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
         const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
@@ -800,6 +809,15 @@ size_t * _ibsearch_tree_predecessor(ibsearch_tree_s * tree, const void * element
         const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
         if (comparison > 0) {
             predecessor = n;
+        } else if (!comparison) {
+            if (NIL != *(tree->node[IBSEARCH_TREE_LEFT] + (*n))) {
+                for (predecessor = tree->node[IBSEARCH_TREE_LEFT] + (*n); NIL != *(tree->node[IBSEARCH_TREE_RIGHT] + (*predecessor));) {
+                    predecessor = tree->node[IBSEARCH_TREE_RIGHT] + (*predecessor);
+                }
+
+                return predecessor;
+            }
+            break;
         }
 
         n = comparison < 0 ? tree->node[IBSEARCH_TREE_LEFT] + (*n) : tree->node[IBSEARCH_TREE_RIGHT] + (*n);
@@ -859,7 +877,7 @@ size_t _ibsearch_tree_remove_fixup(const ibsearch_tree_s tree, size_t * node) {
     }
 
     const size_t hole = left_depth > right_depth ? (*left_node) : (*right_node);
-    memcpy(tree.elements + (*node), tree.elements + hole, tree.size);
+    memmove(tree.elements + ((*node) * tree.size), tree.elements + (hole * tree.size), tree.size);
     if (left_depth > right_depth) {
         if (NIL != tree.node[IBSEARCH_TREE_LEFT][(*left_node)]) { // if right child exists cut off parent
             tree.parent[tree.node[IBSEARCH_TREE_LEFT][(*left_node)]] = tree.parent[(*left_node)];
