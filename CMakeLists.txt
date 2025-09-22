@@ -6,11 +6,9 @@ add_library(CERPEC)
 add_subdirectory(include)
 add_subdirectory(source)
 
-if (NOT DEFINED IS_CERPEC_TEST)
-    set(IS_CERPEC_TEST TRUE)
-endif ()
+option(CERPEC_INCLUDE_TEST "Include cerpec unit tests." ON)
 
-if (IS_CERPEC_TEST)
+if (CERPEC_INCLUDE_TEST)
     add_subdirectory(external)
 
     include(CTest)
