@@ -32,12 +32,12 @@ void clear_istack(istack_s * stack, const destroy_fn destroy);
 /// @param stack Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Stack structure.
-istack_s copy_istack(const istack_s stack, const copy_fn copy);
+istack_s copy_istack(const istack_s * stack, const copy_fn copy);
 
 /// @brief Checks if structure is empty.
 /// @param stack Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_istack(const istack_s stack);
+bool is_empty_istack(const istack_s * stack);
 
 /// @brief Pushes a single element to the top of the structure.
 /// @param stack Structure to push into.
@@ -52,18 +52,18 @@ void pop_istack(istack_s * stack, void * buffer);
 /// @brief Peeps a single element from the top of the structure.
 /// @param stack Structure to peep.
 /// @param buffer Element buffer to save peep.
-void peep_istack(const istack_s stack, void * buffer);
+void peep_istack(const istack_s * stack, void * buffer);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param stack Structure to iterate over.
 /// @param operate Function pointer to operate on each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_istack(const istack_s stack, const operate_fn operate, void * arguments);
+void foreach_istack(const istack_s * stack, const operate_fn operate, void * arguments);
 
 /// @brief Maps each element in structure into an array to manage.
 /// @param stack Structure to map.
 /// @param manage Function pointer to manage array of elements using structure length and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_istack(const istack_s stack, const manage_fn manage, void * arguments);
+void map_istack(const istack_s * stack, const manage_fn manage, void * arguments);
 
 #endif // ISTACK_H

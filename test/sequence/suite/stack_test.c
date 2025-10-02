@@ -86,7 +86,7 @@ TEST PEEP_01(void) {
         push_istack(&test, &i);
 
         int a = 0;
-        peep_istack(test, &a);
+        peep_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
 
@@ -102,7 +102,7 @@ TEST PEEP_02(void) {
         push_istack(&test, &i);
 
         int a = 0;
-        peep_istack(test, &a);
+        peep_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
 
@@ -118,7 +118,7 @@ TEST PEEP_03(void) {
         push_istack(&test, &i);
 
         int a = 0;
-        peep_istack(test, &a);
+        peep_istack(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
 
@@ -189,7 +189,7 @@ TEST FOREACH_01(void) {
     }
 
     int value = 1;
-    foreach_istack(test, increment, &value);
+    foreach_istack(&test, increment, &value);
 
     for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -210,7 +210,7 @@ TEST FOREACH_02(void) {
     }
 
     int value = 1;
-    foreach_istack(test, increment, &value);
+    foreach_istack(&test, increment, &value);
 
     for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
@@ -231,7 +231,7 @@ TEST FOREACH_03(void) {
     }
 
     int value = 1;
-    foreach_istack(test, increment, &value);
+    foreach_istack(&test, increment, &value);
 
     for (int i = ISTACK_CHUNK; i >= 0; --i) {
         int a = 0;
@@ -252,7 +252,7 @@ TEST MAP_01(void) {
     }
 
     struct compare cmp = { .compare_element = compare, };
-    map_istack(test, sort, &cmp);
+    map_istack(&test, sort, &cmp);
 
     for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -273,7 +273,7 @@ TEST MAP_02(void) {
     }
 
     struct compare cmp = { .compare_element = compare, };
-    map_istack(test, sort, &cmp);
+    map_istack(&test, sort, &cmp);
 
     for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
@@ -294,7 +294,7 @@ TEST MAP_03(void) {
     }
 
     struct compare cmp = { .compare_element = compare, };
-    map_istack(test, sort, &cmp);
+    map_istack(&test, sort, &cmp);
 
     for (int i = ISTACK_CHUNK; i >= 0; --i) {
         int a = 0;
@@ -315,7 +315,7 @@ TEST MAP_04(void) {
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
-    map_istack(test, sort, &cmp);
+    map_istack(&test, sort, &cmp);
 
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         int a = 0;
@@ -336,7 +336,7 @@ TEST MAP_05(void) {
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
-    map_istack(test, sort, &cmp);
+    map_istack(&test, sort, &cmp);
 
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         int a = 0;
@@ -357,7 +357,7 @@ TEST MAP_06(void) {
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
-    map_istack(test, sort, &cmp);
+    map_istack(&test, sort, &cmp);
 
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         int a = 0;

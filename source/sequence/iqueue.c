@@ -59,23 +59,24 @@ void clear_iqueue(iqueue_s * queue, const destroy_fn destroy) {
     queue->tail = NULL;
 }
 
-iqueue_s copy_iqueue(const iqueue_s queue, const copy_fn copy) {
+iqueue_s copy_iqueue(const iqueue_s * queue, const copy_fn copy) {
+    assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue.size && "[INVALID] Size can't be zero.");
+    assert(queue->size && "[INVALID] Size can't be zero.");
 
-    iqueue_s queue_copy = { .size = queue.size, .tail = NULL, .length = queue.length, .current = queue.current };
+    iqueue_s queue_copy = { .size = queue->size, .tail = NULL, .length = queue->length, .current = queue->current };
 
-    struct infinite_queue_node const * current_queue = queue.tail;
+    struct infinite_queue_node const * current_queue = queue->tail;
     struct infinite_queue_node ** current_copy = &(queue_copy.tail); // two pointer list to remove special .head case
 
-    size_t remaining = queue.length, start_index = queue.current;
+    size_t remaining = queue->length, start_index = queue->current;
     struct infinite_queue_node * last_added = NULL;
     while (remaining) {
         last_added = (*current_copy) = malloc(sizeof(struct infinite_queue_node));
         assert((*current_copy) && "[ERROR] Memory allocation failed");
 
-        last_added->elements = malloc(IQUEUE_CHUNK * queue.size);
+        last_added->elements = malloc(IQUEUE_CHUNK * queue->size);
         assert(last_added->elements && "[ERROR] Memory allocation failed.");
 
         (*current_copy)->next = queue_copy.tail; // make current/last node's next pointer point to tail
@@ -84,7 +85,7 @@ iqueue_s copy_iqueue(const iqueue_s queue, const copy_fn copy) {
         // outside for loop to get copied chunk size, since it can either be 'remaining' or 'IQUEUE_CHUNK'
         size_t i = start_index;
         for (; i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than both 'remaining' and 'IQUEUE_CHUNK'
-            copy((*current_copy)->elements + (i * queue.size), current_queue->elements + (i * queue.size));
+            copy((*current_copy)->elements + (i * queue->size), current_queue->elements + (i * queue->size));
         }
         remaining -= i; // subtract copied size from remaining size using i
         start_index = 0; // set start index to zero since we only need start index startinf from queue's currrent in tail node
@@ -96,20 +97,22 @@ iqueue_s copy_iqueue(const iqueue_s queue, const copy_fn copy) {
     return queue_copy;
 }
 
-bool is_empty_iqueue(const iqueue_s queue) {
-    assert(queue.size && "[INVALID] Size can't be zero.");
+bool is_empty_iqueue(const iqueue_s * queue) {
+    assert(queue && "[ERROR] Parameter can't be NULL.");
+    assert(queue->size && "[INVALID] Size can't be zero.");
 
-    return (queue.length == 0);
+    return (queue->length == 0);
 }
 
-void peek_iqueue(const iqueue_s queue, void * buffer) {
-    assert(queue.length && "[ERROR] Can't peek empty queue.");
+void peek_iqueue(const iqueue_s * queue, void * buffer) {
+    assert(queue && "[ERROR] Parameter can't be NULL.");
+    assert(queue->length && "[ERROR] Can't peek empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue.tail && "[INVALID] Tail can't be NULL");
-    assert(queue.size && "[INVALID] Size can't be zero.");
+    assert(queue->tail && "[INVALID] Tail can't be NULL");
+    assert(queue->size && "[INVALID] Size can't be zero.");
 
-    memcpy(buffer, queue.tail->next->elements + (queue.current * queue.size), queue.size);
+    memcpy(buffer, queue->tail->next->elements + (queue->current * queue->size), queue->size);
 }
 
 void enqueue_iqueue(iqueue_s * queue, const void * buffer) {
@@ -169,19 +172,20 @@ void dequeue_iqueue(iqueue_s * queue, void * buffer) {
     }
 }
 
-void foreach_iqueue(const iqueue_s queue, const operate_fn operate, void * args) {
+void foreach_iqueue(const iqueue_s * queue, const operate_fn operate, void * args) {
+    assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(operate && "[ERROR] Parameter can't be NULL");
 
-    size_t remaining = queue.length; // save queue size as remaining size for iteration
-    struct infinite_queue_node const * previous = queue.tail;
+    size_t remaining = queue->length; // save queue size as remaining size for iteration
+    struct infinite_queue_node const * previous = queue->tail;
     // while remaining size wasn't decremented to zero
-    for (size_t start = queue.current; remaining; start = 0, previous = previous->next) {
+    for (size_t start = queue->current; remaining; start = 0, previous = previous->next) {
         struct infinite_queue_node * current = previous->next;
 
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size
             // operate on element and if zero is returned then end main function
-            if (!operate(current->elements + (i * queue.size), args)) {
+            if (!operate(current->elements + (i * queue->size), args)) {
                 return;
             }
         }
@@ -189,34 +193,35 @@ void foreach_iqueue(const iqueue_s queue, const operate_fn operate, void * args)
     }
 }
 
-void map_iqueue(const iqueue_s queue, const manage_fn manage, void * arguments) {
+void map_iqueue(const iqueue_s * queue, const manage_fn manage, void * arguments) {
+    assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(manage && "[ERROR] Parameter can't be NULL");
 
-    assert(queue.size && "[INVALID] Size can't be zero.");
+    assert(queue->size && "[INVALID] Size can't be zero.");
 
     // create elements array to temporary save element from circular linked list nodes
-    char * elements_array = malloc(queue.length * queue.size);
+    char * elements_array = malloc(queue->length * queue->size);
     assert(elements_array && "[ERROR] Memory allocation failed.");
 
-    size_t index = 0, remaining = queue.length; // temporary variable to save queue's size
-    struct infinite_queue_node const * previous = queue.tail; // create node pointer to save previous nodes into
-    for (size_t start = queue.current; remaining; start = 0, previous = previous->next) {
+    size_t index = 0, remaining = queue->length; // temporary variable to save queue's size
+    struct infinite_queue_node const * previous = queue->tail; // create node pointer to save previous nodes into
+    for (size_t start = queue->current; remaining; start = 0, previous = previous->next) {
         size_t i = start; // extract i from for loop to later subtract it from remaining size
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than remaining size and node array size
             // save previous' next elements (so current) to elements array at index, and increment index
-            memcpy(elements_array + (index * queue.size), previous->next->elements + (i * queue.size), queue.size);
+            memcpy(elements_array + (index * queue->size), previous->next->elements + (i * queue->size), queue->size);
             index++;
         }
         remaining -= (i - start); // subtract absolute value of i and start from remaining size
     }
 
-    manage(elements_array, queue.length, arguments); // manage initialized elements array
+    manage(elements_array, queue->length, arguments); // manage initialized elements array
 
-    index = 0, remaining = queue.length, previous = queue.tail;
-    for (size_t start = queue.current; remaining; start = 0, previous = previous->next) { // save elements array back into queue
+    index = 0, remaining = queue->length, previous = queue->tail;
+    for (size_t start = queue->current; remaining; start = 0, previous = previous->next) { // save elements array back into queue
         size_t i = start; // extract i from for loop to later subtract it from remaining size
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than remaining size and node array size
-            memcpy(previous->next->elements + (i * queue.size), elements_array + (index * queue.size), queue.size);
+            memcpy(previous->next->elements + (i * queue->size), elements_array + (index * queue->size), queue->size);
             index++;
         }
         remaining -= (i - start); // subtract absolute value of i and start from remaining size

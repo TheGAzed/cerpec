@@ -39,12 +39,12 @@ void clear_ideque(ideque_s * deque, const destroy_fn destroy);
 /// @param deque Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Deque structure.
-ideque_s copy_ideque(const ideque_s deque, const copy_fn copy);
+ideque_s copy_ideque(const ideque_s * deque, const copy_fn copy);
 
 /// @brief Checks if structure is empty.
 /// @param deque Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_ideque(const ideque_s deque);
+bool is_empty_ideque(const ideque_s * deque);
 
 /// @brief Enqueues a single element to the front of the structure.
 /// @param deque Structure to enqueue into.
@@ -69,29 +69,29 @@ void dequeue_back_ideque(ideque_s * deque, void * buffer);
 /// @brief Peeks a single element from the front of the structure.
 /// @param deque Structure to peek.
 /// @param buffer Element buffer to save peek.
-void peek_front_ideque(const ideque_s deque, void * buffer);
+void peek_front_ideque(const ideque_s * deque, void * buffer);
 
 /// @brief Peeks a single element from the back of the structure.
 /// @param deque Structure to peek.
 /// @param buffer Element buffer to save peek.
-void peek_back_ideque(const ideque_s deque, void * buffer);
+void peek_back_ideque(const ideque_s * deque, void * buffer);
 
 /// @brief Iterates over each element in structure starting from the front.
 /// @param deque Structure to iterate over.
 /// @param operate Function pointer to operate on each element reference using element size and generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_front_ideque(const ideque_s deque, const operate_fn operate, void * arguments);
+void foreach_front_ideque(const ideque_s * deque, const operate_fn operate, void * arguments);
 
 /// @brief Iterates over each element in structure starting from the back.
 /// @param deque Structure to iterate over.
 /// @param operate Function pointer to operate on each element reference using element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_back_ideque(const ideque_s deque, const operate_fn operate, void * arguments);
+void foreach_back_ideque(const ideque_s * deque, const operate_fn operate, void * arguments);
 
 /// @brief Maps each element in structure into an array to manage.
 /// @param deque Structure to map.
 /// @param manage Function pointer to manage array of elements using strucuter length, element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_ideque(const ideque_s deque, const manage_fn manage, void * arguments);
+void map_ideque(const ideque_s * deque, const manage_fn manage, void * arguments);
 
 #endif // IDEQUE_H

@@ -120,7 +120,7 @@ TEST PEEK_FRONT_01(void) {
         enqueue_front_ideque(&test, &i);
 
         int a = 0;
-        peek_front_ideque(test, &a);
+        peek_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
 
@@ -136,7 +136,7 @@ TEST PEEK_FRONT_02(void) {
         enqueue_front_ideque(&test, &i);
 
         int a = 0;
-        peek_front_ideque(test, &a);
+        peek_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
 
@@ -152,7 +152,7 @@ TEST PEEK_FRONT_03(void) {
         enqueue_front_ideque(&test, &i);
 
         int a = 0;
-        peek_front_ideque(test, &a);
+        peek_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
 
@@ -168,7 +168,7 @@ TEST PEEK_FRONT_04(void) {
         enqueue_back_ideque(&test, &i);
 
         int a = 0;
-        peek_front_ideque(test, &a);
+        peek_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
 
@@ -184,7 +184,7 @@ TEST PEEK_FRONT_05(void) {
         enqueue_back_ideque(&test, &i);
 
         int a = 0;
-        peek_front_ideque(test, &a);
+        peek_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
 
@@ -200,7 +200,7 @@ TEST PEEK_FRONT_06(void) {
         enqueue_back_ideque(&test, &i);
 
         int a = 0;
-        peek_front_ideque(test, &a);
+        peek_front_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
 
@@ -216,7 +216,7 @@ TEST PEEK_BACK_01(void) {
         enqueue_front_ideque(&test, &i);
 
         int a = 0;
-        peek_back_ideque(test, &a);
+        peek_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
 
@@ -232,7 +232,7 @@ TEST PEEK_BACK_02(void) {
         enqueue_front_ideque(&test, &i);
 
         int a = 0;
-        peek_back_ideque(test, &a);
+        peek_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
 
@@ -248,7 +248,7 @@ TEST PEEK_BACK_03(void) {
         enqueue_front_ideque(&test, &i);
 
         int a = 0;
-        peek_back_ideque(test, &a);
+        peek_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
     }
 
@@ -264,7 +264,7 @@ TEST PEEK_BACK_04(void) {
         enqueue_back_ideque(&test, &i);
 
         int a = 0;
-        peek_back_ideque(test, &a);
+        peek_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
 
@@ -280,7 +280,7 @@ TEST PEEK_BACK_05(void) {
         enqueue_back_ideque(&test, &i);
 
         int a = 0;
-        peek_back_ideque(test, &a);
+        peek_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
 
@@ -296,7 +296,7 @@ TEST PEEK_BACK_06(void) {
         enqueue_back_ideque(&test, &i);
 
         int a = 0;
-        peek_back_ideque(test, &a);
+        peek_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
     }
 
@@ -541,7 +541,7 @@ TEST FOREACH_FRONT_01(void) {
     }
 
     int value = 1;
-    foreach_front_ideque(test, increment, &value);
+    foreach_front_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -562,7 +562,7 @@ TEST FOREACH_FRONT_02(void) {
     }
 
     int value = 1;
-    foreach_front_ideque(test, increment, &value);
+    foreach_front_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -583,7 +583,7 @@ TEST FOREACH_FRONT_03(void) {
     }
 
     int value = 1;
-    foreach_front_ideque(test, increment, &value);
+    foreach_front_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
@@ -604,7 +604,7 @@ TEST FOREACH_BACK_01(void) {
     }
 
     int value = 1;
-    foreach_back_ideque(test, increment, &value);
+    foreach_back_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -625,7 +625,7 @@ TEST FOREACH_BACK_02(void) {
     }
 
     int value = 1;
-    foreach_back_ideque(test, increment, &value);
+    foreach_back_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -646,7 +646,7 @@ TEST FOREACH_BACK_03(void) {
     }
 
     int value = 1;
-    foreach_back_ideque(test, increment, &value);
+    foreach_back_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
