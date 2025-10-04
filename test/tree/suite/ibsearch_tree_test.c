@@ -139,7 +139,7 @@ TEST CONTAINS_01(void) {
     }
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ibsearch_tree(test, &i));
+        ASSERTm("[ERROR] Expected element to be contained.", contains_ibsearch_tree(&test, &i));
     }
 
     destroy_ibsearch_tree(&test, destroy);
@@ -155,7 +155,7 @@ TEST CONTAINS_02(void) {
     }
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ibsearch_tree(test, &i));
+        ASSERTm("[ERROR] Expected element to be contained.", contains_ibsearch_tree(&test, &i));
     }
 
     destroy_ibsearch_tree(&test, destroy);
@@ -171,7 +171,7 @@ TEST CONTAINS_03(void) {
     }
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ibsearch_tree(test, &i));
+        ASSERTm("[ERROR] Expected element to be contained.", contains_ibsearch_tree(&test, &i));
     }
 
     destroy_ibsearch_tree(&test, destroy);
@@ -189,7 +189,7 @@ TEST GET_MAX_01(void) {
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         int a = 0, b = 0;
 
-        get_max_ibsearch_tree(test, &a);
+        get_max_ibsearch_tree(&test, &a);
         remove_ibsearch_tree(&test, &a, &b);
 
         ASSERT_EQm("[ERROR] Expected elements to be equal.", b, a);
@@ -210,7 +210,7 @@ TEST GET_MAX_02(void) {
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         int a = 0, b = 0;
 
-        get_max_ibsearch_tree(test, &a);
+        get_max_ibsearch_tree(&test, &a);
         remove_ibsearch_tree(&test, &a, &b);
 
         ASSERT_EQm("[ERROR] Expected elements to be equal.", b, a);
@@ -231,7 +231,7 @@ TEST GET_MAX_03(void) {
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         int a = 0, b = 0;
 
-        get_max_ibsearch_tree(test, &a);
+        get_max_ibsearch_tree(&test, &a);
         remove_ibsearch_tree(&test, &a, &b);
 
         ASSERT_EQm("[ERROR] Expected elements to be equal.", b, a);
@@ -252,7 +252,7 @@ TEST GET_MIN_01(void) {
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         int a = 0, b = 0;
 
-        get_min_ibsearch_tree(test, &a);
+        get_min_ibsearch_tree(&test, &a);
         remove_ibsearch_tree(&test, &a, &b);
 
         ASSERT_EQm("[ERROR] Expected elements to be equal.", b, a);
@@ -273,7 +273,7 @@ TEST GET_MIN_02(void) {
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         int a = 0, b = 0;
 
-        get_min_ibsearch_tree(test, &a);
+        get_min_ibsearch_tree(&test, &a);
         remove_ibsearch_tree(&test, &a, &b);
 
         ASSERT_EQm("[ERROR] Expected elements to be equal.", b, a);
@@ -294,7 +294,7 @@ TEST GET_MIN_03(void) {
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         int a = 0, b = 0;
 
-        get_min_ibsearch_tree(test, &a);
+        get_min_ibsearch_tree(&test, &a);
         remove_ibsearch_tree(&test, &a, &b);
 
         ASSERT_EQm("[ERROR] Expected elements to be equal.", b, a);
@@ -424,7 +424,7 @@ TEST GET_FLOOR_01(void) {
     remove_ibsearch_tree(&tree, &a, &buf);
 
     int floor = 0;
-    get_floor_ibsearch_tree(tree, &a, &floor);
+    get_floor_ibsearch_tree(&tree, &a, &floor);
 
     ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, floor);
 
@@ -444,7 +444,7 @@ TEST GET_FLOOR_02(void) {
     remove_ibsearch_tree(&tree, &a, &buf);
 
     int floor = 0;
-    get_floor_ibsearch_tree(tree, &a, &floor);
+    get_floor_ibsearch_tree(&tree, &a, &floor);
 
     ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, floor);
 
@@ -464,7 +464,7 @@ TEST GET_FLOOR_03(void) {
     remove_ibsearch_tree(&tree, &a, &buf);
 
     int floor = 0;
-    get_floor_ibsearch_tree(tree, &a, &floor);
+    get_floor_ibsearch_tree(&tree, &a, &floor);
 
     ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, floor);
 
@@ -484,7 +484,7 @@ TEST GET_CEIL_01(void) {
     remove_ibsearch_tree(&tree, &a, &buf);
 
     int ceil = 0;
-    get_ceil_ibsearch_tree(tree, &a, &ceil);
+    get_ceil_ibsearch_tree(&tree, &a, &ceil);
 
     ASSERT_EQm("[ERROR] Expected elements to be equal.", a + 1, ceil);
 
@@ -504,7 +504,7 @@ TEST GET_CEIL_02(void) {
     remove_ibsearch_tree(&tree, &a, &buf);
 
     int ceil = 0;
-    get_ceil_ibsearch_tree(tree, &a, &ceil);
+    get_ceil_ibsearch_tree(&tree, &a, &ceil);
 
     ASSERT_EQm("[ERROR] Expected elements to be equal.", a + 1, ceil);
 
@@ -524,7 +524,7 @@ TEST GET_CEIL_03(void) {
     remove_ibsearch_tree(&tree, &a, &buf);
 
     int ceil = 0;
-    get_ceil_ibsearch_tree(tree, &a, &ceil);
+    get_ceil_ibsearch_tree(&tree, &a, &ceil);
 
     ASSERT_EQm("[ERROR] Expected elements to be equal.", a + 1, ceil);
 
@@ -542,7 +542,7 @@ TEST REMOVE_FLOOR_01(void) {
     int a = 0;
     remove_max_ibsearch_tree(&tree, &a);
 
-    while (!is_empty_ibsearch_tree(tree)) {
+    while (!is_empty_ibsearch_tree(&tree)) {
         int b = 0;
         remove_floor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, b);
@@ -564,7 +564,7 @@ TEST REMOVE_FLOOR_02(void) {
     int a = 0;
     remove_max_ibsearch_tree(&tree, &a);
 
-    while (!is_empty_ibsearch_tree(tree)) {
+    while (!is_empty_ibsearch_tree(&tree)) {
         int b = 0;
         remove_floor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, b);
@@ -586,7 +586,7 @@ TEST REMOVE_FLOOR_03(void) {
     int a = 0;
     remove_max_ibsearch_tree(&tree, &a);
 
-    while (!is_empty_ibsearch_tree(tree)) {
+    while (!is_empty_ibsearch_tree(&tree)) {
         int b = 0;
         remove_floor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, b);
@@ -608,7 +608,7 @@ TEST REMOVE_CEIL_01(void) {
     int a = 0;
     remove_min_ibsearch_tree(&tree, &a);
 
-    while (!is_empty_ibsearch_tree(tree)) {
+    while (!is_empty_ibsearch_tree(&tree)) {
         int b = 0;
         remove_ceil_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a + 1, b);
@@ -630,7 +630,7 @@ TEST REMOVE_CEIL_02(void) {
     int a = 0;
     remove_min_ibsearch_tree(&tree, &a);
 
-    while (!is_empty_ibsearch_tree(tree)) {
+    while (!is_empty_ibsearch_tree(&tree)) {
         int b = 0;
         remove_ceil_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a + 1, b);
@@ -652,7 +652,7 @@ TEST REMOVE_CEIL_03(void) {
     int a = 0;
     remove_min_ibsearch_tree(&tree, &a);
 
-    while (!is_empty_ibsearch_tree(tree)) {
+    while (!is_empty_ibsearch_tree(&tree)) {
         int b = 0;
         remove_ceil_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a + 1, b);
@@ -674,7 +674,7 @@ TEST GET_SUCCESSOR_01(void) {
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         int a = i - 1, b = 0;
-        get_successor_ibsearch_tree(tree, &a, &b);
+        get_successor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, b);
     }
 
@@ -692,7 +692,7 @@ TEST GET_SUCCESSOR_02(void) {
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         int a = i - 1, b = 0;
-        get_successor_ibsearch_tree(tree, &a, &b);
+        get_successor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, b);
     }
 
@@ -710,7 +710,7 @@ TEST GET_SUCCESSOR_03(void) {
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         int a = i - 1, b = 0;
-        get_successor_ibsearch_tree(tree, &a, &b);
+        get_successor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i, b);
     }
 
@@ -728,7 +728,7 @@ TEST GET_PREDECESSOR_01(void) {
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         int a = IBSEARCH_TREE_CHUNK - 1 - i, b = 0;
-        get_predecessor_ibsearch_tree(tree, &a, &b);
+        get_predecessor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, b);
     }
 
@@ -746,7 +746,7 @@ TEST GET_PREDECESSOR_02(void) {
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         int a = IBSEARCH_TREE_CHUNK - i, b = 0;
-        get_predecessor_ibsearch_tree(tree, &a, &b);
+        get_predecessor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, b);
     }
 
@@ -764,7 +764,7 @@ TEST GET_PREDECESSOR_03(void) {
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         int a = IBSEARCH_TREE_CHUNK + 1 - i, b = 0;
-        get_predecessor_ibsearch_tree(tree, &a, &b);
+        get_predecessor_ibsearch_tree(&tree, &a, &b);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", a - 1, b);
     }
 

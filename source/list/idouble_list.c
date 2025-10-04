@@ -65,40 +65,42 @@ void clear_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
     list->capacity = list->head = 0;
 }
 
-idouble_list_s copy_idouble_list(const idouble_list_s list, const copy_fn copy) {
+idouble_list_s copy_idouble_list(const idouble_list_s * list, const copy_fn copy) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(copy && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // allocate and set replica of list
     const idouble_list_s replica = {
-        .capacity = list.capacity, .head = list.head, .length = list.length, .size = list.size,
-        .node[IDOUBLE_LIST_NEXT] = malloc(list.capacity * sizeof(size_t)),
-        .node[IDOUBLE_LIST_PREV] = malloc(list.capacity * sizeof(size_t)),
-        .elements = malloc(list.capacity * list.size),
+        .capacity = list->capacity, .head = list->head, .length = list->length, .size = list->size,
+        .node[IDOUBLE_LIST_NEXT] = malloc(list->capacity * sizeof(size_t)),
+        .node[IDOUBLE_LIST_PREV] = malloc(list->capacity * sizeof(size_t)),
+        .elements = malloc(list->capacity * list->size),
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
 
     // copy nodes (elements and indexes) into list
-    for (size_t i = 0; i < list.length; ++i) {
-        copy(replica.elements + (i * replica.size), list.elements + (i * list.size));
+    for (size_t i = 0; i < list->length; ++i) {
+        copy(replica.elements + (i * replica.size), list->elements + (i * list->size));
     }
-    memcpy(replica.node[IDOUBLE_LIST_NEXT], list.node[IDOUBLE_LIST_NEXT], list.length * sizeof(size_t));
-    memcpy(replica.node[IDOUBLE_LIST_PREV], list.node[IDOUBLE_LIST_PREV], list.length * sizeof(size_t));
+    memcpy(replica.node[IDOUBLE_LIST_NEXT], list->node[IDOUBLE_LIST_NEXT], list->length * sizeof(size_t));
+    memcpy(replica.node[IDOUBLE_LIST_PREV], list->node[IDOUBLE_LIST_PREV], list->length * sizeof(size_t));
 
     return replica;
 }
 
-bool is_empty_idouble_list(const idouble_list_s list) {
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+bool is_empty_idouble_list(const idouble_list_s * list) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    return !(list.length);
+    return !(list->length);
 }
 
 void insert_at_idouble_list(idouble_list_s * restrict list, const void * restrict element, const size_t index) {
@@ -143,24 +145,25 @@ void insert_at_idouble_list(idouble_list_s * restrict list, const void * restric
     list->length++;
 }
 
-void get_idouble_list(const idouble_list_s list, const size_t index, void * buffer) {
+void get_idouble_list(const idouble_list_s * list, const size_t index, void * buffer) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list.length && "[ERROR] Paremeter can't be greater than length.");
+    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // determine closest direction to index and go there
-    size_t current = list.head;
-    const size_t real_index = index <= (list.length >> 1) ? index : list.length - index;
+    size_t current = list->head;
+    const size_t real_index = index <= (list->length >> 1) ? index : list->length - index;
     const bool node_index = real_index == index ? IDOUBLE_LIST_NEXT : IDOUBLE_LIST_PREV;
     for (size_t i = 0; i < real_index; ++i) {
-        current = list.node[node_index][current];
+        current = list->node[node_index][current];
     }
 
     // copy retrieved element into buffer
-    memcpy(buffer, list.elements + (current * list.size), list.size);
+    memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
 void remove_first_idouble_list(idouble_list_s * restrict list, const void * restrict element, void * restrict buffer, const compare_fn compare) {
@@ -529,58 +532,61 @@ idouble_list_s extract_idouble_list(idouble_list_s * list, const filter_fn filte
     return positive;
 }
 
-void foreach_next_idouble_list(const idouble_list_s list, const operate_fn operate, void * arguments) {
+void foreach_next_idouble_list(const idouble_list_s * list, const operate_fn operate, void * arguments) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // for each forward element in list call operate function and break if it returns false
-    for (size_t i = 0, current = list.head; i < list.length; ++i, current = list.node[IDOUBLE_LIST_NEXT][current]) {
-        if (!operate(list.elements + (current * list.size), arguments)) {
+    for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDOUBLE_LIST_NEXT][current]) {
+        if (!operate(list->elements + (current * list->size), arguments)) {
             break;
         }
     }
 }
 
-void foreach_prev_idouble_list(const idouble_list_s list, const operate_fn operate, void * arguments) {
+void foreach_prev_idouble_list(const idouble_list_s * list, const operate_fn operate, void * arguments) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // for each backward element in list call operate function and break if it returns false
-    for (size_t i = 0, current = list.head; i < list.length; ++i) {
-        current = list.node[IDOUBLE_LIST_PREV][current];
-        if (!operate(list.elements + (current * list.size), arguments)) {
+    for (size_t i = 0, current = list->head; i < list->length; ++i) {
+        current = list->node[IDOUBLE_LIST_PREV][current];
+        if (!operate(list->elements + (current * list->size), arguments)) {
             break;
         }
     }
 }
 
-void map_idouble_list(const idouble_list_s list, const manage_fn manage, void * arguments) {
+void map_idouble_list(const idouble_list_s * list, const manage_fn manage, void * arguments) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(manage && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    char * elements = malloc(list.length * list.size);
-    assert((!list.length || elements) && "[ERROR] Memory allocation failed.");
+    char * elements = malloc(list->length * list->size);
+    assert((!list->length || elements) && "[ERROR] Memory allocation failed.");
 
     // push list elements into elements array inorder
-    for (size_t i = 0, current = list.head; i < list.length; ++i) {
-        memcpy(elements + (i * list.size), list.elements + (current * list.size), list.size);
+    for (size_t i = 0, current = list->head; i < list->length; ++i) {
+        memcpy(elements + (i * list->size), list->elements + (current * list->size), list->size);
     }
 
     // manage elements
-    manage(list.elements, list.length, arguments);
+    manage(list->elements, list->length, arguments);
 
     // copy elements back into list
-    for (size_t i = 0, current = list.head; i < list.length; ++i) {
-        memcpy(list.elements + (current * list.size), elements + (i * list.size), list.size);
+    for (size_t i = 0, current = list->head; i < list->length; ++i) {
+        memcpy(list->elements + (current * list->size), elements + (i * list->size), list->size);
     }
 
     free(elements);

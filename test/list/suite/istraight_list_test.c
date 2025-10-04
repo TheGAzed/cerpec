@@ -49,7 +49,7 @@ TEST COPY_01(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s replica = copy_istraight_list(test, copy);
+    istraight_list_s replica = copy_istraight_list(&test, copy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -57,8 +57,8 @@ TEST COPY_01(void) {
 
     for (size_t i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int t = 0, r = 0;
-        get_istraight_list(test, i, &t);
-        get_istraight_list(replica, i, &r);
+        get_istraight_list(&test, i, &t);
+        get_istraight_list(&replica, i, &r);
         ASSERT_EQ(t, r);
     }
 
@@ -75,7 +75,7 @@ TEST COPY_02(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s replica = copy_istraight_list(test, copy);
+    istraight_list_s replica = copy_istraight_list(&test, copy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -83,8 +83,8 @@ TEST COPY_02(void) {
 
     for (size_t i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int t = 0, r = 0;
-        get_istraight_list(test, i, &t);
-        get_istraight_list(replica, i, &r);
+        get_istraight_list(&test, i, &t);
+        get_istraight_list(&replica, i, &r);
         ASSERT_EQ(t, r);
     }
 
@@ -101,7 +101,7 @@ TEST COPY_03(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s replica = copy_istraight_list(test, copy);
+    istraight_list_s replica = copy_istraight_list(&test, copy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -109,8 +109,8 @@ TEST COPY_03(void) {
 
     for (size_t i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int t = 0, r = 0;
-        get_istraight_list(test, i, &t);
-        get_istraight_list(replica, i, &r);
+        get_istraight_list(&test, i, &t);
+        get_istraight_list(&replica, i, &r);
         ASSERT_EQ(t, r);
     }
 
@@ -123,7 +123,7 @@ TEST COPY_03(void) {
 TEST IS_EMPTY_01(void) {
     istraight_list_s test = create_istraight_list(sizeof(int));
 
-    ASSERT(is_empty_istraight_list(test));
+    ASSERT(is_empty_istraight_list(&test));
 
     destroy_istraight_list(&test, destroy);
 
@@ -136,7 +136,7 @@ TEST IS_EMPTY_02(void) {
     const int a = 0;
     insert_at_istraight_list(&test, &a, test.length);
 
-    ASSERT_FALSE(is_empty_istraight_list(test));
+    ASSERT_FALSE(is_empty_istraight_list(&test));
 
     destroy_istraight_list(&test, destroy);
 
@@ -188,7 +188,7 @@ TEST GET_01(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        get_istraight_list(test, (size_t)i, &t);
+        get_istraight_list(&test, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -206,7 +206,7 @@ TEST GET_02(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int t = 0;
-        get_istraight_list(test, (size_t)i, &t);
+        get_istraight_list(&test, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -224,7 +224,7 @@ TEST GET_03(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        get_istraight_list(test, (size_t)i, &t);
+        get_istraight_list(&test, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -417,7 +417,7 @@ TEST SPLICE_01(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        get_istraight_list(one, (size_t)i, &t);
+        get_istraight_list(&one, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -443,7 +443,7 @@ TEST SPLICE_02(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int t = 0;
-        get_istraight_list(one, (size_t)i, &t);
+        get_istraight_list(&one, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -469,7 +469,7 @@ TEST SPLICE_03(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        get_istraight_list(one, (size_t)i, &t);
+        get_istraight_list(&one, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -490,13 +490,13 @@ TEST SPLIT_01(void) {
 
     for (int i = 0; i < (ISTRAIGHT_LIST_CHUNK - 1) / 2; ++i) {
         int s = 0;
-        get_istraight_list(split, (size_t)i, &s);
+        get_istraight_list(&split, (size_t)i, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = (ISTRAIGHT_LIST_CHUNK - 1) / 2; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        get_istraight_list(test, (size_t)(i) - (ISTRAIGHT_LIST_CHUNK - 1) / 2, &t);
+        get_istraight_list(&test, (size_t)(i) - (ISTRAIGHT_LIST_CHUNK - 1) / 2, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -517,13 +517,13 @@ TEST SPLIT_02(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK / 2; ++i) {
         int s = 0;
-        get_istraight_list(split, (size_t)i, &s);
+        get_istraight_list(&split, (size_t)i, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = ISTRAIGHT_LIST_CHUNK / 2; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int t = 0;
-        get_istraight_list(test, (size_t)(i) - ISTRAIGHT_LIST_CHUNK / 2, &t);
+        get_istraight_list(&test, (size_t)(i) - ISTRAIGHT_LIST_CHUNK / 2, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -544,13 +544,13 @@ TEST SPLIT_03(void) {
 
     for (int i = 0; i < (ISTRAIGHT_LIST_CHUNK + 1) / 2; ++i) {
         int s = 0;
-        get_istraight_list(split, (size_t)i, &s);
+        get_istraight_list(&split, (size_t)i, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = (ISTRAIGHT_LIST_CHUNK + 1) / 2; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        get_istraight_list(test, (size_t)(i) - (ISTRAIGHT_LIST_CHUNK + 1) / 2, &t);
+        get_istraight_list(&test, (size_t)(i) - (ISTRAIGHT_LIST_CHUNK + 1) / 2, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -570,13 +570,13 @@ TEST EXTRACT_01(void) {
     istraight_list_s extract = extract_istraight_list(&test, odd, NULL);
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; i += 2) {
         int s = 0;
-        get_istraight_list(test, (size_t)(i) / 2, &s);
+        get_istraight_list(&test, (size_t)(i) / 2, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = 1; i < ISTRAIGHT_LIST_CHUNK - 1; i += 2) {
         int e = 0;
-        get_istraight_list(extract, (size_t)(i) / 2, &e);
+        get_istraight_list(&extract, (size_t)(i) / 2, &e);
         ASSERT_EQ(i, e);
     }
 
@@ -596,13 +596,13 @@ TEST EXTRACT_02(void) {
     istraight_list_s extract = extract_istraight_list(&test, odd, NULL);
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; i += 2) {
         int s = 0;
-        get_istraight_list(test, (size_t)(i) / 2, &s);
+        get_istraight_list(&test, (size_t)(i) / 2, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = 1; i < ISTRAIGHT_LIST_CHUNK; i += 2) {
         int e = 0;
-        get_istraight_list(extract, (size_t)(i) / 2, &e);
+        get_istraight_list(&extract, (size_t)(i) / 2, &e);
         ASSERT_EQ(i, e);
     }
 
@@ -622,13 +622,13 @@ TEST EXTRACT_03(void) {
     istraight_list_s extract = extract_istraight_list(&test, odd, NULL);
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; i += 2) {
         int s = 0;
-        get_istraight_list(test, (size_t)(i) / 2, &s);
+        get_istraight_list(&test, (size_t)(i) / 2, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = 1; i < ISTRAIGHT_LIST_CHUNK + 1; i += 2) {
         int e = 0;
-        get_istraight_list(extract, (size_t)(i) / 2, &e);
+        get_istraight_list(&extract, (size_t)(i) / 2, &e);
         ASSERT_EQ(i, e);
     }
 
@@ -646,11 +646,11 @@ TEST FOREACH_01(void) {
     }
 
     int value = 1;
-    foreach_istraight_list(test, increment, &value);
+    foreach_istraight_list(&test, increment, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int a = 0;
-        get_istraight_list(test, (size_t)i, &a);
+        get_istraight_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 
@@ -667,11 +667,11 @@ TEST FOREACH_02(void) {
     }
 
     int value = 1;
-    foreach_istraight_list(test, increment, &value);
+    foreach_istraight_list(&test, increment, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int a = 0;
-        get_istraight_list(test, (size_t)i, &a);
+        get_istraight_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 
@@ -688,11 +688,11 @@ TEST FOREACH_03(void) {
     }
 
     int value = 1;
-    foreach_istraight_list(test, increment, &value);
+    foreach_istraight_list(&test, increment, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int a = 0;
-        get_istraight_list(test, (size_t)i, &a);
+        get_istraight_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 

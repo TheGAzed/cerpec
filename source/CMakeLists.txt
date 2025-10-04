@@ -7,10 +7,6 @@ target_sources(CERPEC
         PRIVATE list/icircular_list.c
         PRIVATE list/idouble_list.c
 
-        PRIVATE priority/ibinary_heap.c
-
-        PRIVATE table/ihash_table.c
-
         PRIVATE set/ihash_set.c
         PRIVATE set/irb_set.c
         PRIVATE set/ibitwise_set.c
@@ -19,5 +15,7 @@ target_sources(CERPEC
         PRIVATE tree/iavl_tree.c
         PRIVATE tree/irb_tree.c
 
+        PRIVATE misc/ihash_table.c
+        PRIVATE misc/ibinary_heap.c
         PRIVATE misc/itrie.c
 )

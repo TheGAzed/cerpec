@@ -71,12 +71,15 @@ ideque_s copy_ideque(const ideque_s * deque, const copy_fn copy) {
     struct infinite_deque_node ** current_replika = &(replika.head);
     size_t remaining = deque->length; // save remaining size as parameter to decrement for loop
     for (size_t start = deque->current; remaining; start = 0) { // while remaining size is not zero
+        // allocate node for replica
         struct infinite_deque_node * node = malloc(sizeof(struct infinite_deque_node));
         assert(node && "[ERROR] Memory allocation failed.");
 
+        // allocate elements array for replica
         node->elements = malloc(IDEQUE_CHUNK * deque->size);
         assert(node->elements && "[ERROR] Memory allocation failed.");
 
+        // copy each element from old to replica
         size_t i = start;
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
             copy(node->elements + (i * deque->size), current_deque->elements + (i * deque->size));
@@ -113,9 +116,11 @@ void enqueue_front_ideque(ideque_s * deque, const void * buffer) {
     if (!(deque->current)) { // if deque's previous current 'underflows' in node array due to inserting element to front
         deque->current = IDEQUE_CHUNK; // make current into list array chunk size to prevent future underflow
 
+        // allocate node for replica
         struct infinite_deque_node * node = malloc(sizeof(struct infinite_deque_node));
         assert(node && "[ERROR] Memory allocation failed.");
 
+        // allocate elements array for replica
         node->elements = malloc(IDEQUE_CHUNK * deque->size);
         assert(node->elements && "[ERROR] Memory allocation failed.");
 
@@ -165,7 +170,7 @@ void enqueue_back_ideque(ideque_s * deque, const void * buffer) {
 void peek_front_ideque(const ideque_s * deque, void * buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
 
-    assert(deque->length && "[ERROR] Can't peek empty deque.");
+    assert(deque->length && "[ERROR] Can't peek empty structure.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
     assert(deque->head && "[INVALID] Head can't be NULL.");
@@ -183,13 +188,14 @@ void peek_back_ideque(const ideque_s * deque, void * buffer) {
     assert(deque->head->prev && "[INVALID] Head's prev (tail) can't be NULL.");
     assert(deque->size && "[INVALID] Size can't be zero.");
 
+    // calculate back element's location/index and copy it into buffer
     const size_t back_index = (deque->current + deque->length - 1) % IDEQUE_CHUNK;
     memcpy(buffer, deque->head->prev->elements + (back_index * deque->size), deque->size);
 }
 
 void dequeue_front_ideque(ideque_s * deque, void * buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
-    assert(deque->length && "[ERROR] Can't dequeue empty deque.");
+    assert(deque->length && "[ERROR] Can't dequeue empty structure.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
     assert(deque->head && "[INVALID] Head can't be NULL.");
@@ -216,7 +222,7 @@ void dequeue_front_ideque(ideque_s * deque, void * buffer) {
 
 void dequeue_back_ideque(ideque_s * deque, void * buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
-    assert(deque->length && "[ERROR] Can't dequeue empty deque.");
+    assert(deque->length && "[ERROR] Can't dequeue empty structure.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
     assert(deque->head && "[INVALID] Head can't be NULL.");

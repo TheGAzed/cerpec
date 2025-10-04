@@ -47,15 +47,15 @@ TEST COPY_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(test, copy);
+    idouble_list_s replica = copy_idouble_list(&test, copy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 
     for (size_t i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0, r = 0;
-        get_idouble_list(test, i, &t);
-        get_idouble_list(replica, i, &r);
+        get_idouble_list(&test, i, &t);
+        get_idouble_list(&replica, i, &r);
         ASSERT_EQ(t, r);
     }
 
@@ -72,15 +72,15 @@ TEST COPY_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(test, copy);
+    idouble_list_s replica = copy_idouble_list(&test, copy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 
     for (size_t i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int t = 0, r = 0;
-        get_idouble_list(test, i, &t);
-        get_idouble_list(replica, i, &r);
+        get_idouble_list(&test, i, &t);
+        get_idouble_list(&replica, i, &r);
         ASSERT_EQ(t, r);
     }
 
@@ -97,15 +97,15 @@ TEST COPY_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(test, copy);
+    idouble_list_s replica = copy_idouble_list(&test, copy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 
     for (size_t i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int t = 0, r = 0;
-        get_idouble_list(test, i, &t);
-        get_idouble_list(replica, i, &r);
+        get_idouble_list(&test, i, &t);
+        get_idouble_list(&replica, i, &r);
         ASSERT_EQ(t, r);
     }
 
@@ -118,7 +118,7 @@ TEST COPY_03(void) {
 TEST IS_EMPTY_01(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
-    ASSERT(is_empty_idouble_list(test));
+    ASSERT(is_empty_idouble_list(&test));
 
     destroy_idouble_list(&test, destroy);
 
@@ -131,7 +131,7 @@ TEST IS_EMPTY_02(void) {
     const int a = 0;
     insert_at_idouble_list(&test, &a, test.length);
 
-    ASSERT_FALSE(is_empty_idouble_list(test));
+    ASSERT_FALSE(is_empty_idouble_list(&test));
 
     destroy_idouble_list(&test, destroy);
 
@@ -183,7 +183,7 @@ TEST GET_01(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        get_idouble_list(test, (size_t)i, &t);
+        get_idouble_list(&test, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -201,7 +201,7 @@ TEST GET_02(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int t = 0;
-        get_idouble_list(test, (size_t)i, &t);
+        get_idouble_list(&test, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -219,7 +219,7 @@ TEST GET_03(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        get_idouble_list(test, (size_t)i, &t);
+        get_idouble_list(&test, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -406,7 +406,7 @@ TEST SHIFT_NEXT_01(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        get_idouble_list(test, 0, &t);
+        get_idouble_list(&test, 0, &t);
         ASSERT_EQ(i, t);
 
         shift_next_idouble_list(&test, 1);
@@ -427,7 +427,7 @@ TEST SHIFT_NEXT_02(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int t = 0;
-        get_idouble_list(test, 0, &t);
+        get_idouble_list(&test, 0, &t);
         ASSERT_EQ(i, t);
 
         shift_next_idouble_list(&test, 1);
@@ -448,7 +448,7 @@ TEST SHIFT_NEXT_03(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        get_idouble_list(test, 0, &t);
+        get_idouble_list(&test, 0, &t);
         ASSERT_EQ(i, t);
 
         shift_next_idouble_list(&test, 1);
@@ -471,7 +471,7 @@ TEST SHIFT_PREV_01(void) {
         shift_prev_idouble_list(&test, 1);
 
         int t = 0;
-        get_idouble_list(test, 0, &t);
+        get_idouble_list(&test, 0, &t);
         ASSERT_EQ(IDOUBLE_LIST_CHUNK - 1 - 1 - i, t);
     }
 
@@ -492,7 +492,7 @@ TEST SHIFT_PREV_02(void) {
         shift_prev_idouble_list(&test, 1);
 
         int t = 0;
-        get_idouble_list(test, 0, &t);
+        get_idouble_list(&test, 0, &t);
         ASSERT_EQ(IDOUBLE_LIST_CHUNK - 1 - i, t);
     }
 
@@ -513,7 +513,7 @@ TEST SHIFT_PREV_03(void) {
         shift_prev_idouble_list(&test, 1);
 
         int t = 0;
-        get_idouble_list(test, 0, &t);
+        get_idouble_list(&test, 0, &t);
         ASSERT_EQ(IDOUBLE_LIST_CHUNK + 1 - 1 - i, t);
     }
 
@@ -538,7 +538,7 @@ TEST SPLICE_01(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        get_idouble_list(one, (size_t)i, &t);
+        get_idouble_list(&one, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -564,7 +564,7 @@ TEST SPLICE_02(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int t = 0;
-        get_idouble_list(one, (size_t)i, &t);
+        get_idouble_list(&one, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -590,7 +590,7 @@ TEST SPLICE_03(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        get_idouble_list(one, (size_t)i, &t);
+        get_idouble_list(&one, (size_t)i, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -611,13 +611,13 @@ TEST SPLIT_01(void) {
 
     for (int i = 0; i < (IDOUBLE_LIST_CHUNK - 1) / 2; ++i) {
         int s = 0;
-        get_idouble_list(split, (size_t)i, &s);
+        get_idouble_list(&split, (size_t)i, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = (IDOUBLE_LIST_CHUNK - 1) / 2; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        get_idouble_list(test, (size_t)(i) - (IDOUBLE_LIST_CHUNK - 1) / 2, &t);
+        get_idouble_list(&test, (size_t)(i) - (IDOUBLE_LIST_CHUNK - 1) / 2, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -638,13 +638,13 @@ TEST SPLIT_02(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK / 2; ++i) {
         int s = 0;
-        get_idouble_list(split, (size_t)i, &s);
+        get_idouble_list(&split, (size_t)i, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = IDOUBLE_LIST_CHUNK / 2; i < IDOUBLE_LIST_CHUNK; ++i) {
         int t = 0;
-        get_idouble_list(test, (size_t)(i) - IDOUBLE_LIST_CHUNK / 2, &t);
+        get_idouble_list(&test, (size_t)(i) - IDOUBLE_LIST_CHUNK / 2, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -665,13 +665,13 @@ TEST SPLIT_03(void) {
 
     for (int i = 0; i < (IDOUBLE_LIST_CHUNK + 1) / 2; ++i) {
         int s = 0;
-        get_idouble_list(split, (size_t)i, &s);
+        get_idouble_list(&split, (size_t)i, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = (IDOUBLE_LIST_CHUNK + 1) / 2; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        get_idouble_list(test, (size_t)(i) - (IDOUBLE_LIST_CHUNK + 1) / 2, &t);
+        get_idouble_list(&test, (size_t)(i) - (IDOUBLE_LIST_CHUNK + 1) / 2, &t);
         ASSERT_EQ(i, t);
     }
 
@@ -691,13 +691,13 @@ TEST EXTRACT_01(void) {
     idouble_list_s extract = extract_idouble_list(&test, odd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; i += 2) {
         int s = 0;
-        get_idouble_list(test, (size_t)(i) / 2, &s);
+        get_idouble_list(&test, (size_t)(i) / 2, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = 1; i < IDOUBLE_LIST_CHUNK - 1; i += 2) {
         int e = 0;
-        get_idouble_list(extract, (size_t)(i) / 2, &e);
+        get_idouble_list(&extract, (size_t)(i) / 2, &e);
         ASSERT_EQ(i, e);
     }
 
@@ -717,13 +717,13 @@ TEST EXTRACT_02(void) {
     idouble_list_s extract = extract_idouble_list(&test, odd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; i += 2) {
         int s = 0;
-        get_idouble_list(test, (size_t)(i) / 2, &s);
+        get_idouble_list(&test, (size_t)(i) / 2, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = 1; i < IDOUBLE_LIST_CHUNK; i += 2) {
         int e = 0;
-        get_idouble_list(extract, (size_t)(i) / 2, &e);
+        get_idouble_list(&extract, (size_t)(i) / 2, &e);
         ASSERT_EQ(i, e);
     }
 
@@ -743,13 +743,13 @@ TEST EXTRACT_03(void) {
     idouble_list_s extract = extract_idouble_list(&test, odd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; i += 2) {
         int s = 0;
-        get_idouble_list(test, (size_t)(i) / 2, &s);
+        get_idouble_list(&test, (size_t)(i) / 2, &s);
         ASSERT_EQ(i, s);
     }
 
     for (int i = 1; i < IDOUBLE_LIST_CHUNK + 1; i += 2) {
         int e = 0;
-        get_idouble_list(extract, (size_t)(i) / 2, &e);
+        get_idouble_list(&extract, (size_t)(i) / 2, &e);
         ASSERT_EQ(i, e);
     }
 
@@ -767,11 +767,11 @@ TEST FOREACH_NEXT_01(void) {
     }
 
     int value = 1;
-    foreach_next_idouble_list(test, increment, &value);
+    foreach_next_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
-        get_idouble_list(test, (size_t)i, &a);
+        get_idouble_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 
@@ -788,11 +788,11 @@ TEST FOREACH_NEXT_02(void) {
     }
 
     int value = 1;
-    foreach_next_idouble_list(test, increment, &value);
+    foreach_next_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
-        get_idouble_list(test, (size_t)i, &a);
+        get_idouble_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 
@@ -809,11 +809,11 @@ TEST FOREACH_NEXT_03(void) {
     }
 
     int value = 1;
-    foreach_next_idouble_list(test, increment, &value);
+    foreach_next_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;
-        get_idouble_list(test, (size_t)i, &a);
+        get_idouble_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 
@@ -830,11 +830,11 @@ TEST FOREACH_PREV_01(void) {
     }
 
     int value = 1;
-    foreach_prev_idouble_list(test, increment, &value);
+    foreach_prev_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
-        get_idouble_list(test, (size_t)i, &a);
+        get_idouble_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 
@@ -851,11 +851,11 @@ TEST FOREACH_PREV_02(void) {
     }
 
     int value = 1;
-    foreach_prev_idouble_list(test, increment, &value);
+    foreach_prev_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
-        get_idouble_list(test, (size_t)i, &a);
+        get_idouble_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 
@@ -872,11 +872,11 @@ TEST FOREACH_PREV_03(void) {
     }
 
     int value = 1;
-    foreach_prev_idouble_list(test, increment, &value);
+    foreach_prev_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;
-        get_idouble_list(test, (size_t)i, &a);
+        get_idouble_list(&test, (size_t)i, &a);
         ASSERT_EQ(i + value, a);
     }
 

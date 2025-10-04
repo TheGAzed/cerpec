@@ -7,7 +7,7 @@ int main(const int argc, char **argv) {
 
     RUN_SUITE(stack_test);
     RUN_SUITE(queue_test);
-    RUN_SUITE(deque_test);
+    RUN_SUITE(ideque_test);
 
     GREATEST_MAIN_END();
 }

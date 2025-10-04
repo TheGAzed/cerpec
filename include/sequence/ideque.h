@@ -11,7 +11,7 @@
 struct infinite_deque_node {
     struct infinite_deque_node * next; // next sibling node
     struct infinite_deque_node * prev; // previous sibling node
-    char * elements;          // elements array with DEQUE_CHUNK size
+    char * elements;                   // elements array with IDEQUE_CHUNK size
 };
 
 /// @brief Deque data structure.

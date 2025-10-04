@@ -1,4 +1,4 @@
-#include <priority/ibinary_heap.h>
+#include <misc/ibinary_heap.h>
 #include <suite.h>
 
 TEST CREATE_01(void) {

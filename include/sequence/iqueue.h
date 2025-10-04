@@ -7,16 +7,16 @@
 #   define IQUEUE_CHUNK CERPEC_CHUNK
 #endif
 
-/// @brief Linked list type node for queue structure.
+/// @brief Circular ôinked list type node for queue structure.
 struct infinite_queue_node {
-    char * elements;          // elements array with QUEUE_CHUNK size
+    char * elements;                   // elements array with QUEUE_CHUNK size
     struct infinite_queue_node * next; // next sibling node
 };
 
 /// @brief Queue data structure.
 typedef struct infinite_queue {
-    struct infinite_queue_node * tail;
-    size_t size, current, length; // current index, element size and structure length
+    struct infinite_queue_node * tail; // tail node to append next elements while enqueue-ing
+    size_t size, current, length;      // current index, element size and structure length
 } iqueue_s;
 
 /// @brief Creates an empty structure.

@@ -53,37 +53,39 @@ void clear_istraight_list(istraight_list_s * list, const destroy_fn destroy) {
     list->head = list->empty = NIL;
 }
 
-istraight_list_s copy_istraight_list(const istraight_list_s list, const copy_fn copy) {
+istraight_list_s copy_istraight_list(const istraight_list_s * list, const copy_fn copy) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(copy && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // create copy/replica list
     istraight_list_s replica = {
-        .capacity = list.capacity, .empty = NIL, .head = NIL, .length = list.length, .size = list.size,
-        .elements = malloc(list.capacity * list.size),
-        .next = malloc(list.capacity * sizeof(size_t))
+        .capacity = list->capacity, .empty = NIL, .head = NIL, .length = list->length, .size = list->size,
+        .elements = malloc(list->capacity * list->size),
+        .next = malloc(list->capacity * sizeof(size_t))
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     // copy each element into replica (aslo make new list hole-less)
-    for (size_t i = list.head, * r = &(replica.head), index = 0; NIL != i; i = list.next[i], r = replica.next + index, index++) {
+    for (size_t i = list->head, * r = &(replica.head), index = 0; NIL != i; i = list->next[i], r = replica.next + index, index++) {
         (*r) = index;
         replica.next[index] = NIL;
 
-        copy(replica.elements + (index * replica.size), list.elements + (i * list.size));
+        copy(replica.elements + (index * replica.size), list->elements + (i * list->size));
     }
 
     return replica;
 }
 
-bool is_empty_istraight_list(const istraight_list_s list) {
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+bool is_empty_istraight_list(const istraight_list_s * list) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    return !(list.length);
+    return !(list->length);
 }
 
 void insert_at_istraight_list(istraight_list_s * restrict list, const void * restrict element, const size_t index) {
@@ -122,22 +124,23 @@ void insert_at_istraight_list(istraight_list_s * restrict list, const void * res
     list->length++;
 }
 
-void get_istraight_list(const istraight_list_s list, const size_t index, void * buffer) {
+void get_istraight_list(const istraight_list_s * list, const size_t index, void * buffer) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list.length && "[ERROR] List can't be empty.");
-    assert(index < list.length && "[ERROR] Paremeter can't be greater than length.");
+    assert(list->length && "[ERROR] List can't be empty.");
+    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // iterate until node at index isn't reached
-    size_t node = list.head;
+    size_t node = list->head;
     for (size_t i = 0; i < index; ++i) {
-        node = list.next[node];
+        node = list->next[node];
     }
 
     // copy element into buffer
-    memcpy(buffer, list.elements + (node * list.size), list.size);
+    memcpy(buffer, list->elements + (node * list->size), list->size);
 }
 
 void remove_first_istraight_list(istraight_list_s * restrict list, const void * restrict element, void * restrict buffer, const compare_fn compare) {
@@ -408,33 +411,35 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
     return positive;
 }
 
-void foreach_istraight_list(const istraight_list_s list, const operate_fn operate, void * arguments) {
+void foreach_istraight_list(const istraight_list_s * list, const operate_fn operate, void * arguments) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    for (size_t i = list.head; NIL != i && operate(list.elements + (i * list.size), arguments); i = list.next[i]) {}
+    for (size_t i = list->head; NIL != i && operate(list->elements + (i * list->size), arguments); i = list->next[i]) {}
 }
 
-void map_istraight_list(const istraight_list_s list, const manage_fn manage, void * arguments) {
+void map_istraight_list(const istraight_list_s * list, const manage_fn manage, void * arguments) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(manage && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    char * elements = malloc(list.length * list.size);
-    assert((!list.length || elements) && "[ERROR] Memory allocation failed.");
+    char * elements = malloc(list->length * list->size);
+    assert((!list->length || elements) && "[ERROR] Memory allocation failed.");
 
-    for (size_t i = list.head, index = 0; NIL != i; i = list.next[i]) {
-        memcpy(elements + (index * list.size), list.elements + (i * list.size), list.size);
+    for (size_t i = list->head, index = 0; NIL != i; i = list->next[i]) {
+        memcpy(elements + (index * list->size), list->elements + (i * list->size), list->size);
         index++;
     }
 
-    manage(elements, list.length, arguments);
+    manage(elements, list->length, arguments);
 
-    for (size_t i = list.head, index = 0; NIL != i; i = list.next[i]) {
-        memcpy(list.elements + (i * list.size), elements + (index * list.size), list.size);
+    for (size_t i = list->head, index = 0; NIL != i; i = list->next[i]) {
+        memcpy(list->elements + (i * list->size), elements + (index * list->size), list->size);
         index++;
     }
 

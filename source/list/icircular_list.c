@@ -57,39 +57,41 @@ void clear_icircular_list(icircular_list_s * list, const destroy_fn destroy) {
     list->empty = NIL;
 }
 
-icircular_list_s copy_icircular_list(const icircular_list_s list, const copy_fn copy) {
+icircular_list_s copy_icircular_list(const icircular_list_s * list, const copy_fn copy) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(copy && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // create a replica/copy structure
     icircular_list_s replica = {
-        .empty = NIL, .size = list.size, .capacity = list.capacity, .tail = 0, .length = 0,
-        .elements = malloc(list.capacity * list.size),
-        .next = malloc(list.capacity * sizeof(size_t)),
+        .empty = NIL, .size = list->size, .capacity = list->capacity, .tail = 0, .length = 0,
+        .elements = malloc(list->capacity * list->size),
+        .next = malloc(list->capacity * sizeof(size_t)),
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     // for each element in list copy it into the replica while keeping circularity and making replica hole-less
-    for (size_t l = list.tail, * r = &(replica.tail); replica.length < list.length; l = list.next[l], r = replica.next + (*r)) {
+    for (size_t l = list->tail, * r = &(replica.tail); replica.length < list->length; l = list->next[l], r = replica.next + (*r)) {
         (*r) = replica.length++;
         replica.next[(*r)] = replica.tail;
 
-        copy(replica.elements + ((*r) * replica.size), list.elements + (l * list.size));
+        copy(replica.elements + ((*r) * replica.size), list->elements + (l * list->size));
     }
 
     return replica;
 }
 
-bool is_empty_icircular_list(const icircular_list_s list) {
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+bool is_empty_icircular_list(const icircular_list_s * list) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    return !(list.length);
+    return !(list->length);
 }
 
 void insert_at_icircular_list(icircular_list_s * restrict list, const void * restrict element, const size_t index) {
@@ -128,42 +130,27 @@ void insert_at_icircular_list(icircular_list_s * restrict list, const void * res
         list->tail = hole;
     }
 
-#if 0
-    if (!list->length) {
-        list->next[list->tail] = hole;
-    } else if (index == list->length) {
-        list->next[hole] = list->next[list->tail];
-        list->next[list->tail] = hole;
-        list->tail = hole;
-    } else {
-        size_t previous = list->tail;
-        for (size_t i = 0; i < index; ++i) {
-            previous = list->next[previous];
-        }
-        list->next[hole] = list->next[previous];
-        list->next[previous] = hole;
-    }
-#endif
     memcpy(list->elements + (hole * list->size), element, list->size);
     list->length++;
 }
 
-void get_icircular_list(const icircular_list_s list, const size_t index, void * buffer) {
+void get_icircular_list(const icircular_list_s * list, const size_t index, void * buffer) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list.length && "[ERROR] Can't get element from empty list.");
-    assert(index < list.length && "[ERROR] Paremeter can't be greater than length.");
+    assert(list->length && "[ERROR] Can't get element from empty list->");
+    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    size_t current = list.tail;
+    size_t current = list->tail;
     // iterate until current points to node at index, starting from tail
-    for (size_t i = 0; (index != list.length - 1) && i <= index; ++i) {
-        current = list.next[current];
+    for (size_t i = 0; (index != list->length - 1) && i <= index; ++i) {
+        current = list->next[current];
     }
 
-    memcpy(buffer, list.elements + (current * list.size), list.size);
+    memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
 void remove_first_icircular_list(icircular_list_s * restrict list, const void * restrict element, void * restrict buffer, const compare_fn compare) {
@@ -510,45 +497,47 @@ icircular_list_s extract_icircular_list(icircular_list_s * list, const filter_fn
     return positive;
 }
 
-void foreach_icircular_list(const icircular_list_s list, const operate_fn operate, void * arguments) {
+void foreach_icircular_list(const icircular_list_s * list, const operate_fn operate, void * arguments) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
     // iterate over each element calling operate function
-    for (size_t i = 0, current = list.tail; i < list.length; ++i) {
-        current = list.next[current];
-        if (!operate(list.elements + (current * list.size), arguments)) {
+    for (size_t i = 0, current = list->tail; i < list->length; ++i) {
+        current = list->next[current];
+        if (!operate(list->elements + (current * list->size), arguments)) {
             break;
         }
     }
 }
 
-void map_icircular_list(const icircular_list_s list, const manage_fn manage, void * arguments) {
+void map_icircular_list(const icircular_list_s * list, const manage_fn manage, void * arguments) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(manage && "[ERROR] Paremeter can't be NULL.");
 
-    assert(list.size && "[INVALID] Size can't be zero.");
-    assert(!(list.capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
-    assert(list.length <= list.capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
+    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    char * elements = malloc(list.length * list.size);
-    assert((!list.length || elements) && "[ERROR] Memory allocation failed.");
+    char * elements = malloc(list->length * list->size);
+    assert((!list->length || elements) && "[ERROR] Memory allocation failed.");
 
     // push list elements into elements array inorder
-    for (size_t i = 0, current = list.tail; i < list.length; ++i) {
-        current = list.next[current];
-        memcpy(elements + (i * list.size), list.elements + (current * list.size), list.size);
+    for (size_t i = 0, current = list->tail; i < list->length; ++i) {
+        current = list->next[current];
+        memcpy(elements + (i * list->size), list->elements + (current * list->size), list->size);
     }
 
     // manage elements
-    manage(list.elements, list.length, arguments);
+    manage(list->elements, list->length, arguments);
 
     // copy elements back into list
-    for (size_t i = 0, current = list.tail; i < list.length; ++i) {
-        current = list.next[current];
-        memcpy(list.elements + (current * list.size), elements + (i * list.size), list.size);
+    for (size_t i = 0, current = list->tail; i < list->length; ++i) {
+        current = list->next[current];
+        memcpy(list->elements + (current * list->size), elements + (i * list->size), list->size);
     }
 
     free(elements);

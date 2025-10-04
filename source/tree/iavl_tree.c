@@ -16,7 +16,7 @@ size_t * _iavl_tree_predecessor(iavl_tree_s * tree, const void * element);
 /// @param tree Structure to get height from.
 /// @param node Index of node to get height.
 /// @return '0' if node is NIL, else a natural number height.
-size_t _iavl_tree_get_height(const iavl_tree_s tree, const size_t node);
+size_t _iavl_tree_get_height(const iavl_tree_s * tree, const size_t node);
 
 /// Left tree rotation that moves one node up in the tree and one node down.
 /// @param tree Structure to rotate.
@@ -37,7 +37,7 @@ void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node);
 /// @param tree Structure to fix.
 /// @param node Index reference to removed node.
 /// @return Index of hole left behind by fixup.
-size_t _iavl_tree_remove_fixup(const iavl_tree_s tree, size_t * node);
+size_t _iavl_tree_remove_fixup(const iavl_tree_s * tree, size_t * node);
 
 /// Fills the hole left after removing an element in the tree's arrays, puts rightmost element into hole.
 /// @param tree Structure to fill.
@@ -102,44 +102,46 @@ void clear_iavl_tree(iavl_tree_s * tree, const destroy_fn destroy) {
     tree->capacity = 0;
 }
 
-iavl_tree_s copy_iavl_tree(const iavl_tree_s tree, const copy_fn copy) {
+iavl_tree_s copy_iavl_tree(const iavl_tree_s * tree, const copy_fn copy) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     const iavl_tree_s replica = {
-        .elements = malloc(tree.capacity * tree.size),
-        .height = malloc(tree.capacity * sizeof(size_t)),
-        .parent = malloc(tree.capacity * sizeof(size_t)),
-        .node[IAVL_TREE_LEFT] = malloc(tree.capacity * sizeof(size_t)),
-        .node[IAVL_TREE_RIGHT] = malloc(tree.capacity * sizeof(size_t)),
+        .elements = malloc(tree->capacity * tree->size),
+        .height = malloc(tree->capacity * sizeof(size_t)),
+        .parent = malloc(tree->capacity * sizeof(size_t)),
+        .node[IAVL_TREE_LEFT] = malloc(tree->capacity * sizeof(size_t)),
+        .node[IAVL_TREE_RIGHT] = malloc(tree->capacity * sizeof(size_t)),
 
-        .capacity = tree.capacity, .root = tree.root, .length = tree.length, .compare = tree.compare, .size = tree.size,
+        .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare, .size = tree->size,
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.parent) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.node[IAVL_TREE_LEFT]) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.node[IAVL_TREE_RIGHT]) && "[ERROR] Memory allocation failed.");
 
-    for (size_t i = 0; i < tree.length; ++i) {
-        copy(replica.elements + (i * tree.size), tree.elements + (i * tree.size));
+    for (size_t i = 0; i < tree->length; ++i) {
+        copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
     }
-    memcpy(replica.height, tree.height, tree.length * sizeof(size_t));
-    memcpy(replica.parent, tree.parent, tree.length * sizeof(size_t));
-    memcpy(replica.node[IAVL_TREE_LEFT], tree.node[IAVL_TREE_LEFT], tree.length * sizeof(size_t));
-    memcpy(replica.node[IAVL_TREE_RIGHT], tree.node[IAVL_TREE_RIGHT], tree.length * sizeof(size_t));
+    memcpy(replica.height, tree->height, tree->length * sizeof(size_t));
+    memcpy(replica.parent, tree->parent, tree->length * sizeof(size_t));
+    memcpy(replica.node[IAVL_TREE_LEFT], tree->node[IAVL_TREE_LEFT], tree->length * sizeof(size_t));
+    memcpy(replica.node[IAVL_TREE_RIGHT], tree->node[IAVL_TREE_RIGHT], tree->length * sizeof(size_t));
 
     return replica;
 }
 
-bool is_empty_iavl_tree(const iavl_tree_s tree) {
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_empty_iavl_tree(const iavl_tree_s * tree) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    return !tree.length;
+    return !tree->length;
 }
 
 void insert_iavl_tree(iavl_tree_s * tree, const void * element) {
@@ -209,7 +211,7 @@ void remove_iavl_tree(iavl_tree_s * tree, const void * element, void * buffer) {
     memcpy(buffer, tree->elements + ((*node) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _iavl_tree_remove_fixup((*tree), node);
+    const size_t hole = _iavl_tree_remove_fixup(tree, node);
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*node));
 
@@ -218,70 +220,73 @@ void remove_iavl_tree(iavl_tree_s * tree, const void * element, void * buffer) {
     }
 }
 
-bool contains_iavl_tree(const iavl_tree_s tree, const void * element) {
+bool contains_iavl_tree(const iavl_tree_s * tree, const void * element) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
 
-    for (size_t node = tree.root; NIL != node;) {
+    for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree.compare(element, tree.elements + (node * tree.size));
+        const int comparison = tree->compare(element, tree->elements + (node * tree->size));
         if (!comparison) {
             return true;
         }
 
-        node = comparison < 0 ? tree.node[IAVL_TREE_LEFT][node] : tree.node[IAVL_TREE_RIGHT][node];
+        node = comparison < 0 ? tree->node[IAVL_TREE_LEFT][node] : tree->node[IAVL_TREE_RIGHT][node];
     }
 
     return false;
 }
 
-void get_max_iavl_tree(const iavl_tree_s tree, void * buffer) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
+void get_max_iavl_tree(const iavl_tree_s * tree, void * buffer) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
-    size_t maximum = tree.root;
-    for (size_t i = tree.node[IAVL_TREE_RIGHT][maximum]; NIL != i; i = tree.node[IAVL_TREE_RIGHT][i]) {
+    size_t maximum = tree->root;
+    for (size_t i = tree->node[IAVL_TREE_RIGHT][maximum]; NIL != i; i = tree->node[IAVL_TREE_RIGHT][i]) {
         maximum = i;
     }
 
-    memcpy(buffer, tree.elements + (maximum * tree.size), tree.size);
+    memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
 }
 
-void get_min_iavl_tree(const iavl_tree_s tree, void * buffer) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
+void get_min_iavl_tree(const iavl_tree_s * tree, void * buffer) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
-    size_t minimum = tree.root;
-    for (size_t i = tree.node[IAVL_TREE_LEFT][minimum]; NIL != i; i = tree.node[IAVL_TREE_LEFT][i]) {
+    size_t minimum = tree->root;
+    for (size_t i = tree->node[IAVL_TREE_LEFT][minimum]; NIL != i; i = tree->node[IAVL_TREE_LEFT][i]) {
         minimum = i;
     }
 
-    memcpy(buffer, tree.elements + (minimum * tree.size), tree.size);
+    memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
 }
 
 void remove_max_iavl_tree(iavl_tree_s * tree, void * buffer) {
@@ -360,52 +365,80 @@ void remove_min_iavl_tree(iavl_tree_s * tree, void * buffer) {
     }
 }
 
-void get_floor_iavl_tree(const iavl_tree_s tree, const void * element, void * buffer) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
+void get_floor_iavl_tree(const iavl_tree_s * tree, const void * element, void * buffer) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
-    iavl_tree_s copy = tree;
-    const size_t * floor = _iavl_tree_floor(&copy, element);
-    if (NULL == floor) {
+    size_t floor = NIL;
+    for (size_t n = tree->root; NIL != n;) {
+        // calculate and determine next child node, i.e. if left or right child
+        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        if (!comparison) {
+            floor = n;
+            break;
+        }
+        if (comparison > 0) {
+            floor = n;
+        }
+
+        n = comparison < 0 ? tree->node[IAVL_TREE_LEFT][n] : tree->node[IAVL_TREE_RIGHT][n];
+    }
+
+    if (NIL == floor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree.");
+        assert(false && "[ERROR] Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
-    memcpy(buffer, tree.elements + ((*floor) * tree.size), tree.size);
+    memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
 }
 
-void get_ceil_iavl_tree(const iavl_tree_s tree, const void * element, void * buffer) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
+void get_ceil_iavl_tree(const iavl_tree_s * tree, const void * element, void * buffer) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
-    iavl_tree_s copy = tree;
-    const size_t * ceil = _iavl_tree_ceil(&copy, element);
-    if (NULL == ceil) {
+    size_t ceil = NIL;
+    for (size_t n = tree->root; NIL != n;) {
+        // calculate and determine next child node, i.e. if left or right child
+        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        if (!comparison) {
+            ceil = n;
+            break;
+        }
+        if (comparison < 0) {
+            ceil = n;
+        }
+
+        n = comparison < 0 ? tree->node[IAVL_TREE_LEFT][n] : tree->node[IAVL_TREE_RIGHT][n];
+    }
+
+    if (NIL == ceil) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree.");
+        assert(false && "[ERROR] Element not found in tree->");
         exit(EXIT_FAILURE);
     }
 
-    memcpy(buffer, tree.elements + ((*ceil) * tree.size), tree.size);
+    memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
 }
 
 void remove_floor_iavl_tree(iavl_tree_s * tree, const void * element, void * buffer) {
@@ -432,7 +465,7 @@ void remove_floor_iavl_tree(iavl_tree_s * tree, const void * element, void * buf
     memcpy(buffer, tree->elements + ((*floor) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _iavl_tree_remove_fixup((*tree), floor);
+    const size_t hole = _iavl_tree_remove_fixup(tree, floor);
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*floor));
 
@@ -465,7 +498,7 @@ void remove_ceil_iavl_tree(iavl_tree_s * tree, const void * element, void * buff
     memcpy(buffer, tree->elements + ((*ceil) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _iavl_tree_remove_fixup((*tree), ceil);
+    const size_t hole = _iavl_tree_remove_fixup(tree, ceil);
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*ceil));
 
@@ -474,52 +507,88 @@ void remove_ceil_iavl_tree(iavl_tree_s * tree, const void * element, void * buff
     }
 }
 
-void get_successor_iavl_tree(const iavl_tree_s tree, const void * element, void * buffer) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
+void get_successor_iavl_tree(const iavl_tree_s * tree, const void * element, void * buffer) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
-    iavl_tree_s copy = tree;
-    const size_t * successor = _iavl_tree_successor(&copy, element);
-    if (NULL == successor) {
+    size_t successor = NIL;
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IAVL_TREE_RIGHT][tree->root]) {
+        for (successor = tree->node[IAVL_TREE_RIGHT][tree->root]; NIL != tree->node[IAVL_TREE_LEFT][successor];) {
+            successor = tree->node[IAVL_TREE_LEFT][successor];
+        }
+
+        goto SUCCESSOR_CHECK;
+    }
+
+    for (size_t n = tree->root; NIL != n;) {
+        // calculate and determine next child node, i.e. if left or right child
+        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        if (comparison < 0) {
+            successor = n;
+        }
+
+        n = comparison < 0 ? tree->node[IAVL_TREE_LEFT][n] : tree->node[IAVL_TREE_RIGHT][n];
+    }
+
+SUCCESSOR_CHECK:
+    if (NIL == successor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree.");
+        assert(false && "[ERROR] Element not found in tree->");
         exit(EXIT_FAILURE);
     }
 
-    memcpy(buffer, tree.elements + ((*successor) * tree.size), tree.size);
+    memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
 }
 
-void get_predecessor_iavl_tree(const iavl_tree_s tree, const void * element, void * buffer) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
+void get_predecessor_iavl_tree(const iavl_tree_s * tree, const void * element, void * buffer) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
-    iavl_tree_s copy = tree;
-    const size_t * predecessor = _iavl_tree_predecessor(&copy, element);
-    if (NULL == predecessor) {
+    size_t predecessor = NIL;
+    for (size_t n = tree->root; NIL != n;) {
+        // calculate and determine next child node, i.e. if left or right child
+        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        if (comparison > 0) {
+            predecessor = n;
+        } else if (!comparison) {
+            if (NIL != tree->node[IAVL_TREE_LEFT][n]) {
+                for (predecessor = tree->node[IAVL_TREE_LEFT][n]; NIL != tree->node[IAVL_TREE_RIGHT][predecessor];) {
+                    predecessor = tree->node[IAVL_TREE_RIGHT][predecessor];
+                }
+            }
+            break;
+        }
+
+        n = comparison < 0 ? tree->node[IAVL_TREE_LEFT][n] : tree->node[IAVL_TREE_RIGHT][n];
+    }
+
+    if (NIL == predecessor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree.");
+        assert(false && "[ERROR] Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
-    memcpy(buffer, tree.elements + ((*predecessor) * tree.size), tree.size);
+    memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
 }
 
 void remove_successor_iavl_tree(iavl_tree_s * tree, const void * element, void * buffer) {
@@ -546,7 +615,7 @@ void remove_successor_iavl_tree(iavl_tree_s * tree, const void * element, void *
     memcpy(buffer, tree->elements + ((*successor) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _iavl_tree_remove_fixup((*tree), successor);
+    const size_t hole = _iavl_tree_remove_fixup(tree, successor);
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*successor));
 
@@ -579,7 +648,7 @@ void remove_predecessor_iavl_tree(iavl_tree_s * tree, const void * element, void
     memcpy(buffer, tree->elements + ((*predecessor) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _iavl_tree_remove_fixup((*tree), predecessor);
+    const size_t hole = _iavl_tree_remove_fixup(tree, predecessor);
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*predecessor));
 
@@ -588,106 +657,109 @@ void remove_predecessor_iavl_tree(iavl_tree_s * tree, const void * element, void
     }
 }
 
-void update_iavl_tree(const iavl_tree_s tree, const void * latter, void * former) {
-    assert(tree.length && "[ERROR] Can't get element from empty structure.");
+void update_iavl_tree(const iavl_tree_s * tree, const void * latter, void * former) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
+    assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(latter && "[ERROR] Parameter can't be NULL.");
     assert(former && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree.node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree.root && "[INVALID] Paremeter can't be NIL.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
-    size_t node = tree.root; // pointer to later change actual index of the empty child
+    size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree.compare(latter, tree.elements + (node * tree.size));
+        const int comparison = tree->compare(latter, tree->elements + (node * tree->size));
         if (!comparison) {
             break;
         }
 
         // go to next child node
-        node = (comparison < 0) ? tree.node[IAVL_TREE_LEFT][node] : tree.node[IAVL_TREE_RIGHT][node];
+        node = (comparison < 0) ? tree->node[IAVL_TREE_LEFT][node] : tree->node[IAVL_TREE_RIGHT][node];
     }
 
     if (NIL == node) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree.");
+        assert(false && "[ERROR] Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
-    memcpy(former, tree.elements + (node * tree.size), tree.size);
-    memcpy(tree.elements + (node * tree.size), latter, tree.size);
+    memcpy(former, tree->elements + (node * tree->size), tree->size);
+    memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
+void inorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     bool left_done = false;
-    size_t node = tree.root;
+    size_t node = tree->root;
     while (NIL != node) {
-        while (!left_done && NIL != tree.node[IAVL_TREE_LEFT][node]) {
-            node = tree.node[IAVL_TREE_LEFT][node];
+        while (!left_done && NIL != tree->node[IAVL_TREE_LEFT][node]) {
+            node = tree->node[IAVL_TREE_LEFT][node];
         }
 
-        if (!operate(tree.elements + (node * tree.size), arguments)) {
+        if (!operate(tree->elements + (node * tree->size), arguments)) {
             break;
         }
 
         left_done = true;
-        if (NIL != tree.node[IAVL_TREE_RIGHT][node]) {
+        if (NIL != tree->node[IAVL_TREE_RIGHT][node]) {
             left_done = false;
-            node = tree.node[IAVL_TREE_RIGHT][node];
-        } else if (NIL != tree.parent[node]) {
-            while (NIL != tree.parent[node] && node == tree.node[IAVL_TREE_RIGHT][tree.parent[node]]) {
-                node = tree.parent[node];
+            node = tree->node[IAVL_TREE_RIGHT][node];
+        } else if (NIL != tree->parent[node]) {
+            while (NIL != tree->parent[node] && node == tree->node[IAVL_TREE_RIGHT][tree->parent[node]]) {
+                node = tree->parent[node];
             }
 
-            if (NIL == tree.parent[node]) {
+            if (NIL == tree->parent[node]) {
                 break;
             }
 
-            node = tree.parent[node];
+            node = tree->parent[node];
         } else {
             break;
         }
     }
 }
 
-void preorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
+void preorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
     struct pre_stack { size_t length; size_t * elements; } stack = {
-        .length = 0, .elements = malloc(tree.length * sizeof(size_t)),
+        .length = 0, .elements = malloc(tree->length * sizeof(size_t)),
     };
-    assert(!tree.length || stack.elements && "[ERROR] Memory allocation failed.");
+    assert(!tree->length || stack.elements && "[ERROR] Memory allocation failed.");
 
-    if (tree.length) {
-        stack.elements[stack.length++] = tree.root;
+    if (tree->length) {
+        stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && operate(tree.elements + (stack.elements[stack.length - 1] * tree.size), arguments)) {
+    while (stack.length && operate(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
         const size_t node = stack.elements[--stack.length];
 
-        const size_t right_child = tree.node[IAVL_TREE_RIGHT][node];
+        const size_t right_child = tree->node[IAVL_TREE_RIGHT][node];
         if (NIL != right_child) {
             stack.elements[stack.length++] = right_child;
         }
 
-        const size_t left_child = tree.node[IAVL_TREE_LEFT][node];
+        const size_t left_child = tree->node[IAVL_TREE_LEFT][node];
         if (NIL != left_child) {
             stack.elements[stack.length++] = left_child;
         }
@@ -696,34 +768,35 @@ void preorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void *
     free(stack.elements);
 }
 
-void postorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
+void postorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
     struct post_stack { size_t length; size_t * elements; } stack = {
-        .length = 0, .elements = malloc(tree.length * sizeof(size_t)),
+        .length = 0, .elements = malloc(tree->length * sizeof(size_t)),
     };
-    assert(!tree.length || stack.elements && "[ERROR] Memory allocation failed.");
+    assert(!tree->length || stack.elements && "[ERROR] Memory allocation failed.");
 
     // push root node onto stack and initially save it into variable
-    size_t node = tree.root;
+    size_t node = tree->root;
     size_t last = NIL;
     while (stack.length || NIL != node) { // while stack is not empty OR node is valid
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
             stack.elements[stack.length++] = node;
-            node = tree.node[IAVL_TREE_LEFT][node];
+            node = tree->node[IAVL_TREE_LEFT][node];
         } else { // else node is invalid, thus pop a new node from the stack, operate on element, and go to node's right child
             const size_t peek = stack.elements[stack.length - 1];
 
-            const size_t peek_right = tree.node[IAVL_TREE_RIGHT][peek];
+            const size_t peek_right = tree->node[IAVL_TREE_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!operate(tree.elements + (node * tree.size), arguments)) {
+                if (!operate(tree->elements + (node * tree->size), arguments)) {
                     break;
                 }
 
@@ -735,37 +808,38 @@ void postorder_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void 
     free(stack.elements);
 }
 
-void level_order_iavl_tree(const iavl_tree_s tree, const operate_fn operate, void * arguments) {
+void level_order_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+    assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(operate && "[ERROR] Parameter can't be NULL.");
 
-    assert(tree.compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree.size && "[INVALID] Parameter can't be zero.");
-    assert(tree.length <= tree.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
+    assert(tree->size && "[INVALID] Parameter can't be zero.");
+    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple queue to manage breath first level order traversal of node indexes
     struct level_queue { size_t length, current; size_t * elements; } queue = {
-        .length = 0, .current = 0, .elements = malloc(tree.length * sizeof(size_t)),
+        .length = 0, .current = 0, .elements = malloc(tree->length * sizeof(size_t)),
     };
-    assert(!tree.length || queue.elements && "[ERROR] Memory allocation failed.");
+    assert(!tree->length || queue.elements && "[ERROR] Memory allocation failed.");
 
-    if (tree.length) { // if tree isn't empty push root node
-        queue.elements[queue.current + queue.length++] = tree.root;
+    if (tree->length) { // if tree isn't empty push root node
+        queue.elements[queue.current + queue.length++] = tree->root;
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && operate(tree.elements + (queue.elements[queue.current] * tree.size), arguments)) {
+    while (queue.length && operate(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
         // pop index
         const size_t node = queue.elements[queue.current++];
         queue.length--;
 
         // push left child of popped parent to the top of the queue
-        const size_t left_child = tree.node[IAVL_TREE_LEFT][node];
+        const size_t left_child = tree->node[IAVL_TREE_LEFT][node];
         if (NIL != left_child) {
             queue.elements[queue.current + queue.length++] = left_child;
         }
 
         // push right child of popped parent to the top of the queue
-        const size_t right_child = tree.node[IAVL_TREE_RIGHT][node];
+        const size_t right_child = tree->node[IAVL_TREE_RIGHT][node];
         if (NIL != right_child) {
             queue.elements[queue.current + queue.length++] = right_child;
         }
@@ -848,8 +922,6 @@ size_t * _iavl_tree_predecessor(iavl_tree_s * tree, const void * element) {
                 for (predecessor = tree->node[IAVL_TREE_LEFT] + (*n); NIL != *(tree->node[IAVL_TREE_RIGHT] + (*predecessor));) {
                     predecessor = tree->node[IAVL_TREE_RIGHT] + (*predecessor);
                 }
-
-                return predecessor;
             }
             break;
         }
@@ -860,8 +932,8 @@ size_t * _iavl_tree_predecessor(iavl_tree_s * tree, const void * element) {
     return predecessor;
 }
 
-size_t _iavl_tree_get_height(const iavl_tree_s tree, const size_t node) {
-    return (NIL == node ? 0 : tree.height[node]);
+size_t _iavl_tree_get_height(const iavl_tree_s * tree, const size_t node) {
+    return (NIL == node ? 0 : tree->height[node]);
 }
 
 void _iavl_tree_left_rotate(iavl_tree_s * tree, const size_t node) {
@@ -884,12 +956,12 @@ void _iavl_tree_left_rotate(iavl_tree_s * tree, const size_t node) {
     tree->node[IAVL_TREE_LEFT][y] = x;
     tree->parent[x] = y;
 
-    const size_t x_left_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_LEFT][x]);
-    const size_t x_right_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_RIGHT][x]);
+    const size_t x_left_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_LEFT][x]);
+    const size_t x_right_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_RIGHT][x]);
     tree->height[x] = 1 + (x_right_height > x_left_height ? x_right_height : x_left_height);
 
-    const size_t y_left_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_LEFT][y]);
-    const size_t y_right_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_RIGHT][y]);
+    const size_t y_left_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_LEFT][y]);
+    const size_t y_right_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_RIGHT][y]);
     tree->height[y] = 1 + (y_right_height > y_left_height ? y_right_height : y_left_height);
 }
 
@@ -913,12 +985,12 @@ void _iavl_tree_right_rotate(iavl_tree_s * tree, const size_t node) {
     tree->node[IAVL_TREE_RIGHT][y] = x;
     tree->parent[x] = y;
 
-    const size_t x_left_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_LEFT][x]);
-    const size_t x_right_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_RIGHT][x]);
+    const size_t x_left_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_LEFT][x]);
+    const size_t x_right_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_RIGHT][x]);
     tree->height[x] = 1 + (x_right_height > x_left_height ? x_right_height : x_left_height);
 
-    const size_t y_left_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_LEFT][y]);
-    const size_t y_right_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_RIGHT][y]);
+    const size_t y_left_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_LEFT][y]);
+    const size_t y_right_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_RIGHT][y]);
     tree->height[y] = 1 + (y_right_height > y_left_height ? y_right_height : y_left_height);
 }
 
@@ -926,11 +998,11 @@ void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node) {
     for (size_t n = node; NIL != n && NIL != tree->parent[n]; n = tree->parent[n]) {
         // calculate left child's height
         const size_t left = tree->node[IAVL_TREE_LEFT][n];
-        const size_t left_height = _iavl_tree_get_height((*tree), left);
+        const size_t left_height = _iavl_tree_get_height(tree, left);
 
         // calculate right child's height
         const size_t right = tree->node[IAVL_TREE_RIGHT][n];
-        const size_t right_height = _iavl_tree_get_height((*tree), right);
+        const size_t right_height = _iavl_tree_get_height(tree, right);
 
         // set new height for each element popped from stack
         tree->height[n] = 1 + (left_height > right_height ? left_height : right_height);
@@ -943,8 +1015,8 @@ void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node) {
         }
 
         if (left_height < right_height) {
-            const size_t left_grand_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_LEFT][right]);
-            const size_t right_grand_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_RIGHT][right]);
+            const size_t left_grand_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_LEFT][right]);
+            const size_t right_grand_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_RIGHT][right]);
 
             if (left_grand_height > right_grand_height) {
                 _iavl_tree_right_rotate(tree, right);
@@ -953,8 +1025,8 @@ void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node) {
         }
 
         if (left_height > right_height) {
-            const size_t left_grand_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_LEFT][left]);
-            const size_t right_grand_height = _iavl_tree_get_height((*tree), tree->node[IAVL_TREE_RIGHT][left]);
+            const size_t left_grand_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_LEFT][left]);
+            const size_t right_grand_height = _iavl_tree_get_height(tree, tree->node[IAVL_TREE_RIGHT][left]);
 
             if (left_grand_height < right_grand_height) {
                 _iavl_tree_left_rotate(tree, left);
@@ -964,33 +1036,33 @@ void _iavl_tree_rebalance(iavl_tree_s * tree, const size_t node) {
     }
 }
 
-size_t _iavl_tree_remove_fixup(const iavl_tree_s tree, size_t * node) {
+size_t _iavl_tree_remove_fixup(const iavl_tree_s * tree, size_t * node) {
     // calculate the rightmost depth of the left child
     size_t left_depth = 0, * left_node = node;
-    for (size_t * l = tree.node[IAVL_TREE_LEFT] + (*left_node); NIL != (*l); l = tree.node[IAVL_TREE_RIGHT] + (*l)) {
+    for (size_t * l = tree->node[IAVL_TREE_LEFT] + (*left_node); NIL != (*l); l = tree->node[IAVL_TREE_RIGHT] + (*l)) {
         left_depth++;
         left_node = l;
     }
 
     // calculate the leftmost depth of the right child
     size_t right_depth = 0, * right_node = node;
-    for (size_t * r = tree.node[IAVL_TREE_RIGHT] + (*right_node); NIL != (*r); r = tree.node[IAVL_TREE_LEFT] + (*r)) {
+    for (size_t * r = tree->node[IAVL_TREE_RIGHT] + (*right_node); NIL != (*r); r = tree->node[IAVL_TREE_LEFT] + (*r)) {
         right_depth++;
         right_node = r;
     }
 
     const size_t hole = left_depth > right_depth ? (*left_node) : (*right_node);
-    memmove(tree.elements + ((*node) * tree.size), tree.elements + (hole * tree.size), tree.size);
+    memmove(tree->elements + ((*node) * tree->size), tree->elements + (hole * tree->size), tree->size);
     if (left_depth > right_depth) {
-        if (NIL != tree.node[IAVL_TREE_LEFT][(*left_node)]) { // if right child exists cut off parent
-            tree.parent[tree.node[IAVL_TREE_LEFT][(*left_node)]] = tree.parent[(*left_node)];
+        if (NIL != tree->node[IAVL_TREE_LEFT][(*left_node)]) { // if right child exists cut off parent
+            tree->parent[tree->node[IAVL_TREE_LEFT][(*left_node)]] = tree->parent[(*left_node)];
         }
-        (*left_node) = tree.node[IAVL_TREE_LEFT][(*left_node)]; // cut off new hole index
+        (*left_node) = tree->node[IAVL_TREE_LEFT][(*left_node)]; // cut off new hole index
     } else {
-        if (NIL != tree.node[IAVL_TREE_RIGHT][(*right_node)]) { // if left child exists cut off parent
-            tree.parent[tree.node[IAVL_TREE_RIGHT][(*right_node)]] = tree.parent[(*right_node)];
+        if (NIL != tree->node[IAVL_TREE_RIGHT][(*right_node)]) { // if left child exists cut off parent
+            tree->parent[tree->node[IAVL_TREE_RIGHT][(*right_node)]] = tree->parent[(*right_node)];
         }
-        (*right_node) = tree.node[IAVL_TREE_RIGHT][(*right_node)]; // cut off new hole index
+        (*right_node) = tree->node[IAVL_TREE_RIGHT][(*right_node)]; // cut off new hole index
     }
 
     return hole;

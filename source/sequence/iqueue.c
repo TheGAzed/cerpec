@@ -16,17 +16,21 @@ void destroy_iqueue(iqueue_s * queue, const destroy_fn destroy) {
 
     assert(queue->size && "[INVALID] Size can't be zero.");
 
+    // for each node starting from tail (previous to head)
     struct infinite_queue_node * previous = queue->tail;
     for (size_t start = queue->current; queue->length; start = 0) {
+        // destroy elements in previous' next (so head and next)
         size_t i = start;
         for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
             destroy(previous->next->elements + (i * queue->size));
         }
         queue->length -= (i - start);
 
+        // save destroyed node and cut it from queue list
         struct infinite_queue_node * temp = previous->next;
         previous->next = previous->next->next;
 
+        // free destroyed node and its elements array
         free(temp->elements);
         free(temp);
     }
@@ -40,17 +44,21 @@ void clear_iqueue(iqueue_s * queue, const destroy_fn destroy) {
 
     assert(queue->size && "[INVALID] Size can't be zero.");
 
+    // for each node starting from tail (previous to head)
     struct infinite_queue_node * previous = queue->tail;
     for (size_t start = queue->current; queue->length; start = 0) {
+        // destroy elements in previous' next (so head and next)
         size_t i = start;
         for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
             destroy(previous->next->elements + (i * queue->size));
         }
         queue->length -= (i - start);
 
+        // save destroyed node and cut it from queue list
         struct infinite_queue_node * temp = previous->next;
         previous->next = previous->next->next;
 
+        // free destroyed node and its elements array
         free(temp->elements);
         free(temp);
     }
@@ -65,36 +73,42 @@ iqueue_s copy_iqueue(const iqueue_s * queue, const copy_fn copy) {
 
     assert(queue->size && "[INVALID] Size can't be zero.");
 
-    iqueue_s queue_copy = { .size = queue->size, .tail = NULL, .length = queue->length, .current = queue->current };
+    // create properly initialized replica
+    iqueue_s replica = { .size = queue->size, .tail = NULL, .length = queue->length, .current = queue->current };
 
+    // set originale queue's and replica's current nodes for iteration
     struct infinite_queue_node const * current_queue = queue->tail;
-    struct infinite_queue_node ** current_copy = &(queue_copy.tail); // two pointer list to remove special .head case
+    struct infinite_queue_node ** current_copy = &(replica.tail); // two pointer list to remove special .head case
 
-    size_t remaining = queue->length, start_index = queue->current;
-    struct infinite_queue_node * last_added = NULL;
+    // set remaining length and start index for copying
+    size_t remaining = queue->length, start = queue->current;
+    struct infinite_queue_node * last = NULL;
     while (remaining) {
-        last_added = (*current_copy) = malloc(sizeof(struct infinite_queue_node));
+        // allocate new node for replica
+        last = (*current_copy) = malloc(sizeof(struct infinite_queue_node));
         assert((*current_copy) && "[ERROR] Memory allocation failed");
 
-        last_added->elements = malloc(IQUEUE_CHUNK * queue->size);
-        assert(last_added->elements && "[ERROR] Memory allocation failed.");
+        // allocate new elements array for replica
+        (*current_copy)->elements = malloc(IQUEUE_CHUNK * queue->size);
+        assert((*current_copy)->elements && "[ERROR] Memory allocation failed.");
 
-        (*current_copy)->next = queue_copy.tail; // make current/last node's next pointer point to tail
+        // redirect current replica's node with replica's tail fopr circularity
+        (*current_copy)->next = replica.tail;
         current_queue = current_queue->next;
 
         // outside for loop to get copied chunk size, since it can either be 'remaining' or 'IQUEUE_CHUNK'
-        size_t i = start_index;
+        size_t i = start;
         for (; i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than both 'remaining' and 'IQUEUE_CHUNK'
             copy((*current_copy)->elements + (i * queue->size), current_queue->elements + (i * queue->size));
         }
         remaining -= i; // subtract copied size from remaining size using i
-        start_index = 0; // set start index to zero since we only need start index startinf from queue's currrent in tail node
+        start = 0; // set start index to zero since we only need start index startinf from queue's currrent in tail node
 
         current_copy = &((*current_copy)->next);
     }
-    queue_copy.tail = last_added;
+    replica.tail = last; // set replica's tail to its last added node (i.e. its tail)
 
-    return queue_copy;
+    return replica;
 }
 
 bool is_empty_iqueue(const iqueue_s * queue) {

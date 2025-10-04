@@ -1,4 +1,4 @@
-#include <priority/ibinary_heap.h>
+#include <misc/ibinary_heap.h>
 
 #include <assert.h>
 #include <stdlib.h>

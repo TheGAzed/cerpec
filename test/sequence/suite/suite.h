@@ -7,6 +7,6 @@
 
 SUITE_EXTERN(stack_test);
 SUITE_EXTERN(queue_test);
-SUITE_EXTERN(deque_test);
+SUITE_EXTERN(ideque_test);
 
 #endif // SUITE_H

@@ -43,12 +43,12 @@ void clear_irb_tree(irb_tree_s * tree, const destroy_fn destroy);
 /// @param tree Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Stack structure.
-irb_tree_s copy_irb_tree(const irb_tree_s tree, const copy_fn copy);
+irb_tree_s copy_irb_tree(const irb_tree_s * tree, const copy_fn copy);
 
 /// @brief Checks if structure is empty.
 /// @param tree Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_irb_tree(const irb_tree_s tree);
+bool is_empty_irb_tree(const irb_tree_s * tree);
 
 /// @brief Inserts a single element into the structure.
 /// @param tree Structure to insert into.
@@ -65,19 +65,19 @@ void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer);
 /// @param tree Structure to remove from.
 /// @param element Element buffer to search.
 /// @return 'true' if contained, 'false' if not.
-bool contains_irb_tree(const irb_tree_s tree, const void * element);
+bool contains_irb_tree(const irb_tree_s * tree, const void * element);
 
 /// @brief Gets the maximum element.
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save element.
 /// @note Maximum element as specified by compare fucntion pointer.
-void get_max_irb_tree(const irb_tree_s tree, void * buffer);
+void get_max_irb_tree(const irb_tree_s * tree, void * buffer);
 
 /// @brief Gets the minimum element.
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save element.
 /// @note Minimum element as specified by compare fucntion pointer.
-void get_min_irb_tree(const irb_tree_s tree, void * buffer);
+void get_min_irb_tree(const irb_tree_s * tree, void * buffer);
 
 /// @brief Gets and removes the maximum element.
 /// @param tree Structure to get from.
@@ -95,13 +95,13 @@ void remove_min_irb_tree(irb_tree_s * tree, void * buffer);
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save element.
-void get_floor_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+void get_floor_irb_tree(const irb_tree_s * tree, const void * element, void * buffer);
 
 /// @brief Gets the ceil based on parameter element.
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save element.
-void get_ceil_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+void get_ceil_irb_tree(const irb_tree_s * tree, const void * element, void * buffer);
 
 /// @brief Gets and removes the floor element.
 /// @param tree Structure to get from.
@@ -119,13 +119,13 @@ void remove_ceil_irb_tree(irb_tree_s * tree, const void * element, void * buffer
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save removed element.
-void get_successor_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+void get_successor_irb_tree(const irb_tree_s * tree, const void * element, void * buffer);
 
 /// @brief Gets the in-order predecessor of parameter element.
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save removed element.
-void get_predecessor_irb_tree(const irb_tree_s tree, const void * element, void * buffer);
+void get_predecessor_irb_tree(const irb_tree_s * tree, const void * element, void * buffer);
 
 /// @brief Gets and removes the in-order successor element.
 /// @param tree Structure to get from.
@@ -144,30 +144,30 @@ void remove_predecessor_irb_tree(irb_tree_s * tree, const void * element, void *
 /// @param latter Latter buffer to search by.
 /// @param former Former buffer to save replaced element.
 /// @note Both 'former' and 'latter' must be equal based on comparison function pointer.
-void update_irb_tree(const irb_tree_s tree, const void * latter, void * former);
+void update_irb_tree(const irb_tree_s * tree, const void * latter, void * former);
 
 /// @brief Performs an in-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param operate Function pointer to operate on each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void inorder_irb_tree(const irb_tree_s tree, const operate_fn operate, void * arguments);
+void inorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments);
 
 /// @brief Performs a pre-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param operate Function pointer to operate on each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void preorder_irb_tree(const irb_tree_s tree, const operate_fn operate, void * arguments);
+void preorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments);
 
 /// @brief Performs a post-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param operate Function pointer to operate on each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void postorder_irb_tree(const irb_tree_s tree, const operate_fn operate, void * arguments);
+void postorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments);
 
 /// @brief Performs a level-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param operate Function pointer to operate on each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void level_order_irb_tree(const irb_tree_s tree, const operate_fn operate, void * arguments);
+void level_order_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments);
 
 #endif // IRB_TREE_H

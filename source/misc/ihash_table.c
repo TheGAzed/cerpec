@@ -1,4 +1,4 @@
-#include <table/ihash_table.h>
+#include <misc/ihash_table.h>
 
 #include <assert.h>
 #include <stdlib.h>

@@ -9,8 +9,8 @@
 
 /// @brief Stack data structure.
 typedef struct infinite_stack {
-    char * elements;
-    size_t size, length, capacity;
+    char * elements;               // array of elements
+    size_t size, length, capacity; // size of single element, structure length and its capacity
 } istack_s;
 
 /// @brief Creates an empty structure.

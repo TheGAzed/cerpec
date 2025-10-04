@@ -34,12 +34,12 @@ void clear_icircular_list(icircular_list_s * list, const destroy_fn destroy);
 /// @param list Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Stack structure.
-icircular_list_s copy_icircular_list(const icircular_list_s list, const copy_fn copy);
+icircular_list_s copy_icircular_list(const icircular_list_s * list, const copy_fn copy);
 
 /// @brief Checks if structure is empty.
 /// @param list Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_icircular_list(const icircular_list_s list);
+bool is_empty_icircular_list(const icircular_list_s * list);
 
 /// @brief Inserts a single element at the index of the structure.
 /// @param list Structure to insert into.
@@ -51,7 +51,7 @@ void insert_at_icircular_list(icircular_list_s * list, const void * element, con
 /// @param list Structure to get element from.
 /// @param index Index to get element at.
 /// @param buffer Element buffer to save gotten element.
-void get_icircular_list(const icircular_list_s list, const size_t index, void * buffer);
+void get_icircular_list(const icircular_list_s * list, const size_t index, void * buffer);
 
 /// @brief Removes first element equal to parameter one, based on compare function pointer.
 /// @param list Structure to remove element from.
@@ -99,12 +99,12 @@ icircular_list_s extract_icircular_list(icircular_list_s * list, const filter_fn
 /// @param list Structure to iterate over.
 /// @param operate Function pointer to operate on each element.
 /// @param arguments Generic void pointer arguments for function pointer.
-void foreach_icircular_list(const icircular_list_s list, const operate_fn operate, void * arguments);
+void foreach_icircular_list(const icircular_list_s * list, const operate_fn operate, void * arguments);
 
 /// @brief Maps each element in structure into an array to manage.
 /// @param list Structure to manage.
 /// @param manage Function pointer to operate on elements array of structure length.
 /// @param arguments Generic void pointer arguments for function pointer.
-void map_icircular_list(const icircular_list_s list, const manage_fn manage, void * arguments);
+void map_icircular_list(const icircular_list_s * list, const manage_fn manage, void * arguments);
 
 #endif // ICIRCULAR_LIST_H
