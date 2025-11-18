@@ -684,9 +684,9 @@ void update_irb_tree(const irb_tree_s * tree, const void * latter, void * former
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments) {
+void inorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(transform && "[ERROR] Parameter can't be NULL.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -699,7 +699,7 @@ void inorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * 
             node = tree->node[IRB_TREE_LEFT][node];
         }
 
-        if (!operate(tree->elements + (node * tree->size), arguments)) {
+        if (!transform(tree->elements + (node * tree->size), arguments)) {
             break;
         }
 
@@ -723,9 +723,9 @@ void inorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * 
     }
 }
 
-void preorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments) {
+void preorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(transform && "[ERROR] Parameter can't be NULL.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -741,7 +741,7 @@ void preorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void *
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && operate(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
+    while (stack.length && transform(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
         const size_t node = stack.elements[--stack.length];
 
         const size_t right_child = tree->node[IRB_TREE_RIGHT][node];
@@ -758,9 +758,9 @@ void preorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void *
     free(stack.elements);
 }
 
-void postorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments) {
+void postorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(transform && "[ERROR] Parameter can't be NULL.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -779,14 +779,14 @@ void postorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void 
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
             stack.elements[stack.length++] = node;
             node = tree->node[IRB_TREE_LEFT][node];
-        } else { // else node is invalid, thus pop a new node from the stack, operate on element, and go to node's right child
+        } else { // else node is invalid, thus pop a new node from the stack, transform on element, and go to node's right child
             const size_t peek = stack.elements[stack.length - 1];
 
             const size_t peek_right = tree->node[IRB_TREE_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!operate(tree->elements + (node * tree->size), arguments)) {
+                if (!transform(tree->elements + (node * tree->size), arguments)) {
                     break;
                 }
 
@@ -798,9 +798,9 @@ void postorder_irb_tree(const irb_tree_s * tree, const operate_fn operate, void 
     free(stack.elements);
 }
 
-void level_order_irb_tree(const irb_tree_s * tree, const operate_fn operate, void * arguments) {
+void levelorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(transform && "[ERROR] Parameter can't be NULL.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -816,8 +816,8 @@ void level_order_irb_tree(const irb_tree_s * tree, const operate_fn operate, voi
         queue.elements[queue.current + queue.length++] = tree->root;
     }
 
-    // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && operate(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
+    // while queue isn't empty transform on element, pop parent and push valid children
+    while (queue.length && transform(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
         // pop index
         const size_t node = queue.elements[queue.current++];
         queue.length--;

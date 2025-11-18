@@ -532,7 +532,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * list, const filter_fn filte
     return positive;
 }
 
-void foreach_next_idouble_list(const idouble_list_s * list, const operate_fn operate, void * arguments) {
+void map_next_idouble_list(const idouble_list_s * list, const handle_fn operate, void * arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
@@ -548,26 +548,26 @@ void foreach_next_idouble_list(const idouble_list_s * list, const operate_fn ope
     }
 }
 
-void foreach_prev_idouble_list(const idouble_list_s * list, const operate_fn operate, void * arguments) {
+void map_prev_idouble_list(const idouble_list_s * list, const handle_fn handle, void * arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(operate && "[ERROR] Paremeter can't be NULL.");
+    assert(handle && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    // for each backward element in list call operate function and break if it returns false
+    // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
         current = list->node[IDOUBLE_LIST_PREV][current];
-        if (!operate(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), arguments)) {
             break;
         }
     }
 }
 
-void map_idouble_list(const idouble_list_s * list, const manage_fn manage, void * arguments) {
+void apply_idouble_list(const idouble_list_s * list, const process_fn process, void * arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(manage && "[ERROR] Paremeter can't be NULL.");
+    assert(process && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % IDOUBLE_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
@@ -581,8 +581,8 @@ void map_idouble_list(const idouble_list_s * list, const manage_fn manage, void 
         memcpy(elements + (i * list->size), list->elements + (current * list->size), list->size);
     }
 
-    // manage elements
-    manage(list->elements, list->length, arguments);
+    // process elements
+    process(list->elements, list->length, arguments);
 
     // copy elements back into list
     for (size_t i = 0, current = list->head; i < list->length; ++i) {

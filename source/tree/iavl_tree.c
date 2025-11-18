@@ -694,9 +694,9 @@ void update_iavl_tree(const iavl_tree_s * tree, const void * latter, void * form
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+void inorder_iavl_tree(const iavl_tree_s * tree, const handle_fn handle, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -709,7 +709,7 @@ void inorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void 
             node = tree->node[IAVL_TREE_LEFT][node];
         }
 
-        if (!operate(tree->elements + (node * tree->size), arguments)) {
+        if (!handle(tree->elements + (node * tree->size), arguments)) {
             break;
         }
 
@@ -733,9 +733,9 @@ void inorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void 
     }
 }
 
-void preorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+void preorder_iavl_tree(const iavl_tree_s * tree, const handle_fn handle, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -751,7 +751,7 @@ void preorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && operate(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
+    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
         const size_t node = stack.elements[--stack.length];
 
         const size_t right_child = tree->node[IAVL_TREE_RIGHT][node];
@@ -768,9 +768,9 @@ void preorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void
     free(stack.elements);
 }
 
-void postorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+void postorder_iavl_tree(const iavl_tree_s * tree, const handle_fn handle, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -789,14 +789,14 @@ void postorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, voi
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
             stack.elements[stack.length++] = node;
             node = tree->node[IAVL_TREE_LEFT][node];
-        } else { // else node is invalid, thus pop a new node from the stack, operate on element, and go to node's right child
+        } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
             const size_t peek = stack.elements[stack.length - 1];
 
             const size_t peek_right = tree->node[IAVL_TREE_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!operate(tree->elements + (node * tree->size), arguments)) {
+                if (!handle(tree->elements + (node * tree->size), arguments)) {
                     break;
                 }
 
@@ -808,7 +808,7 @@ void postorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, voi
     free(stack.elements);
 }
 
-void level_order_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments) {
+void levelorder_iavl_tree(const iavl_tree_s * tree, const handle_fn operate, void * arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(operate && "[ERROR] Parameter can't be NULL.");
 

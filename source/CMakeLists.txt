@@ -15,7 +15,8 @@ target_sources(CERPEC
         PRIVATE tree/iavl_tree.c
         PRIVATE tree/irb_tree.c
 
+        PRIVATE graph/imatrix_graph.c
+
         PRIVATE misc/ihash_table.c
         PRIVATE misc/ibinary_heap.c
-        PRIVATE misc/itrie.c
 )

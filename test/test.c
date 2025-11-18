@@ -12,6 +12,15 @@ void * copy(void * destination, const void * source) {
     return destination;
 }
 
+void * add(void * a, const void * b) {
+    int * ai = a;
+    const int * bi = b;
+
+    (*ai) += (*bi);
+
+    return ai;
+}
+
 int compare(const void * a, const void * b) {
     return (*(int*)(a)) - (*(int*)(b));
 }

@@ -13,13 +13,13 @@ void _ibinary_heap_resize(ibinary_heap_s * heap, const size_t size);
 /// @param heap Heap to heapify.
 /// @param index Start index to perform heapify.
 /// @param temporary Temporary single size element used in swaps to avoid pointless memory allocation.
-void _ibinary_heapify_up(const ibinary_heap_s heap, const size_t index, void * temporary);
+void _ibinary_heapify_up(const ibinary_heap_s * heap, const size_t index, void * temporary);
 
 /// @brief Performs heapify down operation on heap.
 /// @param heap Heap to heapify.
 /// @param index Start index to perform heapify.
 /// @param temporary Temporary single size element used in swaps to avoid pointless memory allocation.
-void _ibinary_heapify_down(const ibinary_heap_s heap, const size_t index, void * temporary);
+void _ibinary_heapify_down(const ibinary_heap_s * heap, const size_t index, void * temporary);
 
 ibinary_heap_s create_ibinary_heap(const size_t size, const compare_fn compare) {
     assert(compare && "[ERROR] Parameter can't be NULL.");
@@ -63,32 +63,34 @@ void clear_ibinary_heap(ibinary_heap_s * heap, const destroy_fn destroy) {
     heap->elements = NULL;
 }
 
-ibinary_heap_s copy_ibinary_heap(const ibinary_heap_s heap, const copy_fn copy) {
+ibinary_heap_s copy_ibinary_heap(const ibinary_heap_s * heap, const copy_fn copy) {
+    assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(heap.compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap.size && "[INVALID] Parameter can't be zero.");
+    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
+    assert(heap->size && "[INVALID] Parameter can't be zero.");
 
     // initialize replica structure
     const ibinary_heap_s replica = {
-        .capacity = heap.capacity, .compare = heap.compare, .size = heap.size, .length = heap.length,
-        .elements = malloc(heap.capacity * heap.size),
+        .capacity = heap->capacity, .compare = heap->compare, .size = heap->size, .length = heap->length,
+        .elements = malloc(heap->capacity * heap->size),
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
 
     // copy each array element into replica
-    for (size_t i = 0; i < heap.length; ++i) {
-        copy(replica.elements + (i * replica.size), heap.elements + (i * heap.size));
+    for (size_t i = 0; i < heap->length; ++i) {
+        copy(replica.elements + (i * replica.size), heap->elements + (i * heap->size));
     }
 
     return replica;
 }
 
-bool is_empty_ibinary_heap(const ibinary_heap_s heap) {
-    assert(heap.compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap.size && "[INVALID] Parameter can't be zero.");
+bool is_empty_ibinary_heap(const ibinary_heap_s * heap) {
+    assert(heap && "[ERROR] Parameter can't be NULL.");
+    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
+    assert(heap->size && "[INVALID] Parameter can't be zero.");
 
-    return !(heap.length);
+    return !(heap->length);
 }
 
 void push_ibinary_heap(ibinary_heap_s * heap, const void * element) {
@@ -109,7 +111,7 @@ void push_ibinary_heap(ibinary_heap_s * heap, const void * element) {
     void * temporary = malloc(heap->size);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
-    _ibinary_heapify_up(*heap, heap->length, temporary);
+    _ibinary_heapify_up(heap, heap->length, temporary);
 
     free(temporary);
 
@@ -131,48 +133,50 @@ void pop_ibinary_heap(ibinary_heap_s * heap, void * buffer) {
     // put last element in first's place (memory may overlap)
     memmove(heap->elements, heap->elements + (heap->length * heap->size), heap->size);
 
+    // create temporary element holder outside of loop for swaps in heap fixup
+    void * temporary = malloc(heap->size);
+    assert(temporary && "[ERROR] Memory allocation failed.");
+
+    _ibinary_heapify_down(heap, 0, temporary);
+
     if (heap->length == heap->capacity - IBINARY_HEAP_CHUNK) {
         _ibinary_heap_resize(heap, heap->length);
     }
+
+    free(temporary);
+}
+
+void peep_ibinary_heap(const ibinary_heap_s * heap, void * buffer) {
+    assert(heap && "[ERROR] Parameter can't be NULL.");
+    assert(heap->length && "[ERROR] Length can't be zero.");
+    assert(buffer && "[ERROR] Parameter can't be NULL.");
+
+    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
+    assert(heap->size && "[INVALID] Parameter can't be zero.");
+
+    memcpy(buffer, heap->elements, heap->size);
+}
+
+void replace_ibinary_heap(const ibinary_heap_s * heap, const size_t index, const void * element, void * buffer) {
+    assert(heap && "[ERROR] Parameter can't be NULL.");
+    assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(index < heap->length && "[ERROR] Parameter can't be more than length.");
+
+    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
+    assert(heap->size && "[INVALID] Parameter can't be zero.");
+
+    // copy element to replace into buffer
+    memcpy(buffer, heap->elements + (index * heap->size), heap->size);
+    // place parameter element into removed element's place
+    memcpy(heap->elements + (index * heap->size), element, heap->size);
 
     // create temporary element holder outside of loop for swaps in heap fixup
     void * temporary = malloc(heap->size);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
-    _ibinary_heapify_down(*heap, 0, temporary);
-
-    free(temporary);
-}
-
-void peep_ibinary_heap(const ibinary_heap_s heap, void * buffer) {
-    assert(heap.length && "[ERROR] Length can't be zero.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-
-    assert(heap.compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap.size && "[INVALID] Parameter can't be zero.");
-
-    memcpy(buffer, heap.elements, heap.size);
-}
-
-void replace_ibinary_heap(const ibinary_heap_s heap, const size_t index, const void * element, void * buffer) {
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
-    assert(index < heap.length && "[ERROR] Parameter can't be more than length.");
-
-    assert(heap.compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap.size && "[INVALID] Parameter can't be zero.");
-
-    // copy element to replace into buffer
-    memcpy(buffer, heap.elements + (index * heap.size), heap.size);
-    // place parameter element into removed element's place
-    memcpy(heap.elements + (index * heap.size), element, heap.size);
-
-    // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = malloc(heap.size);
-    assert(temporary && "[ERROR] Memory allocation failed.");
-
     // perform heapify up or down based on comparison (ignore comparison equal to 'zero' as heap doesn't change)
-    const int comparison = heap.compare(buffer, element);
+    const int comparison = heap->compare(buffer, element);
     if (comparison > 0) {
         _ibinary_heapify_up(heap, index, temporary);
     } else if (comparison < 0) {
@@ -215,23 +219,24 @@ void meld_ibinary_heap(ibinary_heap_s * restrict destination, ibinary_heap_s * r
     const size_t start = (destination->length / 2) - 1; // value may underflow when length is less than two
     for (size_t i = 0; destination->length > 1 && i <= start; ++i) {
         const size_t reverse = start - i;
-        _ibinary_heapify_down(*destination, reverse, temporary);
+        _ibinary_heapify_down(destination, reverse, temporary);
     }
 
     free(temporary);
 }
 
-void patch_ibinary_heap(const ibinary_heap_s heap) {
-    assert(heap.compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap.size && "[INVALID] Parameter can't be zero.");
+void patch_ibinary_heap(const ibinary_heap_s * heap) {
+    assert(heap && "[ERROR] Parameter can't be NULL.");
+    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
+    assert(heap->size && "[INVALID] Parameter can't be zero.");
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = malloc(heap.size);
+    void * temporary = malloc(heap->size);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // for each element at half index
-    const size_t start = (heap.length / 2) - 1; // value may underflow when length is less than two
-    for (size_t i = 0; heap.length > 1 && i <= start; ++i) {
+    const size_t start = (heap->length / 2) - 1; // value may underflow when length is less than two
+    for (size_t i = 0; heap->length > 1 && i <= start; ++i) {
         const size_t reverse = start - i;
         _ibinary_heapify_down(heap, reverse, temporary);
     }
@@ -239,13 +244,14 @@ void patch_ibinary_heap(const ibinary_heap_s heap) {
     free(temporary);
 }
 
-void foreach_istack(const ibinary_heap_s heap, const operate_fn operate, void * arguments) {
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+void map_ibinary_heap(const ibinary_heap_s * heap, const handle_fn handle, void * arguments) {
+    assert(heap && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(heap.compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap.size && "[INVALID] Parameter can't be zero.");
+    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
+    assert(heap->size && "[INVALID] Parameter can't be zero.");
 
-    for (size_t i = 0; i < heap.length && operate(heap.elements + (i * heap.size), arguments); ++i) {}
+    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), arguments); ++i) {}
 }
 
 void _ibinary_heap_resize(ibinary_heap_s * heap, const size_t size) {
@@ -255,14 +261,14 @@ void _ibinary_heap_resize(ibinary_heap_s * heap, const size_t size) {
     assert((!heap->capacity || heap->elements) && "[ERROR] Memory allocation failed.");
 }
 
-void _ibinary_heapify_up(const ibinary_heap_s heap, const size_t index, void * temporary) {
+void _ibinary_heapify_up(const ibinary_heap_s * heap, const size_t index, void * temporary) {
     // while current top child index is not zero and current element is greater than its parent
     size_t c = index, p = (c - 1 / 2);
-    while (c && heap.compare(heap.elements + (c * heap.size), heap.elements + (p * heap.size)) < 0) {
+    while (c && heap->compare(heap->elements + (c * heap->size), heap->elements + (p * heap->size)) < 0) {
         // swap current child element with parent
-        memcpy(temporary, heap.elements + (c * heap.size), heap.size);
-        memcpy(heap.elements + (c * heap.size), heap.elements + (p * heap.size), heap.size);
-        memcpy(heap.elements + (p * heap.size), temporary, heap.size);
+        memcpy(temporary, heap->elements + (c * heap->size), heap->size);
+        memmove(heap->elements + (c * heap->size), heap->elements + (p * heap->size), heap->size);
+        memcpy(heap->elements + (p * heap->size), temporary, heap->size);
 
         // change current child to parent and parent to grand-parent
         c = p;
@@ -270,22 +276,22 @@ void _ibinary_heapify_up(const ibinary_heap_s heap, const size_t index, void * t
     }
 }
 
-void _ibinary_heapify_down(const ibinary_heap_s heap, const size_t index, void * temporary) {
-    for (size_t p = index, c = (2 * p) + 1; c < heap.length; p = c, c = (2 * p) + 1) {
+void _ibinary_heapify_down(const ibinary_heap_s * heap, const size_t index, void * temporary) {
+    for (size_t p = index, c = (2 * p) + 1; c < heap->length; p = c, c = (2 * p) + 1) {
         const size_t s = c + 1;
         // if right child is a valid index and it is smaller than left child change left child to right one
-        if (s < heap.length && heap.compare(heap.elements + (c * heap.size), heap.elements + (s * heap.size)) > 0) {
+        if (s < heap->length && heap->compare(heap->elements + (c * heap->size), heap->elements + (s * heap->size)) > 0) {
             c = s;
         }
 
         // if child is greater, then parent is properly set and thus break from loop
-        if (heap.compare(heap.elements + (c * heap.size), heap.elements + (p * heap.size)) > 0) {
+        if (heap->compare(heap->elements + (c * heap->size), heap->elements + (p * heap->size)) > 0) {
             break;
         }
 
         // swap current parent element with greatest child
-        memcpy(temporary, heap.elements + (c * heap.size), heap.size);
-        memcpy(heap.elements + (c * heap.size), heap.elements + (p * heap.size), heap.size);
-        memcpy(heap.elements + (p * heap.size), temporary, heap.size);
+        memcpy(temporary, heap->elements + (c * heap->size), heap->size);
+        memmove(heap->elements + (c * heap->size), heap->elements + (p * heap->size), heap->size);
+        memcpy(heap->elements + (p * heap->size), temporary, heap->size);
     }
 }

@@ -97,14 +97,14 @@ icircular_list_s extract_icircular_list(icircular_list_s * list, const filter_fn
 
 /// @brief Iterates over each element in structure based on their order.
 /// @param list Structure to iterate over.
-/// @param operate Function pointer to operate on each element.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic void pointer arguments for function pointer.
-void foreach_icircular_list(const icircular_list_s * list, const operate_fn operate, void * arguments);
+void map_icircular_list(const icircular_list_s * list, const handle_fn handle, void * arguments);
 
-/// @brief Maps each element in structure into an array to manage.
+/// @brief Apply each element in structure into an array to manage.
 /// @param list Structure to manage.
-/// @param manage Function pointer to operate on elements array of structure length.
+/// @param process Function pointer to process elements array of structure length.
 /// @param arguments Generic void pointer arguments for function pointer.
-void map_icircular_list(const icircular_list_s * list, const manage_fn manage, void * arguments);
+void apply_icircular_list(const icircular_list_s * list, const process_fn process, void * arguments);
 
 #endif // ICIRCULAR_LIST_H

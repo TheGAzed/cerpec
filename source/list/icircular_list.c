@@ -497,26 +497,26 @@ icircular_list_s extract_icircular_list(icircular_list_s * list, const filter_fn
     return positive;
 }
 
-void foreach_icircular_list(const icircular_list_s * list, const operate_fn operate, void * arguments) {
+void map_icircular_list(const icircular_list_s * list, const handle_fn handle, void * arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(operate && "[ERROR] Paremeter can't be NULL.");
+    assert(handle && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    // iterate over each element calling operate function
+    // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        if (!operate(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), arguments)) {
             break;
         }
     }
 }
 
-void map_icircular_list(const icircular_list_s * list, const manage_fn manage, void * arguments) {
+void apply_icircular_list(const icircular_list_s * list, const process_fn process, void * arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(manage && "[ERROR] Paremeter can't be NULL.");
+    assert(process && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(!(list->capacity % ICIRCULAR_LIST_CHUNK) && "[INVALID] Capacity must be modulo of chunk size.");
@@ -531,8 +531,8 @@ void map_icircular_list(const icircular_list_s * list, const manage_fn manage, v
         memcpy(elements + (i * list->size), list->elements + (current * list->size), list->size);
     }
 
-    // manage elements
-    manage(list->elements, list->length, arguments);
+    // process elements
+    process(list->elements, list->length, arguments);
 
     // copy elements back into list
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {

@@ -541,7 +541,7 @@ TEST FOREACH_FRONT_01(void) {
     }
 
     int value = 1;
-    foreach_front_ideque(&test, increment, &value);
+    map_front_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -562,7 +562,7 @@ TEST FOREACH_FRONT_02(void) {
     }
 
     int value = 1;
-    foreach_front_ideque(&test, increment, &value);
+    map_front_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -583,7 +583,7 @@ TEST FOREACH_FRONT_03(void) {
     }
 
     int value = 1;
-    foreach_front_ideque(&test, increment, &value);
+    map_front_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
@@ -604,7 +604,7 @@ TEST FOREACH_BACK_01(void) {
     }
 
     int value = 1;
-    foreach_back_ideque(&test, increment, &value);
+    map_back_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -625,7 +625,7 @@ TEST FOREACH_BACK_02(void) {
     }
 
     int value = 1;
-    foreach_back_ideque(&test, increment, &value);
+    map_back_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -646,7 +646,7 @@ TEST FOREACH_BACK_03(void) {
     }
 
     int value = 1;
-    foreach_back_ideque(&test, increment, &value);
+    map_back_ideque(&test, increment, &value);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;

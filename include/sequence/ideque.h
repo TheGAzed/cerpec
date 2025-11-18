@@ -80,18 +80,18 @@ void peek_back_ideque(const ideque_s * deque, void * buffer);
 /// @param deque Structure to iterate over.
 /// @param operate Function pointer to operate on each element reference using element size and generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_front_ideque(const ideque_s * deque, const operate_fn operate, void * arguments);
+void map_front_ideque(const ideque_s * deque, const handle_fn operate, void * arguments);
 
 /// @brief Iterates over each element in structure starting from the back.
 /// @param deque Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using element size and arguments.
+/// @param handle Function pointer to operate on each element reference using element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_back_ideque(const ideque_s * deque, const operate_fn operate, void * arguments);
+void map_back_ideque(const ideque_s * deque, const handle_fn handle, void * arguments);
 
-/// @brief Maps each element in structure into an array to manage.
+/// @brief Apply each element in structure into an array to manage.
 /// @param deque Structure to map.
-/// @param manage Function pointer to manage array of elements using strucuter length, element size and arguments.
+/// @param process Function pointer to manage array of elements using strucuter length, element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_ideque(const ideque_s * deque, const manage_fn manage, void * arguments);
+void apply_ideque(const ideque_s * deque, const process_fn process, void * arguments);
 
 #endif // IDEQUE_H

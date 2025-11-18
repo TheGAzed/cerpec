@@ -186,9 +186,9 @@ void dequeue_iqueue(iqueue_s * queue, void * buffer) {
     }
 }
 
-void foreach_iqueue(const iqueue_s * queue, const operate_fn operate, void * args) {
+void map_iqueue(const iqueue_s * queue, const handle_fn handle, void * args) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL");
+    assert(handle && "[ERROR] Parameter can't be NULL");
 
     size_t remaining = queue->length; // save queue size as remaining size for iteration
     struct infinite_queue_node const * previous = queue->tail;
@@ -198,8 +198,8 @@ void foreach_iqueue(const iqueue_s * queue, const operate_fn operate, void * arg
 
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size
-            // operate on element and if zero is returned then end main function
-            if (!operate(current->elements + (i * queue->size), args)) {
+            // handle on element and if zero is returned then end main function
+            if (!handle(current->elements + (i * queue->size), args)) {
                 return;
             }
         }
@@ -207,9 +207,9 @@ void foreach_iqueue(const iqueue_s * queue, const operate_fn operate, void * arg
     }
 }
 
-void map_iqueue(const iqueue_s * queue, const manage_fn manage, void * arguments) {
+void apply_iqueue(const iqueue_s * queue, const process_fn process, void * arguments) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(manage && "[ERROR] Parameter can't be NULL");
+    assert(process && "[ERROR] Parameter can't be NULL");
 
     assert(queue->size && "[INVALID] Size can't be zero.");
 
@@ -229,7 +229,7 @@ void map_iqueue(const iqueue_s * queue, const manage_fn manage, void * arguments
         remaining -= (i - start); // subtract absolute value of i and start from remaining size
     }
 
-    manage(elements_array, queue->length, arguments); // manage initialized elements array
+    process(elements_array, queue->length, arguments); // process initialized elements array
 
     index = 0, remaining = queue->length, previous = queue->tail;
     for (size_t start = queue->current; remaining; start = 0, previous = previous->next) { // save elements array back into queue

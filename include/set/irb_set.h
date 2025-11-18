@@ -43,12 +43,12 @@ void clear_irb_set(irb_set_s * set, const destroy_fn destroy);
 /// @param set Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Stack structure.
-irb_set_s copy_irb_set(const irb_set_s set, const copy_fn copy);
+irb_set_s copy_irb_set(const irb_set_s * set, const copy_fn copy);
 
 /// @brief Checks if structure is empty.
 /// @param set Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_irb_set(const irb_set_s set);
+bool is_empty_irb_set(const irb_set_s * set);
 
 /// @brief Inserts unique element into structure.
 /// @param set Structure to insert element into.
@@ -65,58 +65,58 @@ void remove_irb_set(irb_set_s * set, const void * element, void * buffer);
 /// @param set Structure to check.
 /// @param element Element to check.
 /// @return 'true' if contained, 'false' otherwise.
-bool contains_irb_set(const irb_set_s set, const void * element);
+bool contains_irb_set(const irb_set_s * set, const void * element);
 
 /// @brief Performs union of two structures and returns a new copy.
 /// @param set_one First structure to union.
 /// @param set_two Second structure to union.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Union structure.
-irb_set_s union_irb_set(const irb_set_s set_one, const irb_set_s set_two, const copy_fn copy);
+irb_set_s union_irb_set(const irb_set_s * set_one, const irb_set_s * set_two, const copy_fn copy);
 
 /// @brief Performs intersection of two structures and returns a new copy.
 /// @param set_one First structure to intersect.
 /// @param set_two Second structure to intersect.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Intersect structure.
-irb_set_s intersect_irb_set(const irb_set_s set_one, const irb_set_s set_two, const copy_fn copy);
+irb_set_s intersect_irb_set(const irb_set_s * set_one, const irb_set_s * set_two, const copy_fn copy);
 
 /// @brief Performs subtraction of two structures and returns a new copy.
 /// @param minuend Structure to subtract from.
 /// @param subtrahend Structure to subtract with.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Subtract structure.
-irb_set_s subtract_irb_set(const irb_set_s minuend, const irb_set_s subtrahend, const copy_fn copy);
+irb_set_s subtract_irb_set(const irb_set_s * minuend, const irb_set_s * subtrahend, const copy_fn copy);
 
 /// @brief Performs exclusion (symmetric difference) of two structures and returns a new copy.
 /// @param set_one First structure to exclude.
 /// @param set_two Second structure to exclude.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Exclude structure.
-irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, const copy_fn copy);
+irb_set_s exclude_irb_set(const irb_set_s * set_one, const irb_set_s * set_two, const copy_fn copy);
 
 /// @brief Checks if structure is subset of another structure.
 /// @param super Superset structure to check with.
 /// @param sub Subset structure to check from.
 /// @return 'true' if structure is subset, 'false' otherwise.
-bool is_subset_irb_set(const irb_set_s super, const irb_set_s sub);
+bool is_subset_irb_set(const irb_set_s * super, const irb_set_s * sub);
 
 /// @brief Checks if structure is proper subset of another structure.
 /// @param super Superset structure to check with.
 /// @param sub Subset structure to check from.
 /// @return 'true' if structure is proper subset, 'false' otherwise.
-bool is_proper_subset_irb_set(const irb_set_s super, const irb_set_s sub);
+bool is_proper_subset_irb_set(const irb_set_s * super, const irb_set_s * sub);
 
 /// @brief Checks if structures are disjoint from each other.
 /// @param set_one First structure to check.
 /// @param set_two Second structure to check.
 /// @return 'true' if structures are disjoint, 'false' otherwise.
-bool is_disjoint_irb_set(const irb_set_s set_one, const irb_set_s set_two);
+bool is_disjoint_irb_set(const irb_set_s * set_one, const irb_set_s * set_two);
 
 /// @brief Iterates over each element in structure.
 /// @param set Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_irb_set(const irb_set_s set, const operate_fn operate, void * arguments);
+void map_irb_set(const irb_set_s * set, const handle_fn handle, void * arguments);
 
 #endif // IRB_SET_H

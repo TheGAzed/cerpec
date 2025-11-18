@@ -26,7 +26,7 @@ void _irb_set_transplant(irb_set_s * set, const size_t u, const size_t v);
 /// @param set Structure to search.
 /// @param node Root of subset.
 /// @return Minimum node.
-size_t _irb_set_minimum(const irb_set_s set, const size_t node);
+size_t _irb_set_minimum(const irb_set_s * set, const size_t node);
 
 /// Red black set fixup function for set insert.
 /// @param set Structure to fixup.
@@ -131,22 +131,23 @@ void clear_irb_set(irb_set_s * set, const destroy_fn destroy) {
     set->capacity = 0;
 }
 
-irb_set_s copy_irb_set(const irb_set_s set, const copy_fn copy) {
+irb_set_s copy_irb_set(const irb_set_s * set, const copy_fn copy) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(set.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // initialize replica
     const irb_set_s replica = {
-        .elements = malloc((set.capacity + 1) * set.size),
-        .color = malloc((set.capacity + 1) * sizeof(bool)),
-        .parent = malloc((set.capacity + 1) * sizeof(size_t)),
-        .node[IRB_SET_LEFT] = malloc((set.capacity + 1) * sizeof(size_t)),
-        .node[IRB_SET_RIGHT] = malloc((set.capacity + 1) * sizeof(size_t)),
+        .elements = malloc((set->capacity + 1) * set->size),
+        .color = malloc((set->capacity + 1) * sizeof(bool)),
+        .parent = malloc((set->capacity + 1) * sizeof(size_t)),
+        .node[IRB_SET_LEFT] = malloc((set->capacity + 1) * sizeof(size_t)),
+        .node[IRB_SET_RIGHT] = malloc((set->capacity + 1) * sizeof(size_t)),
 
-        .capacity = set.capacity, .root = set.root, .length = set.length, .compare = set.compare, .size = set.size,
+        .capacity = set->capacity, .root = set->root, .length = set->length, .compare = set->compare, .size = set->size,
     };
 
     // since the structure always has one additional NIL node malloc must be checked even if capacity is zero
@@ -162,23 +163,24 @@ irb_set_s copy_irb_set(const irb_set_s set, const copy_fn copy) {
 
     // copy elements and indexes straight to replica
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < set.length + 1; ++i) {
-        copy(replica.elements + (i * set.size), set.elements + (i * set.size));
+    for (size_t i = 1; i < set->length + 1; ++i) {
+        copy(replica.elements + (i * set->size), set->elements + (i * set->size));
     }
-    memcpy(replica.color, set.color, (set.length + 1) * sizeof(bool));
-    memcpy(replica.parent, set.parent, (set.length + 1) * sizeof(size_t));
-    memcpy(replica.node[IRB_SET_LEFT], set.node[IRB_SET_LEFT], (set.length + 1) * sizeof(size_t));
-    memcpy(replica.node[IRB_SET_RIGHT], set.node[IRB_SET_RIGHT], (set.length + 1) * sizeof(size_t));
+    memcpy(replica.color, set->color, (set->length + 1) * sizeof(bool));
+    memcpy(replica.parent, set->parent, (set->length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRB_SET_LEFT], set->node[IRB_SET_LEFT], (set->length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRB_SET_RIGHT], set->node[IRB_SET_RIGHT], (set->length + 1) * sizeof(size_t));
 
     return replica;
 }
 
-bool is_empty_irb_set(const irb_set_s set) {
-    assert(set.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_empty_irb_set(const irb_set_s * set) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(set->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    return !(set.length);
+    return !(set->length);
 }
 
 void insert_irb_set(irb_set_s * set, const void * element) {
@@ -260,7 +262,7 @@ void remove_irb_set(irb_set_s * set, const void * element, void * buffer) {
         child = set->node[IRB_SET_LEFT][node];
         _irb_set_transplant(set, node, set->node[IRB_SET_LEFT][node]);
     } else {
-        current = _irb_set_minimum((*set), set->node[IRB_SET_RIGHT][node]);
+        current = _irb_set_minimum(set, set->node[IRB_SET_RIGHT][node]);
         original_color = set->color[current];
         child = set->node[IRB_SET_RIGHT][current];
 
@@ -296,66 +298,69 @@ void remove_irb_set(irb_set_s * set, const void * element, void * buffer) {
     }
 }
 
-bool contains_irb_set(const irb_set_s set, const void * element) {
+bool contains_irb_set(const irb_set_s * set, const void * element) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
 
-    assert(set.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(set.elements && "[INVALID] Paremeter can't be NULL.");
-    assert(set.parent && "[INVALID] Paremeter can't be NULL.");
-    assert(set.node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(set.node[IRB_SET_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(set->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->elements && "[INVALID] Paremeter can't be NULL.");
+    assert(set->parent && "[INVALID] Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_RIGHT] && "[INVALID] Paremeter can't be NULL.");
 
-    for (size_t node = set.root; NIL != node;) {
+    for (size_t node = set->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = set.compare(element, set.elements + (node * set.size));
+        const int comparison = set->compare(element, set->elements + (node * set->size));
         if (!comparison) {
             return true;
         }
 
         const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-        node = set.node[node_index][node]; // go to next child node
+        node = set->node[node_index][node]; // go to next child node
     }
 
     return false;
 }
 
-irb_set_s union_irb_set(const irb_set_s set_one, const irb_set_s set_two, const copy_fn copy) {
+irb_set_s union_irb_set(const irb_set_s * set_one, const irb_set_s * set_two, const copy_fn copy) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one.compare == set_two.compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements to maximum's replica
-    const irb_set_s minimum = set_one.length < set_two.length ? set_one : set_two;
-    const irb_set_s maximum = set_one.length >= set_two.length ? set_one : set_two;
+    const irb_set_s * minimum = set_one->length < set_two->length ? set_one : set_two;
+    const irb_set_s * maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
     irb_set_s set_union = copy_irb_set(maximum, copy);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < minimum.length + 1; ++i) {
-        const char * element = minimum.elements + (i * minimum.size);
+    for (size_t i = 1; i < minimum->length + 1; ++i) {
+        const char * element = minimum->elements + (i * minimum->size);
         bool contains = false;
-        for (size_t node = maximum.root; NIL != node;) {
+        for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = maximum.compare(element, maximum.elements + (node * maximum.size));
+            const int comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = maximum.node[node_index][node]; // go to next child node
+            node = maximum->node[node_index][node]; // go to next child node
         }
 
         // if maximum set contains minimum's element then continue
@@ -393,40 +398,42 @@ irb_set_s union_irb_set(const irb_set_s set_one, const irb_set_s set_two, const 
     return set_union;
 }
 
-irb_set_s intersect_irb_set(const irb_set_s set_one, const irb_set_s set_two, const copy_fn copy) {
+irb_set_s intersect_irb_set(const irb_set_s * set_one, const irb_set_s * set_two, const copy_fn copy) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one.compare == set_two.compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements
-    const irb_set_s minimum = set_one.length < set_two.length ? set_one : set_two;
-    const irb_set_s maximum = set_one.length >= set_two.length ? set_one : set_two;
+    const irb_set_s * minimum = set_one->length < set_two->length ? set_one : set_two;
+    const irb_set_s * maximum = set_one->length >= set_two->length ? set_one : set_two;
 
-    irb_set_s set_intersect = create_irb_set(set_one.size, set_one.compare);
+    irb_set_s set_intersect = create_irb_set(set_one->size, set_one->compare);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < minimum.length + 1; ++i) {
-        const char * element = minimum.elements + (i * minimum.size);
+    for (size_t i = 1; i < minimum->length + 1; ++i) {
+        const char * element = minimum->elements + (i * minimum->size);
         bool contains = false;
-        for (size_t node = maximum.root; NIL != node;) {
+        for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = maximum.compare(element, maximum.elements + (node * maximum.size));
+            const int comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = maximum.node[node_index][node]; // go to next child node
+            node = maximum->node[node_index][node]; // go to next child node
         }
 
         // if maximum set contains minimum's element then continue
@@ -464,36 +471,38 @@ irb_set_s intersect_irb_set(const irb_set_s set_one, const irb_set_s set_two, co
     return set_intersect;
 }
 
-irb_set_s subtract_irb_set(const irb_set_s minuend, const irb_set_s subtrahend, const copy_fn copy) {
+irb_set_s subtract_irb_set(const irb_set_s * minuend, const irb_set_s * subtrahend, const copy_fn copy) {
+    assert(minuend && "[ERROR] Parameter can't be NULL.");
+    assert(subtrahend && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(minuend.compare == subtrahend.compare && "[ERROR] Function pointers must be the same.");
-    assert(minuend.size == subtrahend.size && "[ERROR] Sizes must be the same.");
+    assert(minuend->compare == subtrahend->compare && "[ERROR] Function pointers must be the same.");
+    assert(minuend->size == subtrahend->size && "[ERROR] Sizes must be the same.");
 
-    assert(minuend.compare && "[INVALID] Parameter can't be NULL.");
-    assert(minuend.size && "[INVALID] Parameter can't be zero.");
-    assert(minuend.length <= minuend.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(minuend->compare && "[INVALID] Parameter can't be NULL.");
+    assert(minuend->size && "[INVALID] Parameter can't be zero.");
+    assert(minuend->length <= minuend->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(subtrahend.compare && "[INVALID] Parameter can't be NULL.");
-    assert(subtrahend.size && "[INVALID] Parameter can't be zero.");
-    assert(subtrahend.length <= subtrahend.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subtrahend->compare && "[INVALID] Parameter can't be NULL.");
+    assert(subtrahend->size && "[INVALID] Parameter can't be zero.");
+    assert(subtrahend->length <= subtrahend->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    irb_set_s set_subtract = create_irb_set(minuend.size, minuend.compare);
+    irb_set_s set_subtract = create_irb_set(minuend->size, minuend->compare);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < minuend.length + 1; ++i) {
-        const char * element = minuend.elements + (i * minuend.size);
+    for (size_t i = 1; i < minuend->length + 1; ++i) {
+        const char * element = minuend->elements + (i * minuend->size);
         bool contains = false;
-        for (size_t node = subtrahend.root; NIL != node;) {
+        for (size_t node = subtrahend->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = subtrahend.compare(element, subtrahend.elements + (node * subtrahend.size));
+            const int comparison = subtrahend->compare(element, subtrahend->elements + (node * subtrahend->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = subtrahend.node[node_index][node]; // go to next child node
+            node = subtrahend->node[node_index][node]; // go to next child node
         }
 
         // if maximum set contains minuend's element then continue
@@ -531,36 +540,38 @@ irb_set_s subtract_irb_set(const irb_set_s minuend, const irb_set_s subtrahend, 
     return set_subtract;
 }
 
-irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, const copy_fn copy) {
+irb_set_s exclude_irb_set(const irb_set_s * set_one, const irb_set_s * set_two, const copy_fn copy) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one.compare == set_two.compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    irb_set_s set_exclude = create_irb_set(set_one.size, set_one.compare);
+    irb_set_s set_exclude = create_irb_set(set_one->size, set_one->compare);
 
     // for each element in set one
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < set_one.length + 1; ++i) {
-        const char * element = set_one.elements + (i * set_one.size);
+    for (size_t i = 1; i < set_one->length + 1; ++i) {
+        const char * element = set_one->elements + (i * set_one->size);
         bool contains = false;
-        for (size_t node = set_two.root; NIL != node;) {
+        for (size_t node = set_two->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = set_two.compare(element, set_two.elements + (node * set_two.size));
+            const int comparison = set_two->compare(element, set_two->elements + (node * set_two->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = set_two.node[node_index][node]; // go to next child node
+            node = set_two->node[node_index][node]; // go to next child node
         }
 
         // if maximum set contains minimum's element then continue
@@ -597,19 +608,19 @@ irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, cons
 
     // for each element in set two
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < set_two.length + 1; ++i) {
-        const char * element = set_two.elements + (i * set_two.size);
+    for (size_t i = 1; i < set_two->length + 1; ++i) {
+        const char * element = set_two->elements + (i * set_two->size);
         bool contains = false;
-        for (size_t node = set_one.root; NIL != node;) {
+        for (size_t node = set_one->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = set_one.compare(element, set_one.elements + (node * set_one.size));
+            const int comparison = set_one->compare(element, set_one->elements + (node * set_one->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = set_one.node[node_index][node]; // go to next child node
+            node = set_one->node[node_index][node]; // go to next child node
         }
 
         // if maximum set contains minimum's element then continue
@@ -647,32 +658,34 @@ irb_set_s exclude_irb_set(const irb_set_s set_one, const irb_set_s set_two, cons
     return set_exclude;
 }
 
-bool is_subset_irb_set(const irb_set_s super, const irb_set_s sub) {
-    assert(super.compare == sub.compare && "[ERROR] Function pointers must be the same.");
-    assert(super.size == sub.size && "[ERROR] Sizes must be the same.");
+bool is_subset_irb_set(const irb_set_s * super, const irb_set_s * sub) {
+    assert(super && "[ERROR] Parameter can't be NULL.");
+    assert(sub && "[ERROR] Parameter can't be NULL.");
+    assert(super->compare == sub->compare && "[ERROR] Function pointers must be the same.");
+    assert(super->size == sub->size && "[ERROR] Sizes must be the same.");
 
-    assert(super.compare && "[INVALID] Parameter can't be NULL.");
-    assert(super.size && "[INVALID] Parameter can't be zero.");
-    assert(super.length <= super.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(super->compare && "[INVALID] Parameter can't be NULL.");
+    assert(super->size && "[INVALID] Parameter can't be zero.");
+    assert(super->length <= super->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(sub.compare && "[INVALID] Parameter can't be NULL.");
-    assert(sub.size && "[INVALID] Parameter can't be zero.");
-    assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(sub->compare && "[INVALID] Parameter can't be NULL.");
+    assert(sub->size && "[INVALID] Parameter can't be zero.");
+    assert(sub->length <= sub->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < sub.length + 1; ++i) {
-        const char * element = sub.elements + (i * sub.size);
+    for (size_t i = 1; i < sub->length + 1; ++i) {
+        const char * element = sub->elements + (i * sub->size);
         bool contains = false;
-        for (size_t node = super.root; NIL != node;) {
+        for (size_t node = super->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = super.compare(element, super.elements + (node * super.size));
+            const int comparison = super->compare(element, super->elements + (node * super->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = super.node[node_index][node]; // go to next child node
+            node = super->node[node_index][node]; // go to next child node
         }
 
         if (!contains) {
@@ -683,32 +696,34 @@ bool is_subset_irb_set(const irb_set_s super, const irb_set_s sub) {
     return true;
 }
 
-bool is_proper_subset_irb_set(const irb_set_s super, const irb_set_s sub) {
-    assert(super.compare == sub.compare && "[ERROR] Function pointers must be the same.");
-    assert(super.size == sub.size && "[ERROR] Sizes must be the same.");
+bool is_proper_subset_irb_set(const irb_set_s * super, const irb_set_s * sub) {
+    assert(super && "[ERROR] Parameter can't be NULL.");
+    assert(sub && "[ERROR] Parameter can't be NULL.");
+    assert(super->compare == sub->compare && "[ERROR] Function pointers must be the same.");
+    assert(super->size == sub->size && "[ERROR] Sizes must be the same.");
 
-    assert(super.compare && "[INVALID] Parameter can't be NULL.");
-    assert(super.size && "[INVALID] Parameter can't be zero.");
-    assert(super.length <= super.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(super->compare && "[INVALID] Parameter can't be NULL.");
+    assert(super->size && "[INVALID] Parameter can't be zero.");
+    assert(super->length <= super->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(sub.compare && "[INVALID] Parameter can't be NULL.");
-    assert(sub.size && "[INVALID] Parameter can't be zero.");
-    assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(sub->compare && "[INVALID] Parameter can't be NULL.");
+    assert(sub->size && "[INVALID] Parameter can't be zero.");
+    assert(sub->length <= sub->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < sub.length + 1; ++i) {
-        const char * element = sub.elements + (i * sub.size);
+    for (size_t i = 1; i < sub->length + 1; ++i) {
+        const char * element = sub->elements + (i * sub->size);
         bool contains = false;
-        for (size_t node = super.root; NIL != node;) {
+        for (size_t node = super->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = super.compare(element, super.elements + (node * super.size));
+            const int comparison = super->compare(element, super->elements + (node * super->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = super.node[node_index][node]; // go to next child node
+            node = super->node[node_index][node]; // go to next child node
         }
 
         if (!contains) {
@@ -716,38 +731,40 @@ bool is_proper_subset_irb_set(const irb_set_s super, const irb_set_s sub) {
         }
     }
 
-    return (sub.length != super.length);
+    return (sub->length != super->length);
 }
 
-bool is_disjoint_irb_set(const irb_set_s set_one, const irb_set_s set_two) {
-    assert(set_one.compare == set_two.compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+bool is_disjoint_irb_set(const irb_set_s * set_one, const irb_set_s * set_two) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    const irb_set_s minimum = set_one.length < set_two.length ? set_one : set_two;
-    const irb_set_s maximum = set_one.length >= set_two.length ? set_one : set_two;
+    const irb_set_s * minimum = set_one->length < set_two->length ? set_one : set_two;
+    const irb_set_s * maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // start at 1 since NIL is at zero and elements start beyond NIL
-    for (size_t i = 1; i < minimum.length + 1; ++i) {
-        const char * element = minimum.elements + (i * minimum.size);
+    for (size_t i = 1; i < minimum->length + 1; ++i) {
+        const char * element = minimum->elements + (i * minimum->size);
         bool contains = false;
-        for (size_t node = maximum.root; NIL != node;) {
+        for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = maximum.compare(element, maximum.elements + (node * maximum.size));
+            const int comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
             if (!comparison) {
                 contains = true;
                 break;
             }
 
             const size_t node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
-            node = maximum.node[node_index][node]; // go to next child node
+            node = maximum->node[node_index][node]; // go to next child node
         }
 
         if (contains) {
@@ -758,14 +775,15 @@ bool is_disjoint_irb_set(const irb_set_s set_one, const irb_set_s set_two) {
     return true;
 }
 
-void foreach_irb_set(const irb_set_s set, const operate_fn operate, void * arguments) {
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+void map_irb_set(const irb_set_s * set, const handle_fn handle, void * arguments) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(set.compare && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < set.length && operate(set.elements + (i * set.size), arguments); ++i) {}
+    for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), arguments); ++i) {}
 }
 
 void _irb_set_left_rotate(irb_set_s * set, const size_t node) {
@@ -822,10 +840,10 @@ void _irb_set_transplant(irb_set_s * set, const size_t u, const size_t v) {
     set->parent[v] = set->parent[u];
 }
 
-size_t _irb_set_minimum(const irb_set_s set, const size_t node) {
+size_t _irb_set_minimum(const irb_set_s * set, const size_t node) {
     size_t n = node;
-    while (NIL != set.node[IRB_SET_LEFT][n]) { // SET MINIMUM
-        n = set.node[IRB_SET_LEFT][n];
+    while (NIL != set->node[IRB_SET_LEFT][n]) { // SET MINIMUM
+        n = set->node[IRB_SET_LEFT][n];
     }
 
     return n;

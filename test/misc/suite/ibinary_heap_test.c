@@ -52,7 +52,7 @@ TEST COPY_01(void) {
         push_ibinary_heap(&heap, &i);
     }
 
-    ibinary_heap_s replica = copy_ibinary_heap(heap, copy);
+    ibinary_heap_s replica = copy_ibinary_heap(&heap, copy);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK - 1; ++i) {
         int a = 0, b = 0;
@@ -75,7 +75,7 @@ TEST COPY_02(void) {
         push_ibinary_heap(&heap, &i);
     }
 
-    ibinary_heap_s replica = copy_ibinary_heap(heap, copy);
+    ibinary_heap_s replica = copy_ibinary_heap(&heap, copy);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK; ++i) {
         int a = 0, b = 0;
@@ -98,7 +98,7 @@ TEST COPY_03(void) {
         push_ibinary_heap(&heap, &i);
     }
 
-    ibinary_heap_s replica = copy_ibinary_heap(heap, copy);
+    ibinary_heap_s replica = copy_ibinary_heap(&heap, copy);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK + 1; ++i) {
         int a = 0, b = 0;
@@ -215,7 +215,7 @@ TEST PEEP_01(void) {
     }
 
     int a = 42;
-    peep_ibinary_heap(heap, &a);
+    peep_ibinary_heap(&heap, &a);
     ASSERT_EQm("[ERROR] Expected elements to be equal.", 0, a);
 
     destroy_ibinary_heap(&heap, destroy);
@@ -231,7 +231,7 @@ TEST PEEP_02(void) {
     }
 
     int a = 42;
-    peep_ibinary_heap(heap, &a);
+    peep_ibinary_heap(&heap, &a);
     ASSERT_EQm("[ERROR] Expected elements to be equal.", 0, a);
 
     destroy_ibinary_heap(&heap, destroy);
@@ -247,7 +247,7 @@ TEST PEEP_03(void) {
     }
 
     int a = 42;
-    peep_ibinary_heap(heap, &a);
+    peep_ibinary_heap(&heap, &a);
     ASSERT_EQm("[ERROR] Expected elements to be equal.", 0, a);
 
     destroy_ibinary_heap(&heap, destroy);

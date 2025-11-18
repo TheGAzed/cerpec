@@ -128,24 +128,24 @@ void peep_istack(const istack_s * stack, void * buffer) {
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void foreach_istack(const istack_s * stack, const operate_fn operate, void * arguments) {
+void map_istack(const istack_s * stack, const handle_fn handle, void * arguments) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
-    assert(operate && "[ERROR] Paremeter can't be NULL.");
+    assert(handle && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
 
     // iterate over each element from bottom to the top of stack
-    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && operate(e, arguments); e += stack->size) {}
+    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, arguments); e += stack->size) {}
 }
 
-void map_istack(const istack_s * stack, const manage_fn manage, void * arguments) {
+void apply_istack(const istack_s * stack, const process_fn process, void * arguments) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
-    assert(manage && "[ERROR] Paremeter can't be NULL.");
+    assert(process && "[ERROR] Paremeter can't be NULL.");
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
 
-    // manage stack elements as an array (as a whole)
-    manage(stack->elements, stack->length, arguments);
+    // process stack elements as an array (as a whole)
+    process(stack->elements, stack->length, arguments);
 }

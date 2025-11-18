@@ -10,6 +10,7 @@ struct compare {
 
 void destroy(void * element);
 void * copy(void * destination, const void * source);
+void * add(void * a, const void * b);
 bool increment(void * element, void * value);
 bool print(void * element, void * format);
 bool nothing(void * element, void * argument);

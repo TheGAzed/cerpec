@@ -767,7 +767,7 @@ TEST FOREACH_NEXT_01(void) {
     }
 
     int value = 1;
-    foreach_next_idouble_list(&test, increment, &value);
+    map_next_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -788,7 +788,7 @@ TEST FOREACH_NEXT_02(void) {
     }
 
     int value = 1;
-    foreach_next_idouble_list(&test, increment, &value);
+    map_next_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
@@ -809,7 +809,7 @@ TEST FOREACH_NEXT_03(void) {
     }
 
     int value = 1;
-    foreach_next_idouble_list(&test, increment, &value);
+    map_next_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -830,7 +830,7 @@ TEST FOREACH_PREV_01(void) {
     }
 
     int value = 1;
-    foreach_prev_idouble_list(&test, increment, &value);
+    map_prev_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -851,7 +851,7 @@ TEST FOREACH_PREV_02(void) {
     }
 
     int value = 1;
-    foreach_prev_idouble_list(&test, increment, &value);
+    map_prev_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
@@ -872,7 +872,7 @@ TEST FOREACH_PREV_03(void) {
     }
 
     int value = 1;
-    foreach_prev_idouble_list(&test, increment, &value);
+    map_prev_idouble_list(&test, increment, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;

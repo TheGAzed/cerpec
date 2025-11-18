@@ -34,12 +34,12 @@ void clear_ibinary_heap(ibinary_heap_s * heap, const destroy_fn destroy);
 /// @param heap Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
 /// @return Stack structure.
-ibinary_heap_s copy_ibinary_heap(const ibinary_heap_s heap, const copy_fn copy);
+ibinary_heap_s copy_ibinary_heap(const ibinary_heap_s * heap, const copy_fn copy);
 
 /// @brief Checks if structure is empty.
 /// @param heap Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_ibinary_heap(const ibinary_heap_s heap);
+bool is_empty_ibinary_heap(const ibinary_heap_s * heap);
 
 /// @brief Pushes a single element to the top of the structure.
 /// @param heap Structure to push into.
@@ -54,14 +54,14 @@ void pop_ibinary_heap(ibinary_heap_s * heap, void * buffer);
 /// @brief Peeps a single element from the structure.
 /// @param heap Structure to peep.
 /// @param buffer Element buffer to save peep.
-void peep_ibinary_heap(const ibinary_heap_s heap, void * buffer);
+void peep_ibinary_heap(const ibinary_heap_s * heap, void * buffer);
 
 /// @brief Replace element at array index with parameter.
 /// @param heap Structure to replace element in.
 /// @param index Array index to element in structure.
 /// @param element Element buffer to replace with.
 /// @param buffer Element buffer to save replaced.
-void replace_ibinary_heap(const ibinary_heap_s heap, const size_t index, const void * element, void * buffer);
+void replace_ibinary_heap(const ibinary_heap_s * heap, const size_t index, const void * element, void * buffer);
 
 /// @brief Melds (combines) second structure into first while keeping properties.
 /// @param destination First structure to meld elements into.
@@ -70,12 +70,12 @@ void meld_ibinary_heap(ibinary_heap_s * restrict destination, ibinary_heap_s * r
 
 /// @brief Patches up structure if its properties were broken.
 /// @param heap Structure to patch.
-void patch_ibinary_heap(const ibinary_heap_s heap);
+void patch_ibinary_heap(const ibinary_heap_s * heap);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param heap Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_istack(const ibinary_heap_s heap, const operate_fn operate, void * arguments);
+void map_ibinary_heap(const ibinary_heap_s * heap, const handle_fn handle, void * arguments);
 
 #endif // IBINARY_HEAP_H

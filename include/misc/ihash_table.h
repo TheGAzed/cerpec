@@ -39,12 +39,12 @@ void clear_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, cons
 /// @param copy_key Function pointer to create a deep/shallow copy of a single key.
 /// @param copy_value Function pointer to create a deep/shallow copy of a single value.
 /// @return Stack structure.
-ihash_table_s copy_ihash_table(const ihash_table_s table, const copy_fn copy_key, const copy_fn copy_value);
+ihash_table_s copy_ihash_table(const ihash_table_s * table, const copy_fn copy_key, const copy_fn copy_value);
 
 /// @brief Checks if structure is empty.
 /// @param table Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_ihash_table(const ihash_table_s table);
+bool is_empty_ihash_table(const ihash_table_s * table);
 
 /// @brief Inserts unique key/value pair into structure.
 /// @param table Structure to insert element into.
@@ -63,24 +63,24 @@ void remove_ihash_table(ihash_table_s * table, const void * key, void * key_buff
 /// @param table Structure to check.
 /// @param key Key to check.
 /// @return 'true' if contained, 'false' otherwise.
-bool contains_key_ihash_table(const ihash_table_s table, const void * key);
+bool contains_key_ihash_table(const ihash_table_s * table, const void * key);
 
 /// @brief Gets value based on key.
 /// @param table Structure to get value.
 /// @param key Key to value.
 /// @param value_buffer Value buffer to save retrieved value.
-void get_value_ihash_table(const ihash_table_s table, const void * key, void * value_buffer);
+void get_value_ihash_table(const ihash_table_s * table, const void * key, void * value_buffer);
 
 /// @brief Iterates over each key in structure.
 /// @param table Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_key_ihash_table(const ihash_table_s table, const operate_fn operate, void * arguments);
+void map_key_ihash_table(const ihash_table_s * table, const handle_fn handle, void * arguments);
 
 /// @brief Iterates over each value in structure.
 /// @param table Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_value_ihash_table(const ihash_table_s table, const operate_fn operate, void * arguments);
+void map_value_ihash_table(const ihash_table_s * table, const handle_fn handle, void * arguments);
 
 #endif // IHASH_TABLE_H

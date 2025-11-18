@@ -646,7 +646,7 @@ TEST FOREACH_01(void) {
     }
 
     int value = 1;
-    foreach_istraight_list(&test, increment, &value);
+    map_istraight_list(&test, increment, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -667,7 +667,7 @@ TEST FOREACH_02(void) {
     }
 
     int value = 1;
-    foreach_istraight_list(&test, increment, &value);
+    map_istraight_list(&test, increment, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int a = 0;
@@ -688,7 +688,7 @@ TEST FOREACH_03(void) {
     }
 
     int value = 1;
-    foreach_istraight_list(&test, increment, &value);
+    map_istraight_list(&test, increment, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int a = 0;

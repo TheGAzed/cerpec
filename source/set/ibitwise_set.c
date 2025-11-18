@@ -43,26 +43,28 @@ void clear_ibitwise_set(ibitwise_set_s * set) {
     memset(set, 0, sizeof(ibitwise_set_s));
 }
 
-ibitwise_set_s copy_ibitwise_set(const ibitwise_set_s set) {
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+ibitwise_set_s copy_ibitwise_set(const ibitwise_set_s * set) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create replica structure
     const ibitwise_set_s replica = {
-        .capacity = set.capacity, .length = set.length,
-        .bits = malloc(set.capacity / CHAR_BIT),
+        .capacity = set->capacity, .length = set->length,
+        .bits = malloc(set->capacity / CHAR_BIT),
     };
     assert((!replica.capacity || replica.bits) && "[ERROR] Memory allocation failed.");
 
     // initialize bits
-    memcpy(replica.bits, set.bits, replica.capacity / CHAR_BIT);
+    memcpy(replica.bits, set->bits, replica.capacity / CHAR_BIT);
 
     return replica;
 }
 
-bool is_empty_ibitwise_set(const ibitwise_set_s set) {
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_empty_ibitwise_set(const ibitwise_set_s * set) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    return !(set.length);
+    return !(set->length);
 }
 
 void insert_ibitwise_set(ibitwise_set_s * set, const size_t index) {
@@ -120,49 +122,54 @@ EXIT_LOOP:
     }
 }
 
-bool contains_ibitwise_set(const ibitwise_set_s set, const size_t index) {
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool contains_ibitwise_set(const ibitwise_set_s * set, const size_t index) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // calculate bits array index and bit at parameter index
     const size_t idx = index / BIT_COUNT;
     const unsigned relative = (unsigned)(index % BIT_COUNT);
     const unsigned bit = 1U << (BIT_COUNT - relative - 1);
 
-    return (index < set.capacity) && (bool)(set.bits[idx] & bit); // return ANDed bit as a boolean
+    return (index < set->capacity) && (bool)(set->bits[idx] & bit); // return ANDed bit as a boolean
 }
 
-ibitwise_set_s union_ibitwise_set(const ibitwise_set_s set_one, const ibitwise_set_s set_two) {
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+ibitwise_set_s union_ibitwise_set(const ibitwise_set_s * set_one, const ibitwise_set_s * set_two) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // get smallest and biggest set by capacity
-    const ibitwise_set_s min = set_one.capacity < set_two.capacity ? set_one : set_two;
-    const ibitwise_set_s max = set_one.capacity >= set_two.capacity ? set_one : set_two;
+    const ibitwise_set_s * min = set_one->capacity < set_two->capacity ? set_one : set_two;
+    const ibitwise_set_s * max = set_one->capacity >= set_two->capacity ? set_one : set_two;
 
     // make union as a copy of biggest set and set its length to zero for later popcount
     ibitwise_set_s set_union = copy_ibitwise_set(max);
     set_union.length = 0;
 
     // for each bits in minimum set copy minimum's (OR) into union and calculate new union length
-    for (size_t i = 0; i < min.capacity / BIT_COUNT; ++i) {
-        set_union.bits[i] |= min.bits[i];
+    for (size_t i = 0; i < min->capacity / BIT_COUNT; ++i) {
+        set_union.bits[i] |= min->bits[i];
         set_union.length += (size_t)_ibitwise_set_popcount(set_union.bits[i]);
     }
 
     return set_union;
 }
 
-ibitwise_set_s intersect_ibitwise_set(const ibitwise_set_s set_one, const ibitwise_set_s set_two) {
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+ibitwise_set_s intersect_ibitwise_set(const ibitwise_set_s * set_one, const ibitwise_set_s * set_two) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    const ibitwise_set_s min = set_one.capacity < set_two.capacity ? set_one : set_two;
-    const ibitwise_set_s max = set_one.capacity >= set_two.capacity ? set_one : set_two;
+    const ibitwise_set_s * min = set_one->capacity < set_two->capacity ? set_one : set_two;
+    const ibitwise_set_s * max = set_one->capacity >= set_two->capacity ? set_one : set_two;
 
     ibitwise_set_s set_intersect = copy_ibitwise_set(min);
     set_intersect.length = 0;
-    for (size_t i = 0; i < min.capacity / BIT_COUNT; ++i) {
-        set_intersect.bits[i] &= max.bits[i];
+    for (size_t i = 0; i < min->capacity / BIT_COUNT; ++i) {
+        set_intersect.bits[i] &= max->bits[i];
         set_intersect.length += (size_t)_ibitwise_set_popcount(set_intersect.bits[i]);
     }
 
@@ -186,17 +193,19 @@ EXIT_LOOP:
     return set_intersect;
 }
 
-ibitwise_set_s subtract_ibitwise_set(const ibitwise_set_s minuend, const ibitwise_set_s subtrahend) {
-    assert(minuend.length <= minuend.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(subtrahend.length <= subtrahend.capacity && "[INVALID] Lenght can't be larger than capacity.");
+ibitwise_set_s subtract_ibitwise_set(const ibitwise_set_s * minuend, const ibitwise_set_s * subtrahend) {
+    assert(minuend && "[ERROR] Parameter can't be NULL.");
+    assert(subtrahend && "[ERROR] Parameter can't be NULL.");
+    assert(minuend->length <= minuend->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subtrahend->length <= subtrahend->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // get smallest set based on capacity to minimize operations and invalid array access
-    const ibitwise_set_s min = minuend.capacity < subtrahend.capacity ? minuend : subtrahend;
+    const ibitwise_set_s * min = minuend->capacity < subtrahend->capacity ? minuend : subtrahend;
 
     ibitwise_set_s set_subtract = copy_ibitwise_set(minuend);
     set_subtract.length = 0;
-    for (size_t i = 0; i < min.capacity / BIT_COUNT; ++i) {
-        set_subtract.bits[i] &= ~(subtrahend.bits[i]);
+    for (size_t i = 0; i < min->capacity / BIT_COUNT; ++i) {
+        set_subtract.bits[i] &= ~(subtrahend->bits[i]);
         set_subtract.length += (size_t)_ibitwise_set_popcount(set_subtract.bits[i]);
     }
 
@@ -220,17 +229,19 @@ EXIT_LOOP:
     return set_subtract;
 }
 
-ibitwise_set_s exclude_ibitwise_set(const ibitwise_set_s set_one, const ibitwise_set_s set_two) {
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+ibitwise_set_s exclude_ibitwise_set(const ibitwise_set_s * set_one, const ibitwise_set_s * set_two) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    const ibitwise_set_s minimum = set_one.capacity < set_two.capacity ? set_one : set_two;
-    const ibitwise_set_s maximum = set_one.capacity >= set_two.capacity ? set_one : set_two;
+    const ibitwise_set_s * minimum = set_one->capacity < set_two->capacity ? set_one : set_two;
+    const ibitwise_set_s * maximum = set_one->capacity >= set_two->capacity ? set_one : set_two;
 
     ibitwise_set_s set_exclude = copy_ibitwise_set(maximum);
     set_exclude.length = 0;
-    for (size_t i = 0; i < minimum.capacity / BIT_COUNT; ++i) {
-        set_exclude.bits[i] ^= minimum.bits[i];
+    for (size_t i = 0; i < minimum->capacity / BIT_COUNT; ++i) {
+        set_exclude.bits[i] ^= minimum->bits[i];
         set_exclude.length += (size_t)_ibitwise_set_popcount(set_exclude.bits[i]);
     }
 
@@ -254,21 +265,23 @@ EXIT_LOOP:
     return set_exclude;
 }
 
-bool is_subset_ibitwise_set(const ibitwise_set_s super, const ibitwise_set_s sub) {
-    assert(super.length <= super.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_subset_ibitwise_set(const ibitwise_set_s * super, const ibitwise_set_s * sub) {
+    assert(super && "[ERROR] Parameter can't be NULL.");
+    assert(sub && "[ERROR] Parameter can't be NULL.");
+    assert(super->length <= super->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(sub->length <= sub->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // if ANDed sub- and super-set doesn't equals sub's bits then it isn't a subset
     size_t i = 0;
-    for (; i < sub.capacity / BIT_COUNT && i < super.capacity / BIT_COUNT; ++i) {
-        if (sub.bits[i] & super.bits[i] != sub.bits[i]) {
+    for (; i < sub->capacity / BIT_COUNT && i < super->capacity / BIT_COUNT; ++i) {
+        if (sub->bits[i] & super->bits[i] != sub->bits[i]) {
             return false;
         }
     }
 
     // if subset has bits set beyond superset then it also isn't a subset
-    for (; i < sub.capacity / BIT_COUNT; ++i) {
-        if (sub.bits[i]) {
+    for (; i < sub->capacity / BIT_COUNT; ++i) {
+        if (sub->bits[i]) {
             return false;
         }
     }
@@ -276,34 +289,38 @@ bool is_subset_ibitwise_set(const ibitwise_set_s super, const ibitwise_set_s sub
     return true;
 }
 
-bool is_proper_subset_ibitwise_set(const ibitwise_set_s super, const ibitwise_set_s sub) {
-    assert(super.length <= super.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_proper_subset_ibitwise_set(const ibitwise_set_s * super, const ibitwise_set_s * sub) {
+    assert(super && "[ERROR] Parameter can't be NULL.");
+    assert(sub && "[ERROR] Parameter can't be NULL.");
+    assert(super->length <= super->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(sub->length <= sub->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // if ANDed sub- and super-set doesn't equals sub's bits then it isn't a subset
     size_t i = 0;
-    for (; i < sub.capacity / BIT_COUNT && i < super.capacity / BIT_COUNT; ++i) {
-        if (sub.bits[i] & super.bits[i] != sub.bits[i]) {
+    for (; i < sub->capacity / BIT_COUNT && i < super->capacity / BIT_COUNT; ++i) {
+        if (sub->bits[i] & super->bits[i] != sub->bits[i]) {
             return false;
         }
     }
 
     // if subset has bits set beyond superset then it also isn't a subset
-    for (; i < sub.capacity / BIT_COUNT; ++i) {
-        if (sub.bits[i]) {
+    for (; i < sub->capacity / BIT_COUNT; ++i) {
+        if (sub->bits[i]) {
             return false;
         }
     }
 
-    return (sub.length != super.length);
+    return (sub->length != super->length);
 }
 
-bool is_disjoint_ibitwise_set(const ibitwise_set_s set_one, const ibitwise_set_s set_two) {
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_disjoint_ibitwise_set(const ibitwise_set_s * set_one, const ibitwise_set_s * set_two) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < set_two.capacity / BIT_COUNT && i < set_one.capacity / BIT_COUNT; ++i) {
-        if (set_two.bits[i] & set_one.bits[i]) {
+    for (size_t i = 0; i < set_two->capacity / BIT_COUNT && i < set_one->capacity / BIT_COUNT; ++i) {
+        if (set_two->bits[i] & set_one->bits[i]) {
             return false;
         }
     }
@@ -311,8 +328,13 @@ bool is_disjoint_ibitwise_set(const ibitwise_set_s set_one, const ibitwise_set_s
     return true;
 }
 
-void foreach_index_ibitwise_set(const ibitwise_set_s set, const operate_fn operate, void * arguments) {
-    for (size_t i = 0; i < set.capacity; ++i) {
+void map_index_ibitwise_set(const ibitwise_set_s * set, const handle_fn handle, void * arguments) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
+
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+
+    for (size_t i = 0; i < set->capacity; ++i) {
         size_t temp = i;
 
         // calculate bits' array index and bit to check
@@ -320,8 +342,8 @@ void foreach_index_ibitwise_set(const ibitwise_set_s set, const operate_fn opera
         const unsigned relative = ((unsigned)(i) % BIT_COUNT);
         const unsigned bit = 1U << (BIT_COUNT - relative - 1);
 
-        // if bit isn't set continue, and if operate function returns false break the loop and quit main function
-        if ((set.bits[idx] & bit) && !operate(&temp, arguments)) {
+        // if bit isn't set continue, and if handle function returns false break the loop and quit main function
+        if ((set->bits[idx] & bit) && !handle(&temp, arguments)) {
             break;
         }
     }

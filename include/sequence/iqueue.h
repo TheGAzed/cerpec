@@ -62,14 +62,14 @@ void peek_iqueue(const iqueue_s * queue, void * buffer);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param queue Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using element size and generic arguments.
+/// @param handle Function pointer to operate on each element reference using element size and generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_iqueue(const iqueue_s * queue, const operate_fn operate, void * arguments);
+void map_iqueue(const iqueue_s * queue, const handle_fn handle, void * arguments);
 
-/// @brief Maps each element in structure into an array to manage.
+/// @brief Apply each element in structure into an array to manage.
 /// @param queue Structure to map.
-/// @param manage Function pointer to manage array of elements using strucuter length, element size and arguments.
+/// @param process Function pointer to manage array of elements using strucuter length, element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_iqueue(const iqueue_s * queue, const manage_fn manage, void * arguments);
+void apply_iqueue(const iqueue_s * queue, const process_fn process, void * arguments);
 
 #endif // IQUEUE_H

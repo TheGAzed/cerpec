@@ -254,7 +254,7 @@ void dequeue_back_ideque(ideque_s * deque, void * buffer) {
     }
 }
 
-void foreach_front_ideque(const ideque_s * deque, const operate_fn operate, void * args) {
+void map_front_ideque(const ideque_s * deque, const handle_fn operate, void * args) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(operate && "[ERROR] Parameter is NULL.");
 
@@ -276,9 +276,9 @@ void foreach_front_ideque(const ideque_s * deque, const operate_fn operate, void
     }
 }
 
-void foreach_back_ideque(const ideque_s * deque, const operate_fn operate, void * args) {
+void map_back_ideque(const ideque_s * deque, const handle_fn handle, void * args) {
     assert(deque && "[ERROR] Parameter is NULL.");
-    assert(operate && "[ERROR] Parameter is NULL.");
+    assert(handle && "[ERROR] Parameter is NULL.");
 
     assert(deque->size && "[INVALID] Size can't be zero.");
 
@@ -286,14 +286,14 @@ void foreach_back_ideque(const ideque_s * deque, const operate_fn operate, void 
     size_t last_index = deque->length + deque->current - 1; // may undeflow if lenght adn current are 0
 
     struct infinite_deque_node const * current = deque->head; // save head node as current pointer
-    while (remaining) { // while there are element to operate
+    while (remaining) { // while there are element to handle
         current = current->prev; // fist go to tail and other previous nodes
 
         const size_t node_index = last_index % IDEQUE_CHUNK; // calculate last element index in node
         size_t i = 0; // save number of operated elements in node
         for (; i <= node_index && remaining; ++i, remaining--) { // until node index is reached and elements remain
-            // operate on reversed i to start from last element in node
-            if (!operate(current->elements + ((node_index - i) * deque->size), args)) {
+            // handle on reversed i to start from last element in node
+            if (!handle(current->elements + ((node_index - i) * deque->size), args)) {
                 return;
             }
         }
@@ -301,9 +301,9 @@ void foreach_back_ideque(const ideque_s * deque, const operate_fn operate, void 
     }
 }
 
-void map_ideque(const ideque_s * deque, const manage_fn manage, void * arguments) {
+void apply_ideque(const ideque_s * deque, const process_fn process, void * arguments) {
     assert(deque && "[ERROR] Parameter is NULL.");
-    assert(manage && "[ERROR] Parameter is NULL.");
+    assert(process && "[ERROR] Parameter is NULL.");
 
     assert(deque->size && "[INVALID] Size can't be zero.");
 
@@ -323,7 +323,7 @@ void map_ideque(const ideque_s * deque, const manage_fn manage, void * arguments
         current = current->next;
     }
 
-    manage(elements_array, deque->length, arguments);
+    process(elements_array, deque->length, arguments);
 
     index = 0, remaining = deque->length, current = deque->head;
     for (size_t start = deque->current; remaining; start = 0) {

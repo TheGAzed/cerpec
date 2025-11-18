@@ -67,31 +67,32 @@ void clear_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
     set->elements = NULL;
 }
 
-ihash_set_s copy_ihash_set(const ihash_set_s set, const copy_fn copy) {
+ihash_set_s copy_ihash_set(const ihash_set_s * set, const copy_fn copy) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(set.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
     const ihash_set_s replica = {
-        .capacity = set.capacity, .empty = NIL, .hash = set.hash, .length = set.length, .size = set.size,
-        .elements = malloc(set.capacity * set.size),
-        .head = malloc(set.capacity * sizeof(size_t)),
-        .next = malloc(set.capacity * sizeof(size_t)),
+        .capacity = set->capacity, .empty = NIL, .hash = set->hash, .length = set->length, .size = set->size,
+        .elements = malloc(set->capacity * set->size),
+        .head = malloc(set->capacity * sizeof(size_t)),
+        .next = malloc(set->capacity * sizeof(size_t)),
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.head) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     // for each index, if each index is valid node then push it into replica
-    for (size_t i = 0, hole = 0; i < set.capacity; ++i) {
+    for (size_t i = 0, hole = 0; i < set->capacity; ++i) {
         replica.head[i] = NIL; // initially set replica heads to invalid
 
         // if set has elements in head then push them into replica heads (like a stack)
-        for (size_t n = set.head[i]; NIL != n; n = set.next[n], hole++) {
-            copy(replica.elements + (hole * replica.size), set.elements + (n * set.size));
+        for (size_t n = set->head[i]; NIL != n; n = set->next[n], hole++) {
+            copy(replica.elements + (hole * replica.size), set->elements + (n * set->size));
 
             // node index redirection
             replica.next[hole] = replica.head[i];
@@ -102,12 +103,13 @@ ihash_set_s copy_ihash_set(const ihash_set_s set, const copy_fn copy) {
     return replica;
 }
 
-bool is_empty_ihash_set(const ihash_set_s set) {
-    assert(set.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_empty_ihash_set(const ihash_set_s * set) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(set->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    return !(set.length); // if 0 return 'true'
+    return !(set->length); // if 0 return 'true'
 }
 
 void insert_ihash_set(ihash_set_s * set, const void * element) {
@@ -194,25 +196,26 @@ void remove_ihash_set(ihash_set_s * set, const void * element, void * buffer) {
     exit(EXIT_FAILURE); // terminate on error
 }
 
-bool contains_ihash_set(const ihash_set_s set, const void * element) {
+bool contains_ihash_set(const ihash_set_s * set, const void * element) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
 
-    assert(set.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // early return to avoid 'x mod 0' by capacity
-    if (!set.capacity) {
+    if (!set->capacity) {
         return false;
     }
 
     // calculate hash value and index in array
-    const size_t hash = set.hash(element);
-    const size_t index = hash % set.capacity;
+    const size_t hash = set->hash(element);
+    const size_t index = hash % set->capacity;
 
     // for each node at index check if element is contained and return true or false
-    for (size_t n = set.head[index]; NIL != n; n = set.next[n]) {
-        if (hash == set.hash(set.elements + (n * set.size))) {
+    for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
+        if (hash == set->hash(set->elements + (n * set->size))) {
             return true;
         }
     }
@@ -220,35 +223,37 @@ bool contains_ihash_set(const ihash_set_s set, const void * element) {
     return false;
 }
 
-ihash_set_s union_ihash_set(const ihash_set_s set_one, const ihash_set_s set_two, const copy_fn copy) {
+ihash_set_s union_ihash_set(const ihash_set_s * set_one, const ihash_set_s * set_two, const copy_fn copy) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one.hash == set_two.hash && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+    assert(set_one->hash == set_two->hash && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements to maximum's replica
-    const ihash_set_s minimum = set_one.length < set_two.length ? set_one : set_two;
-    const ihash_set_s maximum = set_one.length >= set_two.length ? set_one : set_two;
+    const ihash_set_s * minimum = set_one->length < set_two->length ? set_one : set_two;
+    const ihash_set_s * maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
     ihash_set_s set_union = copy_ihash_set(maximum, copy);
 
     // copy minimum set's non-contained elements into set union
-    for (size_t i = 0, hole = set_union.length; i < minimum.capacity; ++i) {
-        for (size_t m = minimum.head[i]; NIL != m; m = minimum.next[m]) {
+    for (size_t i = 0, hole = set_union.length; i < minimum->capacity; ++i) {
+        for (size_t m = minimum->head[i]; NIL != m; m = minimum->next[m]) {
             // get element and set its found flag to false
-            const char * element = minimum.elements + (m * minimum.size);
+            const char * element = minimum->elements + (m * minimum->size);
             bool contains = false;
 
             // search for element in union set
-            const size_t min_hash = minimum.hash(element);
+            const size_t min_hash = minimum->hash(element);
             const size_t union_mod = min_hash % set_union.capacity;
             for (size_t u = set_union.head[union_mod]; NIL != u; u = set_union.next[u]) {
                 const size_t union_hash = set_union.hash(set_union.elements + (u * set_union.size));
@@ -281,35 +286,37 @@ ihash_set_s union_ihash_set(const ihash_set_s set_one, const ihash_set_s set_two
     return set_union;
 }
 
-ihash_set_s intersect_ihash_set(const ihash_set_s set_one, const ihash_set_s set_two, const copy_fn copy) {
+ihash_set_s intersect_ihash_set(const ihash_set_s * set_one, const ihash_set_s * set_two, const copy_fn copy) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one.hash == set_two.hash && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+    assert(set_one->hash == set_two->hash && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements
-    const ihash_set_s minimum = set_one.length < set_two.length ? set_one : set_two;
-    const ihash_set_s maximum = set_one.length >= set_two.length ? set_one : set_two;
+    const ihash_set_s * minimum = set_one->length < set_two->length ? set_one : set_two;
+    const ihash_set_s * maximum = set_one->length >= set_two->length ? set_one : set_two;
 
-    ihash_set_s set_intersect = { .size = set_one.size, .hash = set_one.hash, .empty = NIL, };
-    for (size_t i = 0, hole = set_intersect.length; i < minimum.capacity; ++i) {
-        for (size_t min = minimum.head[i]; NIL != min; min = minimum.next[min]) {
+    ihash_set_s set_intersect = { .size = set_one->size, .hash = set_one->hash, .empty = NIL, };
+    for (size_t i = 0, hole = set_intersect.length; i < minimum->capacity; ++i) {
+        for (size_t min = minimum->head[i]; NIL != min; min = minimum->next[min]) {
             // get element and set its found flag to false
-            const char * element = minimum.elements + (min * minimum.size);
+            const char * element = minimum->elements + (min * minimum->size);
             bool contains = false;
 
-            const size_t min_hash = minimum.hash(element);
-            const size_t max_mod = min_hash % maximum.capacity;
+            const size_t min_hash = minimum->hash(element);
+            const size_t max_mod = min_hash % maximum->capacity;
 
-            for (size_t max = maximum.head[max_mod]; NIL != max; max = maximum.next[max]) {
-                const size_t max_hash = minimum.hash(maximum.elements + (max * maximum.size));
+            for (size_t max = maximum->head[max_mod]; NIL != max; max = maximum->next[max]) {
+                const size_t max_hash = minimum->hash(maximum->elements + (max * maximum->size));
                 if (min_hash == max_hash) {
                     contains = true;
                     break;
@@ -338,31 +345,33 @@ ihash_set_s intersect_ihash_set(const ihash_set_s set_one, const ihash_set_s set
     return set_intersect;
 }
 
-ihash_set_s subtract_ihash_set(const ihash_set_s minuend, const ihash_set_s subtrahend, const copy_fn copy) {
+ihash_set_s subtract_ihash_set(const ihash_set_s * minuend, const ihash_set_s * subtrahend, const copy_fn copy) {
+    assert(minuend && "[ERROR] Parameter can't be NULL.");
+    assert(subtrahend && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(minuend.hash == subtrahend.hash && "[ERROR] Function pointers must be the same.");
-    assert(minuend.size == subtrahend.size && "[ERROR] Sizes must be the same.");
+    assert(minuend->hash == subtrahend->hash && "[ERROR] Function pointers must be the same.");
+    assert(minuend->size == subtrahend->size && "[ERROR] Sizes must be the same.");
 
-    assert(minuend.hash && "[INVALID] Parameter can't be NULL.");
-    assert(minuend.size && "[INVALID] Parameter can't be zero.");
-    assert(minuend.length <= minuend.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(minuend->hash && "[INVALID] Parameter can't be NULL.");
+    assert(minuend->size && "[INVALID] Parameter can't be zero.");
+    assert(minuend->length <= minuend->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(subtrahend.hash && "[INVALID] Parameter can't be NULL.");
-    assert(subtrahend.size && "[INVALID] Parameter can't be zero.");
-    assert(subtrahend.length <= subtrahend.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subtrahend->hash && "[INVALID] Parameter can't be NULL.");
+    assert(subtrahend->size && "[INVALID] Parameter can't be zero.");
+    assert(subtrahend->length <= subtrahend->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    ihash_set_s set_subtract = { .size = minuend.size, .hash = minuend.hash, .empty = NIL, };
-    for (size_t i = 0; i < minuend.capacity; ++i) {
-        for (size_t min = minuend.head[i], hole = set_subtract.length; NIL != min; min = minuend.next[min]) {
+    ihash_set_s set_subtract = { .size = minuend->size, .hash = minuend->hash, .empty = NIL, };
+    for (size_t i = 0; i < minuend->capacity; ++i) {
+        for (size_t min = minuend->head[i], hole = set_subtract.length; NIL != min; min = minuend->next[min]) {
             // get element and set its found flag to false
-            const char * element = minuend.elements + (min * minuend.size);
+            const char * element = minuend->elements + (min * minuend->size);
             bool contains = false;
 
-            const size_t min_hash = minuend.hash(element);
-            const size_t sub_mod = min_hash % subtrahend.capacity;
+            const size_t min_hash = minuend->hash(element);
+            const size_t sub_mod = min_hash % subtrahend->capacity;
 
-            for (size_t sub = subtrahend.head[sub_mod]; NIL != sub; sub = subtrahend.next[sub]) {
-                const size_t sub_hash = subtrahend.hash(subtrahend.elements + (sub * subtrahend.size));
+            for (size_t sub = subtrahend->head[sub_mod]; NIL != sub; sub = subtrahend->next[sub]) {
+                const size_t sub_hash = subtrahend->hash(subtrahend->elements + (sub * subtrahend->size));
                 if (sub_hash == min_hash) {
                     contains = true;
                     break;
@@ -391,31 +400,33 @@ ihash_set_s subtract_ihash_set(const ihash_set_s minuend, const ihash_set_s subt
     return set_subtract;
 }
 
-ihash_set_s exclude_ihash_set(const ihash_set_s set_one, const ihash_set_s set_two, const copy_fn copy) {
+ihash_set_s exclude_ihash_set(const ihash_set_s * set_one, const ihash_set_s * set_two, const copy_fn copy) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one.hash == set_two.hash && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+    assert(set_one->hash == set_two->hash && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    ihash_set_s set_exclude = { .size = set_one.size, .hash = set_one.hash, .empty = NIL, };
-    for (size_t i = 0, hole = set_exclude.length; i < set_one.capacity; ++i) {
-        for (size_t one = set_one.head[i]; NIL != one; one = set_one.next[one]) {
+    ihash_set_s set_exclude = { .size = set_one->size, .hash = set_one->hash, .empty = NIL, };
+    for (size_t i = 0, hole = set_exclude.length; i < set_one->capacity; ++i) {
+        for (size_t one = set_one->head[i]; NIL != one; one = set_one->next[one]) {
             // get element and set its found flag to false
-            const char * element = set_one.elements + (one * set_one.size);
+            const char * element = set_one->elements + (one * set_one->size);
             bool contains = false;
 
-            const size_t one_hash = set_one.hash(element);
-            const size_t two_mod = one_hash % set_two.capacity;
+            const size_t one_hash = set_one->hash(element);
+            const size_t two_mod = one_hash % set_two->capacity;
 
-            for (size_t two = set_two.head[two_mod]; NIL != two; two = set_two.next[two]) {
-                const size_t two_hash = set_two.hash(set_two.elements + (two * set_two.size));
+            for (size_t two = set_two->head[two_mod]; NIL != two; two = set_two->next[two]) {
+                const size_t two_hash = set_two->hash(set_two->elements + (two * set_two->size));
                 if (one_hash == two_hash) {
                     contains = true;
                     break;
@@ -441,17 +452,17 @@ ihash_set_s exclude_ihash_set(const ihash_set_s set_one, const ihash_set_s set_t
         }
     }
 
-    for (size_t i = 0, hole = set_exclude.length; i < set_one.capacity; ++i) {
-        for (size_t two = set_two.head[i]; NIL != two; two = set_two.next[two]) {
+    for (size_t i = 0, hole = set_exclude.length; i < set_one->capacity; ++i) {
+        for (size_t two = set_two->head[i]; NIL != two; two = set_two->next[two]) {
             // get element and set its found flag to false
-            const char * element = set_two.elements + (two * set_two.size);
+            const char * element = set_two->elements + (two * set_two->size);
             bool contains = false;
 
-            const size_t two_hash = set_two.hash(element);
-            const size_t one_mod = two_hash % set_one.capacity;
+            const size_t two_hash = set_two->hash(element);
+            const size_t one_mod = two_hash % set_one->capacity;
 
-            for (size_t one = set_one.head[one_mod]; NIL != one; one = set_one.next[one]) {
-                const size_t max_hash = set_one.hash(set_one.elements + (one * set_one.size));
+            for (size_t one = set_one->head[one_mod]; NIL != one; one = set_one->next[one]) {
+                const size_t max_hash = set_one->hash(set_one->elements + (one * set_one->size));
                 if (two_hash == max_hash) {
                     contains = true;
                     break;
@@ -480,29 +491,31 @@ ihash_set_s exclude_ihash_set(const ihash_set_s set_one, const ihash_set_s set_t
     return set_exclude;
 }
 
-bool is_subset_ihash_set(const ihash_set_s super, const ihash_set_s sub) {
-    assert(super.hash == sub.hash && "[ERROR] Function pointers must be the same.");
-    assert(super.size == sub.size && "[ERROR] Sizes must be the same.");
+bool is_subset_ihash_set(const ihash_set_s * super, const ihash_set_s * sub) {
+    assert(super && "[ERROR] Parameter can't be NULL.");
+    assert(sub && "[ERROR] Parameter can't be NULL.");
+    assert(super->hash == sub->hash && "[ERROR] Function pointers must be the same.");
+    assert(super->size == sub->size && "[ERROR] Sizes must be the same.");
 
-    assert(super.hash && "[INVALID] Parameter can't be NULL.");
-    assert(super.size && "[INVALID] Parameter can't be zero.");
-    assert(super.length <= super.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(super->hash && "[INVALID] Parameter can't be NULL.");
+    assert(super->size && "[INVALID] Parameter can't be zero.");
+    assert(super->length <= super->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(sub.hash && "[INVALID] Parameter can't be NULL.");
-    assert(sub.size && "[INVALID] Parameter can't be zero.");
-    assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(sub->hash && "[INVALID] Parameter can't be NULL.");
+    assert(sub->size && "[INVALID] Parameter can't be zero.");
+    assert(sub->length <= sub->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < sub.capacity; ++i) {
-        for (size_t s = sub.head[i]; NIL != s; s = sub.next[s]) {
+    for (size_t i = 0; i < sub->capacity; ++i) {
+        for (size_t s = sub->head[i]; NIL != s; s = sub->next[s]) {
             // get element and set its found flag to false
-            const char * element = sub.elements + (s * sub.size);
+            const char * element = sub->elements + (s * sub->size);
             bool contains = false;
 
-            const size_t sub_hash = sub.hash(element);
-            const size_t super_mod = sub_hash % super.capacity;
+            const size_t sub_hash = sub->hash(element);
+            const size_t super_mod = sub_hash % super->capacity;
 
-            for (size_t n = super.head[super_mod]; NIL != n; n = super.next[n]) {
-                const size_t super_hash = super.hash(super.elements + (n * super.size));
+            for (size_t n = super->head[super_mod]; NIL != n; n = super->next[n]) {
+                const size_t super_hash = super->hash(super->elements + (n * super->size));
                 if (sub_hash == super_hash) {
                     contains = true;
                     break;
@@ -518,29 +531,31 @@ bool is_subset_ihash_set(const ihash_set_s super, const ihash_set_s sub) {
     return true;
 }
 
-bool is_proper_subset_ihash_set(const ihash_set_s super, const ihash_set_s sub) {
-    assert(super.hash == sub.hash && "[ERROR] Function pointers must be the same.");
-    assert(super.size == sub.size && "[ERROR] Sizes must be the same.");
+bool is_proper_subset_ihash_set(const ihash_set_s * super, const ihash_set_s * sub) {
+    assert(super && "[ERROR] Parameter can't be NULL.");
+    assert(sub && "[ERROR] Parameter can't be NULL.");
+    assert(super->hash == sub->hash && "[ERROR] Function pointers must be the same.");
+    assert(super->size == sub->size && "[ERROR] Sizes must be the same.");
 
-    assert(super.hash && "[INVALID] Parameter can't be NULL.");
-    assert(super.size && "[INVALID] Parameter can't be zero.");
-    assert(super.length <= super.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(super->hash && "[INVALID] Parameter can't be NULL.");
+    assert(super->size && "[INVALID] Parameter can't be zero.");
+    assert(super->length <= super->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(sub.hash && "[INVALID] Parameter can't be NULL.");
-    assert(sub.size && "[INVALID] Parameter can't be zero.");
-    assert(sub.length <= sub.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(sub->hash && "[INVALID] Parameter can't be NULL.");
+    assert(sub->size && "[INVALID] Parameter can't be zero.");
+    assert(sub->length <= sub->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < sub.capacity; ++i) {
-        for (size_t s = sub.head[i]; NIL != s; s = sub.next[s]) {
+    for (size_t i = 0; i < sub->capacity; ++i) {
+        for (size_t s = sub->head[i]; NIL != s; s = sub->next[s]) {
             // get element and set its found flag to false
-            const char * element = sub.elements + (s * sub.size);
+            const char * element = sub->elements + (s * sub->size);
             bool contains = false;
 
-            const size_t sub_hash = sub.hash(element);
-            const size_t super_mod = sub_hash % super.capacity;
+            const size_t sub_hash = sub->hash(element);
+            const size_t super_mod = sub_hash % super->capacity;
 
-            for (size_t n = super.head[super_mod]; NIL != n; n = super.next[n]) {
-                const size_t super_hash = super.hash(super.elements + (n * super.size));
+            for (size_t n = super->head[super_mod]; NIL != n; n = super->next[n]) {
+                const size_t super_hash = super->hash(super->elements + (n * super->size));
                 if (sub_hash == super_hash) {
                     contains = true;
                     break;
@@ -553,34 +568,36 @@ bool is_proper_subset_ihash_set(const ihash_set_s super, const ihash_set_s sub) 
         }
     }
 
-    return (sub.length != super.length);
+    return (sub->length != super->length);
 }
 
-bool is_disjoint_ihash_set(const ihash_set_s set_one, const ihash_set_s set_two) {
-    assert(set_one.hash == set_two.hash && "[ERROR] Function pointers must be the same.");
-    assert(set_one.size == set_two.size && "[ERROR] Sizes must be the same.");
+bool is_disjoint_ihash_set(const ihash_set_s * set_one, const ihash_set_s * set_two) {
+    assert(set_one && "[ERROR] Parameter can't be NULL.");
+    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    assert(set_one->hash == set_two->hash && "[ERROR] Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
 
-    assert(set_one.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_one.size && "[INVALID] Parameter can't be zero.");
-    assert(set_one.length <= set_one.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_one->size && "[INVALID] Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    assert(set_two.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set_two.size && "[INVALID] Parameter can't be zero.");
-    assert(set_two.length <= set_two.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set_two->size && "[INVALID] Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    const ihash_set_s minimum = set_one.length < set_two.length ? set_one : set_two;
-    const ihash_set_s maximum = set_one.length >= set_two.length ? set_one : set_two;
-    for (size_t i = 0; i < minimum.capacity; ++i) {
-        for (size_t s = minimum.head[i]; NIL != s; s = minimum.next[s]) {
+    const ihash_set_s * minimum = set_one->length < set_two->length ? set_one : set_two;
+    const ihash_set_s * maximum = set_one->length >= set_two->length ? set_one : set_two;
+    for (size_t i = 0; i < minimum->capacity; ++i) {
+        for (size_t s = minimum->head[i]; NIL != s; s = minimum->next[s]) {
             // get element and set its found flag to false
-            const char * element = minimum.elements + (s * minimum.size);
+            const char * element = minimum->elements + (s * minimum->size);
             bool contains = false;
 
-            const size_t min_hash = minimum.hash(element);
-            const size_t max_mod = min_hash % maximum.capacity;
+            const size_t min_hash = minimum->hash(element);
+            const size_t max_mod = min_hash % maximum->capacity;
 
-            for (size_t n = maximum.head[max_mod]; NIL != n; n = maximum.next[n]) {
-                const size_t max_hash = maximum.hash(maximum.elements + (n * maximum.size));
+            for (size_t n = maximum->head[max_mod]; NIL != n; n = maximum->next[n]) {
+                const size_t max_hash = maximum->hash(maximum->elements + (n * maximum->size));
                 if (min_hash == max_hash) {
                     contains = true;
                     break;
@@ -596,16 +613,17 @@ bool is_disjoint_ihash_set(const ihash_set_s set_one, const ihash_set_s set_two)
     return true;
 }
 
-void foreach_ihash_set(const ihash_set_s set, const operate_fn operate, void * arguments) {
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+void map_ihash_set(const ihash_set_s * set, const handle_fn handle, void * arguments) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(set.hash && "[INVALID] Parameter can't be NULL.");
-    assert(set.size && "[INVALID] Parameter can't be zero.");
-    assert(set.length <= set.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->hash && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < set.capacity; ++i) {
-        for (size_t n = set.head[i]; NIL != n; n = set.next[n]) {
-            if (!operate(set.elements + (n * set.size), arguments)) {
+    for (size_t i = 0; i < set->capacity; ++i) {
+        for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
+            if (!handle(set->elements + (n * set->size), arguments)) {
                 return;
             }
         }

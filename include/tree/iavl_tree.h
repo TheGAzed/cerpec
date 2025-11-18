@@ -145,26 +145,26 @@ void update_iavl_tree(const iavl_tree_s * tree, const void * latter, void * form
 
 /// @brief Performs an in-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void inorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments);
+void inorder_iavl_tree(const iavl_tree_s * tree, const handle_fn handle, void * arguments);
 
 /// @brief Performs a pre-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void preorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments);
+void preorder_iavl_tree(const iavl_tree_s * tree, const handle_fn handle, void * arguments);
 
 /// @brief Performs a post-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void postorder_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments);
+void postorder_iavl_tree(const iavl_tree_s * tree, const handle_fn handle, void * arguments);
 
 /// @brief Performs a level-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void level_order_iavl_tree(const iavl_tree_s * tree, const operate_fn operate, void * arguments);
+void levelorder_iavl_tree(const iavl_tree_s * tree, const handle_fn handle, void * arguments);
 
 #endif // IAVL_TREE_H

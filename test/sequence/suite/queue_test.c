@@ -187,7 +187,7 @@ TEST FOREACH_01(void) {
     }
 
     int value = 1;
-    foreach_iqueue(&test, increment, &value);
+    map_iqueue(&test, increment, &value);
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -208,7 +208,7 @@ TEST FOREACH_02(void) {
     }
 
     int value = 1;
-    foreach_iqueue(&test, increment, &value);
+    map_iqueue(&test, increment, &value);
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         int a = 0;
@@ -229,7 +229,7 @@ TEST FOREACH_03(void) {
     }
 
     int value = 1;
-    foreach_iqueue(&test, increment, &value);
+    map_iqueue(&test, increment, &value);
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         int a = 0;
@@ -250,7 +250,7 @@ TEST MAP_01(void) {
     }
 
     struct compare cmp = { .compare_element = compare, };
-    map_iqueue(&test, sort, &cmp);
+    apply_iqueue(&test, sort, &cmp);
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -271,7 +271,7 @@ TEST MAP_02(void) {
     }
 
     struct compare cmp = { .compare_element = compare, };
-    map_iqueue(&test, sort, &cmp);
+    apply_iqueue(&test, sort, &cmp);
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         int a = 0;
@@ -292,7 +292,7 @@ TEST MAP_03(void) {
     }
 
     struct compare cmp = { .compare_element = compare, };
-    map_iqueue(&test, sort, &cmp);
+    apply_iqueue(&test, sort, &cmp);
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         int a = 0;
@@ -313,7 +313,7 @@ TEST MAP_04(void) {
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
-    map_iqueue(&test, sort, &cmp);
+    apply_iqueue(&test, sort, &cmp);
 
     for (int i = IQUEUE_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -334,7 +334,7 @@ TEST MAP_05(void) {
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
-    map_iqueue(&test, sort, &cmp);
+    apply_iqueue(&test, sort, &cmp);
 
     for (int i = IQUEUE_CHUNK - 1; i >= 0; --i) {
         int a = 0;
@@ -355,7 +355,7 @@ TEST MAP_06(void) {
     }
 
     struct compare cmp = { .compare_element = compare_reverse, };
-    map_iqueue(&test, sort, &cmp);
+    apply_iqueue(&test, sort, &cmp);
 
     for (int i = IQUEUE_CHUNK; i >= 0; --i) {
         int a = 0;

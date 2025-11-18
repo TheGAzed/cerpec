@@ -20,6 +20,7 @@ ihash_table_s create_ihash_table(const size_t key_size, const size_t value_size,
 }
 
 void destroy_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, const destroy_fn destroy_value)  {
+    assert(table && "[ERROR] Parameter can't be NULL.");
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
@@ -43,6 +44,7 @@ void destroy_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, co
 }
 
 void clear_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, const destroy_fn destroy_value)  {
+    assert(table && "[ERROR] Parameter can't be NULL.");
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
@@ -70,25 +72,26 @@ void clear_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, cons
     table->keys = table->values = NULL;
 }
 
-ihash_table_s copy_ihash_table(const ihash_table_s table, const copy_fn copy_key, const copy_fn copy_value) {
+ihash_table_s copy_ihash_table(const ihash_table_s * table, const copy_fn copy_key, const copy_fn copy_value) {
+    assert(table && "[ERROR] Parameter can't be NULL.");
     assert(copy_key && "[ERROR] Parameter can't be NULL.");
     assert(copy_value && "[ERROR] Parameter can't be NULL.");
 
-    assert(table.hash && "[INVALID] Parameter can't be NULL.");
-    assert(table.key_size && "[INVALID] Parameter can't be zero.");
-    assert(table.value_size && "[INVALID] Parameter can't be zero.");
-    assert(table.length <= table.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->hash && "[INVALID] Parameter can't be NULL.");
+    assert(table->key_size && "[INVALID] Parameter can't be zero.");
+    assert(table->value_size && "[INVALID] Parameter can't be zero.");
+    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
     const ihash_table_s replica = {
-        .capacity = table.capacity, .empty = NIL, .hash = table.hash, .length = table.length,
-        .key_size = table.key_size, .value_size = table.value_size,
+        .capacity = table->capacity, .empty = NIL, .hash = table->hash, .length = table->length,
+        .key_size = table->key_size, .value_size = table->value_size,
 
-        .keys = malloc(table.capacity * table.key_size),
-        .values = malloc(table.capacity * table.value_size),
+        .keys = malloc(table->capacity * table->key_size),
+        .values = malloc(table->capacity * table->value_size),
 
-        .head = malloc(table.capacity * sizeof(size_t)),
-        .next = malloc(table.capacity * sizeof(size_t)),
+        .head = malloc(table->capacity * sizeof(size_t)),
+        .next = malloc(table->capacity * sizeof(size_t)),
     };
     assert((!replica.capacity || replica.keys) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.values) && "[ERROR] Memory allocation failed.");
@@ -96,13 +99,13 @@ ihash_table_s copy_ihash_table(const ihash_table_s table, const copy_fn copy_key
     assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
 
     // for each index, if each index is valid node then push it into replica
-    for (size_t i = 0, hole = 0; i < table.capacity; ++i) {
+    for (size_t i = 0, hole = 0; i < table->capacity; ++i) {
         replica.head[i] = NIL; // initially table replica heads to invalid
 
         // if table has elements in head then push them into replica heads (like a stack)
-        for (size_t n = table.head[i]; NIL != n; n = table.next[n], hole++) {
-            copy_key(replica.keys + (hole * replica.key_size), table.keys + (n * table.key_size));
-            copy_value(replica.values + (hole * replica.value_size), table.values + (n * table.value_size));
+        for (size_t n = table->head[i]; NIL != n; n = table->next[n], hole++) {
+            copy_key(replica.keys + (hole * replica.key_size), table->keys + (n * table->key_size));
+            copy_value(replica.values + (hole * replica.value_size), table->values + (n * table->value_size));
 
             // node index redirection
             replica.next[hole] = replica.head[i];
@@ -113,13 +116,14 @@ ihash_table_s copy_ihash_table(const ihash_table_s table, const copy_fn copy_key
     return replica;
 }
 
-bool is_empty_ihash_table(const ihash_table_s table) {
-    assert(table.hash && "[INVALID] Parameter can't be NULL.");
-    assert(table.key_size && "[INVALID] Parameter can't be zero.");
-    assert(table.value_size && "[INVALID] Parameter can't be zero.");
-    assert(table.length <= table.capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_empty_ihash_table(const ihash_table_s * table) {
+    assert(table && "[ERROR] Parameter can't be NULL.");
+    assert(table->hash && "[INVALID] Parameter can't be NULL.");
+    assert(table->key_size && "[INVALID] Parameter can't be zero.");
+    assert(table->value_size && "[INVALID] Parameter can't be zero.");
+    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    return !(table.length); // if 0 return 'true'
+    return !(table->length); // if 0 return 'true'
 }
 
 void insert_ihash_table(ihash_table_s * table, const void * key, const void * value) {
@@ -212,26 +216,27 @@ void remove_ihash_table(ihash_table_s * table, const void * key, void * key_buff
     exit(EXIT_FAILURE); // terminate on error
 }
 
-bool contains_key_ihash_table(const ihash_table_s table, const void * key) {
+bool contains_key_ihash_table(const ihash_table_s * table, const void * key) {
+    assert(table && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
 
-    assert(table.hash && "[INVALID] Parameter can't be NULL.");
-    assert(table.key_size && "[INVALID] Parameter can't be zero.");
-    assert(table.value_size && "[INVALID] Parameter can't be zero.");
-    assert(table.length <= table.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->hash && "[INVALID] Parameter can't be NULL.");
+    assert(table->key_size && "[INVALID] Parameter can't be zero.");
+    assert(table->value_size && "[INVALID] Parameter can't be zero.");
+    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // early return to avoid 'x mod 0' by capacity
-    if (!table.capacity) {
+    if (!table->capacity) {
         return false;
     }
 
     // calculate hash values and index in array
-    const size_t hash = table.hash(key);
-    const size_t index = hash % table.capacity;
+    const size_t hash = table->hash(key);
+    const size_t index = hash % table->capacity;
 
     // for each node at index check if element is contained and return true or false
-    for (size_t n = table.head[index]; NIL != n; n = table.next[n]) {
-        if (hash == table.hash(table.keys + (n * table.key_size))) {
+    for (size_t n = table->head[index]; NIL != n; n = table->next[n]) {
+        if (hash == table->hash(table->keys + (n * table->key_size))) {
             return true;
         }
     }
@@ -239,24 +244,25 @@ bool contains_key_ihash_table(const ihash_table_s table, const void * key) {
     return false;
 }
 
-void get_value_ihash_table(const ihash_table_s table, const void * key, void * value_buffer) {
+void get_value_ihash_table(const ihash_table_s * table, const void * key, void * value_buffer) {
+    assert(table && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(value_buffer && "[ERROR] Parameter can't be NULL.");
 
-    assert(table.hash && "[INVALID] Parameter can't be NULL.");
-    assert(table.key_size && "[INVALID] Parameter can't be zero.");
-    assert(table.value_size && "[INVALID] Parameter can't be zero.");
-    assert(table.length <= table.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->hash && "[INVALID] Parameter can't be NULL.");
+    assert(table->key_size && "[INVALID] Parameter can't be zero.");
+    assert(table->value_size && "[INVALID] Parameter can't be zero.");
+    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // calculate hash values and index in array
-    const size_t hash = table.hash(key);
-    const size_t index = hash % table.capacity;
+    const size_t hash = table->hash(key);
+    const size_t index = hash % table->capacity;
 
     // for each node at index check if element is contained
-    for (size_t n = table.head[index]; NIL != n; n = table.next[n]) {
-        const char * current = table.keys + (n + table.key_size);
-        if (hash == table.hash(current)) {
-            memcpy(value_buffer, current, table.value_size); // copy retrieved element into buffer
+    for (size_t n = table->head[index]; NIL != n; n = table->next[n]) {
+        const char * current = table->keys + (n + table->key_size);
+        if (hash == table->hash(current)) {
+            memcpy(value_buffer, current, table->value_size); // copy retrieved element into buffer
             return; // return to avoid assertion and termination at the end of function if key wasn't found
         }
     }
@@ -265,34 +271,36 @@ void get_value_ihash_table(const ihash_table_s table, const void * key, void * v
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void foreach_key_ihash_table(const ihash_table_s table, const operate_fn operate, void * arguments) {
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+void map_key_ihash_table(const ihash_table_s * table, const handle_fn handle, void * arguments) {
+    assert(table && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(table.hash && "[INVALID] Parameter can't be NULL.");
-    assert(table.key_size && "[INVALID] Parameter can't be zero.");
-    assert(table.value_size && "[INVALID] Parameter can't be zero.");
-    assert(table.length <= table.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->hash && "[INVALID] Parameter can't be NULL.");
+    assert(table->key_size && "[INVALID] Parameter can't be zero.");
+    assert(table->value_size && "[INVALID] Parameter can't be zero.");
+    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < table.capacity; ++i) {
-        for (size_t n = table.head[i]; NIL != n; n = table.next[n]) {
-            if (!operate(table.keys + (n * table.key_size), arguments)) {
+    for (size_t i = 0; i < table->capacity; ++i) {
+        for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
+            if (!handle(table->keys + (n * table->key_size), arguments)) {
                 return;
             }
         }
     }
 }
 
-void foreach_value_ihash_table(const ihash_table_s table, const operate_fn operate, void * arguments) {
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+void map_value_ihash_table(const ihash_table_s * table, const handle_fn handle, void * arguments) {
+    assert(table && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(table.hash && "[INVALID] Parameter can't be NULL.");
-    assert(table.key_size && "[INVALID] Parameter can't be zero.");
-    assert(table.value_size && "[INVALID] Parameter can't be zero.");
-    assert(table.length <= table.capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->hash && "[INVALID] Parameter can't be NULL.");
+    assert(table->key_size && "[INVALID] Parameter can't be zero.");
+    assert(table->value_size && "[INVALID] Parameter can't be zero.");
+    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < table.capacity; ++i) {
-        for (size_t n = table.head[i]; NIL != n; n = table.next[n]) {
-            if (!operate(table.values + (n * table.value_size), arguments)) {
+    for (size_t i = 0; i < table->capacity; ++i) {
+        for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
+            if (!handle(table->values + (n * table->value_size), arguments)) {
                 return;
             }
         }

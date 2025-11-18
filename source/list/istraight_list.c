@@ -411,19 +411,19 @@ istraight_list_s extract_istraight_list(istraight_list_s * list, const filter_fn
     return positive;
 }
 
-void foreach_istraight_list(const istraight_list_s * list, const operate_fn operate, void * arguments) {
+void map_istraight_list(const istraight_list_s * list, const handle_fn handle, void * arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(operate && "[ERROR] Paremeter can't be NULL.");
+    assert(handle && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
 
-    for (size_t i = list->head; NIL != i && operate(list->elements + (i * list->size), arguments); i = list->next[i]) {}
+    for (size_t i = list->head; NIL != i && handle(list->elements + (i * list->size), arguments); i = list->next[i]) {}
 }
 
-void map_istraight_list(const istraight_list_s * list, const manage_fn manage, void * arguments) {
+void apply_istraight_list(const istraight_list_s * list, const process_fn process, void * arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(manage && "[ERROR] Paremeter can't be NULL.");
+    assert(process && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
     assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
@@ -436,7 +436,7 @@ void map_istraight_list(const istraight_list_s * list, const manage_fn manage, v
         index++;
     }
 
-    manage(elements, list->length, arguments);
+    process(elements, list->length, arguments);
 
     for (size_t i = list->head, index = 0; NIL != i; i = list->next[i]) {
         memcpy(list->elements + (i * list->size), elements + (index * list->size), list->size);

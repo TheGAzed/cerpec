@@ -56,14 +56,14 @@ void peep_istack(const istack_s * stack, void * buffer);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param stack Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using generic arguments.
+/// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void foreach_istack(const istack_s * stack, const operate_fn operate, void * arguments);
+void map_istack(const istack_s * stack, const handle_fn handle, void * arguments);
 
-/// @brief Maps each element in structure into an array to manage.
+/// @brief Apply each element in structure into an array to manage.
 /// @param stack Structure to map.
-/// @param manage Function pointer to manage array of elements using structure length and arguments.
+/// @param process Function pointer to process array of elements using structure length and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_istack(const istack_s * stack, const manage_fn manage, void * arguments);
+void apply_istack(const istack_s * stack, const process_fn process, void * arguments);
 
 #endif // ISTACK_H
