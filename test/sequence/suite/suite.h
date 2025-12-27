@@ -5,8 +5,8 @@
 
 #include <test.h>
 
-SUITE_EXTERN(stack_test);
-SUITE_EXTERN(queue_test);
+SUITE_EXTERN(istack_test);
+SUITE_EXTERN(iqueue_test);
 SUITE_EXTERN(ideque_test);
 
 #endif // SUITE_H

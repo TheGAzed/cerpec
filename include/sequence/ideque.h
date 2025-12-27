@@ -18,12 +18,14 @@ struct infinite_deque_node {
 typedef struct deque {
     struct infinite_deque_node * head;
     size_t current, size, length; // current index, element size and structure length
+    memory_s * allocator;
 } ideque_s;
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
+/// @param allocator Allocator for structure memory.
 /// @return Deque structure.
-ideque_s create_ideque(const size_t size);
+ideque_s create_ideque(const size_t size, memory_s * allocator);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param deque Structure to destroy.

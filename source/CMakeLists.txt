@@ -1,4 +1,4 @@
-target_sources(CERPEC
+target_sources(CERPEC PRIVATE cerpec.c
         PRIVATE sequence/istack.c
         PRIVATE sequence/iqueue.c
         PRIVATE sequence/ideque.c
@@ -19,4 +19,9 @@ target_sources(CERPEC
 
         PRIVATE misc/ihash_table.c
         PRIVATE misc/ibinary_heap.c
+)
+
+target_sources(CERPEC
+        PRIVATE sequence/fstack.c
+        PRIVATE sequence/fqueue.c
 )

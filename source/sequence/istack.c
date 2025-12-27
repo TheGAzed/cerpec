@@ -1,13 +1,12 @@
 #include <sequence/istack.h>
 
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
 
-istack_s create_istack(const size_t size) {
+istack_s create_istack(const size_t size, memory_s * allocator) {
     assert(size && "[ERROR] Paremeter can't be zero.");
 
-    return (istack_s) { .size = size, 0 };
+    return (istack_s) { .size = size, .allocator = allocator };
 }
 
 void destroy_istack(istack_s * stack, const destroy_fn destroy) {
@@ -21,11 +20,9 @@ void destroy_istack(istack_s * stack, const destroy_fn destroy) {
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
         destroy(e);
     }
-    free(stack->elements); // free elements array
+    stack->allocator->free(stack->elements, stack->allocator->arguments); // free elements array
 
-    // set all parameters to zero/NULL
-    stack->capacity = stack->length = stack->size = 0;
-    stack->elements = NULL;
+    memset(stack, 0, sizeof(istack_s));
 }
 
 void clear_istack(istack_s * stack, const destroy_fn destroy) {
@@ -39,9 +36,11 @@ void clear_istack(istack_s * stack, const destroy_fn destroy) {
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
         destroy(e);
     }
+    stack->allocator->free(stack->elements, stack->allocator->arguments); // free elements array
 
     // set lenght to zero
-    stack->length = 0;
+    stack->length = stack->capacity = 0;
+    stack->elements = NULL;
 }
 
 istack_s copy_istack(const istack_s * stack, const copy_fn copy) {
@@ -53,7 +52,8 @@ istack_s copy_istack(const istack_s * stack, const copy_fn copy) {
 
     // create replica to initialize and return
     const istack_s replica = {
-        .capacity = stack->capacity, .length = 0, .elements = malloc(stack->capacity * stack->size), .size = stack->size,
+        .capacity = stack->capacity, .length = 0, .size = stack->size,
+        .elements = stack->allocator->alloc(stack->capacity * stack->size, stack->allocator->arguments),
     };
     assert(!replica.capacity || replica.elements && "[ERROR] Memory allocation failed.");
 
@@ -84,7 +84,7 @@ void push_istack(istack_s * stack, const void * element) {
 
     if (stack->length == stack->capacity) { // if length is equal to capacity the array must expand linearly
         stack->capacity += ISTACK_CHUNK;
-        stack->elements = realloc(stack->elements, stack->capacity * stack->size);
+        stack->elements = stack->allocator->realloc(stack->elements, stack->capacity * stack->size, stack->allocator->arguments);
         assert(stack->elements && "[ERROR] Memory allocation failed.");
     }
 
@@ -109,7 +109,7 @@ void pop_istack(istack_s * stack, void * buffer) {
 
     if (stack->length == (stack->capacity - ISTACK_CHUNK)) { // if array can be shrunk
         stack->capacity -= ISTACK_CHUNK;
-        stack->elements = realloc(stack->elements, stack->capacity * stack->size);
+        stack->elements = stack->allocator->realloc(stack->elements, stack->capacity * stack->size, stack->allocator->arguments);
         assert(!stack->capacity || stack->elements && "[ERROR] Memory allocation failed.");
     }
 }

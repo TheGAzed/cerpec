@@ -2,7 +2,8 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
     ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
@@ -15,7 +16,8 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     destroy_ideque(&test, destroy);
 
@@ -28,7 +30,8 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     clear_ideque(&test, destroy);
 
@@ -42,7 +45,8 @@ TEST CLEAR_01(void) {
 }
 
 TEST ENQUEUE_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -54,7 +58,8 @@ TEST ENQUEUE_FRONT_01(void) {
 }
 
 TEST ENQUEUE_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -66,7 +71,8 @@ TEST ENQUEUE_FRONT_02(void) {
 }
 
 TEST ENQUEUE_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -78,7 +84,8 @@ TEST ENQUEUE_FRONT_03(void) {
 }
 
 TEST ENQUEUE_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -90,7 +97,8 @@ TEST ENQUEUE_BACK_01(void) {
 }
 
 TEST ENQUEUE_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -102,7 +110,8 @@ TEST ENQUEUE_BACK_02(void) {
 }
 
 TEST ENQUEUE_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -114,7 +123,8 @@ TEST ENQUEUE_BACK_03(void) {
 }
 
 TEST PEEK_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -130,7 +140,8 @@ TEST PEEK_FRONT_01(void) {
 }
 
 TEST PEEK_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -146,7 +157,8 @@ TEST PEEK_FRONT_02(void) {
 }
 
 TEST PEEK_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -162,7 +174,8 @@ TEST PEEK_FRONT_03(void) {
 }
 
 TEST PEEK_FRONT_04(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -178,7 +191,8 @@ TEST PEEK_FRONT_04(void) {
 }
 
 TEST PEEK_FRONT_05(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -194,7 +208,8 @@ TEST PEEK_FRONT_05(void) {
 }
 
 TEST PEEK_FRONT_06(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -210,7 +225,8 @@ TEST PEEK_FRONT_06(void) {
 }
 
 TEST PEEK_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -226,7 +242,8 @@ TEST PEEK_BACK_01(void) {
 }
 
 TEST PEEK_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -242,7 +259,8 @@ TEST PEEK_BACK_02(void) {
 }
 
 TEST PEEK_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -258,7 +276,8 @@ TEST PEEK_BACK_03(void) {
 }
 
 TEST PEEK_BACK_04(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -274,7 +293,8 @@ TEST PEEK_BACK_04(void) {
 }
 
 TEST PEEK_BACK_05(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -290,7 +310,8 @@ TEST PEEK_BACK_05(void) {
 }
 
 TEST PEEK_BACK_06(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_back_ideque(&test, &i);
@@ -306,7 +327,8 @@ TEST PEEK_BACK_06(void) {
 }
 
 TEST DEQUEUE_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
@@ -325,7 +347,8 @@ TEST DEQUEUE_FRONT_01(void) {
 }
 
 TEST DEQUEUE_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
@@ -344,7 +367,8 @@ TEST DEQUEUE_FRONT_02(void) {
 }
 
 TEST DEQUEUE_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
@@ -363,7 +387,8 @@ TEST DEQUEUE_FRONT_03(void) {
 }
 
 TEST DEQUEUE_FRONT_04(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
@@ -382,7 +407,8 @@ TEST DEQUEUE_FRONT_04(void) {
 }
 
 TEST DEQUEUE_FRONT_05(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
@@ -401,7 +427,8 @@ TEST DEQUEUE_FRONT_05(void) {
 }
 
 TEST DEQUEUE_FRONT_06(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
@@ -420,7 +447,8 @@ TEST DEQUEUE_FRONT_06(void) {
 }
 
 TEST DEQUEUE_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
@@ -439,7 +467,8 @@ TEST DEQUEUE_BACK_01(void) {
 }
 
 TEST DEQUEUE_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
@@ -458,7 +487,8 @@ TEST DEQUEUE_BACK_02(void) {
 }
 
 TEST DEQUEUE_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
@@ -477,7 +507,8 @@ TEST DEQUEUE_BACK_03(void) {
 }
 
 TEST DEQUEUE_BACK_04(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
@@ -496,7 +527,8 @@ TEST DEQUEUE_BACK_04(void) {
 }
 
 TEST DEQUEUE_BACK_05(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
@@ -515,7 +547,8 @@ TEST DEQUEUE_BACK_05(void) {
 }
 
 TEST DEQUEUE_BACK_06(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
@@ -534,7 +567,8 @@ TEST DEQUEUE_BACK_06(void) {
 }
 
 TEST FOREACH_FRONT_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -555,7 +589,8 @@ TEST FOREACH_FRONT_01(void) {
 }
 
 TEST FOREACH_FRONT_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -576,7 +611,8 @@ TEST FOREACH_FRONT_02(void) {
 }
 
 TEST FOREACH_FRONT_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -597,7 +633,8 @@ TEST FOREACH_FRONT_03(void) {
 }
 
 TEST FOREACH_BACK_01(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -618,7 +655,8 @@ TEST FOREACH_BACK_01(void) {
 }
 
 TEST FOREACH_BACK_02(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         enqueue_front_ideque(&test, &i);
@@ -639,7 +677,8 @@ TEST FOREACH_BACK_02(void) {
 }
 
 TEST FOREACH_BACK_03(void) {
-    ideque_s test = create_ideque(sizeof(int));
+    memory_s allocator = standard_memory();
+    ideque_s test = create_ideque(sizeof(int), &allocator);
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         enqueue_front_ideque(&test, &i);

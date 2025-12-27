@@ -1,6 +1,6 @@
 add_executable(sequence_test main.c
-        suite/stack_test.c
-        suite/queue_test.c
+        suite/istack_test.c
+        suite/iqueue_test.c
         suite/ideque_test.c
 )
 

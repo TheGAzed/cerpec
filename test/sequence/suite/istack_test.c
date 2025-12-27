@@ -1,8 +1,10 @@
 #include <sequence/istack.h>
 #include <suite.h>
 
+
 TEST CREATE_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.capacity);
     ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.length);
@@ -16,7 +18,8 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     destroy_istack(&test, destroy);
 
@@ -30,7 +33,8 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     clear_istack(&test, destroy);
 
@@ -44,7 +48,8 @@ TEST CLEAR_01(void) {
 }
 
 TEST PUSH_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
@@ -56,7 +61,8 @@ TEST PUSH_01(void) {
 }
 
 TEST PUSH_02(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
@@ -68,7 +74,8 @@ TEST PUSH_02(void) {
 }
 
 TEST PUSH_03(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
@@ -80,7 +87,8 @@ TEST PUSH_03(void) {
 }
 
 TEST PEEP_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
@@ -96,7 +104,8 @@ TEST PEEP_01(void) {
 }
 
 TEST PEEP_02(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
@@ -112,7 +121,8 @@ TEST PEEP_02(void) {
 }
 
 TEST PEEP_03(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
@@ -128,7 +138,8 @@ TEST PEEP_03(void) {
 }
 
 TEST POP_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
@@ -146,7 +157,8 @@ TEST POP_01(void) {
 }
 
 TEST POP_02(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
@@ -164,7 +176,8 @@ TEST POP_02(void) {
 }
 
 TEST POP_03(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
@@ -182,7 +195,8 @@ TEST POP_03(void) {
 }
 
 TEST FOREACH_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
@@ -203,7 +217,8 @@ TEST FOREACH_01(void) {
 }
 
 TEST FOREACH_02(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
@@ -224,7 +239,8 @@ TEST FOREACH_02(void) {
 }
 
 TEST FOREACH_03(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
@@ -245,7 +261,8 @@ TEST FOREACH_03(void) {
 }
 
 TEST MAP_01(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
@@ -266,7 +283,8 @@ TEST MAP_01(void) {
 }
 
 TEST MAP_02(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
@@ -287,7 +305,8 @@ TEST MAP_02(void) {
 }
 
 TEST MAP_03(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
@@ -308,7 +327,8 @@ TEST MAP_03(void) {
 }
 
 TEST MAP_04(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         push_istack(&test, &i);
@@ -329,7 +349,8 @@ TEST MAP_04(void) {
 }
 
 TEST MAP_05(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         push_istack(&test, &i);
@@ -350,7 +371,8 @@ TEST MAP_05(void) {
 }
 
 TEST MAP_06(void) {
-    istack_s test = create_istack(sizeof(int));
+    memory_s allocator = standard_memory();
+    istack_s test = create_istack(sizeof(int), &allocator);
 
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         push_istack(&test, &i);
@@ -370,7 +392,7 @@ TEST MAP_06(void) {
     PASS();
 }
 
-SUITE (stack_test) {
+SUITE (istack_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(PUSH_01); RUN_TEST(PUSH_02); RUN_TEST(PUSH_03);
     RUN_TEST(PEEP_01); RUN_TEST(PEEP_02); RUN_TEST(PEEP_03);
