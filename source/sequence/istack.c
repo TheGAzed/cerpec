@@ -3,10 +3,10 @@
 #include <assert.h>
 #include <string.h>
 
-istack_s create_istack(const size_t size, memory_s * allocator) {
+istack_s create_istack(const size_t size) {
     assert(size && "[ERROR] Paremeter can't be zero.");
 
-    return (istack_s) { .size = size, .allocator = allocator };
+    return (istack_s) { .size = size, .allocator = &standard };
 }
 
 void destroy_istack(istack_s * stack, const destroy_fn destroy) {
@@ -22,7 +22,8 @@ void destroy_istack(istack_s * stack, const destroy_fn destroy) {
     }
     stack->allocator->free(stack->elements, stack->allocator->arguments); // free elements array
 
-    memset(stack, 0, sizeof(istack_s));
+    stack->capacity = stack->length = stack->size = 0;
+    stack->elements = NULL;
 }
 
 void clear_istack(istack_s * stack, const destroy_fn destroy) {

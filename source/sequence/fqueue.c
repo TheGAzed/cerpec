@@ -189,20 +189,20 @@ void apply_fqueue(const fqueue_s * queue, const process_fn process, void * argum
     assert(queue->elements && "[INVALID] Elements can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
 
-    char * buffer = malloc(queue->max * queue->size);
-    assert(buffer && "[ERROR] Memory allocation failed.");
+    char * elements_array = malloc(queue->length * queue->size);
+    assert(elements_array && "[ERROR] Memory allocation failed.");
 
     const size_t absolute = queue->current + queue->length;
     const size_t right_length = absolute > queue->max ? queue->max - queue->current : queue->length;
     const size_t left_length = queue->length - right_length;
 
-    memcpy(buffer, queue->elements + (queue->current * queue->size), right_length * queue->size);
-    memcpy(buffer + (right_length * queue->size), queue->elements, left_length * queue->size);
+    memcpy(elements_array, queue->elements + (queue->current * queue->size), right_length * queue->size);
+    memcpy(elements_array + (right_length * queue->size), queue->elements, left_length * queue->size);
 
-    process(buffer, queue->length, arguments);
+    process(elements_array, queue->length, arguments);
 
-    memcpy(queue->elements + (queue->current * queue->size), buffer, right_length * queue->size);
-    memcpy(queue->elements, buffer + (right_length * queue->size), left_length * queue->size);
+    memcpy(queue->elements + (queue->current * queue->size), elements_array, right_length * queue->size);
+    memcpy(queue->elements, elements_array + (right_length * queue->size), left_length * queue->size);
 
-    free(buffer);
+    free(elements_array);
 }

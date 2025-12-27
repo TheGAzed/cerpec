@@ -3,10 +3,10 @@
 #include <assert.h>
 #include <string.h>
 
-ideque_s create_ideque(const size_t size, memory_s * allocator) {
+ideque_s create_ideque(const size_t size) {
     assert(size && "[ERROR] Size can't be zero.");
 
-    return (ideque_s) { .size = size, .allocator = allocator, };
+    return (ideque_s) { .size = size, .allocator = &standard, };
 }
 
 void destroy_ideque(ideque_s * deque, const destroy_fn destroy) {
@@ -30,7 +30,9 @@ void destroy_ideque(ideque_s * deque, const destroy_fn destroy) {
         deque->allocator->free(temp, deque->allocator->arguments); // free temporary current node
     }
 
-    memset(deque, 0, sizeof(ideque_s)); // set everything to zero
+    // set everything to zero
+    deque->current = deque->length = deque->size = 0;
+    deque->head = NULL;
 }
 
 void clear_ideque(ideque_s * deque, const destroy_fn destroy) {
@@ -54,8 +56,8 @@ void clear_ideque(ideque_s * deque, const destroy_fn destroy) {
         deque->allocator->free(temp, deque->allocator->arguments); // free temporary current node
     }
 
+    deque->current = deque->length = 0;
     deque->head = NULL;
-    deque->current = 0;
 }
 
 ideque_s copy_ideque(const ideque_s * deque, const copy_fn copy) {

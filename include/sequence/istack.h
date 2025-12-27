@@ -10,15 +10,14 @@
 /// @brief Stack data structure.
 typedef struct infinite_stack {
     char * elements;               // array of elements
-    memory_s * allocator;
     size_t size, length, capacity; // size of single element, structure length and its capacity
+    const memory_s * allocator;
 } istack_s;
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
-/// @param allocator Allocator for structure memory.
 /// @return Stack structure.
-istack_s create_istack(const size_t size, memory_s * allocator);
+istack_s create_istack(const size_t size);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param stack Structure to destroy.

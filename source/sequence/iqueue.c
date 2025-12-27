@@ -3,10 +3,10 @@
 #include <assert.h>
 #include <string.h>
 
-iqueue_s create_iqueue(const size_t size, memory_s * allocator) {
+iqueue_s create_iqueue(const size_t size) {
     assert(size && "[ERROR] Size can't be zero.");
 
-    return (iqueue_s) { .size = size, .allocator = allocator };
+    return (iqueue_s) { .size = size, .allocator = &standard };
 }
 
 void destroy_iqueue(iqueue_s * queue, const destroy_fn destroy) {
@@ -34,7 +34,9 @@ void destroy_iqueue(iqueue_s * queue, const destroy_fn destroy) {
         queue->allocator->free(temp, queue->allocator->arguments);
     }
 
-    memset(queue, 0, sizeof(iqueue_s)); // set everything to zero
+    // set everything to zero
+    queue->current = queue->length = queue->size = 0;
+    queue->tail = NULL;
 }
 
 void clear_iqueue(iqueue_s * queue, const destroy_fn destroy) {
@@ -62,7 +64,7 @@ void clear_iqueue(iqueue_s * queue, const destroy_fn destroy) {
         queue->allocator->free(temp, queue->allocator->arguments);
     }
 
-    queue->current = 0;
+    queue->current = queue->length = 0;
     queue->tail = NULL;
 }
 

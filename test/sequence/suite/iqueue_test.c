@@ -2,8 +2,7 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
     ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
@@ -16,8 +15,7 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     destroy_iqueue(&test, destroy);
 
@@ -30,8 +28,7 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     clear_iqueue(&test, destroy);
 
@@ -45,8 +42,7 @@ TEST CLEAR_01(void) {
 }
 
 TEST ENQUEUE_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -58,8 +54,7 @@ TEST ENQUEUE_01(void) {
 }
 
 TEST ENQUEUE_02(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         enqueue_iqueue(&test, &i);
@@ -71,8 +66,7 @@ TEST ENQUEUE_02(void) {
 }
 
 TEST ENQUEUE_03(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -84,8 +78,7 @@ TEST ENQUEUE_03(void) {
 }
 
 TEST PEEK_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -101,8 +94,7 @@ TEST PEEK_01(void) {
 }
 
 TEST PEEK_02(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         enqueue_iqueue(&test, &i);
@@ -118,8 +110,7 @@ TEST PEEK_02(void) {
 }
 
 TEST PEEK_03(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -135,8 +126,7 @@ TEST PEEK_03(void) {
 }
 
 TEST DEQUEUE_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -154,8 +144,7 @@ TEST DEQUEUE_01(void) {
 }
 
 TEST DEQUEUE_02(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         enqueue_iqueue(&test, &i);
@@ -173,8 +162,7 @@ TEST DEQUEUE_02(void) {
 }
 
 TEST DEQUEUE_03(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -192,8 +180,7 @@ TEST DEQUEUE_03(void) {
 }
 
 TEST FOREACH_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -214,8 +201,7 @@ TEST FOREACH_01(void) {
 }
 
 TEST FOREACH_02(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         enqueue_iqueue(&test, &i);
@@ -236,8 +222,7 @@ TEST FOREACH_02(void) {
 }
 
 TEST FOREACH_03(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -258,8 +243,7 @@ TEST FOREACH_03(void) {
 }
 
 TEST MAP_01(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -280,8 +264,7 @@ TEST MAP_01(void) {
 }
 
 TEST MAP_02(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         enqueue_iqueue(&test, &i);
@@ -302,8 +285,7 @@ TEST MAP_02(void) {
 }
 
 TEST MAP_03(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -324,8 +306,7 @@ TEST MAP_03(void) {
 }
 
 TEST MAP_04(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         enqueue_iqueue(&test, &i);
@@ -346,8 +327,7 @@ TEST MAP_04(void) {
 }
 
 TEST MAP_05(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
         enqueue_iqueue(&test, &i);
@@ -368,8 +348,7 @@ TEST MAP_05(void) {
 }
 
 TEST MAP_06(void) {
-    memory_s allocator = standard_memory();
-    iqueue_s test = create_iqueue(sizeof(int), &allocator);
+    iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
         enqueue_iqueue(&test, &i);
