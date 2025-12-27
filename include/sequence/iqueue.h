@@ -16,7 +16,7 @@ struct infinite_queue_node {
 /// @brief Queue data structure.
 typedef struct infinite_queue {
     struct infinite_queue_node * tail; // tail node to append next elements while enqueue-ing
-    const memory_s * allocator;
+    memory_s const * allocator;
     size_t size, current, length;      // current index, element size and structure length
 } iqueue_s;
 

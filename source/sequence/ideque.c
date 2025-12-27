@@ -33,6 +33,7 @@ void destroy_ideque(ideque_s * deque, const destroy_fn destroy) {
     // set everything to zero
     deque->current = deque->length = deque->size = 0;
     deque->head = NULL;
+    deque->allocator = NULL;
 }
 
 void clear_ideque(ideque_s * deque, const destroy_fn destroy) {

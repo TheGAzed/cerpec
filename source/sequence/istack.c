@@ -24,6 +24,7 @@ void destroy_istack(istack_s * stack, const destroy_fn destroy) {
 
     stack->capacity = stack->length = stack->size = 0;
     stack->elements = NULL;
+    stack->allocator = NULL;
 }
 
 void clear_istack(istack_s * stack, const destroy_fn destroy) {

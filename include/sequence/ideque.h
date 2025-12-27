@@ -18,7 +18,7 @@ struct infinite_deque_node {
 typedef struct deque {
     struct infinite_deque_node * head;
     size_t current, size, length; // current index, element size and structure length
-    const memory_s * allocator;
+    memory_s const * allocator;
 } ideque_s;
 
 /// @brief Creates an empty structure.

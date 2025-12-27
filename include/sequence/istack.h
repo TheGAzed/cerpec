@@ -11,7 +11,7 @@
 typedef struct infinite_stack {
     char * elements;               // array of elements
     size_t size, length, capacity; // size of single element, structure length and its capacity
-    const memory_s * allocator;
+    memory_s const * allocator;
 } istack_s;
 
 /// @brief Creates an empty structure.

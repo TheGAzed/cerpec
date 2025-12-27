@@ -37,6 +37,7 @@ void destroy_iqueue(iqueue_s * queue, const destroy_fn destroy) {
     // set everything to zero
     queue->current = queue->length = queue->size = 0;
     queue->tail = NULL;
+    queue->allocator = NULL;
 }
 
 void clear_iqueue(iqueue_s * queue, const destroy_fn destroy) {
