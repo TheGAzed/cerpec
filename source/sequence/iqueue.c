@@ -9,7 +9,7 @@ iqueue_s create_iqueue(const size_t size) {
     return (iqueue_s) { .size = size, .allocator = &standard };
 }
 
-void destroy_iqueue(iqueue_s * queue, const destroy_fn destroy) {
+void destroy_iqueue(iqueue_s * queue, const set_fn destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -40,7 +40,7 @@ void destroy_iqueue(iqueue_s * queue, const destroy_fn destroy) {
     queue->allocator = NULL;
 }
 
-void clear_iqueue(iqueue_s * queue, const destroy_fn destroy) {
+void clear_iqueue(iqueue_s * queue, const set_fn destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 

@@ -1,10 +1,10 @@
-#ifndef IMATRIX_GRAPH_H
-#define IMATRIX_GRAPH_H
+#ifndef IMATRIX_H
+#define IMATRIX_H
 
 #include <cerpec.h>
 
-#if !defined(IMATRIX_GRAPH_CHUNK)
-#   define IMATRIX_GRAPH_CHUNK CERPEC_CHUNK
+#if !defined(IMATRIX_CHUNK)
+#   define IMATRIX_CHUNK CERPEC_CHUNK
 #endif
 
 #define IMATRIX_NIL ((size_t)(-1))
@@ -16,22 +16,27 @@ typedef struct infinite_matrix_graph {
     void * none;     // non-edge
     compare_fn compare; // comapres edges and determines if they're smaller, bigger or equal
     size_t vertex_size, edge_size, length, capacity; // size of single element, structure length and its capacity
-} imatrix_graph_s;
+} iam_graph_s;
 
 typedef struct infinite_matrix_graph_edge {
     char * edge; // edge first to simplify weight comparison by dereferencing it directly to edge type
-    size_t index[2];
-} imatrix_edge_s;
+    size_t vertices[2];
+} iam_edge_s;
 
-typedef struct infinite_matrix_graph_pair {
-    char * edge; // edge first to simplify weight comparison by dereferencing it directly to edge type
-    char * vertex[2];
-} imatrix_pair_s;
+typedef struct infinite_matrix_graph_cost {
+    compare_fn compare;
+    copy_fn add;
+    size_t size;
+    void * infinite, * zero;
+} iam_cost_s;
 
 typedef struct infinite_matrix_graph_table {
+    iam_cost_s const * data;
     size_t * previous;
-    char * edges;
-} imatrix_table_s;
+    char * cost;
+} iam_list_s;
+
+iam_cost_s compose_iam_cost(const size_t size, compare_fn compare, const copy_fn add, void * zero, void * infinite);
 
 /// @brief Creates an empty structure.
 /// @param vertex_size Size of a single vertex element.
@@ -40,37 +45,37 @@ typedef struct infinite_matrix_graph_table {
 /// @param none Non-edge element to represent absence of an edge.
 /// @return Graph structure.
 /// @note Compare function must return equal if a 'none' edge is compared with 'none' parameter.
-imatrix_graph_s create_imatrix_graph(const size_t vertex_size, const size_t edge_size, const compare_fn compare, void * none);
+iam_graph_s create_iam_graph(const size_t vertex_size, const size_t edge_size, const compare_fn compare, void * none);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param graph Structure to destroy.
 /// @param destroy_vertex Function pointer to destroy a single vertex element.
 /// @param destroy_edge Function pointer to destroy a single edge element.
-void destroy_imatrix_graph(imatrix_graph_s * graph, const destroy_fn destroy_vertex, const destroy_fn destroy_edge);
+void destroy_iam_graph(iam_graph_s * graph, const set_fn destroy_vertex, const set_fn destroy_edge);
 
 /// @brief Clears a structure, and destroys its elements, but remains usable.
 /// @param graph Structure to destroy.
 /// @param destroy_vertex Function pointer to destroy a single vertex element.
 /// @param destroy_edge Function pointer to destroy a single edge element.
-void clear_imatrix_graph(imatrix_graph_s * graph, const destroy_fn destroy_vertex, const destroy_fn destroy_edge);
+void clear_iam_graph(iam_graph_s * graph, const set_fn destroy_vertex, const set_fn destroy_edge);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param graph Structure to copy.
 /// @param copy_vertex Function pointer to create a deep/shallow copy of a single vertex element.
 /// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element.
 /// @return Matrix graph structure.
-imatrix_graph_s copy_imatrix_graph(const imatrix_graph_s * graph, const copy_fn copy_vertex, const copy_fn copy_edge);
+iam_graph_s copy_iam_graph(const iam_graph_s * graph, const copy_fn copy_vertex, const copy_fn copy_edge);
 
 /// @brief Checks if structure is empty.
 /// @param graph Structure to check.
 /// @return 'true' if empty, 'false' if not.
-bool is_empty_imatrix_graph(const imatrix_graph_s * graph);
+bool is_empty_iam_graph(const iam_graph_s * graph);
 
 /// @brief Inserts a single vertex element into the structure.
 /// @param graph Structure to insert into.
 /// @param vertex Element buffer to insert.
 /// @return Index of element in vertex array.
-size_t insert_vertex_imatrix_graph(imatrix_graph_s * graph, const void * vertex);
+size_t insert_vertex_iam_graph(iam_graph_s * graph, const void * vertex);
 
 /// @brief Remove specified vertex element at index from structure.
 /// @param graph Structure to remove from.
@@ -79,13 +84,13 @@ size_t insert_vertex_imatrix_graph(imatrix_graph_s * graph, const void * vertex)
 /// @param destroy_edge Function pointer to destroy single edge element associated wtih removed vertex.
 /// @return Index of last swapped element in vertex array or 'IGRAPH_NIL', if removed element was last.
 /// @note The last vertex in elements array (including its edges) gets swapped with the removed index vertex.
-size_t remove_vertex_imatrix_graph(imatrix_graph_s * graph, const size_t index, void * buffer, const destroy_fn destroy_edge);
+size_t remove_vertex_iam_graph(iam_graph_s * graph, const size_t index, void * buffer, const set_fn destroy_edge);
 
 /// @brief Gets the vertex element at index in structure.
 /// @param graph Structure to get from.
 /// @param index Index location of vertex.
 /// @param buffer Element buffer to save vertex.
-void get_vertex_imatrix_graph(const imatrix_graph_s * graph, const size_t index, void * buffer);
+void get_vertex_iam_graph(const iam_graph_s * graph, const size_t index, void * buffer);
 
 /// @brief Inserts a single edge element into the structure.
 /// @param graph Structure to insert into.
@@ -93,14 +98,14 @@ void get_vertex_imatrix_graph(const imatrix_graph_s * graph, const size_t index,
 /// @param index_two Index location of second vertex.
 /// @param edge Element buffer to insert.
 /// @return Index of element in vertex array.
-void insert_edge_imatrix_graph(const imatrix_graph_s * graph, const size_t index_one, const size_t index_two, const void * edge);
+void insert_edge_iam_graph(const iam_graph_s * graph, const size_t index_one, const size_t index_two, const void * edge);
 
 /// @brief Remove specified edge element at vertex indices from structure.
 /// @param graph Structure to remove from.
 /// @param index_one Index location of first vertex.
 /// @param index_two Index location of second vertex.
 /// @param buffer Element buffer to insert.
-void remove_edge_imatrix_graph(const imatrix_graph_s * graph, const size_t index_one, const size_t index_two, void * buffer);
+void remove_edge_iam_graph(const iam_graph_s * graph, const size_t index_one, const size_t index_two, void * buffer);
 
 /// @brief Checks if edge exists between two vertives.
 /// @param graph Structure to check.
@@ -108,88 +113,76 @@ void remove_edge_imatrix_graph(const imatrix_graph_s * graph, const size_t index
 /// @param index_two Index location of second vertex.
 /// @return 'true' if an edge exists, 'false' otherwise.
 /// @note Existance is dependent on 'none' structure parameter.
-bool contains_edge_imatrix_graph(const imatrix_graph_s * graph, const size_t index_one, const size_t index_two);
+bool contains_edge_iam_graph(const iam_graph_s * graph, const size_t index_one, const size_t index_two);
 
 /// @brief Gets the edge element at vertex indices in structure.
 /// @param graph Structure to get from.
 /// @param index_one First vertex index of edge.
 /// @param index_two Second vertex index of edge.
 /// @param buffer Element buffer to save edge.
-void get_edge_imatrix_graph(const imatrix_graph_s * graph, const size_t index_one, const size_t index_two, void * buffer);
+void get_edge_iam_graph(const iam_graph_s * graph, const size_t index_one, const size_t index_two, void * buffer);
 
 /// @brief Traverses the vertices of the specified structure using breadth first search.
 /// @param graph Structure to traverse.
+/// @param cost Cost structure that defines the distance properties in table.
 /// @param start Starting vertex index.
-/// @param end Last vertex index, or 'IMATRIX_GRAPH_NIL' if all vertex shortest path.
-/// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element for table.
+/// @param end Last vertex index, or 'IMATRIX_NIL' if all vertex shortest path.
 /// @return Breadth first search lookup table with subgraph from start node to all other nodes.
-imatrix_table_s breadth_first_imatrix_table(const imatrix_graph_s * graph, const size_t start, const size_t end, const copy_fn copy_edge);
+iam_list_s bfs_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, const size_t start, const size_t end);
 
 /// @brief Traverses the vertices of the specified structure using depth first search.
 /// @param graph Structure to traverse.
+/// @param cost Cost structure that defines the distance properties in table.
 /// @param start Starting vertex index.
-/// @param end Last vertex index, or 'IMATRIX_GRAPH_NIL' if all vertex shortest path.
-/// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element for table.
+/// @param end Last vertex index, or 'IMATRIX_NIL' if all vertex shortest path.
 /// @return Depth first search lookup table with subgraph from start node to all other nodes.
-imatrix_table_s depth_first_imatrix_table(const imatrix_graph_s * graph, const size_t start, const size_t end, const copy_fn copy_edge);
+iam_list_s dfs_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, const size_t start, const size_t end);
 
 /// @brief Generate a Dijkstra lookup array table with nodes' edge sums and previous indexes.
 /// @param graph Structure to generate from.
 /// @param start Starting vertex index.
-/// @param end Last vertex index, or 'IMATRIX_GRAPH_NIL' if all vertex shortest path.
-/// @param add_edge Function pointer to add two edges' weights into destination edge.
-/// @param destroy_edge Function pointer to destroy a single edge element.
+/// @param end Last vertex index, or 'IMATRIX_NIL' if all vertex shortest path.
+/// @param cost Cost structure that defines the distance properties in table.
 /// @return Dijkstra lookup table with subgraph of shortest paths from start node to all other nodes.
-imatrix_table_s dijkstra_imatrix_table(const imatrix_graph_s * graph, const size_t start, const size_t end, const copy_fn add_edge, const destroy_fn destroy_edge);
+iam_list_s dijkstra_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, const size_t start, const size_t end);
 
 /// @brief Generate a Bellman-Ford lookup array table with nodes' edge sums and previous indexes.
 /// @param graph Structure to generate from.
 /// @param start Starting vertex index.
-/// @param add_edge Function pointer to add two edges' weights into destination edge.
-/// @param destroy_edge Function pointer to destroy a single edge element.
+/// @param cost Cost structure that defines the distance properties in table.
 /// @return Bellman-Ford lookup table with subgraph of shortest paths from start node to all other nodes.
-imatrix_table_s bellman_ford_imatrix_table(const imatrix_graph_s * graph, const size_t start, const copy_fn add_edge, const destroy_fn destroy_edge);
-
-/// @brief Generate a Prim lookup array table with nodes' edges and previous indexes.
-/// @param graph Structure to generate from.
-/// @param start Starting vertex index.
-/// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element for table.
-/// @param destroy_edge Function pointer to destroy a single edge element.
-/// @return Prim lookup table with subgraph of minimum spanning tree from start node to all other nodes.
-imatrix_table_s prim_imatrix_table(const imatrix_graph_s * graph, const size_t start, const copy_fn copy_edge, const destroy_fn destroy_edge);
-
-/// @brief Generate a Kruskal lookup array table with nodes' edges and previous indexes.
-/// @param graph Structure to generate from.
-/// @param sort Function pointer to sort special array of edges and vertices - 'imatrix_graph_edge', for Kruskal's algorithm.
-/// @param sort_args Arguments for sorting function.
-/// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element for table.
-/// @param destroy_edge Function pointer to destroy a single edge element.
-/// @return Kruskal lookup table with subgraph of minimum spanning tree from start node to all other nodes.
-imatrix_table_s kruskal_imatrix_table(const imatrix_graph_s * graph, const process_fn sort, void * sort_args, const copy_fn copy_edge, const destroy_fn destroy_edge);
+iam_list_s bellman_ford_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, const size_t start);
 
 /// @brief Generate an A* lookup array table with nodes' edges and previous indexes.
 /// @param graph Structure to generate from.
 /// @param start Starting vertex index.
 /// @param end Last vertex index.
-/// @param add_edge Function pointer to add two edges' weights into destination edge.
-/// @param destroy_edge Function pointer to destroy a single edge element.
-/// @param heuristic Function pointer to determine heuristic 'edge weight' based on two vectices.
+/// @param sum_cost Function pointer to add two costs into one.
+/// @param cost Cost structure that defines the distance properties in table.
+/// @param heuristic Function pointer to determine heuristic distance based on two vectices.
 /// @return A* lookup table with subgraph of shortest paths from start to end node.
-imatrix_table_s a_star_imatrix_table(const imatrix_graph_s * graph, const size_t start, const size_t end, const operate_fn add_edge, const operate_fn heuristic, const destroy_fn destroy_edge);
+iam_list_s a_star_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, const size_t start, const size_t end, const operate_fn heuristic, const copy_fn sum_cost);
 
-/// @brief Traverses the vertices of the specified structure using a generated table.
-/// @param graph Structure to traverse.
-/// @param table Structure to reference.
+/// @brief Generate a Prim lookup array table with nodes' edges and previous indexes.
+/// @param graph Structure to generate from.
 /// @param start Starting vertex index.
-/// @param operate Operate function pointer to operate on each vertex.
-/// @param arguments Arguments for operate function pointer.
-void search_imatrix_table(const imatrix_graph_s * graph, const imatrix_table_s * table, const size_t start, const handle_fn operate, void * arguments);
+/// @param cost Cost structure that defines the distance properties in table.
+/// @return Prim lookup table with subgraph of minimum spanning tree from start node to all other nodes.
+iam_list_s prim_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, const size_t start);
+
+/// @brief Generate a Kruskal lookup array table with nodes' ranks and previous indexes.
+/// @param graph Structure to generate from.
+/// @param sort Function pointer to sort special array of edge-vertices - 'iedge_s', for Kruskal's algorithm.
+/// @param cost Cost structure that defines the distance properties in table.
+/// @param sort_arguments Arguments for sorting function.
+/// @param increment_cost Function pointer to increment rank cost by one.
+/// @return Kruskal lookup table with subgraph of minimum spanning tree from start node to all other nodes.
+iam_list_s kruskal_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, const process_fn sort, void * sort_arguments, const set_fn increment_cost);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param graph Structure to reference.
 /// @param table Structure to destroy.
-/// @param destroy_edge Function pointer to destroy a single edge element.
-void destroy_imatrix_table(const imatrix_graph_s * graph, imatrix_table_s * table, const destroy_fn destroy_edge);
+void destroy_iam_list(const iam_graph_s * graph, iam_list_s * table);
 
 /// @brief Creates a subgraph copy of specified graph based on its table.
 /// @param graph Structure to copy.
@@ -197,18 +190,26 @@ void destroy_imatrix_table(const imatrix_graph_s * graph, imatrix_table_s * tabl
 /// @param copy_vertex Function pointer to create a deep/shallow copy of a single vertex element.
 /// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element.
 /// @return Matrix graph structure.
-imatrix_graph_s subgraph_imatrix_table(const imatrix_graph_s * graph, const imatrix_table_s * table, const copy_fn copy_vertex, const copy_fn copy_edge);
+iam_graph_s subgraph_iam_list(const iam_graph_s * graph, const iam_list_s * table, const copy_fn copy_vertex, const copy_fn copy_edge);
 
 /// @brief Iterates over each vertex element in structure starting from the beginning.
 /// @param graph Structure to iterate.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Arguments for operate function pointer.
-void map_vertex_imatrix_graph(const imatrix_graph_s * graph, const handle_fn handle, void * arguments);
+void map_vertex_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments);
 
 /// @brief Iterates over each edge element in structure starting from the beginning.
 /// @param graph Structure to iterate.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Arguments for operate function pointer.
-void map_edge_imatrix_graph(const imatrix_graph_s * graph, const handle_fn handle, void * arguments);
+void map_edge_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments);
 
-#endif // IMATRIX_GRAPH_H
+/// @brief Traverses the costs of the specified structure using a generated table.
+/// @param graph Structure to traverse.
+/// @param table Structure to reference.
+/// @param start Starting vertex index.
+/// @param handle Operate function pointer to operate on each vertex.
+/// @param arguments Arguments for operate function pointer.
+void map_cost_iam_list(const iam_graph_s * graph, const iam_list_s * table, const size_t start, const handle_fn handle, void * arguments);
+
+#endif // IMATRIX_H

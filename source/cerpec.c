@@ -28,7 +28,7 @@ void * _standard_realloc(void * pointer, const size_t size, void * arguments) {
     return realloc(pointer, size);
 }
 
-memory_s custom_memory(const alloc_fn alloc, const realloc_fn realloc, const free_fn free, void * arguments) {
+memory_s compose_memory(const alloc_fn alloc, const realloc_fn realloc, const free_fn free, void * arguments) {
     return (memory_s) {
         .alloc = alloc,
         .free = free,

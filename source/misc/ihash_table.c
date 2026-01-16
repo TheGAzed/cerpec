@@ -19,7 +19,7 @@ ihash_table_s create_ihash_table(const size_t key_size, const size_t value_size,
     return (ihash_table_s) { .key_size = key_size, .value_size = value_size, .hash = hash, .empty = NIL, }; // table empty list to NIL
 }
 
-void destroy_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, const destroy_fn destroy_value)  {
+void destroy_ihash_table(ihash_table_s * table, const set_fn destroy_key, const set_fn destroy_value)  {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
@@ -43,7 +43,7 @@ void destroy_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, co
     memset(table, 0, sizeof(ihash_table_s)); // table everything to zero/false
 }
 
-void clear_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, const destroy_fn destroy_value)  {
+void clear_ihash_table(ihash_table_s * table, const set_fn destroy_key, const set_fn destroy_value)  {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");

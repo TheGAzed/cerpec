@@ -18,7 +18,7 @@ ihash_set_s create_ihash_set(const size_t size, const hash_fn hash) {
     return (ihash_set_s) { .size = size, .hash = hash, .empty = NIL, }; // set empty list to NIL
 }
 
-void destroy_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
+void destroy_ihash_set(ihash_set_s * set, const set_fn destroy) {
     assert(set && "[ERROR] Parameter can't be NULL.");
 
     assert(set->hash && "[INVALID] Parameter can't be NULL.");
@@ -40,7 +40,7 @@ void destroy_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
     memset(set, 0, sizeof(ihash_set_s)); // set everything to zero/false
 }
 
-void clear_ihash_set(ihash_set_s * set, const destroy_fn destroy) {
+void clear_ihash_set(ihash_set_s * set, const set_fn destroy) {
     assert(set && "[ERROR] Parameter can't be NULL.");
 
     assert(set->hash && "[INVALID] Parameter can't be NULL.");

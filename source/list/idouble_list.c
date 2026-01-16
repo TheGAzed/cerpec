@@ -18,7 +18,7 @@ idouble_list_s create_idouble_list(const size_t size) {
     return (idouble_list_s) { .size = size };
 }
 
-void destroy_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
+void destroy_idouble_list(idouble_list_s * list, const set_fn destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
@@ -40,7 +40,7 @@ void destroy_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
     memset(list, 0, sizeof(idouble_list_s)); // set list to zero/make it invalid
 }
 
-void clear_idouble_list(idouble_list_s * list, const destroy_fn destroy) {
+void clear_idouble_list(idouble_list_s * list, const set_fn destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 

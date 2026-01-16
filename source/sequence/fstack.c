@@ -17,7 +17,7 @@ fstack_s create_fstack(const size_t max, const size_t size) {
     return stack;
 }
 
-void destroy_fstack(fstack_s * stack, const destroy_fn destroy) {
+void destroy_fstack(fstack_s * stack, const set_fn destroy) {
     assert(stack && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -34,7 +34,7 @@ void destroy_fstack(fstack_s * stack, const destroy_fn destroy) {
     memset(stack, 0, sizeof(fstack_s));
 }
 
-void clear_fstack(fstack_s * stack, const destroy_fn destroy) {
+void clear_fstack(fstack_s * stack, const set_fn destroy) {
     assert(stack && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 

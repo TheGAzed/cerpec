@@ -9,7 +9,7 @@ ideque_s create_ideque(const size_t size) {
     return (ideque_s) { .size = size, .allocator = &standard, };
 }
 
-void destroy_ideque(ideque_s * deque, const destroy_fn destroy) {
+void destroy_ideque(ideque_s * deque, const set_fn destroy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(destroy && "[ERROR] Parameter is NULL.");
 
@@ -36,7 +36,7 @@ void destroy_ideque(ideque_s * deque, const destroy_fn destroy) {
     deque->allocator = NULL;
 }
 
-void clear_ideque(ideque_s * deque, const destroy_fn destroy) {
+void clear_ideque(ideque_s * deque, const set_fn destroy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(destroy && "[ERROR] Parameter is NULL.");
 

@@ -15,7 +15,7 @@ icircular_list_s create_icircular_list(const size_t size) {
     return (icircular_list_s) { .empty = NIL, .size = size };
 }
 
-void destroy_icircular_list(icircular_list_s * list, const destroy_fn destroy) {
+void destroy_icircular_list(icircular_list_s * list, const set_fn destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
@@ -34,7 +34,7 @@ void destroy_icircular_list(icircular_list_s * list, const destroy_fn destroy) {
     memset(list, 0, sizeof(icircular_list_s)); // set everything to zero
 }
 
-void clear_icircular_list(icircular_list_s * list, const destroy_fn destroy) {
+void clear_icircular_list(icircular_list_s * list, const set_fn destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 

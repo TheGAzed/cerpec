@@ -11,7 +11,7 @@
 
 typedef void * (*alloc_fn)   (const size_t, void *);
 typedef void * (*realloc_fn) (void *, const size_t, void *);
-typedef void   (*free_fn) (void *, void *);
+typedef void   (*free_fn)    (void *, void *);
 
 typedef struct memory {
     void * arguments;
@@ -22,7 +22,7 @@ typedef struct memory {
 
 extern const memory_s standard;
 
-typedef void   (*destroy_fn) (void * element);
+typedef void   (*set_fn)     (void * element);
 typedef void * (*copy_fn)    (void * destination, const void * source);
 typedef size_t (*hash_fn)    (const void * element);
 typedef int    (*compare_fn) (const void * a, const void * b);
@@ -31,6 +31,6 @@ typedef bool   (*handle_fn)  (void * element, void * arguments);
 typedef void   (*process_fn) (void * array, const size_t lenght, void * arguments);
 typedef void   (*operate_fn) (void * a, void * b, const void * result);
 
-memory_s custom_memory(const alloc_fn alloc, const realloc_fn realloc, const free_fn free, void * arguments);
+memory_s compose_memory(const alloc_fn alloc, const realloc_fn realloc, const free_fn free, void * arguments);
 
 #endif // CERPEC_H

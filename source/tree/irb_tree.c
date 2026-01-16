@@ -103,7 +103,7 @@ irb_tree_s create_irb_tree(const size_t size, const compare_fn compare) {
     return tree;
 }
 
-void destroy_irb_tree(irb_tree_s * tree, const destroy_fn destroy) {
+void destroy_irb_tree(irb_tree_s * tree, const set_fn destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -125,7 +125,7 @@ void destroy_irb_tree(irb_tree_s * tree, const destroy_fn destroy) {
     memset(tree, 0, sizeof(irb_tree_s));
 }
 
-void clear_irb_tree(irb_tree_s * tree, const destroy_fn destroy) {
+void clear_irb_tree(irb_tree_s * tree, const set_fn destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 

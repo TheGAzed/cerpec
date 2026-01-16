@@ -74,7 +74,7 @@ irb_set_s create_irb_set(const size_t size, const compare_fn compare) {
     return set;
 }
 
-void destroy_irb_set(irb_set_s * set, const destroy_fn destroy) {
+void destroy_irb_set(irb_set_s * set, const set_fn destroy) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -99,7 +99,7 @@ void destroy_irb_set(irb_set_s * set, const destroy_fn destroy) {
     memset(set, 0, sizeof(irb_set_s));
 }
 
-void clear_irb_set(irb_set_s * set, const destroy_fn destroy) {
+void clear_irb_set(irb_set_s * set, const set_fn destroy) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 

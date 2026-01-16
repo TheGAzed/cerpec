@@ -56,7 +56,7 @@ iavl_tree_s create_iavl_tree(const size_t size, const compare_fn compare) {
     return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size };
 }
 
-void destroy_iavl_tree(iavl_tree_s * tree, const destroy_fn destroy) {
+void destroy_iavl_tree(iavl_tree_s * tree, const set_fn destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -77,7 +77,7 @@ void destroy_iavl_tree(iavl_tree_s * tree, const destroy_fn destroy) {
     memset(tree, 0, sizeof(iavl_tree_s));
 }
 
-void clear_iavl_tree(iavl_tree_s * tree, const destroy_fn destroy) {
+void clear_iavl_tree(iavl_tree_s * tree, const set_fn destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 

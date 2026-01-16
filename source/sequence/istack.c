@@ -9,7 +9,7 @@ istack_s create_istack(const size_t size) {
     return (istack_s) { .size = size, .allocator = &standard };
 }
 
-void destroy_istack(istack_s * stack, const destroy_fn destroy) {
+void destroy_istack(istack_s * stack, const set_fn destroy) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
@@ -27,7 +27,7 @@ void destroy_istack(istack_s * stack, const destroy_fn destroy) {
     stack->allocator = NULL;
 }
 
-void clear_istack(istack_s * stack, const destroy_fn destroy) {
+void clear_istack(istack_s * stack, const set_fn destroy) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 

@@ -15,7 +15,7 @@ istraight_list_s create_istraight_list(const size_t size) {
     return (istraight_list_s) { .head = NIL, .empty = NIL, .size = size };
 }
 
-void destroy_istraight_list(istraight_list_s * list, const destroy_fn destroy) {
+void destroy_istraight_list(istraight_list_s * list, const set_fn destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
@@ -32,7 +32,7 @@ void destroy_istraight_list(istraight_list_s * list, const destroy_fn destroy) {
     memset(list, 0, sizeof(istraight_list_s)); // set everything to zero/invalid
 }
 
-void clear_istraight_list(istraight_list_s * list, const destroy_fn destroy) {
+void clear_istraight_list(istraight_list_s * list, const set_fn destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 

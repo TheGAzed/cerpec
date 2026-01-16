@@ -17,7 +17,7 @@ fqueue_s create_fqueue(const size_t max, const size_t size) {
     return queue;
 }
 
-void destroy_fqueue(fqueue_s * queue, const destroy_fn destroy) {
+void destroy_fqueue(fqueue_s * queue, const set_fn destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -42,7 +42,7 @@ void destroy_fqueue(fqueue_s * queue, const destroy_fn destroy) {
     memset(queue, 0, sizeof(fqueue_s));
 }
 
-void clear_fqueue(fqueue_s * queue, const destroy_fn destroy) {
+void clear_fqueue(fqueue_s * queue, const set_fn destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 

@@ -35,7 +35,7 @@ ibsearch_tree_s create_ibsearch_tree(const size_t size, const compare_fn compare
     return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size };
 }
 
-void destroy_ibsearch_tree(ibsearch_tree_s * tree, const destroy_fn destroy) {
+void destroy_ibsearch_tree(ibsearch_tree_s * tree, const set_fn destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -55,7 +55,7 @@ void destroy_ibsearch_tree(ibsearch_tree_s * tree, const destroy_fn destroy) {
     memset(tree, 0, sizeof(ibsearch_tree_s));
 }
 
-void clear_ibsearch_tree(ibsearch_tree_s * tree, const destroy_fn destroy) {
+void clear_ibsearch_tree(ibsearch_tree_s * tree, const set_fn destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 

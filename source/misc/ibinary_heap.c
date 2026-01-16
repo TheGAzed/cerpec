@@ -28,7 +28,7 @@ ibinary_heap_s create_ibinary_heap(const size_t size, const compare_fn compare) 
     return (ibinary_heap_s) { .size = size, .compare = compare, };
 }
 
-void destroy_ibinary_heap(ibinary_heap_s * heap, const destroy_fn destroy) {
+void destroy_ibinary_heap(ibinary_heap_s * heap, const set_fn destroy) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -45,7 +45,7 @@ void destroy_ibinary_heap(ibinary_heap_s * heap, const destroy_fn destroy) {
     memset(heap, 0, sizeof((*heap)));
 }
 
-void clear_ibinary_heap(ibinary_heap_s * heap, const destroy_fn destroy) {
+void clear_ibinary_heap(ibinary_heap_s * heap, const set_fn destroy) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
