@@ -1,27 +1,25 @@
-target_sources(CERPEC PRIVATE cerpec.c
-        PRIVATE sequence/istack.c
-        PRIVATE sequence/iqueue.c
-        PRIVATE sequence/ideque.c
+add_library(${PROJECT_NAME} cerpec.c
+        sequence/istack.c
+        sequence/iqueue.c
+        sequence/ideque.c
 
-        PRIVATE list/istraight_list.c
-        PRIVATE list/icircular_list.c
-        PRIVATE list/idouble_list.c
+        list/istraight_list.c
+        list/icircular_list.c
+        list/idouble_list.c
 
-        PRIVATE set/ihash_set.c
-        PRIVATE set/irb_set.c
-        PRIVATE set/ibitwise_set.c
+        set/ihash_set.c
+        set/irb_set.c
+        set/ibitwise_set.c
 
-        PRIVATE tree/ibsearch_tree.c
-        PRIVATE tree/iavl_tree.c
-        PRIVATE tree/irb_tree.c
+        tree/ibsearch_tree.c
+        tree/iavl_tree.c
+        tree/irb_tree.c
 
-        PRIVATE graph/imatrix_graph.c
+        graph/imatrix_graph.c
 
-        PRIVATE misc/ihash_table.c
-        PRIVATE misc/ibinary_heap.c
-)
+        misc/ihash_table.c
+        misc/ibinary_heap.c
 
-target_sources(CERPEC
-        PRIVATE sequence/fstack.c
-        PRIVATE sequence/fqueue.c
+        sequence/fstack.c
+        sequence/fqueue.c
 )

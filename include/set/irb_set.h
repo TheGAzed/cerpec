@@ -32,12 +32,12 @@ irb_set_s create_irb_set(const size_t size, const compare_fn compare);
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_irb_set(irb_set_s * set, const destroy_fn destroy);
+void destroy_irb_set(irb_set_s * set, const set_fn destroy);
 
 /// @brief Clears a structure, and destroys its elements, but remains usable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_irb_set(irb_set_s * set, const destroy_fn destroy);
+void clear_irb_set(irb_set_s * set, const set_fn destroy);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param set Structure to copy.

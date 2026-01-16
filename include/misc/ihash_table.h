@@ -26,13 +26,13 @@ ihash_table_s create_ihash_table(const size_t key_size, const size_t value_size,
 /// @param table Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
 /// @param destroy_value Function pointer to destroy a single value.
-void destroy_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, const destroy_fn destroy_value);
+void destroy_ihash_table(ihash_table_s * table, const set_fn destroy_key, const set_fn destroy_value);
 
 /// @brief Clears a structure, and destroys its elements, but remains usable.
 /// @param table Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
 /// @param destroy_value Function pointer to destroy a single value.
-void clear_ihash_table(ihash_table_s * table, const destroy_fn destroy_key, const destroy_fn destroy_value);
+void clear_ihash_table(ihash_table_s * table, const set_fn destroy_key, const set_fn destroy_value);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param table Structure to copy.

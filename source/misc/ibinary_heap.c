@@ -101,7 +101,7 @@ void push_ibinary_heap(ibinary_heap_s * heap, const void * element) {
     assert(heap->size && "[INVALID] Parameter can't be zero.");
 
     if (heap->length == heap->capacity) {
-        _ibinary_heap_resize(heap, heap->capacity + IBINARY_HEAP_CHUNK);
+        _ibinary_heap_resize(heap, heap->length + IBINARY_HEAP_CHUNK);
     }
 
     // append element to the end of the structure
@@ -257,22 +257,28 @@ void map_ibinary_heap(const ibinary_heap_s * heap, const handle_fn handle, void 
 void _ibinary_heap_resize(ibinary_heap_s * heap, const size_t size) {
     heap->capacity = size;
 
-    heap->elements = realloc(heap->elements, heap->capacity * heap->size);
-    assert((!heap->capacity || heap->elements) && "[ERROR] Memory allocation failed.");
+    heap->elements = realloc(heap->elements, size * heap->size);
+    assert((!size || heap->elements) && "[ERROR] Memory allocation failed.");
 }
 
 void _ibinary_heapify_up(const ibinary_heap_s * heap, const size_t index, void * temporary) {
     // while current top child index is not zero and current element is greater than its parent
-    size_t c = index, p = (c - 1 / 2);
-    while (c && heap->compare(heap->elements + (c * heap->size), heap->elements + (p * heap->size)) < 0) {
+    size_t c = index;
+    size_t p = (c - 1) / 2;
+
+    void * child = heap->elements + (c * heap->size);
+    void * parent = heap->elements + (p * heap->size);
+    while (c && heap->compare(child, parent) < 0) {
         // swap current child element with parent
-        memcpy(temporary, heap->elements + (c * heap->size), heap->size);
-        memmove(heap->elements + (c * heap->size), heap->elements + (p * heap->size), heap->size);
-        memcpy(heap->elements + (p * heap->size), temporary, heap->size);
+        memcpy(temporary, child, heap->size);
+        memmove(child, parent, heap->size);
+        memcpy(parent, temporary, heap->size);
 
         // change current child to parent and parent to grand-parent
         c = p;
         p = (c - 1) / 2;
+        child = heap->elements + (c * heap->size);
+        parent = heap->elements + (p * heap->size);
     }
 }
 

@@ -308,38 +308,27 @@ void map_value_ihash_table(const ihash_table_s * table, const handle_fn handle, 
 }
 
 void _ihash_table_resize(ihash_table_s * table, const size_t size) {
-    char * keys = NULL;
-    char * values = NULL;
+    char * keys = malloc(size * table->key_size);
+    assert((!size || keys) && "[ERROR] Memory allocation failed.");
 
-    if (size != table->length) {
-        keys = realloc(table->keys, table->capacity * table->key_size);
-        values = realloc(table->values, table->capacity * table->value_size);
+    char * values = malloc(size * table->value_size);
+    assert((!size || values) && "[ERROR] Memory allocation failed.");
 
-        assert(keys && "[ERROR] Memory allocation failed.");
-        assert(values && "[ERROR] Memory allocation failed.");
-    } else {
-        keys = malloc(size * table->key_size);
-        values = malloc(size * table->value_size);
-
-        for (size_t i = 0; i < table->capacity; ++i) {
-            for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
-                memcpy(keys, table->keys + (n * table->key_size), table->key_size);
-                memcpy(values, table->values + (n * table->value_size), table->value_size);
-            }
+    for (size_t i = 0; i < table->capacity; ++i) {
+        for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
+            memcpy(keys, table->keys + (n * table->key_size), table->key_size);
+            memcpy(values, table->values + (n * table->value_size), table->value_size);
         }
-        assert((!table->capacity || table->keys) && "[ERROR] Memory allocation failed.");
-
-        free(table->keys);
     }
+
+    free(table->keys);
+    free(table->values);
 
     table->capacity = size;
     table->head     = realloc(table->head, table->capacity * sizeof(size_t));
     table->next     = realloc(table->next, table->capacity * sizeof(size_t));
     table->keys     = keys;
-    table->keys     = values;
-
-    assert((!table->capacity || table->head) && "[ERROR] Memory allocation failed.");
-    assert((!table->capacity || table->next) && "[ERROR] Memory allocation failed.");
+    table->values   = values;
 
     table->empty = NIL;
     for (size_t i = 0; i < table->capacity; ++i) {

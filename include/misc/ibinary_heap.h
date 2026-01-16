@@ -5,6 +5,8 @@
 
 #if !defined(IBINARY_HEAP_CHUNK)
 #   define IBINARY_HEAP_CHUNK CERPEC_CHUNK
+#elif IBINARY_HEAP_CHUNK <= 0
+#   error "Chunk size must be greater than zero."
 #endif
 
 /// @brief Inifinite binary heap structure.
@@ -23,12 +25,12 @@ ibinary_heap_s create_ibinary_heap(const size_t size, const compare_fn compare);
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param heap Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_ibinary_heap(ibinary_heap_s * heap, const destroy_fn destroy);
+void destroy_ibinary_heap(ibinary_heap_s * heap, const set_fn destroy);
 
 /// @brief Clears a structure, and destroys its elements, but remains usable.
 /// @param heap Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_ibinary_heap(ibinary_heap_s * heap, const destroy_fn destroy);
+void clear_ibinary_heap(ibinary_heap_s * heap, const set_fn destroy);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param heap Structure to copy.

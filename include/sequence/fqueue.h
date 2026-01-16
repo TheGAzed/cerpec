@@ -18,12 +18,12 @@ fqueue_s create_fqueue(const size_t max, const size_t size);
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_fqueue(fqueue_s * queue, const destroy_fn destroy);
+void destroy_fqueue(fqueue_s * queue, const set_fn destroy);
 
 /// @brief Clears a structure, and destroys its elements, but remains usable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_fqueue(fqueue_s * queue, const destroy_fn destroy);
+void clear_fqueue(fqueue_s * queue, const set_fn destroy);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param queue Structure to copy.

@@ -32,12 +32,12 @@ irb_tree_s create_irb_tree(const size_t size, const compare_fn compare);
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param tree Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_irb_tree(irb_tree_s * tree, const destroy_fn destroy);
+void destroy_irb_tree(irb_tree_s * tree, const set_fn destroy);
 
 /// @brief Clears a structure, and destroys its elements, but remains usable.
 /// @param tree Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_irb_tree(irb_tree_s * tree, const destroy_fn destroy);
+void clear_irb_tree(irb_tree_s * tree, const set_fn destroy);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param tree Structure to copy.
