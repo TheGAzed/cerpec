@@ -274,7 +274,7 @@ bool is_subset_ibitwise_set(const ibitwise_set_s * super, const ibitwise_set_s *
     // if ANDed sub- and super-set doesn't equals sub's bits then it isn't a subset
     size_t i = 0;
     for (; i < sub->capacity / BIT_COUNT && i < super->capacity / BIT_COUNT; ++i) {
-        if (sub->bits[i] & super->bits[i] != sub->bits[i]) {
+        if ((sub->bits[i] & super->bits[i]) != sub->bits[i]) {
             return false;
         }
     }
@@ -298,7 +298,7 @@ bool is_proper_subset_ibitwise_set(const ibitwise_set_s * super, const ibitwise_
     // if ANDed sub- and super-set doesn't equals sub's bits then it isn't a subset
     size_t i = 0;
     for (; i < sub->capacity / BIT_COUNT && i < super->capacity / BIT_COUNT; ++i) {
-        if (sub->bits[i] & super->bits[i] != sub->bits[i]) {
+        if ((sub->bits[i] & super->bits[i]) != sub->bits[i]) {
             return false;
         }
     }

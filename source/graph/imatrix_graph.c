@@ -325,7 +325,7 @@ iam_list_s dijkstra_iam_list(const iam_graph_s * graph, const iam_cost_s * cost,
     }
     memcpy(table.cost + (table.data->size * start), table.data->zero, table.data->size);
 
-    void * buffer = malloc(2 * cost->size); // allocate for both minimum and sum
+    char * buffer = malloc(2 * cost->size); // allocate for both minimum and sum
     assert(buffer && "[ERROR] Memory allocation failed.");
 
     struct smallest minimum = {
@@ -333,7 +333,7 @@ iam_list_s dijkstra_iam_list(const iam_graph_s * graph, const iam_cost_s * cost,
     };
     memcpy(minimum.cost, table.data->zero, table.data->size);
 
-    void * sum_cost = buffer + cost->size;
+    char * sum_cost = buffer + cost->size;
     for (size_t i = 0; i < graph->length - 1 && end != minimum.vertex && IMATRIX_NIL != minimum.vertex; ++i) {
         const size_t current_vertex = minimum.vertex;
         const void * current_cost = table.cost + (minimum.vertex * table.data->size);
@@ -410,7 +410,7 @@ iam_list_s prim_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, con
     }
     memcpy(table.cost + (table.data->size * start), table.data->zero, table.data->size);
 
-    void * buffer = malloc(2 * cost->size); // allocate for both minimum and sum
+    char * buffer = malloc(2 * cost->size); // allocate for both minimum and sum
     assert(buffer && "[ERROR] Memory allocation failed.");
 
     struct smallest minimum = {
@@ -418,7 +418,7 @@ iam_list_s prim_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, con
     };
     memcpy(minimum.cost, table.data->zero, table.data->size);
 
-    void * distance_cost = buffer + cost->size;
+    char * distance_cost = buffer + cost->size;
 
     for (size_t i = 0; i < graph->length - 1 && IMATRIX_NIL != minimum.vertex; ++i) {
         const size_t current_vertex = minimum.vertex;
