@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void destroy(void * element) {
+void destroy(void * const element) {
     (void)(element);
 }
 
-void * copy(void * destination, const void * source) {
+void * copy(void * destination, void const * source) {
     (*(int*)destination) = (*(int*)source);
     return destination;
 }
@@ -21,51 +21,51 @@ void * add(void * a, const void * b) {
     return ai;
 }
 
-int compare(const void * a, const void * b) {
+int compare(void const * const a, void const * const b) {
     return (*(int*)(a)) - (*(int*)(b));
 }
 
-int compare_reverse(const void * a, const void * b) {
+int compare_reverse(void const * const a, void const * const b) {
     return (*(int*)(b)) - (*(int*)(a));
 }
 
-bool increment(void * element, void * value) {
+bool increment(void * const element, void * const value) {
     int * e = element, * v = value;
     (*e) += (*v);
 
     return true;
 }
 
-bool print(void * element, void * format) {
+bool print(void * const element, void * const format) {
     printf(format, (*(int*)element));
     (void)(element); (void)(format);
 
     return true;
 }
 
-bool nothing(void * element, void * argument) {
+bool nothing(void * const element, void * const argument) {
     (void)(element);
     (void)(argument);
 
     return true;
 }
 
-void sort(void * array, const size_t length, void * compare) {
+void sort(void * const array, size_t const length, void * const compare) {
     struct compare const * cmp = compare;
     qsort(array, length, sizeof(int), cmp->compare_element);
 }
 
-bool odd(const void * element, void * nil) {
+bool odd(void const * const element, void * const nil) {
     (void)(nil);
     return (*(int*)element) % 2;
 }
 
-bool even(const void * element, void * nil) {
+bool even(void const * const element, void * const nil) {
     (void)(nil);
     return !((*(int*)element) % 2);
 }
 
-bool prime(const void * element, void * nil) {
+bool prime(void const * const element, void * const nil) {
     (void)(nil);
 
     const int number = (*(int*)element);
@@ -78,6 +78,6 @@ bool prime(const void * element, void * nil) {
     return number > 1;
 }
 
-size_t hash(const void * element) {
+size_t hash(void const * const element) {
     return (size_t)(*(int*)(element));
 }

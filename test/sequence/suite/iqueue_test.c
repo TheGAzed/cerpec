@@ -179,69 +179,6 @@ TEST DEQUEUE_03(void) {
     PASS();
 }
 
-TEST FOREACH_01(void) {
-    iqueue_s test = create_iqueue(sizeof(int));
-
-    for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
-        enqueue_iqueue(&test, &i);
-    }
-
-    int value = 1;
-    map_iqueue(&test, increment, &value);
-
-    for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
-        int a = 0;
-        dequeue_iqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
-    }
-
-    destroy_iqueue(&test, destroy);
-
-    PASS();
-}
-
-TEST FOREACH_02(void) {
-    iqueue_s test = create_iqueue(sizeof(int));
-
-    for (int i = 0; i < IQUEUE_CHUNK; ++i) {
-        enqueue_iqueue(&test, &i);
-    }
-
-    int value = 1;
-    map_iqueue(&test, increment, &value);
-
-    for (int i = 0; i < IQUEUE_CHUNK; ++i) {
-        int a = 0;
-        dequeue_iqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
-    }
-
-    destroy_iqueue(&test, destroy);
-
-    PASS();
-}
-
-TEST FOREACH_03(void) {
-    iqueue_s test = create_iqueue(sizeof(int));
-
-    for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
-        enqueue_iqueue(&test, &i);
-    }
-
-    int value = 1;
-    map_iqueue(&test, increment, &value);
-
-    for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
-        int a = 0;
-        dequeue_iqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
-    }
-
-    destroy_iqueue(&test, destroy);
-
-    PASS();
-}
-
 TEST MAP_01(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
@@ -249,13 +186,13 @@ TEST MAP_01(void) {
         enqueue_iqueue(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_iqueue(&test, sort, &cmp);
+    int value = 1;
+    map_iqueue(&test, increment, &value);
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_iqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
     }
 
     destroy_iqueue(&test, destroy);
@@ -270,6 +207,69 @@ TEST MAP_02(void) {
         enqueue_iqueue(&test, &i);
     }
 
+    int value = 1;
+    map_iqueue(&test, increment, &value);
+
+    for (int i = 0; i < IQUEUE_CHUNK; ++i) {
+        int a = 0;
+        dequeue_iqueue(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+    }
+
+    destroy_iqueue(&test, destroy);
+
+    PASS();
+}
+
+TEST MAP_03(void) {
+    iqueue_s test = create_iqueue(sizeof(int));
+
+    for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
+        enqueue_iqueue(&test, &i);
+    }
+
+    int value = 1;
+    map_iqueue(&test, increment, &value);
+
+    for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
+        int a = 0;
+        dequeue_iqueue(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+    }
+
+    destroy_iqueue(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_01(void) {
+    iqueue_s test = create_iqueue(sizeof(int));
+
+    for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
+        enqueue_iqueue(&test, &i);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_iqueue(&test, sort, &cmp);
+
+    for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
+        int a = 0;
+        dequeue_iqueue(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+    }
+
+    destroy_iqueue(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_02(void) {
+    iqueue_s test = create_iqueue(sizeof(int));
+
+    for (int i = 0; i < IQUEUE_CHUNK; ++i) {
+        enqueue_iqueue(&test, &i);
+    }
+
     struct compare cmp = { .compare_element = compare, };
     apply_iqueue(&test, sort, &cmp);
 
@@ -284,7 +284,7 @@ TEST MAP_02(void) {
     PASS();
 }
 
-TEST MAP_03(void) {
+TEST APPLY_03(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
@@ -305,7 +305,7 @@ TEST MAP_03(void) {
     PASS();
 }
 
-TEST MAP_04(void) {
+TEST APPLY_04(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
@@ -326,7 +326,7 @@ TEST MAP_04(void) {
     PASS();
 }
 
-TEST MAP_05(void) {
+TEST APPLY_05(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK; ++i) {
@@ -347,7 +347,7 @@ TEST MAP_05(void) {
     PASS();
 }
 
-TEST MAP_06(void) {
+TEST APPLY_06(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
     for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
@@ -373,6 +373,6 @@ SUITE (iqueue_test) {
     RUN_TEST(ENQUEUE_01); RUN_TEST(ENQUEUE_02); RUN_TEST(ENQUEUE_03);
     RUN_TEST(PEEK_01); RUN_TEST(PEEK_02); RUN_TEST(PEEK_03);
     RUN_TEST(DEQUEUE_01); RUN_TEST(DEQUEUE_02); RUN_TEST(DEQUEUE_03);
-    RUN_TEST(FOREACH_01); RUN_TEST(FOREACH_02); RUN_TEST(FOREACH_03);
-    RUN_TEST(MAP_01); RUN_TEST(MAP_02); RUN_TEST(MAP_03); RUN_TEST(MAP_04); RUN_TEST(MAP_05); RUN_TEST(MAP_06);
+    RUN_TEST(MAP_01); RUN_TEST(MAP_02); RUN_TEST(MAP_03);
+    RUN_TEST(APPLY_01); RUN_TEST(APPLY_02); RUN_TEST(APPLY_03); RUN_TEST(APPLY_04); RUN_TEST(APPLY_05); RUN_TEST(APPLY_06);
 }

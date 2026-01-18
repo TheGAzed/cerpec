@@ -1,6 +1,7 @@
 #include <cerpec.h>
 
 #include <stdlib.h>
+#include <assert.h>
 
 void * _standard_alloc(const size_t size, void * arguments);
 void _standard_dealloc(void * pointer, void * arguments);
@@ -29,6 +30,10 @@ void * _standard_realloc(void * pointer, const size_t size, void * arguments) {
 }
 
 memory_s compose_memory(const alloc_fn alloc, const realloc_fn realloc, const free_fn free, void * arguments) {
+    assert(alloc && "[ERROR] Paremeter can't be NULL.");
+    assert(realloc && "[ERROR] Paremeter can't be NULL.");
+    assert(free && "[ERROR] Paremeter can't be NULL.");
+
     return (memory_s) {
         .alloc = alloc,
         .free = free,

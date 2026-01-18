@@ -9,6 +9,12 @@ istack_s create_istack(const size_t size) {
     return (istack_s) { .size = size, .allocator = &standard };
 }
 
+istack_s make_istack(const size_t size, const memory_s * allocator) {
+    assert(size && "[ERROR] Paremeter can't be zero.");
+
+    return (istack_s) { .size = size, .allocator = allocator };
+}
+
 void destroy_istack(istack_s * stack, const set_fn destroy) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");

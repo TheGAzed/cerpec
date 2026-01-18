@@ -533,7 +533,7 @@ TEST DEQUEUE_BACK_06(void) {
     PASS();
 }
 
-TEST FOREACH_FRONT_01(void) {
+TEST MAP_FRONT_01(void) {
     ideque_s test = create_ideque(sizeof(int));
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
@@ -554,7 +554,7 @@ TEST FOREACH_FRONT_01(void) {
     PASS();
 }
 
-TEST FOREACH_FRONT_02(void) {
+TEST MAP_FRONT_02(void) {
     ideque_s test = create_ideque(sizeof(int));
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
@@ -575,7 +575,7 @@ TEST FOREACH_FRONT_02(void) {
     PASS();
 }
 
-TEST FOREACH_FRONT_03(void) {
+TEST MAP_FRONT_03(void) {
     ideque_s test = create_ideque(sizeof(int));
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
@@ -596,7 +596,7 @@ TEST FOREACH_FRONT_03(void) {
     PASS();
 }
 
-TEST FOREACH_BACK_01(void) {
+TEST MAP_BACK_01(void) {
     ideque_s test = create_ideque(sizeof(int));
 
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
@@ -617,7 +617,7 @@ TEST FOREACH_BACK_01(void) {
     PASS();
 }
 
-TEST FOREACH_BACK_02(void) {
+TEST MAP_BACK_02(void) {
     ideque_s test = create_ideque(sizeof(int));
 
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
@@ -638,7 +638,7 @@ TEST FOREACH_BACK_02(void) {
     PASS();
 }
 
-TEST FOREACH_BACK_03(void) {
+TEST MAP_BACK_03(void) {
     ideque_s test = create_ideque(sizeof(int));
 
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
@@ -652,6 +652,132 @@ TEST FOREACH_BACK_03(void) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
         ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+    }
+
+    destroy_ideque(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_01(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        enqueue_back_ideque(&test, &i);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_ideque(&test, sort, &cmp);
+
+    for (int i = IDEQUE_CHUNK - 2; i >= 0; --i) {
+        int a = 0;
+        dequeue_back_ideque(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+    }
+
+    destroy_ideque(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_02(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        enqueue_back_ideque(&test, &i);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_ideque(&test, sort, &cmp);
+
+    for (int i = IDEQUE_CHUNK - 1; i >= 0; --i) {
+        int a = 0;
+        dequeue_back_ideque(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+    }
+
+    destroy_ideque(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_03(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        enqueue_back_ideque(&test, &i);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_ideque(&test, sort, &cmp);
+
+    for (int i = IDEQUE_CHUNK; i >= 0; --i) {
+        int a = 0;
+        dequeue_back_ideque(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+    }
+
+    destroy_ideque(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_04(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        enqueue_back_ideque(&test, &i);
+    }
+
+    struct compare cmp = { .compare_element = compare_reverse, };
+    apply_ideque(&test, sort, &cmp);
+
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        int a = 0;
+        dequeue_back_ideque(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+    }
+
+    destroy_ideque(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_05(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        enqueue_back_ideque(&test, &i);
+    }
+
+    struct compare cmp = { .compare_element = compare_reverse, };
+    apply_ideque(&test, sort, &cmp);
+
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        int a = 0;
+        dequeue_back_ideque(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+    }
+
+    destroy_ideque(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_06(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        enqueue_back_ideque(&test, &i);
+    }
+
+    struct compare cmp = { .compare_element = compare_reverse, };
+    apply_ideque(&test, sort, &cmp);
+
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        int a = 0;
+        dequeue_back_ideque(&test, &a);
+        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -671,7 +797,7 @@ SUITE (ideque_test) {
     RUN_TEST(DEQUEUE_FRONT_04); RUN_TEST(DEQUEUE_FRONT_05); RUN_TEST(DEQUEUE_FRONT_06);
     RUN_TEST(DEQUEUE_BACK_01); RUN_TEST(DEQUEUE_BACK_02); RUN_TEST(DEQUEUE_BACK_03);
     RUN_TEST(DEQUEUE_BACK_04); RUN_TEST(DEQUEUE_BACK_05); RUN_TEST(DEQUEUE_BACK_06);
-    RUN_TEST(FOREACH_FRONT_01); RUN_TEST(FOREACH_FRONT_02); RUN_TEST(FOREACH_FRONT_03);
-    RUN_TEST(FOREACH_BACK_01); RUN_TEST(FOREACH_BACK_02); RUN_TEST(FOREACH_BACK_03);
-    //RUN_TEST(MAP_01); RUN_TEST(MAP_02); RUN_TEST(MAP_03); RUN_TEST(MAP_04); RUN_TEST(MAP_05); RUN_TEST(MAP_06);
+    RUN_TEST(MAP_FRONT_01); RUN_TEST(MAP_FRONT_02); RUN_TEST(MAP_FRONT_03);
+    RUN_TEST(MAP_BACK_01); RUN_TEST(MAP_BACK_02); RUN_TEST(MAP_BACK_03);
+    RUN_TEST(APPLY_01); RUN_TEST(APPLY_02); RUN_TEST(APPLY_03); RUN_TEST(APPLY_04); RUN_TEST(APPLY_05); RUN_TEST(APPLY_06);
 }

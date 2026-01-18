@@ -16,14 +16,20 @@ struct infinite_queue_node {
 /// @brief Queue data structure.
 typedef struct infinite_queue {
     struct infinite_queue_node * tail; // tail node to append next elements while enqueue-ing
-    memory_s const * allocator;
     size_t size, current, length;      // current index, element size and structure length
+    const memory_s * allocator;
 } iqueue_s;
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @return Queue structure.
 iqueue_s create_iqueue(const size_t size);
+
+/// @brief Creates an empty structure.
+/// @param size Size of a single element.
+/// @param allocator Custom allocator structure.
+/// @return Stack structure.
+iqueue_s make_iqueue(const size_t size, const memory_s * allocator);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param queue Structure to destroy.

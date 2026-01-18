@@ -2,6 +2,9 @@ add_executable(sequence_test main.c
         suite/istack_test.c
         suite/iqueue_test.c
         suite/ideque_test.c
+        suite/fstack_test.c
+        suite/fqueue_test.c
+        suite/fdeque_test.c
 )
 
 target_include_directories(sequence_test PUBLIC suite)

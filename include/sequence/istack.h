@@ -11,13 +11,19 @@
 typedef struct infinite_stack {
     char * elements;               // array of elements
     size_t size, length, capacity; // size of single element, structure length and its capacity
-    memory_s const * allocator;
+    const memory_s * allocator;
 } istack_s;
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @return Stack structure.
 istack_s create_istack(const size_t size);
+
+/// @brief Creates an empty structure.
+/// @param size Size of a single element.
+/// @param allocator Custom allocator structure.
+/// @return Stack structure.
+istack_s make_istack(const size_t size, const memory_s * allocator);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param stack Structure to destroy.

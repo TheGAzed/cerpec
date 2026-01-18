@@ -9,6 +9,12 @@ iqueue_s create_iqueue(const size_t size) {
     return (iqueue_s) { .size = size, .allocator = &standard };
 }
 
+iqueue_s make_iqueue(const size_t size, const memory_s * allocator) {
+    assert(size && "[ERROR] Size can't be zero.");
+
+    return (iqueue_s) { .size = size, .allocator = allocator };
+}
+
 void destroy_iqueue(iqueue_s * queue, const set_fn destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
@@ -196,7 +202,7 @@ void map_iqueue(const iqueue_s * queue, const handle_fn handle, void * args) {
     struct infinite_queue_node const * previous = queue->tail;
     // while remaining size wasn't decremented to zero
     for (size_t start = queue->current; remaining; start = 0, previous = previous->next) {
-        struct infinite_queue_node * current = previous->next;
+        const struct infinite_queue_node * current = previous->next;
 
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size

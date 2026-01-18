@@ -5,6 +5,8 @@
 
 #if !defined(IDEQUE_CHUNK)
 #   define IDEQUE_CHUNK CERPEC_CHUNK
+#elif IDEQUE_CHUNK <= 0
+#   error "Chunk size must be greater than zero."
 #endif
 
 /// @brief Doubly linked list type node for deque structure.
@@ -15,16 +17,22 @@ struct infinite_deque_node {
 };
 
 /// @brief Deque data structure.
-typedef struct deque {
+typedef struct infinite_deque {
     struct infinite_deque_node * head;
     size_t current, size, length; // current index, element size and structure length
-    memory_s const * allocator;
+    const memory_s * allocator;
 } ideque_s;
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @return Deque structure.
 ideque_s create_ideque(const size_t size);
+
+/// @brief Creates an empty structure.
+/// @param size Size of a single element.
+/// @param allocator Custom allocator structure.
+/// @return Stack structure.
+ideque_s make_ideque(const size_t size, const memory_s * allocator);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param deque Structure to destroy.
@@ -79,9 +87,9 @@ void peek_back_ideque(const ideque_s * deque, void * buffer);
 
 /// @brief Iterates over each element in structure starting from the front.
 /// @param deque Structure to iterate over.
-/// @param operate Function pointer to operate on each element reference using element size and generic arguments.
+/// @param handle Function pointer to operate on each element reference using element size and generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_front_ideque(const ideque_s * deque, const handle_fn operate, void * arguments);
+void map_front_ideque(const ideque_s * deque, const handle_fn handle, void * arguments);
 
 /// @brief Iterates over each element in structure starting from the back.
 /// @param deque Structure to iterate over.

@@ -22,4 +22,5 @@ add_library(${PROJECT_NAME} cerpec.c
 
         sequence/fstack.c
         sequence/fqueue.c
+        sequence/fdeque.c
 )

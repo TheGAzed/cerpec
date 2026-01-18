@@ -101,7 +101,7 @@ void push_ibinary_heap(ibinary_heap_s * heap, const void * element) {
     assert(heap->size && "[INVALID] Parameter can't be zero.");
 
     if (heap->length == heap->capacity) {
-        _ibinary_heap_resize(heap, heap->length + IBINARY_HEAP_CHUNK);
+        _ibinary_heap_resize(heap, heap->capacity + IBINARY_HEAP_CHUNK);
     }
 
     // append element to the end of the structure

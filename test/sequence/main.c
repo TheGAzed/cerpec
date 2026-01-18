@@ -9,5 +9,9 @@ int main(const int argc, char **argv) {
     RUN_SUITE(iqueue_test);
     RUN_SUITE(ideque_test);
 
+    RUN_SUITE(fstack_test);
+    RUN_SUITE(fqueue_test);
+    RUN_SUITE(fdeque_test);
+
     GREATEST_MAIN_END();
 }

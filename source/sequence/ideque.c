@@ -9,6 +9,12 @@ ideque_s create_ideque(const size_t size) {
     return (ideque_s) { .size = size, .allocator = &standard, };
 }
 
+ideque_s make_ideque(const size_t size, const memory_s * allocator) {
+    assert(size && "[ERROR] Size can't be zero.");
+
+    return (ideque_s) { .size = size, .allocator = allocator, };
+}
+
 void destroy_ideque(ideque_s * deque, const set_fn destroy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(destroy && "[ERROR] Parameter is NULL.");
@@ -252,9 +258,9 @@ void dequeue_back_ideque(ideque_s * deque, void * buffer) {
     }
 }
 
-void map_front_ideque(const ideque_s * deque, const handle_fn operate, void * args) {
+void map_front_ideque(const ideque_s * deque, const handle_fn handle, void * args) {
     assert(deque && "[ERROR] Parameter is NULL.");
-    assert(operate && "[ERROR] Parameter is NULL.");
+    assert(handle && "[ERROR] Parameter is NULL.");
 
     assert(deque->size && "[INVALID] Size can't be zero.");
 
@@ -264,7 +270,7 @@ void map_front_ideque(const ideque_s * deque, const handle_fn operate, void * ar
         size_t i = start;
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
             // if operate returns false then terminate main function
-            if (!operate(current->elements + (i * deque->size), args)) {
+            if (!handle(current->elements + (i * deque->size), args)) {
                 return;
             }
         }

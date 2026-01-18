@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 struct compare {
-    int (*compare_element)(const void *, const void *);
+    int (*compare_element)(void const * const, void const * const);
 };
 
 void destroy(void * element);
