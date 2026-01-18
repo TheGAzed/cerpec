@@ -3,19 +3,19 @@
 #include <assert.h>
 #include <string.h>
 
-ideque_s create_ideque(const size_t size) {
+ideque_s create_ideque(size_t const size) {
     assert(size && "[ERROR] Size can't be zero.");
 
     return (ideque_s) { .size = size, .allocator = &standard, };
 }
 
-ideque_s make_ideque(const size_t size, const memory_s * allocator) {
+ideque_s make_ideque(size_t const size, memory_s const * const allocator) {
     assert(size && "[ERROR] Size can't be zero.");
 
     return (ideque_s) { .size = size, .allocator = allocator, };
 }
 
-void destroy_ideque(ideque_s * deque, const set_fn destroy) {
+void destroy_ideque(ideque_s * const deque, set_fn const destroy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(destroy && "[ERROR] Parameter is NULL.");
 
@@ -42,7 +42,7 @@ void destroy_ideque(ideque_s * deque, const set_fn destroy) {
     deque->allocator = NULL;
 }
 
-void clear_ideque(ideque_s * deque, const set_fn destroy) {
+void clear_ideque(ideque_s * const deque, set_fn const destroy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(destroy && "[ERROR] Parameter is NULL.");
 
@@ -67,13 +67,13 @@ void clear_ideque(ideque_s * deque, const set_fn destroy) {
     deque->head = NULL;
 }
 
-ideque_s copy_ideque(const ideque_s * deque, const copy_fn copy) {
+ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(copy && "[ERROR] Parameter is NULL.");
 
     assert(deque->size && "[INVALID] Size can't be zero.");
 
-    ideque_s replika = { .current = deque->current, .head = NULL, .size = deque->size, .length = deque->length };
+    ideque_s replika = { .current = deque->current, .size = deque->size, .length = deque->length };
 
     struct infinite_deque_node const * current_deque = deque->head; // save head index as current node
     struct infinite_deque_node ** current_replika = &(replika.head);
@@ -108,14 +108,15 @@ ideque_s copy_ideque(const ideque_s * deque, const copy_fn copy) {
     return replika;
 }
 
-bool is_empty_ideque(const ideque_s * deque) {
+bool is_empty_ideque(ideque_s const * const deque) {
     assert(deque && "[ERROR] Parameter is NULL.");
+
     assert(deque->size && "[INVALID] Size can't be zero.");
 
     return (deque->length == 0);
 }
 
-void enqueue_front_ideque(ideque_s * deque, const void * buffer) {
+void enqueue_front_ideque(ideque_s * const deque, void const * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
@@ -147,7 +148,7 @@ void enqueue_front_ideque(ideque_s * deque, const void * buffer) {
     memcpy(deque->head->elements + (deque->current * deque->size), buffer, deque->size); // copy element into deque's head
 }
 
-void enqueue_back_ideque(ideque_s * deque, const void * buffer) {
+void enqueue_back_ideque(ideque_s * const deque, void const * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
@@ -175,7 +176,7 @@ void enqueue_back_ideque(ideque_s * deque, const void * buffer) {
     memcpy(deque->head->prev->elements + (next_index * deque->size), buffer, deque->size); // copy element into deque's tail
 }
 
-void peek_front_ideque(const ideque_s * deque, void * buffer) {
+void peek_front_ideque(ideque_s const * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
 
     assert(deque->length && "[ERROR] Can't peek empty structure.");
@@ -187,7 +188,7 @@ void peek_front_ideque(const ideque_s * deque, void * buffer) {
     memcpy(buffer, deque->head->elements + (deque->current * deque->size), deque->size);
 }
 
-void peek_back_ideque(const ideque_s * deque, void * buffer) {
+void peek_back_ideque(ideque_s const * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(deque->length && "[ERROR] Can't peek empty structure.");
     assert(buffer && "[ERROR] Parameter is NULL.");
@@ -197,11 +198,11 @@ void peek_back_ideque(const ideque_s * deque, void * buffer) {
     assert(deque->size && "[INVALID] Size can't be zero.");
 
     // calculate back element's location/index and copy it into buffer
-    const size_t back_index = (deque->current + deque->length - 1) % IDEQUE_CHUNK;
+    size_t const back_index = (deque->current + deque->length - 1) % IDEQUE_CHUNK;
     memcpy(buffer, deque->head->prev->elements + (back_index * deque->size), deque->size);
 }
 
-void dequeue_front_ideque(ideque_s * deque, void * buffer) {
+void dequeue_front_ideque(ideque_s * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(deque->length && "[ERROR] Can't dequeue empty structure.");
     assert(buffer && "[ERROR] Parameter is NULL.");
@@ -228,7 +229,7 @@ void dequeue_front_ideque(ideque_s * deque, void * buffer) {
     }
 }
 
-void dequeue_back_ideque(ideque_s * deque, void * buffer) {
+void dequeue_back_ideque(ideque_s * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(deque->length && "[ERROR] Can't dequeue empty structure.");
     assert(buffer && "[ERROR] Parameter is NULL.");
@@ -238,7 +239,7 @@ void dequeue_back_ideque(ideque_s * deque, void * buffer) {
     assert(deque->size && "[INVALID] Size can't be zero.");
 
     deque->length--; // decrement only size since it's removing from the back
-    const size_t back_index = (deque->current + deque->length) % IDEQUE_CHUNK; // calculate back element's index
+    size_t const back_index = (deque->current + deque->length) % IDEQUE_CHUNK; // calculate back element's index
     memcpy(buffer, deque->head->prev->elements + (back_index * deque->size), deque->size);
 
     if (!deque->length) {
@@ -258,7 +259,7 @@ void dequeue_back_ideque(ideque_s * deque, void * buffer) {
     }
 }
 
-void map_front_ideque(const ideque_s * deque, const handle_fn handle, void * args) {
+void map_front_ideque(ideque_s const * const deque, handle_fn const handle, void * const arguments) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(handle && "[ERROR] Parameter is NULL.");
 
@@ -270,7 +271,7 @@ void map_front_ideque(const ideque_s * deque, const handle_fn handle, void * arg
         size_t i = start;
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
             // if operate returns false then terminate main function
-            if (!handle(current->elements + (i * deque->size), args)) {
+            if (!handle(current->elements + (i * deque->size), arguments)) {
                 return;
             }
         }
@@ -280,7 +281,7 @@ void map_front_ideque(const ideque_s * deque, const handle_fn handle, void * arg
     }
 }
 
-void map_back_ideque(const ideque_s * deque, const handle_fn handle, void * args) {
+void map_back_ideque(ideque_s const * const deque, handle_fn const handle, void * const arguments) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(handle && "[ERROR] Parameter is NULL.");
 
@@ -293,11 +294,11 @@ void map_back_ideque(const ideque_s * deque, const handle_fn handle, void * args
     while (remaining) { // while there are element to handle
         current = current->prev; // fist go to tail and other previous nodes
 
-        const size_t node_index = last_index % IDEQUE_CHUNK; // calculate last element index in node
+        size_t const node_index = last_index % IDEQUE_CHUNK; // calculate last element index in node
         size_t i = 0; // save number of operated elements in node
         for (; i <= node_index && remaining; ++i, remaining--) { // until node index is reached and elements remain
             // handle on reversed i to start from last element in node
-            if (!handle(current->elements + ((node_index - i) * deque->size), args)) {
+            if (!handle(current->elements + ((node_index - i) * deque->size), arguments)) {
                 return;
             }
         }
@@ -305,7 +306,7 @@ void map_back_ideque(const ideque_s * deque, const handle_fn handle, void * args
     }
 }
 
-void apply_ideque(const ideque_s * deque, const process_fn process, void * arguments) {
+void apply_ideque(ideque_s const * const deque, process_fn const process, void * const arguments) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(process && "[ERROR] Parameter is NULL.");
 

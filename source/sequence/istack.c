@@ -3,19 +3,19 @@
 #include <assert.h>
 #include <string.h>
 
-istack_s create_istack(const size_t size) {
+istack_s create_istack(size_t const size) {
     assert(size && "[ERROR] Paremeter can't be zero.");
 
     return (istack_s) { .size = size, .allocator = &standard };
 }
 
-istack_s make_istack(const size_t size, const memory_s * allocator) {
+istack_s make_istack(size_t const size, memory_s const * const allocator) {
     assert(size && "[ERROR] Paremeter can't be zero.");
 
     return (istack_s) { .size = size, .allocator = allocator };
 }
 
-void destroy_istack(istack_s * stack, const set_fn destroy) {
+void destroy_istack(istack_s * const stack, set_fn const destroy) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
@@ -33,7 +33,7 @@ void destroy_istack(istack_s * stack, const set_fn destroy) {
     stack->allocator = NULL;
 }
 
-void clear_istack(istack_s * stack, const set_fn destroy) {
+void clear_istack(istack_s * const stack, set_fn const destroy) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
@@ -51,7 +51,7 @@ void clear_istack(istack_s * stack, const set_fn destroy) {
     stack->elements = NULL;
 }
 
-istack_s copy_istack(const istack_s * stack, const copy_fn copy) {
+istack_s copy_istack(istack_s const * const stack, copy_fn const copy) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(copy && "[ERROR] Paremeter can't be NULL.");
 
@@ -59,7 +59,7 @@ istack_s copy_istack(const istack_s * stack, const copy_fn copy) {
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
 
     // create replica to initialize and return
-    const istack_s replica = {
+    istack_s const replica = {
         .capacity = stack->capacity, .length = 0, .size = stack->size,
         .elements = stack->allocator->alloc(stack->capacity * stack->size, stack->allocator->arguments),
     };
@@ -75,7 +75,7 @@ istack_s copy_istack(const istack_s * stack, const copy_fn copy) {
     return replica;
 }
 
-bool is_empty_istack(const istack_s * stack) {
+bool is_empty_istack(istack_s const * const stack) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
@@ -83,7 +83,7 @@ bool is_empty_istack(const istack_s * stack) {
     return !(stack->length);
 }
 
-void push_istack(istack_s * stack, const void * element) {
+void push_istack(istack_s * const stack, void const * const element) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(element && "[ERROR] Paremeter can't be NULL.");
 
@@ -101,7 +101,7 @@ void push_istack(istack_s * stack, const void * element) {
     stack->length++;
 }
 
-void pop_istack(istack_s * stack, void * buffer) {
+void pop_istack(istack_s * const stack, void * const buffer) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length && "[ERROR] Length can't be zero.");
@@ -122,7 +122,7 @@ void pop_istack(istack_s * stack, void * buffer) {
     }
 }
 
-void peep_istack(const istack_s * stack, void * buffer) {
+void peep_istack(istack_s const * const stack, void * const buffer) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length && "[ERROR] Length can't be zero.");
@@ -136,7 +136,7 @@ void peep_istack(const istack_s * stack, void * buffer) {
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void map_istack(const istack_s * stack, const handle_fn handle, void * arguments) {
+void map_istack(istack_s const * const stack, handle_fn const handle, void * const arguments) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(handle && "[ERROR] Paremeter can't be NULL.");
 
@@ -147,7 +147,7 @@ void map_istack(const istack_s * stack, const handle_fn handle, void * arguments
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, arguments); e += stack->size) {}
 }
 
-void apply_istack(const istack_s * stack, const process_fn process, void * arguments) {
+void apply_istack(istack_s const * const stack, process_fn const process, void * const arguments) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(process && "[ERROR] Paremeter can't be NULL.");
 

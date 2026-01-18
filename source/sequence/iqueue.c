@@ -3,19 +3,19 @@
 #include <assert.h>
 #include <string.h>
 
-iqueue_s create_iqueue(const size_t size) {
+iqueue_s create_iqueue(size_t const size) {
     assert(size && "[ERROR] Size can't be zero.");
 
     return (iqueue_s) { .size = size, .allocator = &standard };
 }
 
-iqueue_s make_iqueue(const size_t size, const memory_s * allocator) {
+iqueue_s make_iqueue(size_t const size, memory_s const * const allocator) {
     assert(size && "[ERROR] Size can't be zero.");
 
     return (iqueue_s) { .size = size, .allocator = allocator };
 }
 
-void destroy_iqueue(iqueue_s * queue, const set_fn destroy) {
+void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -46,7 +46,7 @@ void destroy_iqueue(iqueue_s * queue, const set_fn destroy) {
     queue->allocator = NULL;
 }
 
-void clear_iqueue(iqueue_s * queue, const set_fn destroy) {
+void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -75,14 +75,14 @@ void clear_iqueue(iqueue_s * queue, const set_fn destroy) {
     queue->tail = NULL;
 }
 
-iqueue_s copy_iqueue(const iqueue_s * queue, const copy_fn copy) {
+iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
     assert(queue->size && "[INVALID] Size can't be zero.");
 
     // create properly initialized replica
-    iqueue_s replica = { .size = queue->size, .tail = NULL, .length = queue->length, .current = queue->current };
+    iqueue_s replica = { .size = queue->size, .length = queue->length, .current = queue->current };
 
     // set originale queue's and replica's current nodes for iteration
     struct infinite_queue_node const * current_queue = queue->tail;
@@ -119,14 +119,14 @@ iqueue_s copy_iqueue(const iqueue_s * queue, const copy_fn copy) {
     return replica;
 }
 
-bool is_empty_iqueue(const iqueue_s * queue) {
+bool is_empty_iqueue(iqueue_s const * const queue) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(queue->size && "[INVALID] Size can't be zero.");
 
     return (queue->length == 0);
 }
 
-void peek_iqueue(const iqueue_s * queue, void * buffer) {
+void peek_iqueue(iqueue_s const * const queue, void * const buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Can't peek empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
@@ -137,7 +137,7 @@ void peek_iqueue(const iqueue_s * queue, void * buffer) {
     memcpy(buffer, queue->tail->next->elements + (queue->current * queue->size), queue->size);
 }
 
-void enqueue_iqueue(iqueue_s * queue, const void * buffer) {
+void enqueue_iqueue(iqueue_s * const queue, void const * const buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(~(queue->length) && "[ERROR] Queue's size will overflow.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
@@ -166,7 +166,7 @@ void enqueue_iqueue(iqueue_s * queue, const void * buffer) {
     queue->length++;
 }
 
-void dequeue_iqueue(iqueue_s * queue, void * buffer) {
+void dequeue_iqueue(iqueue_s * const queue, void * const buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Strucutre can't be empty.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
@@ -194,7 +194,7 @@ void dequeue_iqueue(iqueue_s * queue, void * buffer) {
     }
 }
 
-void map_iqueue(const iqueue_s * queue, const handle_fn handle, void * args) {
+void map_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const arguments) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL");
 
@@ -207,7 +207,7 @@ void map_iqueue(const iqueue_s * queue, const handle_fn handle, void * args) {
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size
             // handle on element and if zero is returned then end main function
-            if (!handle(current->elements + (i * queue->size), args)) {
+            if (!handle(current->elements + (i * queue->size), arguments)) {
                 return;
             }
         }
@@ -215,7 +215,7 @@ void map_iqueue(const iqueue_s * queue, const handle_fn handle, void * args) {
     }
 }
 
-void apply_iqueue(const iqueue_s * queue, const process_fn process, void * arguments) {
+void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const arguments) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(process && "[ERROR] Parameter can't be NULL");
 
