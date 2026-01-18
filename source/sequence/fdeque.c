@@ -21,6 +21,7 @@ fdeque_s create_fdeque(size_t const size, size_t const max) {
 fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * allocator) {
     assert(size && "[ERROR] Paremeter can't be zero.");
     assert(max && "[ERROR] Paremeter can't be zero.");
+    assert(allocator && "[ERROR] Paremeter can't be NULL.");
 
     // create finite queue with custom allocated memory and check if allocation succeded
     fdeque_s const deque = {
@@ -37,9 +38,10 @@ void destroy_fdeque(fdeque_s * const deque, set_fn const destroy) {
     assert(deque && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -69,9 +71,10 @@ void clear_fdeque(fdeque_s * const deque, set_fn const destroy) {
     assert(deque && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -97,9 +100,10 @@ fdeque_s copy_fdeque(fdeque_s const * const deque, copy_fn const copy) {
     assert(deque && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -133,9 +137,10 @@ fdeque_s copy_fdeque(fdeque_s const * const deque, copy_fn const copy) {
 bool is_empty_fdeque(fdeque_s const * const deque) {
     assert(deque && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -145,9 +150,10 @@ bool is_empty_fdeque(fdeque_s const * const deque) {
 bool is_full_fdeque(fdeque_s const * const deque) {
     assert(deque && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -159,9 +165,10 @@ void enqueue_front_fdeque(fdeque_s * const deque, void const * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(deque->length != deque->max && "[ERROR] Structure is full.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -180,9 +187,10 @@ void enqueue_back_fdeque(fdeque_s * const deque, void const * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(deque->length != deque->max && "[ERROR] Structure is full.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -199,9 +207,10 @@ void dequeue_front_fdeque(fdeque_s * const deque, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(deque->length && "[ERROR] Structure is empty.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -216,9 +225,10 @@ void dequeue_back_fdeque(fdeque_s * const deque, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(deque->length && "[ERROR] Structure is empty.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -234,9 +244,10 @@ void peek_front_fdeque(fdeque_s const * const deque, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(deque->length && "[ERROR] Structure is empty.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -249,9 +260,10 @@ void peek_back_fdeque(fdeque_s const * const deque, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(deque->length && "[ERROR] Structure is empty.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -264,9 +276,10 @@ void map_front_fdeque(fdeque_s const * const deque, handle_fn const handle, void
     assert(deque && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -289,9 +302,10 @@ void map_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void 
     assert(deque && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 
@@ -317,9 +331,10 @@ void apply_fdeque(fdeque_s const * const deque, process_fn const process, void *
     assert(deque && "[ERROR] Parameter can't be NULL.");
     assert(process && "[ERROR] Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
-    assert(deque->max && "[INVALID] Maximum can't be zero.");
-    assert(deque->elements && "[INVALID] Elements can't be NULL.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->max && "[INVALID] Parameter can't be zero.");
+    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
+    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
     assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
 

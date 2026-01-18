@@ -20,6 +20,7 @@ fstack_s create_fstack(size_t const size, size_t const max) {
 fstack_s make_fstack(size_t const size, size_t const max, memory_s const * const allocator) {
     assert(size && "[ERROR] Paremeter can't be zero.");
     assert(max && "[ERROR] Paremeter can't be zero.");
+    assert(allocator && "[ERROR] Paremeter can't be NULL.");
 
     // create constant initialized structure with custom checked allocated memory
     fstack_s const stack = {
@@ -35,9 +36,10 @@ void destroy_fstack(fstack_s * const stack, set_fn const destroy) {
     assert(stack && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // iterate over each element and call destroy function on it
@@ -57,9 +59,10 @@ void clear_fstack(fstack_s * const stack, set_fn const destroy) {
     assert(stack && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // iterate over each element and call destroy function on it
@@ -75,9 +78,10 @@ fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy) {
     assert(stack && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // create initialized constant copy of structure with checked allocated memory
@@ -99,9 +103,10 @@ fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy) {
 bool is_empty_fstack(fstack_s const * const stack) {
     assert(stack && "[ERROR] Parameter can't be NULL.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     return !(stack->length); // return negated length
@@ -110,9 +115,10 @@ bool is_empty_fstack(fstack_s const * const stack) {
 bool is_full_fstack(fstack_s const * const stack) {
     assert(stack && "[ERROR] Parameter can't be NULL.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     return (stack->length == stack->max); // return comparison of length and max
@@ -123,9 +129,10 @@ void push_fstack(fstack_s * const stack, void const * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(stack->length != stack->max && "[ERROR] Structure is full.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // copy buffer beyond last element in structure's elements array
@@ -138,9 +145,10 @@ void pop_fstack(fstack_s * const stack, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(stack->length && "[ERROR] Structure is empty.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // decrement length to get last's position and copy it into buffer
@@ -153,9 +161,10 @@ void peep_fstack(fstack_s const * const stack, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(stack->length && "[ERROR] Structure is empty.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // just subtract 1 from length to get current position of topmost element to copy into buffer
@@ -166,9 +175,10 @@ void map_fstack(fstack_s const * const stack, handle_fn const handle, void * con
     assert(stack && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // empty for loop since all the logic can just fit into its expressions
@@ -179,9 +189,10 @@ void apply_fstack(fstack_s const * const stack, process_fn const process, void *
     assert(stack && "[ERROR] Parameter can't be NULL.");
     assert(process && "[ERROR] Parameter can't be NULL.");
 
-    assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->max && "[INVALID] Maximum can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can't be NULL.");
+    assert(stack->size && "[INVALID] Parameter can't be zero.");
+    assert(stack->max && "[INVALID] Parameter can't be zero.");
+    assert(stack->elements && "[INVALID] Parameter can't be NULL.");
+    assert(stack->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length <= stack->max && "[INVALID] Length exceeds maximum.");
 
     // simply call the function on the stack as everyting is continuous

@@ -20,6 +20,7 @@ fqueue_s create_fqueue(size_t const size, size_t const max) {
 fqueue_s make_fqueue(size_t const size, size_t const max, memory_s const * const allocator) {
     assert(size && "[ERROR] Paremeter can't be zero.");
     assert(max && "[ERROR] Paremeter can't be zero.");
+    assert(allocator && "[ERROR] Paremeter can't be NULL.");
 
     // initializer constant queue structure with allocated memory and check if it was successful
     fqueue_s const queue = {
@@ -35,9 +36,10 @@ void destroy_fqueue(fqueue_s * const queue, set_fn const destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -66,9 +68,10 @@ void clear_fqueue(fqueue_s * const queue, set_fn const destroy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -93,9 +96,10 @@ fqueue_s copy_fqueue(fqueue_s const * const queue, copy_fn const copy) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -127,9 +131,10 @@ fqueue_s copy_fqueue(fqueue_s const * const queue, copy_fn const copy) {
 bool is_empty_fqueue(fqueue_s const * const queue) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -139,9 +144,10 @@ bool is_empty_fqueue(fqueue_s const * const queue) {
 bool is_full_fqueue(fqueue_s const * const queue) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -153,9 +159,10 @@ void enqueue_fqueue(fqueue_s * const queue, void const * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(queue->length != queue->max && "[ERROR] Structure is full.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -172,9 +179,10 @@ void dequeue_fqueue(fqueue_s * const queue, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Structure is empty.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -189,9 +197,10 @@ void peek_fqueue(fqueue_s const * const queue, void * const buffer) {
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Structure is empty.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -203,9 +212,10 @@ void map_fqueue(fqueue_s const * const queue, handle_fn const handle, void * con
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 
@@ -228,9 +238,10 @@ void apply_fqueue(fqueue_s const * const queue, process_fn const process, void *
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(process && "[ERROR] Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Size can't be zero.");
-    assert(queue->max && "[INVALID] Maximum can't be zero.");
-    assert(queue->elements && "[INVALID] Elements can't be NULL.");
+    assert(queue->size && "[INVALID] Parameter can't be zero.");
+    assert(queue->max && "[INVALID] Parameter can't be zero.");
+    assert(queue->elements && "[INVALID] Parameter can't be NULL.");
+    assert(queue->allocator && "[ERROR] Paremeter can't be NULL.");
     assert(queue->length <= queue->max && "[INVALID] Length exceeds maximum.");
     assert(queue->current < queue->max && "[INVALID] Current exceeds maximum.");
 

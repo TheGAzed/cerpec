@@ -11,6 +11,7 @@ istack_s create_istack(size_t const size) {
 
 istack_s make_istack(size_t const size, memory_s const * const allocator) {
     assert(size && "[ERROR] Paremeter can't be zero.");
+    assert(allocator && "[ERROR] Paremeter can't be NULL.");
 
     return (istack_s) { .size = size, .allocator = allocator };
 }
@@ -21,6 +22,7 @@ void destroy_istack(istack_s * const stack, set_fn const destroy) {
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // for each element in elements array call destroy
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
@@ -39,6 +41,7 @@ void clear_istack(istack_s * const stack, set_fn const destroy) {
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // for each element in elements array call destroy
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
@@ -57,6 +60,7 @@ istack_s copy_istack(istack_s const * const stack, copy_fn const copy) {
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // create replica to initialize and return
     istack_s const replica = {
@@ -77,8 +81,10 @@ istack_s copy_istack(istack_s const * const stack, copy_fn const copy) {
 
 bool is_empty_istack(istack_s const * const stack) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
+
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     return !(stack->length);
 }
@@ -89,6 +95,7 @@ void push_istack(istack_s * const stack, void const * const element) {
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     if (stack->length == stack->capacity) { // if length is equal to capacity the array must expand linearly
         stack->capacity += ISTACK_CHUNK;
@@ -105,11 +112,12 @@ void pop_istack(istack_s * const stack, void * const buffer) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length && "[ERROR] Length can't be zero.");
+    assert(stack->elements && "[ERROR] Elements can' be NULL.");
     assert(stack->capacity && "[ERROR] Capacity can't be zero.");
 
     assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can' be NULL.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // remove element from elements array
     stack->length--;
@@ -126,11 +134,12 @@ void peep_istack(istack_s const * const stack, void * const buffer) {
     assert(stack && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
     assert(stack->length && "[ERROR] Length can't be zero.");
+    assert(stack->elements && "[ERROR] Elements can' be NULL.");
     assert(stack->capacity && "[ERROR] Capacity can't be zero.");
 
     assert(stack->size && "[INVALID] Size can't be zero.");
-    assert(stack->elements && "[INVALID] Elements can' be NULL.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // only copy the top element into the buffer
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
@@ -142,6 +151,7 @@ void map_istack(istack_s const * const stack, handle_fn const handle, void * con
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // iterate over each element from bottom to the top of stack
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, arguments); e += stack->size) {}
@@ -153,6 +163,7 @@ void apply_istack(istack_s const * const stack, process_fn const process, void *
 
     assert(stack->size && "[INVALID] Size can't be zero.");
     assert(stack->length <= stack->capacity && "[INVALID] Length exceeds capacity.");
+    assert(stack->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // process stack elements as an array (as a whole)
     process(stack->elements, stack->length, arguments);

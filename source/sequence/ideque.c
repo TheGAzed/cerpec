@@ -4,13 +4,14 @@
 #include <string.h>
 
 ideque_s create_ideque(size_t const size) {
-    assert(size && "[ERROR] Size can't be zero.");
+    assert(size && "[ERROR] Parameter can't be zero.");
 
     return (ideque_s) { .size = size, .allocator = &standard, };
 }
 
 ideque_s make_ideque(size_t const size, memory_s const * const allocator) {
-    assert(size && "[ERROR] Size can't be zero.");
+    assert(size && "[ERROR] Parameter can't be zero.");
+    assert(allocator && "[ERROR] Paremeter can't be NULL.");
 
     return (ideque_s) { .size = size, .allocator = allocator, };
 }
@@ -19,7 +20,8 @@ void destroy_ideque(ideque_s * const deque, set_fn const destroy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(destroy && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     struct infinite_deque_node * current = deque->head; // save head index as current node
     for (size_t start = deque->current; deque->length; start = 0) { // for every node in deque list until size is not zero
@@ -46,7 +48,8 @@ void clear_ideque(ideque_s * const deque, set_fn const destroy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(destroy && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     struct infinite_deque_node * current = deque->head; // save head index as current node
     for (size_t start = deque->current; deque->length; start = 0) { // for every node in deque list until size is not zero
@@ -71,7 +74,8 @@ ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(copy && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     ideque_s replika = { .current = deque->current, .size = deque->size, .length = deque->length };
 
@@ -111,7 +115,8 @@ ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy) {
 bool is_empty_ideque(ideque_s const * const deque) {
     assert(deque && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     return (deque->length == 0);
 }
@@ -120,7 +125,8 @@ void enqueue_front_ideque(ideque_s * const deque, void const * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     if (!(deque->current)) { // if deque's previous current 'underflows' in node array due to inserting element to front
         deque->current = IDEQUE_CHUNK; // make current into list array chunk size to prevent future underflow
@@ -152,7 +158,8 @@ void enqueue_back_ideque(ideque_s * const deque, void const * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     const size_t next_index = ((deque->current + deque->length) % IDEQUE_CHUNK);
     if (!next_index) { // if next index to insert into is zero
@@ -178,12 +185,12 @@ void enqueue_back_ideque(ideque_s * const deque, void const * const buffer) {
 
 void peek_front_ideque(ideque_s const * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
-
     assert(deque->length && "[ERROR] Can't peek empty structure.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
     assert(deque->head && "[INVALID] Head can't be NULL.");
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     memcpy(buffer, deque->head->elements + (deque->current * deque->size), deque->size);
 }
@@ -191,11 +198,12 @@ void peek_front_ideque(ideque_s const * const deque, void * const buffer) {
 void peek_back_ideque(ideque_s const * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(deque->length && "[ERROR] Can't peek empty structure.");
+    assert(deque->head && "[ERROR] Head can't be NULL.");
+    assert(deque->head->prev && "[ERROR] Head's prev (tail) can't be NULL.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
-    assert(deque->head && "[INVALID] Head can't be NULL.");
-    assert(deque->head->prev && "[INVALID] Head's prev (tail) can't be NULL.");
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // calculate back element's location/index and copy it into buffer
     size_t const back_index = (deque->current + deque->length - 1) % IDEQUE_CHUNK;
@@ -205,10 +213,11 @@ void peek_back_ideque(ideque_s const * const deque, void * const buffer) {
 void dequeue_front_ideque(ideque_s * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(deque->length && "[ERROR] Can't dequeue empty structure.");
+    assert(deque->head && "[ERROR] Head can't be NULL.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
-    assert(deque->head && "[INVALID] Head can't be NULL.");
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     memcpy(buffer, deque->head->elements + (deque->current * deque->size), deque->size);
     deque->current++; // increment current index since it's removing from front (like a queue)
@@ -232,11 +241,12 @@ void dequeue_front_ideque(ideque_s * const deque, void * const buffer) {
 void dequeue_back_ideque(ideque_s * const deque, void * const buffer) {
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(deque->length && "[ERROR] Can't dequeue empty structure.");
+    assert(deque->head && "[ERROR] Head can't be NULL.");
+    assert(deque->head->prev && "[ERROR] Head's prev (tail) can't be NULL.");
     assert(buffer && "[ERROR] Parameter is NULL.");
 
-    assert(deque->head && "[INVALID] Head can't be NULL.");
-    assert(deque->head->prev && "[INVALID] Head's prev (tail) can't be NULL.");
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     deque->length--; // decrement only size since it's removing from the back
     size_t const back_index = (deque->current + deque->length) % IDEQUE_CHUNK; // calculate back element's index
@@ -263,7 +273,8 @@ void map_front_ideque(ideque_s const * const deque, handle_fn const handle, void
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(handle && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     struct infinite_deque_node const * current = deque->head; // save head node as current pointer
     size_t remaining = deque->length; // save remaining size as parameter to decrement for loop
@@ -285,7 +296,8 @@ void map_back_ideque(ideque_s const * const deque, handle_fn const handle, void 
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(handle && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
     size_t remaining = deque->length;
     size_t last_index = deque->length + deque->current - 1; // may undeflow if lenght adn current are 0
@@ -310,36 +322,48 @@ void apply_ideque(ideque_s const * const deque, process_fn const process, void *
     assert(deque && "[ERROR] Parameter is NULL.");
     assert(process && "[ERROR] Parameter is NULL.");
 
-    assert(deque->size && "[INVALID] Size can't be zero.");
+    assert(deque->size && "[INVALID] Parameter can't be zero.");
+    assert(deque->allocator && "[INVALID] Paremeter can't be NULL.");
 
+    // create elements array to temporary save doubly linked list elements into straight array
     char * elements_array = deque->allocator->alloc(deque->length * deque->size, deque->allocator->arguments);
     assert(elements_array && "[ERROR] Memory alloction failed.");
 
+    // index increments after getting each element from node
+    // remaining count of elements is calculated
+    // copying starts from head
     size_t index = 0, remaining = deque->length;
     struct infinite_deque_node const * current = deque->head;
+    // set start to current and then begin from 0 for all the other elements in array node
     for (size_t start = deque->current; remaining; start = 0) {
-        size_t i = start;
+        size_t i = start; // temporary save iterator outside for later subtraction
+
+        // copy elements starting from start until either 'relative remaining' or 'array node' size is reached
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) {
             memcpy(elements_array + (index * deque->size), current->elements + (i * deque->size), deque->size);
             index++;
         }
 
-        remaining -= (i - start);
-        current = current->next;
+        remaining -= (i - start); // subtract copied count from remaining size
+        current = current->next; // go to next node
     }
 
     process(elements_array, deque->length, arguments);
 
+    // reset index and remaining and copy back elements from array into each node array
     index = 0, remaining = deque->length, current = deque->head;
+    // set start to current and then begin from 0 for all the other elements in array node
     for (size_t start = deque->current; remaining; start = 0) {
-        size_t i = start;
+        size_t i = start; // temporary save iterator outside for later subtraction
+
+        // copy elements starting from start until either 'relative remaining' or 'array node' size is reached
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) {
             memcpy(current->elements + (i * deque->size), elements_array + (index * deque->size), deque->size);
             index++;
         }
 
-        remaining -= (i - start);
-        current = current->next;
+        remaining -= (i - start); // subtract copied count from remaining size
+        current = current->next; // go to next node
     }
 
     deque->allocator->free(elements_array, deque->allocator->arguments);
