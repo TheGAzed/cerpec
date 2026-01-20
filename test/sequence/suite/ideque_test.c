@@ -4,10 +4,10 @@
 TEST CREATE_01(void) {
     ideque_s test = create_ideque(sizeof(int));
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
-    ASSERT_EQm("[ERROR] Expected head to be NULL.", NULL, test.head);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
+    ASSERT_EQ(NULL, test.head);
 
     destroy_ideque(&test, destroy);
 
@@ -19,10 +19,10 @@ TEST DESTROY_01(void) {
 
     destroy_ideque(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_NEQm("[ERROR] Expected size to be zero.", sizeof(int), test.size);
-    ASSERT_EQm("[ERROR] Expected size to be zero.", 0, test.size);
-    ASSERT_EQm("[ERROR] Expected head to be NULL.", NULL, test.head);
+    ASSERT_EQ(0, test.length);
+    ASSERT_NEQ(sizeof(int), test.size);
+    ASSERT_EQ(0, test.size);
+    ASSERT_EQ(NULL, test.head);
 
     PASS();
 }
@@ -32,9 +32,9 @@ TEST CLEAR_01(void) {
 
     clear_ideque(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
 
     destroy_ideque(&test, destroy);
 
@@ -121,7 +121,7 @@ TEST PEEK_FRONT_01(void) {
 
         int a = 0;
         peek_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -137,7 +137,7 @@ TEST PEEK_FRONT_02(void) {
 
         int a = 0;
         peek_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -153,7 +153,7 @@ TEST PEEK_FRONT_03(void) {
 
         int a = 0;
         peek_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -169,7 +169,7 @@ TEST PEEK_FRONT_04(void) {
 
         int a = 0;
         peek_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -185,7 +185,7 @@ TEST PEEK_FRONT_05(void) {
 
         int a = 0;
         peek_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -201,7 +201,7 @@ TEST PEEK_FRONT_06(void) {
 
         int a = 0;
         peek_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -217,7 +217,7 @@ TEST PEEK_BACK_01(void) {
 
         int a = 0;
         peek_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -233,7 +233,7 @@ TEST PEEK_BACK_02(void) {
 
         int a = 0;
         peek_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -249,7 +249,7 @@ TEST PEEK_BACK_03(void) {
 
         int a = 0;
         peek_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be 0.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -265,7 +265,7 @@ TEST PEEK_BACK_04(void) {
 
         int a = 0;
         peek_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -281,7 +281,7 @@ TEST PEEK_BACK_05(void) {
 
         int a = 0;
         peek_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -297,7 +297,7 @@ TEST PEEK_BACK_06(void) {
 
         int a = 0;
         peek_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected peeked element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -316,7 +316,7 @@ TEST DEQUEUE_FRONT_01(void) {
     for (int i = IDEQUE_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         dequeue_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -335,7 +335,7 @@ TEST DEQUEUE_FRONT_02(void) {
     for (int i = IDEQUE_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         dequeue_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -354,7 +354,7 @@ TEST DEQUEUE_FRONT_03(void) {
     for (int i = IDEQUE_CHUNK; i >= 0; --i) {
         int a = 0;
         dequeue_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -373,7 +373,7 @@ TEST DEQUEUE_FRONT_04(void) {
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -392,7 +392,7 @@ TEST DEQUEUE_FRONT_05(void) {
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
         dequeue_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -411,7 +411,7 @@ TEST DEQUEUE_FRONT_06(void) {
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
         dequeue_front_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -430,7 +430,7 @@ TEST DEQUEUE_BACK_01(void) {
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -449,7 +449,7 @@ TEST DEQUEUE_BACK_02(void) {
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -468,7 +468,7 @@ TEST DEQUEUE_BACK_03(void) {
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -487,7 +487,7 @@ TEST DEQUEUE_BACK_04(void) {
     for (int i = IDEQUE_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -506,7 +506,7 @@ TEST DEQUEUE_BACK_05(void) {
     for (int i = IDEQUE_CHUNK - 1; i >= 0; --i)  {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -525,7 +525,7 @@ TEST DEQUEUE_BACK_06(void) {
     for (int i = IDEQUE_CHUNK; i >= 0; --i)  {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected dequeued element to be i.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -546,7 +546,7 @@ TEST MAP_FRONT_01(void) {
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -567,7 +567,7 @@ TEST MAP_FRONT_02(void) {
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -588,7 +588,7 @@ TEST MAP_FRONT_03(void) {
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -609,7 +609,7 @@ TEST MAP_BACK_01(void) {
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -630,7 +630,7 @@ TEST MAP_BACK_02(void) {
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -651,7 +651,7 @@ TEST MAP_BACK_03(void) {
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -672,7 +672,7 @@ TEST APPLY_01(void) {
     for (int i = IDEQUE_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -693,7 +693,7 @@ TEST APPLY_02(void) {
     for (int i = IDEQUE_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -714,7 +714,7 @@ TEST APPLY_03(void) {
     for (int i = IDEQUE_CHUNK; i >= 0; --i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -735,7 +735,7 @@ TEST APPLY_04(void) {
     for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -756,7 +756,7 @@ TEST APPLY_05(void) {
     for (int i = 0; i < IDEQUE_CHUNK; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);
@@ -777,7 +777,7 @@ TEST APPLY_06(void) {
     for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
         int a = 0;
         dequeue_back_ideque(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_ideque(&test, destroy);

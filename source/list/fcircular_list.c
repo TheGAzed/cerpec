@@ -562,23 +562,23 @@ void apply_fcircular_list(fcircular_list_s const * const list, process_fn const 
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
     assert(list->max && "[INVALID] Parameter can't be zero.");
 
-    char * elements = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
-    assert((!list->length || elements) && "[ERROR] Memory allocation failed.");
+    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
+    assert((!list->length || elements_array) && "[ERROR] Memory allocation failed.");
 
     // push list elements into elements array inorder
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        memcpy(elements + (i * list->size), list->elements + (current * list->size), list->size);
+        memcpy(elements_array + (i * list->size), list->elements + (current * list->size), list->size);
     }
 
     // process elements
-    process(list->elements, list->length, arguments);
+    process(elements_array, list->length, arguments);
 
     // copy elements back into list
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        memcpy(list->elements + (current * list->size), elements + (i * list->size), list->size);
+        memcpy(list->elements + (current * list->size), elements_array + (i * list->size), list->size);
     }
 
-    list->allocator->free(elements, list->allocator->arguments);
+    list->allocator->free(elements_array, list->allocator->arguments);
 }

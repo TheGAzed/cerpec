@@ -6,9 +6,9 @@
 TEST CREATE_01(void) {
     fqueue_s test = create_fqueue(sizeof(int), FQUEUE_CHUNK);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
 
     destroy_fqueue(&test, destroy);
 
@@ -20,9 +20,9 @@ TEST DESTROY_01(void) {
 
     destroy_fqueue(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_NEQm("[ERROR] Expected size to be zero.", sizeof(int), test.size);
-    ASSERT_EQm("[ERROR] Expected size to be zero.", 0, test.size);
+    ASSERT_EQ(0, test.length);
+    ASSERT_NEQ(sizeof(int), test.size);
+    ASSERT_EQ(0, test.size);
 
     PASS();
 }
@@ -32,9 +32,9 @@ TEST CLEAR_01(void) {
 
     clear_fqueue(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected size to not be zero.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
 
     destroy_fqueue(&test, destroy);
 
@@ -73,7 +73,7 @@ TEST PEEK_01(void) {
 
         int a = 0;
         peek_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -89,7 +89,7 @@ TEST PEEK_02(void) {
 
         int a = 0;
         peek_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", 0, a);
+        ASSERT_EQ(0, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -107,7 +107,7 @@ TEST DEQUEUE_01(void) {
     for (int i = 0; i < FQUEUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -125,7 +125,7 @@ TEST DEQUEUE_02(void) {
     for (int i = 0; i < FQUEUE_CHUNK; ++i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -146,7 +146,7 @@ TEST MAP_01(void) {
     for (int i = 0; i < FQUEUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -167,7 +167,7 @@ TEST MAP_02(void) {
     for (int i = 0; i < FQUEUE_CHUNK; ++i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -188,7 +188,7 @@ TEST APPLY_01(void) {
     for (int i = 0; i < FQUEUE_CHUNK - 1; ++i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -209,7 +209,7 @@ TEST APPLY_02(void) {
     for (int i = 0; i < FQUEUE_CHUNK; ++i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -230,7 +230,7 @@ TEST APPLY_03(void) {
     for (int i = FQUEUE_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fqueue(&test, destroy);
@@ -251,7 +251,7 @@ TEST APPLY_04(void) {
     for (int i = FQUEUE_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         dequeue_fqueue(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fqueue(&test, destroy);

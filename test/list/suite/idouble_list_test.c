@@ -885,6 +885,135 @@ TEST MAP_PREV_03(void) {
     PASS();
 }
 
+TEST APPLY_01() {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_idouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_idouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_02() {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_idouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_idouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_03() {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        insert_at_idouble_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_idouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        int a = 0;
+        get_idouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_04() {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        int reverse = (IDOUBLE_LIST_CHUNK - 1) - i - 1;
+        insert_at_idouble_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_idouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_idouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_05() {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        int reverse = (IDOUBLE_LIST_CHUNK) - i - 1;
+        insert_at_idouble_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_idouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_idouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_06() {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        int reverse = (IDOUBLE_LIST_CHUNK + 1) - i - 1;
+        insert_at_idouble_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_idouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
+        int a = 0;
+        get_idouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_idouble_list(&test, destroy);
+
+    PASS();
+}
+
 SUITE (idouble_list_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
@@ -901,4 +1030,5 @@ SUITE (idouble_list_test) {
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02); RUN_TEST(EXTRACT_03);
     RUN_TEST(MAP_NEXT_01); RUN_TEST(MAP_NEXT_02); RUN_TEST(MAP_NEXT_03);
     RUN_TEST(MAP_PREV_01); RUN_TEST(MAP_PREV_02); RUN_TEST(MAP_PREV_03);
+    RUN_TEST(APPLY_01); RUN_TEST(APPLY_02); RUN_TEST(APPLY_03); RUN_TEST(APPLY_04); RUN_TEST(APPLY_05); RUN_TEST(APPLY_06);
 }

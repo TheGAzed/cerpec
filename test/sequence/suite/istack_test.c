@@ -5,11 +5,11 @@
 TEST CREATE_01(void) {
     istack_s test = create_istack(sizeof(int));
 
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.capacity);
-    ASSERT_EQm("[ERROR] Expected lenght to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected sizes to be equal.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
-    ASSERT_EQm("[ERROR] Expected elements to be NULL.", NULL, test.elements);
+    ASSERT_EQ(0, test.capacity);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
+    ASSERT_EQ(NULL, test.elements);
 
     destroy_istack(&test, destroy);
 
@@ -21,11 +21,11 @@ TEST DESTROY_01(void) {
 
     destroy_istack(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.capacity);
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_NEQm("[ERROR] Expected sizes to not be equal.", sizeof(int), test.size);
-    ASSERT_EQm("[ERROR] Expected size to be zero.", 0, test.size);
-    ASSERT_EQm("[ERROR] Expected elements to be NULL.", NULL, test.elements);
+    ASSERT_EQ(0, test.capacity);
+    ASSERT_EQ(0, test.length);
+    ASSERT_NEQ(sizeof(int), test.size);
+    ASSERT_EQ(0, test.size);
+    ASSERT_EQ(NULL, test.elements);
 
     PASS();
 }
@@ -35,10 +35,10 @@ TEST CLEAR_01(void) {
 
     clear_istack(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, test.capacity);
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected sizes to be equal.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
+    ASSERT_EQ(0, test.capacity);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
 
     destroy_istack(&test, destroy);
 
@@ -89,7 +89,7 @@ TEST PEEP_01(void) {
 
         int a = 0;
         peep_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -105,7 +105,7 @@ TEST PEEP_02(void) {
 
         int a = 0;
         peep_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -121,7 +121,7 @@ TEST PEEP_03(void) {
 
         int a = 0;
         peep_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -139,7 +139,7 @@ TEST POP_01(void) {
     for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -157,7 +157,7 @@ TEST POP_02(void) {
     for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -175,7 +175,7 @@ TEST POP_03(void) {
     for (int i = ISTACK_CHUNK; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -196,7 +196,7 @@ TEST MAP_01(void) {
     for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_istack(&test, destroy);
@@ -217,7 +217,7 @@ TEST MAP_02(void) {
     for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_istack(&test, destroy);
@@ -238,7 +238,7 @@ TEST MAP_03(void) {
     for (int i = ISTACK_CHUNK; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_istack(&test, destroy);
@@ -259,7 +259,7 @@ TEST APPLY_01(void) {
     for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -280,7 +280,7 @@ TEST APPLY_02(void) {
     for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -301,7 +301,7 @@ TEST APPLY_03(void) {
     for (int i = ISTACK_CHUNK; i >= 0; --i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -322,7 +322,7 @@ TEST APPLY_04(void) {
     for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -343,7 +343,7 @@ TEST APPLY_05(void) {
     for (int i = 0; i < ISTACK_CHUNK; ++i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);
@@ -364,7 +364,7 @@ TEST APPLY_06(void) {
     for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
         int a = 0;
         pop_istack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_istack(&test, destroy);

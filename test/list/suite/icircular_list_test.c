@@ -762,6 +762,135 @@ TEST MAP_03(void) {
     PASS();
 }
 
+TEST APPLY_01() {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
+        insert_at_icircular_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_icircular_list(&test, sort, &cmp);
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_icircular_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_02() {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
+        insert_at_icircular_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_icircular_list(&test, sort, &cmp);
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_icircular_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_03() {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {
+        insert_at_icircular_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_icircular_list(&test, sort, &cmp);
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {
+        int a = 0;
+        get_icircular_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_04() {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
+        int reverse = (ICIRCULAR_LIST_CHUNK - 1) - i - 1;
+        insert_at_icircular_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_icircular_list(&test, sort, &cmp);
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_icircular_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_05() {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
+        int reverse = (ICIRCULAR_LIST_CHUNK) - i - 1;
+        insert_at_icircular_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_icircular_list(&test, sort, &cmp);
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_icircular_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_06() {
+    icircular_list_s test = create_icircular_list(sizeof(int));
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {
+        int reverse = (ICIRCULAR_LIST_CHUNK + 1) - i - 1;
+        insert_at_icircular_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_icircular_list(&test, sort, &cmp);
+
+    for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {
+        int a = 0;
+        get_icircular_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_icircular_list(&test, destroy);
+
+    PASS();
+}
+
 SUITE (icircular_list_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
@@ -776,4 +905,5 @@ SUITE (icircular_list_test) {
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02); RUN_TEST(SPLIT_03);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02); RUN_TEST(EXTRACT_03);
     RUN_TEST(MAP_01); RUN_TEST(MAP_02); RUN_TEST(MAP_03);
+    RUN_TEST(APPLY_01); RUN_TEST(APPLY_02); RUN_TEST(APPLY_03); RUN_TEST(APPLY_04); RUN_TEST(APPLY_05); RUN_TEST(APPLY_06);
 }

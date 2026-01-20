@@ -491,6 +491,92 @@ TEST MAP_02(void) {
     PASS();
 }
 
+TEST APPLY_01() {
+    fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; ++i) {
+        insert_at_fstraight_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fstraight_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_fstraight_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fstraight_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_02() {
+    fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; ++i) {
+        insert_at_fstraight_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fstraight_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_fstraight_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fstraight_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_03() {
+    fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; ++i) {
+        int reverse = (FSTRAIGHT_LIST_CHUNK - 1) - i - 1;
+        insert_at_fstraight_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fstraight_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_fstraight_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fstraight_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_04() {
+    fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; ++i) {
+        int reverse = (FSTRAIGHT_LIST_CHUNK) - i - 1;
+        insert_at_fstraight_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fstraight_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_fstraight_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fstraight_list(&test, destroy);
+
+    PASS();
+}
+
 SUITE (fstraight_list_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(COPY_01); RUN_TEST(COPY_02);
@@ -504,4 +590,5 @@ SUITE (fstraight_list_test) {
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02);
     RUN_TEST(MAP_01); RUN_TEST(MAP_02);
+    RUN_TEST(APPLY_01); RUN_TEST(APPLY_02); RUN_TEST(APPLY_03); RUN_TEST(APPLY_04);
 }

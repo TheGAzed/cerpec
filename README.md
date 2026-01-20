@@ -1,6 +1,6 @@
 # CERPEC
 
-CERPEC is a personal project that aims to recreate popular data structures for the C programming language.
+CERPEC is a personal project that aims to recreate popular data structures for the C programming language. These are divided based on their length into finite and 'infinite' (adjustable) structures.
 
 ## Prerequisite
 C compiler that supports at least the **C99 standard**, for example:
@@ -22,8 +22,14 @@ C compiler that supports at least the **C99 standard**, for example:
 
 ### [SET](source/set)
 - HASH SET
+- BITWISE SET
+- RED-BLACK SET
 
 ### [TREE](source/tree)
 - BINARY SEARCH TREE
 - ALV TREE
 - RED-BLACK TREE
+
+### [MISC](source/misc)
+- BINARY HEAP
+- HASH TABLE

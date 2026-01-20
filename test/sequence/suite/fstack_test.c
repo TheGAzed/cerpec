@@ -6,9 +6,9 @@
 TEST CREATE_01(void) {
     fstack_s test = create_fstack(sizeof(int), FSTACK_CHUNK);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected sizes to be equal.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
 
     destroy_fstack(&test, destroy);
 
@@ -20,9 +20,9 @@ TEST DESTROY_01(void) {
 
     destroy_fstack(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_NEQm("[ERROR] Expected sizes to not be equal.", sizeof(int), test.size);
-    ASSERT_EQm("[ERROR] Expected size to be zero.", 0, test.size);
+    ASSERT_EQ(0, test.length);
+    ASSERT_NEQ(sizeof(int), test.size);
+    ASSERT_EQ(0, test.size);
 
     PASS();
 }
@@ -32,9 +32,9 @@ TEST CLEAR_01(void) {
 
     clear_fstack(&test, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, test.length);
-    ASSERT_EQm("[ERROR] Expected sizes to be equal.", sizeof(int), test.size);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, test.size);
+    ASSERT_EQ(0, test.length);
+    ASSERT_EQ(sizeof(int), test.size);
+    ASSERT_NEQ(0, test.size);
 
     destroy_fstack(&test, destroy);
 
@@ -73,7 +73,7 @@ TEST PEEP_01(void) {
 
         int a = 0;
         peep_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -89,7 +89,7 @@ TEST PEEP_02(void) {
 
         int a = 0;
         peep_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -107,7 +107,7 @@ TEST POP_01(void) {
     for (int i = FSTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -125,7 +125,7 @@ TEST POP_02(void) {
     for (int i = FSTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -146,7 +146,7 @@ TEST MAP_01(void) {
     for (int i = FSTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -167,7 +167,7 @@ TEST MAP_02(void) {
     for (int i = FSTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i + value, a);
+        ASSERT_EQ(i + value, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -188,7 +188,7 @@ TEST APPLY_01(void) {
     for (int i = FSTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -209,7 +209,7 @@ TEST APPLY_02(void) {
     for (int i = FSTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -230,7 +230,7 @@ TEST APPLY_03(void) {
     for (int i = 0; i < FSTACK_CHUNK - 1; ++i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);
@@ -251,7 +251,7 @@ TEST APPLY_04(void) {
     for (int i = 0; i < FSTACK_CHUNK; ++i) {
         int a = 0;
         pop_fstack(&test, &a);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, a);
+        ASSERT_EQ(i, a);
     }
 
     destroy_fstack(&test, destroy);

@@ -613,6 +613,92 @@ TEST MAP_PREV_02(void) {
     PASS();
 }
 
+TEST APPLY_01() {
+    fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
+        insert_at_fdouble_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fdouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_fdouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fdouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_02() {
+    fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
+        insert_at_fdouble_list(&test, &i, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fdouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_fdouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fdouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_03() {
+    fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
+        int reverse = (FDOUBLE_LIST_CHUNK - 1) - i - 1;
+        insert_at_fdouble_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fdouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
+        int a = 0;
+        get_fdouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fdouble_list(&test, destroy);
+
+    PASS();
+}
+
+TEST APPLY_04() {
+    fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
+        int reverse = (FDOUBLE_LIST_CHUNK) - i - 1;
+        insert_at_fdouble_list(&test, &reverse, test.length);
+    }
+
+    struct compare cmp = { .compare_element = compare, };
+    apply_fdouble_list(&test, sort, &cmp);
+
+    for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
+        int a = 0;
+        get_fdouble_list(&test, (size_t)i, &a);
+        ASSERT_EQ(i, a);
+    }
+
+    destroy_fdouble_list(&test, destroy);
+
+    PASS();
+}
+
 SUITE (fdouble_list_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(COPY_01); RUN_TEST(COPY_02);
@@ -629,4 +715,5 @@ SUITE (fdouble_list_test) {
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02);
     RUN_TEST(MAP_NEXT_01); RUN_TEST(MAP_NEXT_02);
     RUN_TEST(MAP_PREV_01); RUN_TEST(MAP_PREV_02);
+    RUN_TEST(APPLY_01); RUN_TEST(APPLY_02); RUN_TEST(APPLY_03); RUN_TEST(APPLY_04);
 }
