@@ -638,7 +638,7 @@ TEST EXTRACT_03(void) {
     PASS();
 }
 
-TEST FOREACH_01(void) {
+TEST MAP_01(void) {
     istraight_list_s test = create_istraight_list(sizeof(int));
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
@@ -659,7 +659,7 @@ TEST FOREACH_01(void) {
     PASS();
 }
 
-TEST FOREACH_02(void) {
+TEST MAP_02(void) {
     istraight_list_s test = create_istraight_list(sizeof(int));
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
@@ -680,7 +680,7 @@ TEST FOREACH_02(void) {
     PASS();
 }
 
-TEST FOREACH_03(void) {
+TEST MAP_03(void) {
     istraight_list_s test = create_istraight_list(sizeof(int));
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
@@ -713,5 +713,5 @@ SUITE (istraight_list_test) {
     RUN_TEST(SPLICE_01); RUN_TEST(SPLICE_02); RUN_TEST(SPLICE_03);
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02); RUN_TEST(SPLIT_03);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02); RUN_TEST(EXTRACT_03);
-    RUN_TEST(FOREACH_01); RUN_TEST(FOREACH_02); RUN_TEST(FOREACH_03);
+    RUN_TEST(MAP_01); RUN_TEST(MAP_02); RUN_TEST(MAP_03);
 }

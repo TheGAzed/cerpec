@@ -1,39 +1,57 @@
-#include <list/idouble_list.h>
+#include <list/fdouble_list.h>
 
 #include <assert.h>
 #include <stdlib.h> // import exit()
 #include <string.h>
 
-/// @brief Resizes structure to new size.
-/// @param list Strcuture to resize.
-/// @param size New size to be used.
-void _idouble_list_resize(idouble_list_s * const list, size_t const size);
-
 /// @brief Fills hole/empty node index with last array-based node and fixes/redirects siblings.
 /// @param list Strcuture to fill.
 /// @param hole Index of hole node.
-void _idouble_list_fill_hole(idouble_list_s * const list, size_t const hole);
+void _fdouble_list_fill_hole(fdouble_list_s * const list, size_t const hole);
 
-idouble_list_s create_idouble_list(size_t const size) {
+fdouble_list_s create_fdouble_list(size_t const size, size_t const max) {
     assert(size && "[ERROR] Paremeter can't be zero.");
+    assert(max && "[ERROR] Paremeter can't be zero.");
 
-    return (idouble_list_s) { .size = size, .allocator = &standard, };
+    fdouble_list_s const list = {
+        .max = max, .size = size, .allocator = &standard,
+        .elements = standard.alloc(max * size, standard.arguments),
+        .node[IDOUBLE_LIST_PREV] = standard.alloc(max * sizeof(size_t), standard.arguments),
+        .node[IDOUBLE_LIST_NEXT] = standard.alloc(max * sizeof(size_t), standard.arguments),
+    };
+    assert(list.elements && "[ERROR] Memory allocation failed.");
+    assert(list.node[IDOUBLE_LIST_PREV] && "[ERROR] Memory allocation failed.");
+    assert(list.node[IDOUBLE_LIST_NEXT] && "[ERROR] Memory allocation failed.");
+
+    return list;
 }
 
-idouble_list_s make_idouble_list(size_t const size, memory_s const * const allocator) {
+fdouble_list_s make_fdouble_list(size_t const size, size_t const max, memory_s const * const allocator) {
     assert(size && "[ERROR] Paremeter can't be zero.");
+    assert(max && "[ERROR] Paremeter can't be zero.");
     assert(allocator && "[ERROR] Paremeter can't be NULL.");
 
-    return (idouble_list_s) { .size = size, .allocator = allocator, };
+    fdouble_list_s const list = {
+        .max = max, .size = size, .allocator = allocator,
+        .elements = allocator->alloc(max * size, allocator->arguments),
+        .node[IDOUBLE_LIST_PREV] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .node[IDOUBLE_LIST_NEXT] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+    };
+    assert(list.elements && "[ERROR] Memory allocation failed.");
+    assert(list.node[IDOUBLE_LIST_PREV] && "[ERROR] Memory allocation failed.");
+    assert(list.node[IDOUBLE_LIST_NEXT] && "[ERROR] Memory allocation failed.");
+
+    return list;
 }
 
-void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy) {
+void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
@@ -46,20 +64,21 @@ void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy) {
     list->allocator->free(list->node[IDOUBLE_LIST_NEXT], list->allocator->arguments);
     list->allocator->free(list->node[IDOUBLE_LIST_PREV], list->allocator->arguments);
 
-    list->capacity = list->head = list->length = list->size = 0;
+    list->max = list->head = list->length = list->size = 0;
     list->node[IDOUBLE_LIST_PREV] = list->node[IDOUBLE_LIST_NEXT] = NULL;
     list->elements = NULL;
 
     list->allocator = NULL;
 }
 
-void clear_idouble_list(idouble_list_s * const list, set_fn const destroy) {
+void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(destroy && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
@@ -67,36 +86,30 @@ void clear_idouble_list(idouble_list_s * const list, set_fn const destroy) {
         current = list->node[IDOUBLE_LIST_NEXT][current];
     }
 
-    // free list's node arrays
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->node[IDOUBLE_LIST_NEXT], list->allocator->arguments);
-    list->allocator->free(list->node[IDOUBLE_LIST_PREV], list->allocator->arguments);
-
     // make list clear, but still usable
-    list->node[IDOUBLE_LIST_NEXT] = list->node[IDOUBLE_LIST_PREV] = NULL;
-    list->elements = NULL;
-    list->capacity = list->head = list->length = 0;
+    list->head = list->length = 0;
 }
 
-idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn const copy) {
+fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn const copy) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(copy && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // allocate and set replica of list
-    idouble_list_s const replica = {
-        .capacity = list->capacity, .head = list->head, .length = list->length, .size = list->size,
-        .node[IDOUBLE_LIST_NEXT] = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
-        .node[IDOUBLE_LIST_PREV] = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
-        .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments),
+    fdouble_list_s const replica = {
+        .max = list->max, .head = list->head, .length = list->length, .size = list->size,
+        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
+        .node[IDOUBLE_LIST_NEXT] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .node[IDOUBLE_LIST_PREV] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
+    assert(replica.elements && "[ERROR] Memory allocation failed.");
+    assert(replica.node[IDOUBLE_LIST_NEXT] && "[ERROR] Memory allocation failed.");
+    assert(replica.node[IDOUBLE_LIST_PREV] && "[ERROR] Memory allocation failed.");
 
     // copy nodes (elements and indexes) into list
     for (size_t i = 0; i < list->length; ++i) {
@@ -108,30 +121,38 @@ idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn cons
     return replica;
 }
 
-bool is_empty_idouble_list(idouble_list_s const * const list) {
+bool is_empty_fdouble_list(fdouble_list_s const * const list) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     return !(list->length);
 }
 
-void insert_at_idouble_list(idouble_list_s * const list, void const * const element, size_t const index) {
+bool is_full_fdouble_list(fdouble_list_s const * const list) {
+    assert(list && "[ERROR] Paremeter can't be NULL.");
+
+    assert(list->size && "[INVALID] Size can't be zero.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
+    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
+
+    return (list->length == list->max);
+}
+
+void insert_at_fdouble_list(fdouble_list_s * const list, void const * const element, size_t const index) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(element && "[ERROR] Paremeter can't be NULL.");
     assert(index <= list->length && "[ERROR] Paremeter can't be greater than length.");
     assert(element != list && "[ERROR] Paremeters can't be the same.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-
-    // if list is full resize (expand) it
-    if (list->length == list->capacity) {
-        _idouble_list_resize(list, list->capacity + IDOUBLE_LIST_CHUNK);
-    }
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -160,14 +181,15 @@ void insert_at_idouble_list(idouble_list_s * const list, void const * const elem
     list->length++;
 }
 
-void get_idouble_list(idouble_list_s const * const list, size_t const index, void * const buffer) {
+void get_fdouble_list(fdouble_list_s const * const list, size_t const index, void * const buffer) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -181,7 +203,7 @@ void get_idouble_list(idouble_list_s const * const list, size_t const index, voi
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_idouble_list(idouble_list_s * const list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_first_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(element && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
@@ -192,8 +214,9 @@ void remove_first_idouble_list(idouble_list_s * const list, void const * const r
     assert(list->node[IDOUBLE_LIST_PREV] && "[ERROR] Array can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // for each element in list travel forward
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDOUBLE_LIST_NEXT][current]) {
@@ -211,12 +234,7 @@ void remove_first_idouble_list(idouble_list_s * const list, void const * const r
             list->head = list->node[IDOUBLE_LIST_NEXT][current];
         }
 
-        _idouble_list_fill_hole(list, current);
-
-        // if smaller capacity exists then resize (shrink) list
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
-        }
+        _fdouble_list_fill_hole(list, current);
 
         return;
     }
@@ -226,7 +244,7 @@ void remove_first_idouble_list(idouble_list_s * const list, void const * const r
     exit(EXIT_FAILURE);
 }
 
-void remove_last_idouble_list(idouble_list_s * const list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_last_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(element && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
@@ -237,8 +255,9 @@ void remove_last_idouble_list(idouble_list_s * const list, void const * const re
     assert(list->node[IDOUBLE_LIST_PREV] && "[ERROR] Array can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // for each element in list travel backwards
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
@@ -258,12 +277,7 @@ void remove_last_idouble_list(idouble_list_s * const list, void const * const re
             list->head = list->node[IDOUBLE_LIST_NEXT][current];
         }
 
-        _idouble_list_fill_hole(list, current);
-
-        // if smaller capacity exists then resize (shrink) list
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
-        }
+        _fdouble_list_fill_hole(list, current);
 
         return;
     }
@@ -273,14 +287,15 @@ void remove_last_idouble_list(idouble_list_s * const list, void const * const re
     exit(EXIT_FAILURE);
 }
 
-void remove_at_idouble_list(idouble_list_s * const list, size_t const index, void * const buffer) {
+void remove_at_fdouble_list(fdouble_list_s * const list, size_t const index, void * const buffer) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(buffer && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -299,20 +314,16 @@ void remove_at_idouble_list(idouble_list_s * const list, size_t const index, voi
         list->head = list->node[IDOUBLE_LIST_NEXT][current];
     }
 
-    _idouble_list_fill_hole(list, current);
-
-    // if smaller capacity exists then resize (shrink) list
-    if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-        _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
-    }
+    _fdouble_list_fill_hole(list, current);
 }
 
-void reverse_idouble_list(idouble_list_s * const list) {
+void reverse_fdouble_list(fdouble_list_s * const list) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     size_t current = list->head;
     for (size_t i = 0; i < list->length; ++i) {
@@ -327,13 +338,14 @@ void reverse_idouble_list(idouble_list_s * const list) {
     }
 }
 
-void shift_next_idouble_list(idouble_list_s * const list, size_t const shift) {
+void shift_next_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(list->length && "[ERROR] Can't shift empty list.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -341,13 +353,14 @@ void shift_next_idouble_list(idouble_list_s * const list, size_t const shift) {
     }
 }
 
-void shift_prev_idouble_list(idouble_list_s * const list, size_t const shift) {
+void shift_prev_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(list->length && "[ERROR] Can't shift empty list.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -355,26 +368,23 @@ void shift_prev_idouble_list(idouble_list_s * const list, size_t const shift) {
     }
 }
 
-void splice_idouble_list(idouble_list_s * const restrict destination, idouble_list_s * const restrict source, size_t const index) {
+void splice_fdouble_list(fdouble_list_s * const destination, fdouble_list_s * const source, size_t const index) {
     assert(destination && "[ERROR] Paremeter can't be NULL.");
     assert(source && "[ERROR] Paremeter can't be NULL.");
     assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
     assert(destination != source && "[ERROR] Paremeters can't be the same.");
 
     assert(destination->size && "[INVALID] Size can't be zero.");
-    assert(destination->length <= destination->capacity && "[INVALID] Length exceeds capacity.");
+    assert(destination->length <= destination->max && "[INVALID] Length exceeds maximum.");
     assert(destination->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(destination->max && "[INVALID] Parameter can't be zero.");
 
     assert(source->size && "[INVALID] Size can't be zero.");
-    assert(source->length <= source->capacity && "[INVALID] Length exceeds capacity.");
+    assert(source->length <= source->max && "[INVALID] Length exceeds maximum.");
     assert(source->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(source->max && "[INVALID] Parameter can't be zero.");
 
     assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
-
-    // calculate new capacity of destination list and resize it
-    size_t const sum = destination->length + source->length;
-    size_t const mod = sum % IDOUBLE_LIST_CHUNK;
-    _idouble_list_resize(destination, mod ? sum - mod + IDOUBLE_LIST_CHUNK : sum);
 
     // determine closest direction to index and go there
     size_t current = destination->head;
@@ -414,23 +424,18 @@ void splice_idouble_list(idouble_list_s * const restrict destination, idouble_li
     destination->length += source->length;
 
     // clear (NOT DESTROY) source list
-    source->allocator->free(source->elements, source->allocator->arguments);
-    source->allocator->free(source->node[IDOUBLE_LIST_NEXT], source->allocator->arguments);
-    source->allocator->free(source->node[IDOUBLE_LIST_PREV], source->allocator->arguments);
-
-    source->node[IDOUBLE_LIST_NEXT] = source->node[IDOUBLE_LIST_PREV] = NULL;
-    source->elements = NULL;
-    source->length = source->capacity = source->head = 0;
+    source->length = source->head = 0;
 }
 
-idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const index, size_t const length) {
+fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const index, size_t const length) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
     assert(length <= list->length && "[ERROR] Paremeter can't be greater than length.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -441,18 +446,16 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     }
 
     // create split list
-    size_t const split_mod = length % IDOUBLE_LIST_CHUNK;
-    size_t const split_capacity = split_mod ? length - split_mod + IDOUBLE_LIST_CHUNK : length;
-    idouble_list_s split = {
-        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
-        .node[IDOUBLE_LIST_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
-        .node[IDOUBLE_LIST_PREV] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+    fdouble_list_s split = {
+        .head = 0, .size = list->size, .length = 0, .max = list->max, .allocator = list->allocator,
 
-        .head = 0, .size = list->size, .length = 0, .capacity = split_capacity, .allocator = list->allocator,
+        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
+        .node[IDOUBLE_LIST_NEXT] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .node[IDOUBLE_LIST_PREV] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
     };
-    assert((!split.capacity || split.elements) && "[ERROR] Memory allocation failed.");
-    assert((!split.capacity || split.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
-    assert((!split.capacity || split.node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
+    assert(split.elements && "[ERROR] Memory allocation failed.");
+    assert(split.node[IDOUBLE_LIST_NEXT] && "[ERROR] Memory allocation failed.");
+    assert(split.node[IDOUBLE_LIST_PREV] && "[ERROR] Memory allocation failed.");
 
     // push list elements into split list (includes pointer magic)
     size_t * split_current = &(split.head);
@@ -470,12 +473,7 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
             list->head = next;
         }
 
-        _idouble_list_fill_hole(list, current);
-
-        // shrink list if smaller chunk is available
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
-        }
+        _fdouble_list_fill_hole(list, current);
 
         split_current = split.node[IDOUBLE_LIST_NEXT] + (split.length - 1);
         current = (next == list->length) ? current : next;
@@ -490,16 +488,25 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     return split;
 }
 
-idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const filter, void * const arguments) {
+fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const filter, void * const arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(filter && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // only create positive to save true filtered values
-    idouble_list_s positive = { .size = list->size, .allocator = list->allocator, };
+    fdouble_list_s positive = {
+        .size = list->size, .allocator = list->allocator, .max = list->max,
+        .elements = list->allocator->alloc(list->size * list->max, list->allocator->arguments),
+        .node[IDOUBLE_LIST_PREV] = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
+        .node[IDOUBLE_LIST_NEXT] = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
+    };
+    assert(positive.elements && "[ERROR] Memory allocation failed.");
+    assert(positive.node[IDOUBLE_LIST_NEXT] && "[ERROR] Memory allocation failed.");
+    assert(positive.node[IDOUBLE_LIST_PREV] && "[ERROR] Memory allocation failed.");
 
     size_t * pos = &(positive.head);
     size_t const length = list->length; // list length may change
@@ -512,9 +519,6 @@ idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const
         } // else extract and append list node into positive list
 
         (*pos) = positive.length; // set head and next nodes to next index
-        if (positive.length == positive.capacity) { // expand capacity if needed
-            _idouble_list_resize(&positive, positive.capacity + IDOUBLE_LIST_CHUNK);
-        }
         positive.node[IDOUBLE_LIST_PREV][positive.length] = positive.length - 1; // set previous node indexes to one minus current
         positive.node[IDOUBLE_LIST_PREV][0] = positive.length; // set first node's prev to positive length
 
@@ -528,12 +532,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const
             list->head = next;
         }
 
-        _idouble_list_fill_hole(list, current);
-
-        // shrink list if smaller chunk is available
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
-        }
+        _fdouble_list_fill_hole(list, current);
 
         pos = positive.node[IDOUBLE_LIST_NEXT] + (positive.length - 1);
         current = (next == list->length) ? current : next; // nex may point to last node in array, which gets swapped
@@ -543,13 +542,14 @@ idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const
     return positive;
 }
 
-void map_next_idouble_list(idouble_list_s const * const list, handle_fn const operate, void * const arguments) {
+void map_next_fdouble_list(fdouble_list_s const * const list, handle_fn const operate, void * const arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // for each forward element in list call operate function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDOUBLE_LIST_NEXT][current]) {
@@ -559,13 +559,14 @@ void map_next_idouble_list(idouble_list_s const * const list, handle_fn const op
     }
 }
 
-void map_prev_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const arguments) {
+void map_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(handle && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
@@ -576,13 +577,14 @@ void map_prev_idouble_list(idouble_list_s const * const list, handle_fn const ha
     }
 }
 
-void apply_idouble_list(idouble_list_s const * const list, process_fn const process, void * const arguments) {
+void apply_fdouble_list(fdouble_list_s const * const list, process_fn const process, void * const arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(process && "[ERROR] Paremeter can't be NULL.");
 
     assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
+    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
     assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(list->max && "[INVALID] Parameter can't be zero.");
 
     char * elements = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
     assert((!list->length || elements) && "[ERROR] Memory allocation failed.");
@@ -603,20 +605,8 @@ void apply_idouble_list(idouble_list_s const * const list, process_fn const proc
     list->allocator->free(elements, list->allocator->arguments);
 }
 
-void _idouble_list_resize(idouble_list_s * const list, size_t const size) {
-    list->capacity = size;
 
-    list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arguments);
-    assert((!list->capacity || list->elements) && "[ERROR] Memory allocation failed.");
-
-    list->node[IDOUBLE_LIST_NEXT] = list->allocator->realloc(list->node[IDOUBLE_LIST_NEXT], list->capacity * sizeof(size_t), list->allocator->arguments);
-    assert((!list->capacity || list->node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
-
-    list->node[IDOUBLE_LIST_PREV] = list->allocator->realloc(list->node[IDOUBLE_LIST_PREV], list->capacity * sizeof(size_t), list->allocator->arguments);
-    assert((!list->capacity || list->node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
-}
-
-void _idouble_list_fill_hole(idouble_list_s * list, const size_t hole) {
+void _fdouble_list_fill_hole(fdouble_list_s * list, const size_t hole) {
     if (list->head == list->length) { list->head = hole; }
 
     // cut current removed node's siblings from itself

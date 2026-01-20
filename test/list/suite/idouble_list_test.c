@@ -759,7 +759,7 @@ TEST EXTRACT_03(void) {
     PASS();
 }
 
-TEST FOREACH_NEXT_01(void) {
+TEST MAP_NEXT_01(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
@@ -780,7 +780,7 @@ TEST FOREACH_NEXT_01(void) {
     PASS();
 }
 
-TEST FOREACH_NEXT_02(void) {
+TEST MAP_NEXT_02(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
@@ -801,7 +801,7 @@ TEST FOREACH_NEXT_02(void) {
     PASS();
 }
 
-TEST FOREACH_NEXT_03(void) {
+TEST MAP_NEXT_03(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
@@ -822,7 +822,7 @@ TEST FOREACH_NEXT_03(void) {
     PASS();
 }
 
-TEST FOREACH_PREV_01(void) {
+TEST MAP_PREV_01(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
@@ -843,7 +843,7 @@ TEST FOREACH_PREV_01(void) {
     PASS();
 }
 
-TEST FOREACH_PREV_02(void) {
+TEST MAP_PREV_02(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
@@ -864,7 +864,7 @@ TEST FOREACH_PREV_02(void) {
     PASS();
 }
 
-TEST FOREACH_PREV_03(void) {
+TEST MAP_PREV_03(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
@@ -899,6 +899,6 @@ SUITE (idouble_list_test) {
     RUN_TEST(SPLICE_01); RUN_TEST(SPLICE_02); RUN_TEST(SPLICE_03);
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02); RUN_TEST(SPLIT_03);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02); RUN_TEST(EXTRACT_03);
-    RUN_TEST(FOREACH_NEXT_01); RUN_TEST(FOREACH_NEXT_02); RUN_TEST(FOREACH_NEXT_03);
-    RUN_TEST(FOREACH_PREV_01); RUN_TEST(FOREACH_PREV_02); RUN_TEST(FOREACH_PREV_03);
+    RUN_TEST(MAP_NEXT_01); RUN_TEST(MAP_NEXT_02); RUN_TEST(MAP_NEXT_03);
+    RUN_TEST(MAP_PREV_01); RUN_TEST(MAP_PREV_02); RUN_TEST(MAP_PREV_03);
 }

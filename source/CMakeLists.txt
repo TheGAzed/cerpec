@@ -23,4 +23,7 @@ add_library(${PROJECT_NAME} cerpec.c
         sequence/fstack.c
         sequence/fqueue.c
         sequence/fdeque.c
+        list/fstraight_list.c
+        list/fcircular_list.c
+        list/fdouble_list.c
 )
