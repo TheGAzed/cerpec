@@ -3,8 +3,8 @@
 
 #include <cerpec.h>
 
-/// @brief Queue data structure.
-typedef struct infinite_queue {
+/// @brief Finite queue data structure.
+typedef struct finite_queue {
     char * elements;
     size_t size, current, length, max; // current index, element size, maximum length and structure length
     memory_s const * allocator;
