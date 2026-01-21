@@ -1,5 +1,8 @@
 add_executable(misc_test main.c
         suite/ibinary_heap_test.c
+        suite/fbinary_heap_test.c
+        suite/ihash_table_test.c
+        suite/fhash_table_test.c
 )
 
 target_include_directories(misc_test PUBLIC suite)

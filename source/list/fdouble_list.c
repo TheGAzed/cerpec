@@ -373,6 +373,7 @@ void splice_fdouble_list(fdouble_list_s * const destination, fdouble_list_s * co
     assert(source && "[ERROR] Paremeter can't be NULL.");
     assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
     assert(destination != source && "[ERROR] Paremeters can't be the same.");
+    assert(destination->length + source->length <= destination->max && "[ERROR] Spliced length exceeds maximum.");
 
     assert(destination->size && "[INVALID] Size can't be zero.");
     assert(destination->length <= destination->max && "[INVALID] Length exceeds maximum.");

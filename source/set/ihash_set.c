@@ -631,34 +631,26 @@ void map_ihash_set(const ihash_set_s * set, const handle_fn handle, void * argum
 }
 
 void _ihash_set_resize(ihash_set_s * set, const size_t size) {
-    char * elements = NULL;
-    if (size > set->capacity) { // just expand set's elements as they're continuous in memory
-        elements = realloc(set->elements, size * set->size);
-        assert(elements && "[ERROR] Memory allocation failed.");
-    } else { // else the set shrinks and elements must be pushed into new array continuously
-        elements = malloc(size * set->size);
+    char * elements = malloc(size * set->size);
+    assert((!size || elements) && "[ERROR] Memory allocation failed.");
 
-        for (size_t i = 0, index = 0; i < set->capacity; ++i) {
-            for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
-                memcpy(elements + ((index++) * set->size), set->elements + (n * set->size), set->size);
-            }
+    for (size_t i = 0, index = 0; i < set->capacity; ++i) {
+        for (size_t n = set->head[i]; NIL != n; n = set->next[n]) {
+            memcpy(elements + (index * set->size), set->elements + (n * set->size), set->size);
+            index++;
         }
-        assert((!set->capacity || set->elements) && "[ERROR] Memory allocation failed.");
-
-        free(set->elements);
     }
+
+    free(set->elements);
 
     set->capacity = size;
     set->head     = realloc(set->head, set->capacity * sizeof(size_t));
     set->next     = realloc(set->next, set->capacity * sizeof(size_t));
     set->elements = elements;
 
-    assert((!set->capacity || set->head) && "[ERROR] Memory allocation failed.");
-    assert((!set->capacity || set->next) && "[ERROR] Memory allocation failed.");
-
     set->empty = NIL;
     for (size_t i = 0; i < set->capacity; ++i) {
-        set->head[i] = NIL;
+        set->head[i] = set->next[i] = NIL;
     }
 
     for (size_t i = 0, hole = 0; i < set->length; ++i, ++hole) {

@@ -1,4 +1,4 @@
-#include <misc/ihash_table.h>
+#include <misc/fhash_table.h>
 
 #include <assert.h>
 #include <stdlib.h> // imports exit()
@@ -6,35 +6,60 @@
 
 #define NIL (size_t)(-1)
 
-/// Resizes (reallocates) table parameter arrays based on changed capacity.
-/// @param table Structure to resize.
-/// @param size New size.
-void _ihash_table_resize(ihash_table_s * const table, size_t const size);
-
-ihash_table_s create_ihash_table(size_t const key_size, size_t const value_size, hash_fn const hash)  {
+fhash_table_s create_fhash_table(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash) {
     assert(hash && "[ERROR] Parameter can't be NULL.");
     assert(key_size && "[ERROR] Parameter can't be zero.");
     assert(value_size && "[ERROR] Parameter can't be zero.");
+    assert(max && "[ERROR] Parameter can't be zero.");
 
-    return (ihash_table_s) {
-        .key_size = key_size, .value_size = value_size, .hash = hash, .empty = NIL,
+    fhash_table_s const table =  {
+        .key_size = key_size, .value_size = value_size, .hash = hash, .empty = NIL, .max = max,
         .allocator = &standard,
+        .head = standard.alloc(max * sizeof(size_t), standard.arguments),
+        .next = standard.alloc(max * sizeof(size_t), standard.arguments),
+        .keys = standard.alloc(max * key_size, standard.arguments),
+        .values = standard.alloc(max * value_size, standard.arguments),
     };
+    assert(table.head && "[ERROR] Memory allocation failed.");
+    assert(table.next && "[ERROR] Memory allocation failed.");
+    assert(table.keys && "[ERROR] Memory allocation failed.");
+    assert(table.values && "[ERROR] Memory allocation failed.");
+
+    for (size_t i = 0; i < max; ++i) {
+        table.head[i] = table.next[i] = NIL;
+    }
+
+    return table;
 }
 
-ihash_table_s make_ihash_table(size_t const key_size, size_t const value_size, hash_fn const hash, memory_s const * const allocator) {
+fhash_table_s make_fhash_table(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash, memory_s const * const allocator) {
     assert(hash && "[ERROR] Parameter can't be NULL.");
     assert(key_size && "[ERROR] Parameter can't be zero.");
     assert(value_size && "[ERROR] Parameter can't be zero.");
+    assert(max && "[ERROR] Parameter can't be zero.");
     assert(allocator && "[ERROR] Parameter can't be NULL.");
 
-    return (ihash_table_s) {
-        .key_size = key_size, .value_size = value_size, .hash = hash, .empty = NIL,
+    fhash_table_s const table =  {
+        .key_size = key_size, .value_size = value_size, .hash = hash, .empty = NIL, .max = max,
         .allocator = allocator,
+        .head = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .next = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .keys = allocator->alloc(max * key_size, allocator->arguments),
+        .values = allocator->alloc(max * value_size, allocator->arguments),
     };
+    assert(table.head && "[ERROR] Memory allocation failed.");
+    assert(table.next && "[ERROR] Memory allocation failed.");
+    assert(table.keys && "[ERROR] Memory allocation failed.");
+    assert(table.values && "[ERROR] Memory allocation failed.");
+
+    for (size_t i = 0; i < max; ++i) {
+        table.head[i] = table.next[i] = NIL;
+    }
+
+    return table;
 }
 
-void destroy_ihash_table(ihash_table_s * const table, set_fn const destroy_key, set_fn const destroy_value)  {
+void destroy_fhash_table(fhash_table_s * const table, set_fn const destroy_key, set_fn const destroy_value) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(destroy_key && "[ERROR] Parameter can't be NULL.");
     assert(destroy_value && "[ERROR] Parameter can't be NULL.");
@@ -42,11 +67,11 @@ void destroy_ihash_table(ihash_table_s * const table, set_fn const destroy_key, 
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // for each index, if each index is valid node then call destroy function on its element
-    for (size_t i = 0; i < table->capacity; ++i) {
+    for (size_t i = 0; i < table->max; ++i) {
         for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
             destroy_key(table->keys + (n * table->key_size));
             destroy_value(table->values + (n * table->value_size));
@@ -60,14 +85,14 @@ void destroy_ihash_table(ihash_table_s * const table, set_fn const destroy_key, 
     table->allocator->free(table->next, table->allocator->arguments);
 
     // table everything to zero/false
-    table->capacity = table->empty = table->key_size = table->length = table->value_size = 0;
+    table->max = table->empty = table->key_size = table->length = table->value_size = 0;
     table->hash = NULL;
     table->keys = table->values = NULL;
     table->next = NULL;
     table->allocator = NULL;
 }
 
-void clear_ihash_table(ihash_table_s * const table, set_fn const destroy_key, set_fn const destroy_value)  {
+void clear_fhash_table(fhash_table_s * table, const set_fn destroy_key, const set_fn destroy_value) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(destroy_key && "[ERROR] Parameter can't be NULL.");
     assert(destroy_value && "[ERROR] Parameter can't be NULL.");
@@ -75,32 +100,27 @@ void clear_ihash_table(ihash_table_s * const table, set_fn const destroy_key, se
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // for each index, if each index is valid node then call destroy function on its element
-    for (size_t i = 0; i < table->capacity; ++i) {
+    for (size_t i = 0; i < table->max; ++i) {
         for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
             destroy_key(table->keys + (n * table->key_size));
             destroy_value(table->values + (n * table->value_size));
         }
     }
 
-    // free arrays
-    table->allocator->free(table->head, table->allocator->arguments);
-    table->allocator->free(table->keys, table->allocator->arguments);
-    table->allocator->free(table->values, table->allocator->arguments);
-    table->allocator->free(table->next, table->allocator->arguments);
+    for (size_t i = 0; i < table->max; ++i) {
+        table->head[i] = table->next[i] = NIL;
+    }
 
     // only clear table (keep the table usable)
     table->empty = NIL;
-    table->capacity = table->length = 0;
-    table->head = NULL;
-    table->next = NULL;
-    table->keys = table->values = NULL;
+    table->length = 0;
 }
 
-ihash_table_s copy_ihash_table(ihash_table_s const * const table, copy_fn const copy_key, copy_fn const copy_value) {
+fhash_table_s copy_fhash_table(fhash_table_s const * const table, copy_fn const copy_key, copy_fn const copy_value) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(copy_key && "[ERROR] Parameter can't be NULL.");
     assert(copy_value && "[ERROR] Parameter can't be NULL.");
@@ -108,33 +128,33 @@ ihash_table_s copy_ihash_table(ihash_table_s const * const table, copy_fn const 
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
-    ihash_table_s const replica = {
-        .capacity = table->capacity, .empty = NIL, .hash = table->hash, .length = table->length,
+    fhash_table_s const replica = {
+        .max = table->max, .empty = NIL, .hash = table->hash, .length = table->length,
         .key_size = table->key_size, .value_size = table->value_size,
 
-        .keys = table->allocator->alloc(table->capacity * table->key_size, table->allocator->arguments),
-        .values = table->allocator->alloc(table->capacity * table->value_size, table->allocator->arguments),
+        .keys = table->allocator->alloc(table->max * table->key_size, table->allocator->arguments),
+        .values = table->allocator->alloc(table->max * table->value_size, table->allocator->arguments),
 
-        .head = table->allocator->alloc(table->capacity * sizeof(size_t), table->allocator->arguments),
-        .next = table->allocator->alloc(table->capacity * sizeof(size_t), table->allocator->arguments),
+        .head = table->allocator->alloc(table->max * sizeof(size_t), table->allocator->arguments),
+        .next = table->allocator->alloc(table->max * sizeof(size_t), table->allocator->arguments),
 
         .allocator = table->allocator,
     };
-    assert((!replica.capacity || replica.keys) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.values) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.head) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
+    assert(replica.keys && "[ERROR] Memory allocation failed.");
+    assert(replica.values && "[ERROR] Memory allocation failed.");
+    assert(replica.head && "[ERROR] Memory allocation failed.");
+    assert(replica.next && "[ERROR] Memory allocation failed.");
 
-    for (size_t i = 0; i < table->capacity; ++i) {
+    for (size_t i = 0; i < table->max; ++i) {
         replica.head[i] = replica.next[i] = NIL; // initially table replica heads to invalid
     }
 
     // for each index, if each index is valid node then push it into replica
-    for (size_t i = 0, hole = 0; i < table->capacity; ++i) {
+    for (size_t i = 0, hole = 0; i < table->max; ++i) {
         // if table has elements in head then push them into replica heads (like a stack)
         for (size_t n = table->head[i]; NIL != n; n = table->next[n], hole++) {
             copy_key(replica.keys + (hole * replica.key_size), table->keys + (n * table->key_size));
@@ -149,19 +169,31 @@ ihash_table_s copy_ihash_table(ihash_table_s const * const table, copy_fn const 
     return replica;
 }
 
-bool is_empty_ihash_table(ihash_table_s const * const table) {
+bool is_empty_fhash_table(fhash_table_s const * const table) {
     assert(table && "[ERROR] Parameter can't be NULL.");
 
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
 
     return !(table->length); // if 0 return 'true'
 }
 
-void insert_ihash_table(ihash_table_s * const table, void const * const key, void const * const value) {
+bool is_full_fhash_table(fhash_table_s const * const table) {
+    assert(table && "[ERROR] Parameter can't be NULL.");
+
+    assert(table->hash && "[INVALID] Parameter can't be NULL.");
+    assert(table->key_size && "[INVALID] Parameter can't be zero.");
+    assert(table->value_size && "[INVALID] Parameter can't be zero.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
+
+    return (table->length == table->max); // if 0 return 'true'
+}
+
+void insert_fhash_table(fhash_table_s * const table, void const * const restrict key, void const * const restrict value) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(value && "[ERROR] Parameter can't be NULL.");
@@ -169,17 +201,12 @@ void insert_ihash_table(ihash_table_s * const table, void const * const key, voi
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
-
-    // resize (expand) if table can't contain new element
-    if (table->length == table->capacity) {
-        _ihash_table_resize(table, table->capacity + IHASH_TABLE_CHUNK);
-    }
 
     // calculate hash values and index in array
     size_t const hash = table->hash(key);
-    size_t const index = hash % table->capacity;
+    size_t const index = hash % table->max;
 
     // check if element is in table or not
     for (size_t n = table->head[index]; NIL != n; n = table->next[n]) {
@@ -203,7 +230,7 @@ void insert_ihash_table(ihash_table_s * const table, void const * const key, voi
     table->length++;
 }
 
-void remove_ihash_table(ihash_table_s * const table, void const * const restrict key, void * const restrict key_buffer, void * const restrict value_buffer) {
+void remove_fhash_table(fhash_table_s * const table, void const * const restrict key, void * const restrict key_buffer, void * const restrict value_buffer) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(key_buffer && "[ERROR] Parameter can't be NULL.");
@@ -216,12 +243,12 @@ void remove_ihash_table(ihash_table_s * const table, void const * const restrict
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // calculate hash values and index in array
     size_t const hash = table->hash(key);
-    size_t const index = hash % table->capacity;
+    size_t const index = hash % table->max;
 
     // for each node at index check if element is contained
     for (size_t * n = table->head + index; NIL != (*n); n = table->next + (*n)) {
@@ -245,9 +272,8 @@ void remove_ihash_table(ihash_table_s * const table, void const * const restrict
             table->empty = hole;
         }
 
-        // resize (expand) if table can contain a smaller capacity of elements
-        if (table->capacity - IHASH_TABLE_CHUNK == table->length) {
-            _ihash_table_resize(table, table->capacity - IHASH_TABLE_CHUNK);
+        if (!table->length) {
+            table->empty = NIL;
         }
 
         return; // return to avoid assertion and termination at the end of function if element wasn't found
@@ -257,24 +283,19 @@ void remove_ihash_table(ihash_table_s * const table, void const * const restrict
     exit(EXIT_FAILURE); // terminate on error
 }
 
-bool contains_key_ihash_table(ihash_table_s const * const table, void const * const key) {
+bool contains_key_fhash_table(fhash_table_s const * const table, void const * const key) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
 
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
-
-    // early return to avoid 'x mod 0' by capacity
-    if (!table->capacity) {
-        return false;
-    }
 
     // calculate hash values and index in array
     size_t const hash = table->hash(key);
-    size_t const index = hash % table->capacity;
+    size_t const index = hash % table->max;
 
     // for each node at index check if element is contained and return true or false
     for (size_t n = table->head[index]; NIL != n; n = table->next[n]) {
@@ -286,7 +307,7 @@ bool contains_key_ihash_table(ihash_table_s const * const table, void const * co
     return false;
 }
 
-void get_value_ihash_table(ihash_table_s const * const table, void const * const restrict key, void * const restrict value_buffer) {
+void get_value_fhash_table(fhash_table_s const * const table, void const * const restrict key, void * const restrict value_buffer) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(value_buffer && "[ERROR] Parameter can't be NULL.");
@@ -297,11 +318,11 @@ void get_value_ihash_table(ihash_table_s const * const table, void const * const
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // calculate hash values and index in array
     size_t const hash = table->hash(key);
-    size_t const index = hash % table->capacity;
+    size_t const index = hash % table->max;
 
     // for each node at index check if element is contained
     for (size_t n = table->head[index]; NIL != n; n = table->next[n]) {
@@ -316,24 +337,24 @@ void get_value_ihash_table(ihash_table_s const * const table, void const * const
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void set_value_ihash_table(ihash_table_s const * const table, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer) {
+void set_value_fhash_table(fhash_table_s const * const table, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(value_buffer && "[ERROR] Parameter can't be NULL.");
     assert(key != value_buffer && "[ERROR] Parameters can't be the same.");
-    assert(value != value_buffer && "[ERROR] Parameters can't be the same.");
     assert(key != value && "[ERROR] Parameters can't be the same.");
+    assert(value != value_buffer && "[ERROR] Parameters can't be the same.");
     assert(table->length && "[ERROR] Structure is empty.");
 
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // calculate hash values and index in array
     size_t const hash = table->hash(key);
-    size_t const index = hash % table->capacity;
+    size_t const index = hash % table->max;
 
     // for each node at index check if element is contained
     for (size_t n = table->head[index]; NIL != n; n = table->next[n]) {
@@ -350,18 +371,18 @@ void set_value_ihash_table(ihash_table_s const * const table, void const * const
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void map_key_ihash_table(ihash_table_s const * const table, handle_fn const handle, void * const arguments) {
+void map_key_fhash_table(fhash_table_s const * const table, handle_fn const handle, void * const arguments) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // iterate over each valid key in lists
-    for (size_t i = 0; i < table->capacity; ++i) {
+    for (size_t i = 0; i < table->max; ++i) {
         for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
             if (!handle(table->keys + (n * table->key_size), arguments)) {
                 return; // return since we need to break-off of two loops
@@ -370,66 +391,22 @@ void map_key_ihash_table(ihash_table_s const * const table, handle_fn const hand
     }
 }
 
-void map_value_ihash_table(ihash_table_s const * const table, handle_fn const handle, void * const arguments) {
+void map_value_fhash_table(fhash_table_s const * const table, handle_fn const handle, void * const arguments) {
     assert(table && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
     assert(table->hash && "[INVALID] Parameter can't be NULL.");
     assert(table->key_size && "[INVALID] Parameter can't be zero.");
     assert(table->value_size && "[INVALID] Parameter can't be zero.");
-    assert(table->length <= table->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(table->length <= table->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(table->allocator && "[INVALID] Paremeter can't be NULL.");
 
     // iterate over each valid value in lists
-    for (size_t i = 0; i < table->capacity; ++i) {
+    for (size_t i = 0; i < table->max; ++i) {
         for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
             if (!handle(table->values + (n * table->value_size), arguments)) {
                 return; // return since we need to break-off of two loops
             }
         }
-    }
-}
-
-void _ihash_table_resize(ihash_table_s * const table, size_t const size) {
-    // allocate new array for keys and values based on new capacity
-    char * keys = table->allocator->alloc(size * table->key_size, table->allocator->arguments);
-    assert((!size || keys) && "[ERROR] Memory allocation failed.");
-
-    char * values = table->allocator->alloc(size * table->value_size, table->allocator->arguments);
-    assert((!size || values) && "[ERROR] Memory allocation failed.");
-
-    // for each valid key-value copy it straight into new arrays
-    for (size_t i = 0, index = 0; i < table->capacity; ++i) {
-        for (size_t n = table->head[i]; NIL != n; n = table->next[n]) {
-            memcpy(keys + (index * table->key_size), table->keys + (n * table->key_size), table->key_size);
-            memcpy(values + (index * table->key_size), table->values + (n * table->value_size), table->value_size);
-            index++;
-        }
-    }
-
-    // free up previous keys and values array
-    table->allocator->free(table->keys, table->allocator->arguments);
-    table->allocator->free(table->values, table->allocator->arguments);
-
-    // set table to new resized parameters
-    table->capacity = size;
-    table->head     = table->allocator->realloc(table->head, size * sizeof(size_t), table->allocator->arguments);
-    table->next     = table->allocator->realloc(table->next, size * sizeof(size_t), table->allocator->arguments);
-    table->keys     = keys;
-    table->values   = values;
-
-    // set empty stack index and heads to NIL (make them invalid)
-    table->empty = NIL;
-    for (size_t i = 0; i < table->capacity; ++i) {
-        table->head[i] = table->next[i] = NIL;
-    }
-
-    // reset lists by pushing hashes to their valid list
-    for (size_t i = 0; i < table->length; ++i) {
-        const size_t hash = table->hash(keys + (i * table->key_size));
-        const size_t index = hash % table->capacity;
-
-        table->next[i] = table->head[index];
-        table->head[index] = i;
     }
 }

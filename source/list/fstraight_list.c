@@ -289,6 +289,7 @@ void splice_fstraight_list(fstraight_list_s * const destination, fstraight_list_
     assert(destination && "[ERROR] Paremeter can't be NULL.");
     assert(source && "[ERROR] Paremeter can't be NULL.");
     assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
+    assert(destination->length + source->length <= destination->max && "[ERROR] Spliced length exceeds maximum.");
 
     assert(destination->size && "[INVALID] Size can't be zero.");
     assert(destination->length <= destination->max && "[INVALID] Length exceeds maximum.");
