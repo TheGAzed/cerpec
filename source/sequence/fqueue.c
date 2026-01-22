@@ -154,10 +154,11 @@ bool is_full_fqueue(fqueue_s const * const queue) {
     return (queue->length == queue->max); // return comparison of length and max
 }
 
-void enqueue_fqueue(fqueue_s * const queue, void const * const buffer) {
+void enqueue_fqueue(fqueue_s * const restrict queue, void const * const restrict buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(queue->length != queue->max && "[ERROR] Structure is full.");
+    assert(queue != buffer && "[ERROR] Parameters can't be the same.");
 
     assert(queue->size && "[INVALID] Parameter can't be zero.");
     assert(queue->max && "[INVALID] Parameter can't be zero.");
@@ -174,10 +175,11 @@ void enqueue_fqueue(fqueue_s * const queue, void const * const buffer) {
     queue->length++;
 }
 
-void dequeue_fqueue(fqueue_s * const queue, void * const buffer) {
+void dequeue_fqueue(fqueue_s * const restrict queue, void * const restrict buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Structure is empty.");
+    assert(queue != buffer && "[ERROR] Parameters can't be the same.");
 
     assert(queue->size && "[INVALID] Parameter can't be zero.");
     assert(queue->max && "[INVALID] Parameter can't be zero.");
@@ -192,10 +194,11 @@ void dequeue_fqueue(fqueue_s * const queue, void * const buffer) {
     queue->length--;
 }
 
-void peek_fqueue(fqueue_s const * const queue, void * const buffer) {
+void peek_fqueue(fqueue_s const * const restrict queue, void * const restrict buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Structure is empty.");
+    assert(queue != buffer && "[ERROR] Parameters can't be the same.");
 
     assert(queue->size && "[INVALID] Parameter can't be zero.");
     assert(queue->max && "[INVALID] Parameter can't be zero.");
@@ -208,9 +211,10 @@ void peek_fqueue(fqueue_s const * const queue, void * const buffer) {
     memcpy(buffer, queue->elements + (queue->current * queue->size), queue->size);
 }
 
-void map_fqueue(fqueue_s const * const queue, handle_fn const handle, void * const arguments) {
+void map_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
+    assert(queue != arguments && "[ERROR] Parameters can't be the same.");
 
     assert(queue->size && "[INVALID] Parameter can't be zero.");
     assert(queue->max && "[INVALID] Parameter can't be zero.");
@@ -234,9 +238,10 @@ void map_fqueue(fqueue_s const * const queue, handle_fn const handle, void * con
     }
 }
 
-void apply_fqueue(fqueue_s const * const queue, process_fn const process, void * const arguments) {
+void apply_fqueue(fqueue_s const * const restrict queue, process_fn const process, void * const restrict arguments) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(process && "[ERROR] Parameter can't be NULL.");
+    assert(queue != arguments && "[ERROR] Parameters can't be the same.");
 
     assert(queue->size && "[INVALID] Parameter can't be zero.");
     assert(queue->max && "[INVALID] Parameter can't be zero.");

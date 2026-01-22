@@ -6,6 +6,7 @@ add_library(${PROJECT_NAME} cerpec.c
         list/fstraight_list.c list/fcircular_list.c list/fdouble_list.c
 
         set/ihash_set.c set/irb_set.c set/ibitwise_set.c
+        set/fbitwise_set.c set/fhash_set.c
 
         tree/ibsearch_tree.c tree/iavl_tree.c tree/irb_tree.c
 
@@ -13,4 +14,5 @@ add_library(${PROJECT_NAME} cerpec.c
 
         misc/ihash_table.c misc/ibinary_heap.c
         misc/fbinary_heap.c misc/fhash_table.c
+        set/frb_set.c
 )

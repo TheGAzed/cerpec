@@ -11,9 +11,10 @@
 
 /// @brief Infinite hash table data structure.
 typedef struct infinite_hash_table {
-    hash_fn hash;
+    hash_fn hash_key;
+    compare_fn compare_key;
     char * keys, * values;
-    size_t * next, * head;
+    size_t * next, * head, * hashes;
     size_t key_size, value_size, empty, length, capacity;
     memory_s const * allocator;
 } ihash_table_s;
@@ -21,17 +22,19 @@ typedef struct infinite_hash_table {
 /// @brief Creates an empty structure.
 /// @param key_size Size of a single key.
 /// @param value_size Size of a single value.
-/// @param hash Function pointer to hash element into value.
+/// @param hash_key Function pointer to hash element into value.
+/// @param compare_key Function pointer to compare keys.
 /// @return Table structure.
-ihash_table_s create_ihash_table(size_t const key_size, size_t const value_size, hash_fn const hash);
+ihash_table_s create_ihash_table(size_t const key_size, size_t const value_size, hash_fn const hash_key, compare_fn const compare_key);
 
 /// @brief Creates an empty structure.
 /// @param key_size Size of a single key.
 /// @param value_size Size of a single value.
-/// @param hash Function pointer to hash element into value.
+/// @param hash_key Function pointer to hash element into value.
 /// @param allocator Custom allocator structure.
+/// @param compare_key Function pointer to compare keys.
 /// @return Table structure.
-ihash_table_s make_ihash_table(size_t const key_size, size_t const value_size, hash_fn const hash, memory_s const * const allocator);
+ihash_table_s make_ihash_table(size_t const key_size, size_t const value_size, hash_fn const hash_key, compare_fn const compare_key, memory_s const * const allocator);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param table Structure to destroy.

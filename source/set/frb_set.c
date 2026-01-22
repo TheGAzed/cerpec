@@ -1,7 +1,7 @@
-#include <set/irb_set.h>
+#include <set/frb_set.h>
 
 #include <assert.h>
-#include <stdlib.h> // imports exit()
+#include <stdlib.h>
 #include <string.h>
 
 #define NIL (0)
@@ -9,57 +9,53 @@
 /// Left set rotation that moves one node up in the set and one node down.
 /// @param set Structure to rotate.
 /// @param node Index of node to start rotations from.
-void _irb_set_left_rotate(irb_set_s * const set, size_t const node);
+void _frb_set_left_rotate(frb_set_s * const set, size_t const node);
 
 /// Right set rotation that moves one node up in the set and one node down.
 /// @param set Structure to rotate.
 /// @param node Index of node to start rotations from.
-void _irb_set_right_rotate(irb_set_s * const set, size_t const node);
+void _frb_set_right_rotate(frb_set_s * const set, size_t const node);
 
 /// Replace one subset with another.
 /// @param set Structure to replace subsets in.
 /// @param u First subset.
 /// @param v Second subset.
-void _irb_set_transplant(irb_set_s * const set, size_t const u, size_t const v);
+void _frb_set_transplant(frb_set_s * const set, size_t const u, size_t const v);
 
 /// Finds the minimum node in subset.
 /// @param set Structure to search.
 /// @param node Root of subset.
 /// @return Minimum node.
-size_t _irb_set_minimum(irb_set_s const * const set, size_t const node);
+size_t _frb_set_minimum(frb_set_s const * const set, size_t const node);
 
 /// Red black set fixup function for set insert.
 /// @param set Structure to fixup.
 /// @param node Node to start fixup upwards.
-void _irb_set_insert_fixup(irb_set_s * const set, size_t const node);
+void _frb_set_insert_fixup(frb_set_s * const set, size_t const node);
 
 /// Red black set fixup function for set removal.
 /// @param set Structure to fixup.
 /// @param node Node to start fixup upwards.
-void _irb_set_remove_fixup(irb_set_s * const set, size_t const node);
+void _frb_set_remove_fixup(frb_set_s * const set, size_t const node);
 
 /// Fills the hole left after removing an element in the set's arrays, puts rightmost element into hole.
 /// @param set Structure to fill.
 /// @param hole Index of hole in structure's arrays.
-void _irb_set_fill_hole(irb_set_s * const set, size_t const hole);
+void _frb_set_fill_hole(frb_set_s * const set, size_t const hole);
 
-/// Resizes (reallocates) set parameter arrays based on changed capacity.
-/// @param set Structure to resize.
-/// @param size New size.
-void _irb_set_resize(irb_set_s * const set, size_t const size);
-
-irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
+frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const compare) {
     assert(compare && "[ERROR] Parameter can't be NULL.");
     assert(size && "[ERROR] Parameter can't be zero.");
+    assert(max && "[ERROR] Parameter can't be zero.");
 
     // initialize structure
-    irb_set_s const set = {
-        .root = NIL, .compare = compare, .size = size,
-        .elements = standard.alloc(size, standard.arguments),
-        .color = standard.alloc(sizeof(bool), standard.arguments),
-        .parent = standard.alloc(sizeof(size_t), standard.arguments),
-        .node[IRB_SET_LEFT] = standard.alloc(sizeof(size_t), standard.arguments),
-        .node[IRB_SET_RIGHT] = standard.alloc(sizeof(size_t), standard.arguments),
+    frb_set_s const set = {
+        .root = NIL, .compare = compare, .size = size, .max = max,
+        .elements = standard.alloc((max + 1) * size, standard.arguments),
+        .color = standard.alloc((max + 1) * sizeof(bool), standard.arguments),
+        .parent = standard.alloc((max + 1) * sizeof(size_t), standard.arguments),
+        .node[IRB_SET_LEFT] = standard.alloc((max + 1) * sizeof(size_t), standard.arguments),
+        .node[IRB_SET_RIGHT] = standard.alloc((max + 1) * sizeof(size_t), standard.arguments),
         .allocator = &standard,
     };
     assert(set.elements && "[ERROR] Memory allocation failed.");
@@ -75,19 +71,20 @@ irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
     return set;
 }
 
-irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s const * const allocator) {
+frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
     assert(compare && "[ERROR] Parameter can't be NULL.");
     assert(size && "[ERROR] Parameter can't be zero.");
+    assert(max && "[ERROR] Parameter can't be zero.");
     assert(allocator && "[ERROR] Parameter can't be NULL.");
 
     // initialize structure
-    irb_set_s const set = {
-        .root = NIL, .compare = compare, .size = size,
-        .elements = allocator->alloc(size, allocator->arguments),
-        .color = allocator->alloc(sizeof(bool), allocator->arguments),
-        .parent = allocator->alloc(sizeof(size_t), allocator->arguments),
-        .node[IRB_SET_LEFT] = allocator->alloc(sizeof(size_t), allocator->arguments),
-        .node[IRB_SET_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arguments),
+    frb_set_s const set = {
+        .root = NIL, .compare = compare, .size = size, .max = max,
+        .elements = allocator->alloc((max + 1) *size, allocator->arguments),
+        .color = allocator->alloc((max + 1) *sizeof(bool), allocator->arguments),
+        .parent = allocator->alloc((max + 1) *sizeof(size_t), allocator->arguments),
+        .node[IRB_SET_LEFT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arguments),
+        .node[IRB_SET_RIGHT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arguments),
         .allocator = allocator,
     };
     assert(set.elements && "[ERROR] Memory allocation failed.");
@@ -103,13 +100,13 @@ irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s con
     return set;
 }
 
-void destroy_irb_set(irb_set_s * const set, set_fn const destroy) {
+void destroy_frb_set(frb_set_s * const set, set_fn const destroy) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
@@ -124,7 +121,7 @@ void destroy_irb_set(irb_set_s * const set, set_fn const destroy) {
     set->allocator->free(set->node[IRB_SET_RIGHT], set->allocator->arguments);
 
     // make strucutre invalid/set to zero
-    set->capacity = set->length = set->root = set->size = 0;
+    set->max = set->length = set->root = set->size = 0;
     set->allocator = NULL;
     set->color = NULL;
     set->compare = NULL;
@@ -132,55 +129,42 @@ void destroy_irb_set(irb_set_s * const set, set_fn const destroy) {
     set->node[IRB_SET_LEFT] = set->node[IRB_SET_RIGHT] = set->parent = NULL;
 }
 
-void clear_irb_set(irb_set_s * const set, set_fn const destroy) {
+void clear_frb_set(frb_set_s * const set, set_fn const destroy) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
         destroy(set->elements + (i * set->size));
     }
 
-    // shrink arrays to hold only one node
-    set->elements = set->allocator->realloc(set->elements, set->size, set->allocator->arguments);
-    set->color = set->allocator->realloc(set->color, sizeof(bool), set->allocator->arguments);
-    set->parent = set->allocator->realloc(set->parent, sizeof(size_t), set->allocator->arguments);
-    set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], sizeof(size_t), set->allocator->arguments);
-    set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], sizeof(size_t), set->allocator->arguments);
-
-    assert(set->elements && "[ERROR] Memory allocation failed.");
-    assert(set->color && "[ERROR] Memory allocation failed.");
-    assert(set->parent && "[ERROR] Memory allocation failed.");
-    assert(set->node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(set->node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
-
     // clear (NOT destroy) structure
     set->root = NIL;
-    set->capacity = set->length = 0;
+    set->length = 0;
 }
 
-irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy) {
+frb_set_s copy_frb_set(frb_set_s const * const set, copy_fn const copy) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // initialize replica
-    irb_set_s const replica = {
-        .elements = set->allocator->alloc((set->capacity + 1) * set->size, set->allocator->arguments),
-        .color = set->allocator->alloc((set->capacity + 1) * sizeof(bool), set->allocator->arguments),
-        .parent = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arguments),
-        .node[IRB_SET_LEFT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arguments),
-        .node[IRB_SET_RIGHT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arguments),
+    frb_set_s const replica = {
+        .elements = set->allocator->alloc((set->max + 1) * set->size, set->allocator->arguments),
+        .color = set->allocator->alloc((set->max + 1) * sizeof(bool), set->allocator->arguments),
+        .parent = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arguments),
+        .node[IRB_SET_LEFT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arguments),
+        .node[IRB_SET_RIGHT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arguments),
         .allocator = set->allocator,
 
-        .capacity = set->capacity, .root = set->root, .length = set->length, .compare = set->compare, .size = set->size,
+        .max = set->max, .root = set->root, .length = set->length, .compare = set->compare, .size = set->size,
     };
 
     // since the structure always has one additional NIL node malloc must be checked even if capacity is zero
@@ -203,26 +187,33 @@ irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy) {
     return replica;
 }
 
-bool is_empty_irb_set(irb_set_s const * const set) {
+bool is_empty_frb_set(frb_set_s const * const set) {
     assert(set && "[ERROR] Parameter can't be NULL.");
+
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
 
     return !(set->length);
 }
 
-void insert_irb_set(irb_set_s * const set, void const * const element) {
+bool is_full_frb_set(frb_set_s const * const set) {
+    assert(set && "[ERROR] Parameter can't be NULL.");
+
+    assert(set->compare && "[INVALID] Parameter can't be NULL.");
+    assert(set->size && "[INVALID] Parameter can't be zero.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+
+    return (set->length == set->max);
+}
+
+void insert_frb_set(frb_set_s * const set, void const * const element) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
 
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
-
-    if (set->length == set->capacity) {
-        _irb_set_resize(set, set->capacity + IRB_SET_CHUNK);
-    }
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
 
     size_t previous = NIL; // initially invalid for the head case when set is empty
     size_t * node = &(set->root); // pointer to later change actual index of the empty child
@@ -245,17 +236,17 @@ void insert_irb_set(irb_set_s * const set, void const * const element) {
     memcpy(set->elements + ((*node) * set->size), element, set->size);
     set->length++;
 
-    _irb_set_insert_fixup(set, (*node));
+    _frb_set_insert_fixup(set, (*node));
 }
 
-void remove_irb_set(irb_set_s * const set, void const * const element, void * const buffer) {
+void remove_frb_set(frb_set_s * const set, void const * const element, void * const buffer) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(set->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
 
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(set->elements && "[INVALID] Paremeter can't be NULL.");
     assert(set->parent && "[INVALID] Paremeter can't be NULL.");
     assert(set->node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
@@ -286,30 +277,30 @@ void remove_irb_set(irb_set_s * const set, void const * const element, void * co
     bool original_color = set->color[current];
     if (NIL == set->node[IRB_SET_LEFT][node]) {
         child = set->node[IRB_SET_RIGHT][node];
-        _irb_set_transplant(set, node, set->node[IRB_SET_RIGHT][node]);
+        _frb_set_transplant(set, node, set->node[IRB_SET_RIGHT][node]);
     } else if (NIL == set->node[IRB_SET_RIGHT][node]) {
         child = set->node[IRB_SET_LEFT][node];
-        _irb_set_transplant(set, node, set->node[IRB_SET_LEFT][node]);
+        _frb_set_transplant(set, node, set->node[IRB_SET_LEFT][node]);
     } else {
-        current = _irb_set_minimum(set, set->node[IRB_SET_RIGHT][node]);
+        current = _frb_set_minimum(set, set->node[IRB_SET_RIGHT][node]);
         original_color = set->color[current];
         child = set->node[IRB_SET_RIGHT][current];
 
         if (set->parent[current] == node) {
             set->parent[child] = current;
         } else {
-            _irb_set_transplant(set, current, set->node[IRB_SET_RIGHT][current]);
+            _frb_set_transplant(set, current, set->node[IRB_SET_RIGHT][current]);
             set->node[IRB_SET_RIGHT][current] = set->node[IRB_SET_RIGHT][node];
             set->parent[set->node[IRB_SET_RIGHT][current]] = current;
         }
-        _irb_set_transplant(set, node, current);
+        _frb_set_transplant(set, node, current);
         set->node[IRB_SET_LEFT][current] = set->node[IRB_SET_LEFT][node];
         set->parent[set->node[IRB_SET_LEFT][current]] = current;
         set->color[current] = set->color[node];
     }
 
     if (IBLACK_SET_COLOR == original_color) {
-        _irb_set_remove_fixup(set, child);
+        _frb_set_remove_fixup(set, child);
     }
 
     // fix NIL node
@@ -320,20 +311,16 @@ void remove_irb_set(irb_set_s * const set, void const * const element, void * co
     memcpy(buffer, set->elements + (node * set->size), set->size);
     set->length--;
 
-    _irb_set_fill_hole(set, node);
-
-    if (set->length == set->capacity - IRB_SET_CHUNK) {
-        _irb_set_resize(set, set->length);
-    }
+    _frb_set_fill_hole(set, node);
 }
 
-bool contains_irb_set(irb_set_s const * const set, void const * const element) {
+bool contains_frb_set(frb_set_s const * const set, void const * const element) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
 
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
     assert(set->elements && "[INVALID] Paremeter can't be NULL.");
     assert(set->parent && "[INVALID] Paremeter can't be NULL.");
     assert(set->node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
@@ -353,7 +340,7 @@ bool contains_irb_set(irb_set_s const * const set, void const * const element) {
     return false;
 }
 
-irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy) {
+frb_set_s union_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy) {
     assert(set_one && "[ERROR] Parameter can't be NULL.");
     assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
@@ -362,18 +349,18 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
 
     assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
 
     assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements to maximum's replica
-    irb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
-    irb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
+    frb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
+    frb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
-    irb_set_s set_union = copy_irb_set(maximum, copy);
+    frb_set_s set_union = copy_frb_set(maximum, copy);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -397,10 +384,6 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
             continue;
         } // else add minimum's element to set union
 
-        if (set_union.length == set_union.capacity) {
-            _irb_set_resize(&set_union, set_union.capacity + IRB_SET_CHUNK);
-        }
-
         size_t previous = NIL; // initially invalid for the head case when set is empty
         size_t * node = &(set_union.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
@@ -421,13 +404,13 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
         copy(set_union.elements + ((*node) * set_union.size), element);
         set_union.length++;
 
-        _irb_set_insert_fixup(&set_union, (*node));
+        _frb_set_insert_fixup(&set_union, (*node));
     }
 
     return set_union;
 }
 
-irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy) {
+frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy) {
     assert(set_one && "[ERROR] Parameter can't be NULL.");
     assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
@@ -436,17 +419,19 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
 
     assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
 
     assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements
-    irb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
-    irb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
+    frb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
+    frb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
-    irb_set_s set_intersect = make_irb_set(set_one->size, set_one->compare, set_one->allocator);
+    frb_set_s const * const smallest = set_one->max < set_two->max ? set_one : set_two;
+
+    frb_set_s set_intersect = make_frb_set(smallest->size, smallest->max, smallest->compare, smallest->allocator);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -470,10 +455,6 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
             continue;
         } // else add minimum's element to set union
 
-        if (set_intersect.length == set_intersect.capacity) {
-            _irb_set_resize(&set_intersect, set_intersect.capacity + IRB_SET_CHUNK);
-        }
-
         size_t previous = NIL; // initially invalid for the head case when set is empty
         size_t * node = &(set_intersect.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
@@ -494,13 +475,13 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
         copy(set_intersect.elements + ((*node) * set_intersect.size), element);
         set_intersect.length++;
 
-        _irb_set_insert_fixup(&set_intersect, (*node));
+        _frb_set_insert_fixup(&set_intersect, (*node));
     }
 
     return set_intersect;
 }
 
-irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * const subtrahend, copy_fn const copy) {
+frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * const subtrahend, copy_fn const copy) {
     assert(minuend && "[ERROR] Parameter can't be NULL.");
     assert(subtrahend && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
@@ -509,13 +490,13 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
 
     assert(minuend->compare && "[INVALID] Parameter can't be NULL.");
     assert(minuend->size && "[INVALID] Parameter can't be zero.");
-    assert(minuend->length <= minuend->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(minuend->length <= minuend->max && "[INVALID] Lenght can't be larger than maximum.");
 
     assert(subtrahend->compare && "[INVALID] Parameter can't be NULL.");
     assert(subtrahend->size && "[INVALID] Parameter can't be zero.");
-    assert(subtrahend->length <= subtrahend->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subtrahend->length <= subtrahend->max && "[INVALID] Lenght can't be larger than maximum.");
 
-    irb_set_s set_subtract = make_irb_set(minuend->size, minuend->compare, minuend->allocator);
+    frb_set_s set_subtract = make_frb_set(minuend->size, minuend->max, minuend->compare, minuend->allocator);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -539,10 +520,6 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
             continue;
         } // else add minuend's element to set union
 
-        if (set_subtract.length == set_subtract.capacity) {
-            _irb_set_resize(&set_subtract, set_subtract.capacity + IRB_SET_CHUNK);
-        }
-
         size_t previous = NIL; // initially invalid for the head case when set is empty
         size_t * node = &(set_subtract.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
@@ -563,13 +540,13 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
         copy(set_subtract.elements + ((*node) * set_subtract.size), element);
         set_subtract.length++;
 
-        _irb_set_insert_fixup(&set_subtract, (*node));
+        _frb_set_insert_fixup(&set_subtract, (*node));
     }
 
     return set_subtract;
 }
 
-irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy) {
+frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy) {
     assert(set_one && "[ERROR] Parameter can't be NULL.");
     assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
@@ -578,13 +555,15 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
 
     assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
 
     assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
 
-    irb_set_s set_exclude = make_irb_set(set_one->size, set_one->compare, set_one->allocator);
+    frb_set_s const * const biggest = set_one->max >= set_two->max ? set_one : set_two;
+
+    frb_set_s set_exclude = make_frb_set(biggest->size, biggest->max, biggest->compare, biggest->allocator);
 
     // for each element in set one
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -608,10 +587,6 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
             continue;
         } // else add minimum's element to set union
 
-        if (set_exclude.length == set_exclude.capacity) {
-            _irb_set_resize(&set_exclude, set_exclude.capacity + IRB_SET_CHUNK);
-        }
-
         size_t previous = NIL; // initially invalid for the head case when set is empty
         size_t * node = &(set_exclude.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
@@ -632,7 +607,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         copy(set_exclude.elements + ((*node) * set_exclude.size), element);
         set_exclude.length++;
 
-        _irb_set_insert_fixup(&set_exclude, (*node));
+        _frb_set_insert_fixup(&set_exclude, (*node));
     }
 
     // for each element in set two
@@ -657,10 +632,6 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
             continue;
         } // else add minimum's element to set union
 
-        if (set_exclude.length == set_exclude.capacity) {
-            _irb_set_resize(&set_exclude, set_exclude.capacity + IRB_SET_CHUNK);
-        }
-
         size_t previous = NIL; // initially invalid for the head case when set is empty
         size_t * node = &(set_exclude.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
@@ -681,13 +652,13 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         copy(set_exclude.elements + ((*node) * set_exclude.size), element);
         set_exclude.length++;
 
-        _irb_set_insert_fixup(&set_exclude, (*node));
+        _frb_set_insert_fixup(&set_exclude, (*node));
     }
 
     return set_exclude;
 }
 
-bool is_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const subset) {
+bool is_subset_frb_set(frb_set_s const * const superset, frb_set_s const * const subset) {
     assert(superset && "[ERROR] Parameter can't be NULL.");
     assert(subset && "[ERROR] Parameter can't be NULL.");
     assert(superset->compare == subset->compare && "[ERROR] Function pointers must be the same.");
@@ -695,11 +666,11 @@ bool is_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const
 
     assert(superset->compare && "[INVALID] Parameter can't be NULL.");
     assert(superset->size && "[INVALID] Parameter can't be zero.");
-    assert(superset->length <= superset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(superset->length <= superset->max && "[INVALID] Lenght can't be larger than maximum.");
 
     assert(subset->compare && "[INVALID] Parameter can't be NULL.");
     assert(subset->size && "[INVALID] Parameter can't be zero.");
-    assert(subset->length <= subset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subset->length <= subset->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < subset->length + 1; ++i) {
@@ -725,7 +696,7 @@ bool is_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const
     return true;
 }
 
-bool is_proper_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const subset) {
+bool is_proper_subset_frb_set(frb_set_s const * const superset, frb_set_s const * const subset) {
     assert(superset && "[ERROR] Parameter can't be NULL.");
     assert(subset && "[ERROR] Parameter can't be NULL.");
     assert(superset->compare == subset->compare && "[ERROR] Function pointers must be the same.");
@@ -733,11 +704,11 @@ bool is_proper_subset_irb_set(irb_set_s const * const superset, irb_set_s const 
 
     assert(superset->compare && "[INVALID] Parameter can't be NULL.");
     assert(superset->size && "[INVALID] Parameter can't be zero.");
-    assert(superset->length <= superset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(superset->length <= superset->max && "[INVALID] Lenght can't be larger than maximum.");
 
     assert(subset->compare && "[INVALID] Parameter can't be NULL.");
     assert(subset->size && "[INVALID] Parameter can't be zero.");
-    assert(subset->length <= subset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subset->length <= subset->max && "[INVALID] Lenght can't be larger than maximum.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < subset->length + 1; ++i) {
@@ -763,7 +734,7 @@ bool is_proper_subset_irb_set(irb_set_s const * const superset, irb_set_s const 
     return (subset->length != superset->length);
 }
 
-bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two) {
+bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two) {
     assert(set_one && "[ERROR] Parameter can't be NULL.");
     assert(set_two && "[ERROR] Parameter can't be NULL.");
     assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
@@ -771,14 +742,14 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
 
     assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
 
     assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
     assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
 
-    irb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
-    irb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
+    frb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
+    frb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < minimum->length + 1; ++i) {
@@ -804,18 +775,18 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
     return true;
 }
 
-void map_irb_set(irb_set_s const * const set, handle_fn const handle, void * const arguments) {
+void map_frb_set(frb_set_s const * const set, handle_fn const handle, void * const arguments) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
     assert(set->compare && "[INVALID] Parameter can't be NULL.");
     assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
 
     for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), arguments); ++i) {}
 }
 
-void _irb_set_left_rotate(irb_set_s * const set, size_t const node) {
+void _frb_set_left_rotate(frb_set_s * const set, size_t const node) {
     size_t const x = node, y = set->node[IRB_SET_RIGHT][x], z = set->node[IRB_SET_LEFT][y];
 
     set->node[IRB_SET_RIGHT][x] = z;
@@ -836,7 +807,7 @@ void _irb_set_left_rotate(irb_set_s * const set, size_t const node) {
     set->parent[x] = y;
 }
 
-void _irb_set_right_rotate(irb_set_s * const set, size_t const node) {
+void _frb_set_right_rotate(frb_set_s * const set, size_t const node) {
     size_t const x = node, y = set->node[IRB_SET_LEFT][x], z = set->node[IRB_SET_RIGHT][y];
 
     set->node[IRB_SET_LEFT][x] = z;
@@ -857,7 +828,7 @@ void _irb_set_right_rotate(irb_set_s * const set, size_t const node) {
     set->parent[x] = y;
 }
 
-void _irb_set_transplant(irb_set_s * const set, size_t const u, size_t const v) {
+void _frb_set_transplant(frb_set_s * const set, size_t const u, size_t const v) {
     if (NIL == set->parent[u]) {
         set->root = v;
     } else if (u == set->node[IRB_SET_LEFT][set->parent[u]]) {
@@ -869,7 +840,7 @@ void _irb_set_transplant(irb_set_s * const set, size_t const u, size_t const v) 
     set->parent[v] = set->parent[u];
 }
 
-size_t _irb_set_minimum(irb_set_s const * const set, size_t const node) {
+size_t _frb_set_minimum(frb_set_s const * const set, size_t const node) {
     size_t n = node;
     while (NIL != set->node[IRB_SET_LEFT][n]) { // SET MINIMUM
         n = set->node[IRB_SET_LEFT][n];
@@ -878,7 +849,7 @@ size_t _irb_set_minimum(irb_set_s const * const set, size_t const node) {
     return n;
 }
 
-void _irb_set_insert_fixup(irb_set_s * const set, size_t const node) {
+void _frb_set_insert_fixup(frb_set_s * const set, size_t const node) {
     for (size_t child = node; child != set->root && IRED_SET_COLOR == set->color[set->parent[child]];) {
         if (set->parent[child] == set->node[IRB_SET_LEFT][set->parent[set->parent[child]]]) {
             size_t const uncle = set->node[IRB_SET_RIGHT][set->parent[set->parent[child]]];
@@ -890,12 +861,12 @@ void _irb_set_insert_fixup(irb_set_s * const set, size_t const node) {
             } else {
                 if (child == set->node[IRB_SET_RIGHT][set->parent[child]]) {
                     child = set->parent[child];
-                    _irb_set_left_rotate(set, child);
+                    _frb_set_left_rotate(set, child);
                 }
 
                 set->color[set->parent[child]] = IBLACK_SET_COLOR;
                 set->color[set->parent[set->parent[child]]] = IRED_SET_COLOR;
-                _irb_set_right_rotate(set, set->parent[set->parent[child]]);
+                _frb_set_right_rotate(set, set->parent[set->parent[child]]);
             }
         } else {
             size_t const uncle = set->node[IRB_SET_LEFT][set->parent[set->parent[child]]];
@@ -907,12 +878,12 @@ void _irb_set_insert_fixup(irb_set_s * const set, size_t const node) {
             } else {
                 if (child == set->node[IRB_SET_LEFT][set->parent[child]]) {
                     child = set->parent[child];
-                    _irb_set_right_rotate(set, child);
+                    _frb_set_right_rotate(set, child);
                 }
 
                 set->color[set->parent[child]] = IBLACK_SET_COLOR;
                 set->color[set->parent[set->parent[child]]] = IRED_SET_COLOR;
-                _irb_set_left_rotate(set, set->parent[set->parent[child]]);
+                _frb_set_left_rotate(set, set->parent[set->parent[child]]);
             }
         }
     }
@@ -924,7 +895,7 @@ void _irb_set_insert_fixup(irb_set_s * const set, size_t const node) {
     set->color[set->root] = IBLACK_SET_COLOR;
 }
 
-void _irb_set_remove_fixup(irb_set_s * const set, size_t const node) {
+void _frb_set_remove_fixup(frb_set_s * const set, size_t const node) {
     size_t child = node;
     while (child != set->root && IBLACK_SET_COLOR == set->color[child]) {
         if (child == set->parent[child]) {
@@ -932,7 +903,7 @@ void _irb_set_remove_fixup(irb_set_s * const set, size_t const node) {
             if (IRED_SET_COLOR == set->color[sibling]) {
                 set->color[sibling] = IBLACK_SET_COLOR;
                 set->color[set->parent[child]] = IRED_SET_COLOR;
-                _irb_set_left_rotate(set, set->parent[child]);
+                _frb_set_left_rotate(set, set->parent[child]);
                 sibling = set->node[IRB_SET_RIGHT][set->parent[child]];
             }
 
@@ -946,14 +917,14 @@ void _irb_set_remove_fixup(irb_set_s * const set, size_t const node) {
                 if (IBLACK_SET_COLOR == set->color[set->node[IRB_SET_RIGHT][sibling]]) {
                     set->color[set->node[IRB_SET_LEFT][sibling]] = IBLACK_SET_COLOR;
                     set->color[sibling] = IRED_SET_COLOR;
-                    _irb_set_right_rotate(set, sibling);
+                    _frb_set_right_rotate(set, sibling);
                     sibling = set->node[IRB_SET_RIGHT][set->parent[child]];
                 }
 
                 set->color[sibling] = set->color[set->parent[child]];
                 set->color[set->parent[child]] = IBLACK_SET_COLOR;
                 set->color[set->node[IRB_SET_RIGHT][sibling]] = IBLACK_SET_COLOR;
-                _irb_set_left_rotate(set, set->parent[child]);
+                _frb_set_left_rotate(set, set->parent[child]);
                 child = set->root;
             }
         } else {
@@ -961,7 +932,7 @@ void _irb_set_remove_fixup(irb_set_s * const set, size_t const node) {
             if (IRED_SET_COLOR == set->color[sibling]) {
                 set->color[sibling] = IBLACK_SET_COLOR;
                 set->color[set->parent[child]] = IRED_SET_COLOR;
-                _irb_set_right_rotate(set, set->parent[child]);
+                _frb_set_right_rotate(set, set->parent[child]);
                 sibling = set->node[IRB_SET_LEFT][set->parent[child]];
             }
 
@@ -975,14 +946,14 @@ void _irb_set_remove_fixup(irb_set_s * const set, size_t const node) {
                 if (IBLACK_SET_COLOR == set->color[set->node[IRB_SET_LEFT][sibling]]) {
                     set->color[set->node[IRB_SET_LEFT][sibling]] = IBLACK_SET_COLOR;
                     set->color[sibling] = IRED_SET_COLOR;
-                    _irb_set_left_rotate(set, sibling);
+                    _frb_set_left_rotate(set, sibling);
                     sibling = set->node[IRB_SET_LEFT][set->parent[child]];
                 }
 
                 set->color[sibling] = set->color[set->parent[child]];
                 set->color[set->parent[child]] = IBLACK_SET_COLOR;
                 set->color[set->node[IRB_SET_LEFT][sibling]] = IBLACK_SET_COLOR;
-                _irb_set_right_rotate(set, set->parent[child]);
+                _frb_set_right_rotate(set, set->parent[child]);
                 child = set->root;
             }
         }
@@ -991,7 +962,7 @@ void _irb_set_remove_fixup(irb_set_s * const set, size_t const node) {
     set->color[child] = IBLACK_SET_COLOR;
 }
 
-void _irb_set_fill_hole(irb_set_s * const set, size_t const hole) {
+void _frb_set_fill_hole(frb_set_s * const set, size_t const hole) {
     size_t const last = set->length + 1;
     if (set->length && set->root == last) { // if head node is last array element then change index to removed one
         set->root = hole;
@@ -1025,24 +996,4 @@ void _irb_set_fill_hole(irb_set_s * const set, size_t const hole) {
         size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
         set->node[node_index][parent_last] = hole;
     }
-}
-
-void _irb_set_resize(irb_set_s * const set, size_t const size) {
-    set->capacity = size;
-    size_t const resize = set->capacity + 1; // +1 to account for special NIL node
-
-    set->elements = set->allocator->realloc(set->elements, resize * set->size, set->allocator->arguments);
-    assert(set->elements && "[ERROR] Memory allocation failed.");
-
-    set->color = set->allocator->realloc(set->color, resize * sizeof(bool), set->allocator->arguments);
-    assert(set->color && "[ERROR] Memory allocation failed.");
-
-    set->parent = set->allocator->realloc(set->parent, resize * sizeof(size_t), set->allocator->arguments);
-    assert(set->parent && "[ERROR] Memory allocation failed.");
-
-    set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], resize * sizeof(size_t), set->allocator->arguments);
-    assert(set->node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-
-    set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], resize * sizeof(size_t), set->allocator->arguments);
-    assert(set->node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
 }

@@ -5,6 +5,8 @@
 
 #if !defined(ISTACK_CHUNK)
 #   define ISTACK_CHUNK CERPEC_CHUNK
+#elif ISTACK_CHUNK <= 0
+#   error "Chunk size must be greater than zero."
 #endif
 
 /// @brief Stack data structure.

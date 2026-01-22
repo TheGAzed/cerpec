@@ -132,7 +132,7 @@ bool is_empty_iqueue(iqueue_s const * const queue) {
     return (queue->length == 0);
 }
 
-void peek_iqueue(iqueue_s const * const queue, void * const buffer) {
+void peek_iqueue(iqueue_s const * const restrict queue, void * const restrict buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Can't peek empty structure.");
     assert(queue->tail && "[ERROR] Tail can't be NULL");
@@ -144,7 +144,7 @@ void peek_iqueue(iqueue_s const * const queue, void * const buffer) {
     memcpy(buffer, queue->tail->next->elements + (queue->current * queue->size), queue->size);
 }
 
-void enqueue_iqueue(iqueue_s * const queue, void const * const buffer) {
+void enqueue_iqueue(iqueue_s * const restrict queue, void const * const restrict buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(~(queue->length) && "[ERROR] Queue's size will overflow.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
@@ -174,7 +174,7 @@ void enqueue_iqueue(iqueue_s * const queue, void const * const buffer) {
     queue->length++;
 }
 
-void dequeue_iqueue(iqueue_s * const queue, void * const buffer) {
+void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffer) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(queue->length && "[ERROR] Strucutre can't be empty.");
     assert(queue->tail && "[ERROR] Tail can't be NULL");
@@ -202,7 +202,7 @@ void dequeue_iqueue(iqueue_s * const queue, void * const buffer) {
     }
 }
 
-void map_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const arguments) {
+void map_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL");
 
@@ -226,7 +226,7 @@ void map_iqueue(iqueue_s const * const queue, handle_fn const handle, void * con
     }
 }
 
-void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const arguments) {
+void apply_iqueue(iqueue_s const * const restrict queue, process_fn const process, void * const restrict arguments) {
     assert(queue && "[ERROR] Parameter can't be NULL.");
     assert(process && "[ERROR] Parameter can't be NULL");
 
