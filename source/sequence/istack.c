@@ -90,6 +90,7 @@ bool is_empty_istack(istack_s const * const stack) {
 void push_istack(istack_s * const restrict stack, void const * const restrict element) {
     error(stack && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
+    error(stack != element && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
@@ -111,6 +112,7 @@ void pop_istack(istack_s * const restrict stack, void * const restrict buffer) {
     error(buffer && "Paremeter can't be NULL.");
     error(stack->length && "Length can't be zero.");
     error(stack->elements && "Elements can't be NULL.");
+    error(stack != buffer && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
@@ -132,6 +134,7 @@ void peep_istack(istack_s const * const restrict stack, void * const restrict bu
     error(buffer && "Paremeter can't be NULL.");
     error(stack->length && "Length can't be zero.");
     error(stack->elements && "Elements can't be NULL.");
+    error(stack != buffer && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
@@ -144,6 +147,7 @@ void peep_istack(istack_s const * const restrict stack, void * const restrict bu
 void map_istack(istack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments) {
     error(stack && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
+    error(stack != arguments && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
@@ -156,6 +160,7 @@ void map_istack(istack_s const * const restrict stack, handle_fn const handle, v
 void apply_istack(istack_s const * const restrict stack, process_fn const process, void * const restrict arguments) {
     error(stack && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
+    error(stack != arguments && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
