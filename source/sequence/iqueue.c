@@ -1,27 +1,27 @@
 #include <sequence/iqueue.h>
 
-#include <assert.h>
 #include <string.h>
 
 iqueue_s create_iqueue(size_t const size) {
-    assert(size && "[ERROR] Parameter can't be zero.");
+    error(size && "Parameter can't be zero.");
 
     return (iqueue_s) { .size = size, .allocator = &standard };
 }
 
 iqueue_s make_iqueue(size_t const size, memory_s const * const allocator) {
-    assert(size && "[ERROR] Parameter can't be zero.");
-    assert(allocator && "[ERROR] Paremeter can't be NULL.");
+    error(size && "Parameter can't be zero.");
+    error(allocator && "Paremeter can't be NULL.");
 
     return (iqueue_s) { .size = size, .allocator = allocator };
 }
 
 void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+    error(queue && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     // for each node starting from tail (previous to head)
     struct infinite_queue_node * previous = queue->tail;
@@ -49,11 +49,12 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
 }
 
 void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+    error(queue && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     // for each node starting from tail (previous to head)
     struct infinite_queue_node * previous = queue->tail;
@@ -79,11 +80,12 @@ void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
 }
 
 iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
+    error(queue && "Parameter can't be NULL.");
+    error(copy && "Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     // create properly initialized replica
     iqueue_s replica = { .size = queue->size, .length = queue->length, .current = queue->current };
@@ -92,29 +94,26 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
     struct infinite_queue_node const * current_queue = queue->tail;
     struct infinite_queue_node ** current_copy = &(replica.tail); // two pointer list to remove special .head case
 
-    // set remaining length and start index for copying
-    size_t remaining = queue->length, start = queue->current;
     struct infinite_queue_node * last = NULL;
-    while (remaining) {
+    for (size_t r = queue->length, s = queue->current; r; s = 0) {
         // allocate new node for replica
         last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node), queue->allocator->arguments);
-        assert((*current_copy) && "[ERROR] Memory allocation failed");
+        error((*current_copy) && "Memory allocation failed");
 
         // allocate new elements array for replica
         (*current_copy)->elements = queue->allocator->alloc(IQUEUE_CHUNK * queue->size, queue->allocator->arguments);
-        assert((*current_copy)->elements && "[ERROR] Memory allocation failed.");
+        error((*current_copy)->elements && "Memory allocation failed.");
 
         // redirect current replica's node with replica's tail fopr circularity
         (*current_copy)->next = replica.tail;
         current_queue = current_queue->next;
 
         // outside for loop to get copied chunk size, since it can either be 'remaining' or 'IQUEUE_CHUNK'
-        size_t i = start;
-        for (; i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than both 'remaining' and 'IQUEUE_CHUNK'
+        size_t i = s;
+        for (; i < r && i < IQUEUE_CHUNK; ++i) { // while i is less than both 'remaining' and 'IQUEUE_CHUNK'
             copy((*current_copy)->elements + (i * queue->size), current_queue->elements + (i * queue->size));
         }
-        remaining -= i; // subtract copied size from remaining size using i
-        start = 0; // set start index to zero since we only need start index startinf from queue's currrent in tail node
+        r -= i; // subtract copied size from remaining size using i
 
         current_copy = &((*current_copy)->next);
     }
@@ -124,42 +123,47 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
 }
 
 bool is_empty_iqueue(iqueue_s const * const queue) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
+    error(queue && "Parameter can't be NULL.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     return (queue->length == 0);
 }
 
 void peek_iqueue(iqueue_s const * const restrict queue, void * const restrict buffer) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(queue->length && "[ERROR] Can't peek empty structure.");
-    assert(queue->tail && "[ERROR] Tail can't be NULL");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+    error(queue && "Parameter can't be NULL.");
+    error(buffer && "Parameter can't be NULL.");
+    error(queue->length && "Can't peek empty structure.");
+    error(queue->tail && "Tail can't be NULL");
+    error(queue != buffer && "Parameters can't be the same.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     memcpy(buffer, queue->tail->next->elements + (queue->current * queue->size), queue->size);
 }
 
 void enqueue_iqueue(iqueue_s * const restrict queue, void const * const restrict buffer) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(~(queue->length) && "[ERROR] Queue's size will overflow.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+    error(queue && "Parameter can't be NULL.");
+    error(buffer && "Parameter can't be NULL.");
+    error(~(queue->length) && "Queue's size will overflow.");
+    error(queue != buffer && "Parameters can't be the same.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     // index where the next element will be enqueued
-    const size_t next_index = (queue->current + queue->length) % IQUEUE_CHUNK;
+    size_t const next_index = (queue->current + queue->length) % IQUEUE_CHUNK;
     if (!next_index) { // if head list array is full (is divisible) adds new list element to head
         struct infinite_queue_node * node = queue->allocator->alloc(sizeof(struct infinite_queue_node), queue->allocator->arguments);
-        assert(node && "[ERROR] Memory allocation failed");
+        error(node && "Memory allocation failed");
 
         node->elements = queue->allocator->alloc(IQUEUE_CHUNK * queue->size, queue->allocator->arguments);
-        assert(node->elements && "[ERROR] Memory allocation failed.");
+        error(node->elements && "Memory allocation failed.");
 
         if (queue->tail == NULL) {
             node->next = node; // create initial circle
@@ -175,13 +179,15 @@ void enqueue_iqueue(iqueue_s * const restrict queue, void const * const restrict
 }
 
 void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffer) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(queue->length && "[ERROR] Strucutre can't be empty.");
-    assert(queue->tail && "[ERROR] Tail can't be NULL");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+    error(queue && "Parameter can't be NULL.");
+    error(queue->length && "Strucutre can't be empty.");
+    error(queue->tail && "Tail can't be NULL");
+    error(buffer && "Parameter can't be NULL.");
+    error(queue != buffer && "Parameters can't be the same.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     memcpy(buffer, queue->tail->next->elements + (queue->current * queue->size), queue->size);
     queue->length--; // decrement queue size
@@ -203,11 +209,13 @@ void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffe
 }
 
 void map_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL");
+    error(queue && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL");
+    error(queue != arguments && "Parameters can't be the same.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     size_t remaining = queue->length; // save queue size as remaining size for iteration
     struct infinite_queue_node const * previous = queue->tail;
@@ -227,15 +235,17 @@ void map_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, v
 }
 
 void apply_iqueue(iqueue_s const * const restrict queue, process_fn const process, void * const restrict arguments) {
-    assert(queue && "[ERROR] Parameter can't be NULL.");
-    assert(process && "[ERROR] Parameter can't be NULL");
+    error(queue && "Parameter can't be NULL.");
+    error(process && "Parameter can't be NULL");
+    error(queue != arguments && "Parameters can't be the same.");
 
-    assert(queue->size && "[INVALID] Parameter can't be zero.");
-    assert(queue->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(queue->size && "Size can't be zero.");
+    valid(queue->allocator && "Allocator can't be NULL.");
+    valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     // create elements array to temporary save element from circular linked list nodes
     char * elements_array = queue->allocator->alloc(queue->length * queue->size, queue->allocator->arguments);
-    assert(elements_array && "[ERROR] Memory allocation failed.");
+    error(elements_array && "Memory allocation failed.");
 
     size_t index = 0, remaining = queue->length; // temporary variable to save queue's size
     struct infinite_queue_node const * previous = queue->tail; // create node pointer to save previous nodes into
