@@ -1,6 +1,5 @@
 #include <list/icircular_list.h>
 
-#include <assert.h>
 #include <stdlib.h> // import exit()
 #include <string.h>
 
@@ -12,25 +11,26 @@
 void _icircular_list_resize(icircular_list_s * const list, size_t const size);
 
 icircular_list_s create_icircular_list(size_t const size) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
+    error(size && "Paremeter can't be zero.");
 
     return (icircular_list_s) { .empty = NIL, .size = size, .allocator = &standard };
 }
 
 icircular_list_s make_icircular_list(size_t const size, memory_s const * const allocator) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(allocator && "[ERROR] Paremeter can't be NULL.");
+    error(size && "Paremeter can't be zero.");
+    error(allocator && "Paremeter can't be NULL.");
 
     return (icircular_list_s) { .empty = NIL, .size = size, .allocator = allocator };
 }
 
 void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -48,12 +48,13 @@ void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy)
 }
 
 void clear_icircular_list(icircular_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -72,12 +73,13 @@ void clear_icircular_list(icircular_list_s * const list, set_fn const destroy) {
 }
 
 icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_fn const copy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(copy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(copy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // create a replica/copy structure
     icircular_list_s replica = {
@@ -86,8 +88,8 @@ icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_f
         .next = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
+    error((!replica.capacity || replica.elements) && "Memory allocation failed.");
+    error((!replica.capacity || replica.next) && "Memory allocation failed.");
 
     // for each element in list copy it into the replica while keeping circularity and making replica hole-less
     for (size_t l = list->tail, * r = &(replica.tail); replica.length < list->length; l = list->next[l], r = replica.next + (*r)) {
@@ -101,23 +103,26 @@ icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_f
 }
 
 bool is_empty_icircular_list(icircular_list_s const * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     return !(list->length);
 }
 
-void insert_at_icircular_list(icircular_list_s * const list, void const * const element, size_t const index) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= list->length && "[ERROR] Paremeter can't be greater than length.");
+void insert_at_icircular_list(icircular_list_s * const restrict list, void const * const restrict element, size_t const index) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(index <= list->length && "Paremeter can't be greater than length.");
+    error(list != element && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // if length has reached capacity increase capacity linearly and call resize function to expand nodes
     if (list->length == list->capacity) {
@@ -150,15 +155,17 @@ void insert_at_icircular_list(icircular_list_s * const list, void const * const 
     list->length++;
 }
 
-void get_icircular_list(icircular_list_s const * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't get element from empty list->");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+void get_icircular_list(icircular_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(list->length && "Can't get element from empty list->");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     size_t current = list->tail;
     // iterate until current points to node at index, starting from tail
@@ -169,17 +176,20 @@ void get_icircular_list(icircular_list_s const * const list, size_t const index,
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_icircular_list(icircular_list_s * const list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(compare && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't get element from empty list.");
-    assert(element != buffer && "[ERROR] Parameters can't be the same.");
+void remove_first_icircular_list(icircular_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(compare && "Paremeter can't be NULL.");
+    error(list->length && "Can't get element from empty list.");
+    error(list != element && "Parameters can't be equal.");
+    error(list != buffer && "Parameters can't be equal.");
+    error(element != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // iterate over each element until searched element is found
     for (size_t i = 0, previous = list->tail; i < list->length; ++i, previous = list->next[previous]) {
@@ -217,20 +227,22 @@ void remove_first_icircular_list(icircular_list_s * const list, void const * con
         return; // leave function with found element
     }
 
-    assert(0 && "[ERROR] Element not found in list."); // if element is not found in list then that is an error
+    error(0 && "Element not found in list."); // if element is not found in list then that is an error
     // and exit failure is returned, since the function returns the removed element, element can contain allocated memory
     exit(EXIT_FAILURE);
 }
 
-void remove_at_icircular_list(icircular_list_s * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't get element from empty list.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than or equal length.");
+void remove_at_icircular_list(icircular_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(list->length && "Can't get element from empty list.");
+    error(index < list->length && "Paremeter can't be greater than or equal length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     size_t previous = list->tail;
     // iterate until node previous to index node is reached
@@ -265,11 +277,12 @@ void remove_at_icircular_list(icircular_list_s * const list, size_t const index,
 }
 
 void reverse_icircular_list(icircular_list_s * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     if (!list->length) { // if list is empty early return to not break the function code
         return;
@@ -287,12 +300,13 @@ void reverse_icircular_list(icircular_list_s * const list) {
 }
 
 void shift_next_icircular_list(icircular_list_s * const list, size_t const shift) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't shift empty list.");
+    error(list && "Paremeter can't be NULL.");
+    error(list->length && "Can't shift empty list.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -301,19 +315,21 @@ void shift_next_icircular_list(icircular_list_s * const list, size_t const shift
 }
 
 void splice_icircular_list(icircular_list_s * const restrict destination, icircular_list_s * const restrict source, size_t const index) {
-    assert(destination && "[ERROR] Paremeter can't be NULL.");
-    assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
+    error(destination && "Paremeter can't be NULL.");
+    error(source && "Paremeter can't be NULL.");
+    error(index <= destination->length && "Paremeter can't be greater than length.");
+    error(source->size == destination->size && "Element sizes must be equal.");
+    error(source != destination && "Parameters can't be equal.");
 
-    assert(destination->size && "[INVALID] Size can't be zero.");
-    assert(destination->length <= destination->capacity && "[INVALID] Length exceeds capacity.");
-    assert(destination->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(destination->size && "Size can't be zero.");
+    valid(destination->length <= destination->capacity && "Length exceeds capacity.");
+    valid(destination->allocator && "Allocator can't be NULL.");
+    valid(destination->tail != NIL && "Tail can't be NIL.");
 
-    assert(source->size && "[INVALID] Size can't be zero.");
-    assert(source->length <= source->capacity && "[INVALID] Length exceeds capacity.");
-    assert(source->allocator && "[INVALID] Paremeter can't be NULL.");
-
-    assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
+    valid(source->size && "Size can't be zero.");
+    valid(source->length <= source->capacity && "Length exceeds capacity.");
+    valid(source->allocator && "Allocator can't be NULL.");
+    valid(source->tail != NIL && "Tail can't be NIL.");
 
     size_t const dest_length = destination->length;
 
@@ -385,13 +401,14 @@ void splice_icircular_list(icircular_list_s * const restrict destination, icircu
 }
 
 icircular_list_s split_icircular_list(icircular_list_s * const list, size_t const index, size_t const length) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Index can't be more than or equal length.");
-    assert(length <= list->length && "[ERROR] Size can't be more than length.");
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Index can't be more than or equal length.");
+    error(length <= list->length && "Size can't be more than length.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     size_t previous = list->tail;
     // iterate to previous node from index
@@ -408,8 +425,8 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
         .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert((!split_capacity || split.elements) && "[ERROR] Memory allocation failed.");
-    assert((!split_capacity || split.next) && "[ERROR] Memory allocation failed.");
+    error((!split_capacity || split.elements) && "Memory allocation failed.");
+    error((!split_capacity || split.next) && "Memory allocation failed.");
 
     // copy list elements into split list starting from index node (also redirect list's removed nodes)
     for (size_t * s = &(split.tail); split.length < length; s = split.next + (*s)) {
@@ -441,8 +458,8 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
         .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert((!replica_capacity || replica.elements) && "[ERROR] Memory allocation failed.");
-    assert((!replica_capacity || replica.next) && "[ERROR] Memory allocation failed.");
+    error((!replica_capacity || replica.elements) && "Memory allocation failed.");
+    error((!replica_capacity || replica.next) && "Memory allocation failed.");
 
     // copy remaining list element into replica
     for (size_t * r = &(replica.tail); replica.length < replica_length; previous = list->next[previous], r = replica.next + (*r)) {
@@ -462,13 +479,15 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
     return split;
 }
 
-icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn const filter, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(filter && "[ERROR] Paremeter can't be NULL.");
+icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(filter && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // create temporary lists to save filtered elements
     icircular_list_s negative = { .empty = NIL, .size = list->size, .allocator = list->allocator, };
@@ -521,13 +540,15 @@ icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn
     return positive;
 }
 
-void map_icircular_list(icircular_list_s const * const list, handle_fn const handle, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(handle && "[ERROR] Paremeter can't be NULL.");
+void map_icircular_list(icircular_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(handle && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -538,16 +559,18 @@ void map_icircular_list(icircular_list_s const * const list, handle_fn const han
     }
 }
 
-void apply_icircular_list(icircular_list_s const * const list, process_fn const process, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(process && "[ERROR] Paremeter can't be NULL.");
+void apply_icircular_list(icircular_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(process && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
 
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
-    assert((!list->length || elements_array) && "[ERROR] Memory allocation failed.");
+    error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -573,17 +596,17 @@ void _icircular_list_resize(icircular_list_s * const list, size_t const size) {
     // if list expands or hole stack is empty then just expand/shrink the list and return
     if (list->capacity != list->length || NIL == list->empty) {
         list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arguments);
-        list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arguments);
+        error((!list->capacity || list->elements) && "Memory allocation failed.");
 
-        assert((!list->capacity || list->elements) && "[ERROR] Memory allocation failed.");
-        assert((!list->capacity || list->next) && "[ERROR] Memory allocation failed.");
+        list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arguments);
+        error((!list->capacity || list->next) && "Memory allocation failed.");
 
         return;
     } // else copy elements into new array in order, and clear hole stack
 
     // allocate new array to save alements linearly without holes
     char * elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments);
-    assert((!list->capacity || elements) && "[ERROR] Memory allocation failed.");
+    error((!list->capacity || elements) && "Memory allocation failed.");
 
     // copy each element inside new array and set it to elements list starting from tail
     for (size_t i = 0, current = list->tail; i < list->length; ++i, current = list->next[current]) {
@@ -594,7 +617,7 @@ void _icircular_list_resize(icircular_list_s * const list, size_t const size) {
 
     // reallocate next indexes and set them from
     list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arguments);
-    assert((!list->capacity || list->next) && "[ERROR] Memory allocation failed.");
+    error((!list->capacity || list->next) && "Memory allocation failed.");
 
     for (size_t i = 0, * current = &(list->tail); i < list->length; current = list->next + i, i++) {
         (*current) = i; // set index (including tail)
