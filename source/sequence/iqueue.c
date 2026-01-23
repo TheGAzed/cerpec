@@ -245,7 +245,7 @@ void apply_iqueue(iqueue_s const * const restrict queue, process_fn const proces
 
     // create elements array to temporary save element from circular linked list nodes
     char * elements_array = queue->allocator->alloc(queue->length * queue->size, queue->allocator->arguments);
-    error(elements_array && "Memory allocation failed.");
+    error((!queue->length || elements_array) && "Memory allocation failed.");
 
     size_t index = 0, remaining = queue->length; // temporary variable to save queue's size
     struct infinite_queue_node const * previous = queue->tail; // create node pointer to save previous nodes into

@@ -58,49 +58,49 @@ bool is_empty_ideque(ideque_s const * const deque);
 /// @brief Enqueues a single element to the front of the structure.
 /// @param deque Structure to enqueue into.
 /// @param buffer Element buffer to enqueue.
-void enqueue_front_ideque(ideque_s * const deque, void const * const buffer);
+void enqueue_front_ideque(ideque_s * const restrict deque, void const * const restrict buffer);
 
 /// @brief Enqueues a single element to the back of the structure.
 /// @param deque Structure to enqueue into.
 /// @param buffer Element buffer to enqueue.
-void enqueue_back_ideque(ideque_s * const deque, void const * const buffer);
+void enqueue_back_ideque(ideque_s * const restrict deque, void const * const restrict buffer);
 
 /// @brief Dequeues a single element from the front of the structure.
 /// @param deque Structure to dequeue from.
 /// @param buffer Element buffer to save dequeue.
-void dequeue_front_ideque(ideque_s * const deque, void * const buffer);
+void dequeue_front_ideque(ideque_s * const restrict deque, void * const restrict buffer);
 
 /// @brief Dequeues a single element from the back of the structure.
 /// @param deque Structure to dequeue from.
 /// @param buffer Element buffer to save dequeue.
-void dequeue_back_ideque(ideque_s * const deque, void * const buffer);
+void dequeue_back_ideque(ideque_s * const restrict deque, void * const restrict buffer);
 
 /// @brief Peeks a single element from the front of the structure.
 /// @param deque Structure to peek.
 /// @param buffer Element buffer to save peek.
-void peek_front_ideque(ideque_s const * const deque, void * const buffer);
+void peek_front_ideque(ideque_s const * const restrict deque, void * const restrict buffer);
 
 /// @brief Peeks a single element from the back of the structure.
 /// @param deque Structure to peek.
 /// @param buffer Element buffer to save peek.
-void peek_back_ideque(ideque_s const * const deque, void * const buffer);
+void peek_back_ideque(ideque_s const * const restrict deque, void * const restrict buffer);
 
 /// @brief Iterates over each element in structure starting from the front.
 /// @param deque Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_front_ideque(ideque_s const * const deque, handle_fn const handle, void * const arguments);
+void map_front_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Iterates over each element in structure starting from the back.
 /// @param deque Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_back_ideque(ideque_s const * const deque, handle_fn const handle, void * const arguments);
+void map_back_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param deque Structure to map.
 /// @param process Function pointer to manage array of elements using strucuter length, element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void apply_ideque(ideque_s const * const deque, process_fn const process, void * const arguments);
+void apply_ideque(ideque_s const * const restrict deque, process_fn const process, void * const restrict arguments);
 
 #endif // IDEQUE_H
