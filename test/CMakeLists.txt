@@ -4,8 +4,6 @@ else ()
     add_compile_options(-std=c99 -O0 -g -Wall -Wextra -Wconversion -Werror -Wpedantic)
 endif ()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE IHASH_TABLE_CHUNK=524288)
-
 add_library(TEST test.c)
 target_include_directories(TEST PUBLIC .)
 
