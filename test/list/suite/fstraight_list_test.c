@@ -491,7 +491,7 @@ TEST MAP_02(void) {
     PASS();
 }
 
-TEST APPLY_01() {
+TEST APPLY_01(void) {
     fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
 
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; ++i) {
@@ -512,7 +512,7 @@ TEST APPLY_01() {
     PASS();
 }
 
-TEST APPLY_02() {
+TEST APPLY_02(void) {
     fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
 
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; ++i) {
@@ -533,7 +533,7 @@ TEST APPLY_02() {
     PASS();
 }
 
-TEST APPLY_03() {
+TEST APPLY_03(void) {
     fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
 
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; ++i) {
@@ -555,7 +555,7 @@ TEST APPLY_03() {
     PASS();
 }
 
-TEST APPLY_04() {
+TEST APPLY_04(void) {
     fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);
 
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; ++i) {

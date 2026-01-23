@@ -256,7 +256,7 @@ TEST PEEP_03(void) {
     PASS();
 }
 
-TEST REPLACE_01() {
+TEST REPLACE_01(void) {
     ibinary_heap_s heap = create_ibinary_heap(sizeof(int), compare);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK - 1; ++i) {
@@ -277,7 +277,7 @@ TEST REPLACE_01() {
     PASS();
 }
 
-TEST REPLACE_02() {
+TEST REPLACE_02(void) {
     ibinary_heap_s heap = create_ibinary_heap(sizeof(int), compare);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK; ++i) {
@@ -298,7 +298,7 @@ TEST REPLACE_02() {
     PASS();
 }
 
-TEST REPLACE_03() {
+TEST REPLACE_03(void) {
     ibinary_heap_s heap = create_ibinary_heap(sizeof(int), compare);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK + 1; ++i) {
@@ -319,7 +319,7 @@ TEST REPLACE_03() {
     PASS();
 }
 
-TEST MELD_01() {
+TEST MELD_01(void) {
     ibinary_heap_s one = create_ibinary_heap(sizeof(int), compare);
     ibinary_heap_s two = create_ibinary_heap(sizeof(int), compare);
 
@@ -346,7 +346,7 @@ TEST MELD_01() {
     PASS();
 }
 
-TEST MELD_02() {
+TEST MELD_02(void) {
     ibinary_heap_s one = create_ibinary_heap(sizeof(int), compare);
     ibinary_heap_s two = create_ibinary_heap(sizeof(int), compare);
 
@@ -373,7 +373,7 @@ TEST MELD_02() {
     PASS();
 }
 
-TEST MELD_03() {
+TEST MELD_03(void) {
     ibinary_heap_s one = create_ibinary_heap(sizeof(int), compare);
     ibinary_heap_s two = create_ibinary_heap(sizeof(int), compare);
 
@@ -400,7 +400,7 @@ TEST MELD_03() {
     PASS();
 }
 
-TEST MAP_01() {
+TEST MAP_01(void) {
     ibinary_heap_s test = create_ibinary_heap(sizeof(int), compare);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK - 1; ++i) {
@@ -421,7 +421,7 @@ TEST MAP_01() {
     PASS();
 }
 
-TEST MAP_02() {
+TEST MAP_02(void) {
     ibinary_heap_s test = create_ibinary_heap(sizeof(int), compare);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK; ++i) {
@@ -442,7 +442,7 @@ TEST MAP_02() {
     PASS();
 }
 
-TEST MAP_03() {
+TEST MAP_03(void) {
     ibinary_heap_s test = create_ibinary_heap(sizeof(int), compare);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK + 1; ++i) {

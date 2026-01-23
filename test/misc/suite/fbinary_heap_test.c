@@ -185,7 +185,7 @@ TEST PEEP_02(void) {
     PASS();
 }
 
-TEST REPLACE_01() {
+TEST REPLACE_01(void) {
     fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
@@ -206,7 +206,7 @@ TEST REPLACE_01() {
     PASS();
 }
 
-TEST REPLACE_02() {
+TEST REPLACE_02(void) {
     fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
@@ -227,7 +227,7 @@ TEST REPLACE_02() {
     PASS();
 }
 
-TEST MELD_01() {
+TEST MELD_01(void) {
     fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
     fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
 
@@ -254,7 +254,7 @@ TEST MELD_01() {
     PASS();
 }
 
-TEST MELD_02() {
+TEST MELD_02(void) {
     fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
     fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
 
@@ -281,7 +281,7 @@ TEST MELD_02() {
     PASS();
 }
 
-TEST MAP_01() {
+TEST MAP_01(void) {
     fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
@@ -302,7 +302,7 @@ TEST MAP_01() {
     PASS();
 }
 
-TEST MAP_02() {
+TEST MAP_02(void) {
     fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {

@@ -2,7 +2,7 @@
 
 #include <suite.h>
 
-TEST CREATE_01() {
+TEST CREATE_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     ASSERT_EQ(0, table.capacity);
@@ -18,7 +18,7 @@ TEST CREATE_01() {
     PASS();
 }
 
-TEST DESTROY_01() {
+TEST DESTROY_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     destroy_ihash_table(&table, destroy, destroy);
@@ -34,7 +34,7 @@ TEST DESTROY_01() {
     PASS();
 }
 
-TEST CLEAR_01() {
+TEST CLEAR_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     clear_ihash_table(&table, destroy, destroy);
@@ -52,7 +52,7 @@ TEST CLEAR_01() {
     PASS();
 }
 
-TEST COPY_01() {
+TEST COPY_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK - 1; ++i) {
@@ -75,7 +75,7 @@ TEST COPY_01() {
     PASS();
 }
 
-TEST COPY_02() {
+TEST COPY_02(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK; ++i) {
@@ -98,7 +98,7 @@ TEST COPY_02() {
     PASS();
 }
 
-TEST COPY_03() {
+TEST COPY_03(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK + 1; ++i) {
@@ -121,7 +121,7 @@ TEST COPY_03() {
     PASS();
 }
 
-TEST INSERT_01() {
+TEST INSERT_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK - 1; ++i) {
@@ -133,7 +133,7 @@ TEST INSERT_01() {
     PASS();
 }
 
-TEST INSERT_02() {
+TEST INSERT_02(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK; ++i) {
@@ -145,7 +145,7 @@ TEST INSERT_02() {
     PASS();
 }
 
-TEST INSERT_03() {
+TEST INSERT_03(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK + 1; ++i) {
@@ -157,7 +157,7 @@ TEST INSERT_03() {
     PASS();
 }
 
-TEST REMOVE_01() {
+TEST REMOVE_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK - 1; ++i) {
@@ -177,7 +177,7 @@ TEST REMOVE_01() {
     PASS();
 }
 
-TEST REMOVE_02() {
+TEST REMOVE_02(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK; ++i) {
@@ -197,7 +197,7 @@ TEST REMOVE_02() {
     PASS();
 }
 
-TEST REMOVE_03() {
+TEST REMOVE_03(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK + 1; ++i) {
@@ -217,7 +217,7 @@ TEST REMOVE_03() {
     PASS();
 }
 
-TEST CONTAINS_01() {
+TEST CONTAINS_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK - 1; ++i) {
@@ -233,7 +233,7 @@ TEST CONTAINS_01() {
     PASS();
 }
 
-TEST CONTAINS_02() {
+TEST CONTAINS_02(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK; ++i) {
@@ -249,7 +249,7 @@ TEST CONTAINS_02() {
     PASS();
 }
 
-TEST CONTAINS_03() {
+TEST CONTAINS_03(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK + 1; ++i) {
@@ -265,7 +265,7 @@ TEST CONTAINS_03() {
     PASS();
 }
 
-TEST GET_VALUE_01() {
+TEST GET_VALUE_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK - 1; ++i) {
@@ -283,7 +283,7 @@ TEST GET_VALUE_01() {
     PASS();
 }
 
-TEST GET_VALUE_02() {
+TEST GET_VALUE_02(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK; ++i) {
@@ -301,7 +301,7 @@ TEST GET_VALUE_02() {
     PASS();
 }
 
-TEST GET_VALUE_03() {
+TEST GET_VALUE_03(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK + 1; ++i) {
@@ -319,7 +319,7 @@ TEST GET_VALUE_03() {
     PASS();
 }
 
-TEST SET_VALUE_01() {
+TEST SET_VALUE_01(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK - 1; ++i) {
@@ -340,7 +340,7 @@ TEST SET_VALUE_01() {
     PASS();
 }
 
-TEST SET_VALUE_02() {
+TEST SET_VALUE_02(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK; ++i) {
@@ -361,7 +361,7 @@ TEST SET_VALUE_02() {
     PASS();
 }
 
-TEST SET_VALUE_03() {
+TEST SET_VALUE_03(void) {
     ihash_table_s table = create_ihash_table(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_TABLE_CHUNK + 1; ++i) {

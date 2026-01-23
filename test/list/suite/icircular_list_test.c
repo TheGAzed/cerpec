@@ -762,7 +762,7 @@ TEST MAP_03(void) {
     PASS();
 }
 
-TEST APPLY_01() {
+TEST APPLY_01(void) {
     icircular_list_s test = create_icircular_list(sizeof(int));
 
     for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
@@ -783,7 +783,7 @@ TEST APPLY_01() {
     PASS();
 }
 
-TEST APPLY_02() {
+TEST APPLY_02(void) {
     icircular_list_s test = create_icircular_list(sizeof(int));
 
     for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
@@ -804,7 +804,7 @@ TEST APPLY_02() {
     PASS();
 }
 
-TEST APPLY_03() {
+TEST APPLY_03(void) {
     icircular_list_s test = create_icircular_list(sizeof(int));
 
     for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {
@@ -825,7 +825,7 @@ TEST APPLY_03() {
     PASS();
 }
 
-TEST APPLY_04() {
+TEST APPLY_04(void) {
     icircular_list_s test = create_icircular_list(sizeof(int));
 
     for (int i = 0; i < ICIRCULAR_LIST_CHUNK - 1; ++i) {
@@ -847,7 +847,7 @@ TEST APPLY_04() {
     PASS();
 }
 
-TEST APPLY_05() {
+TEST APPLY_05(void) {
     icircular_list_s test = create_icircular_list(sizeof(int));
 
     for (int i = 0; i < ICIRCULAR_LIST_CHUNK; ++i) {
@@ -869,7 +869,7 @@ TEST APPLY_05() {
     PASS();
 }
 
-TEST APPLY_06() {
+TEST APPLY_06(void) {
     icircular_list_s test = create_icircular_list(sizeof(int));
 
     for (int i = 0; i < ICIRCULAR_LIST_CHUNK + 1; ++i) {

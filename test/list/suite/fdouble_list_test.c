@@ -613,7 +613,7 @@ TEST MAP_PREV_02(void) {
     PASS();
 }
 
-TEST APPLY_01() {
+TEST APPLY_01(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
@@ -634,7 +634,7 @@ TEST APPLY_01() {
     PASS();
 }
 
-TEST APPLY_02() {
+TEST APPLY_02(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
@@ -655,7 +655,7 @@ TEST APPLY_02() {
     PASS();
 }
 
-TEST APPLY_03() {
+TEST APPLY_03(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
@@ -677,7 +677,7 @@ TEST APPLY_03() {
     PASS();
 }
 
-TEST APPLY_04() {
+TEST APPLY_04(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
