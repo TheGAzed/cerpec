@@ -31,6 +31,7 @@ iavl_tree_s create_iavl_tree(size_t const size, compare_fn const compare);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
+/// @param allocator Custom allocator structure.
 /// @param compare Function pointer to compare elements.
 /// @return Tree structure.
 iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, memory_s const * const allocator);

@@ -6,12 +6,12 @@
 
 #define NIL ((size_t)(-1))
 
-struct stack {
+struct iavl_tree_stack {
     size_t length;
     size_t * elements;
 };
 
-struct queue {
+struct iavl_tree_queue {
     size_t length, current;
     size_t * elements;
 };
@@ -821,7 +821,7 @@ void preorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct stack pre_order = {
+    struct iavl_tree_stack pre_order = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
     assert(!tree->length || pre_order.elements && "[ERROR] Memory allocation failed.");
@@ -857,7 +857,7 @@ void postorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn cons
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct stack post_order = {
+    struct iavl_tree_stack post_order = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
     assert(!tree->length || post_order.elements && "[ERROR] Memory allocation failed.");
@@ -898,7 +898,7 @@ void levelorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn con
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple queue to manage breath first level order traversal of node indexes
-    struct queue level_order = {
+    struct iavl_tree_queue level_order = {
         .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
     assert(!tree->length || level_order.elements && "[ERROR] Memory allocation failed.");

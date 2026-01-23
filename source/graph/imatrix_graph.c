@@ -4,27 +4,27 @@
 #include <assert.h>
 #include <string.h>
 
-struct queue {
+struct iam_graph_queue {
     size_t * array;
     size_t length, current;
 };
 
-struct stack {
+struct iam_graph_stack {
     size_t * array;
     size_t length;
 };
 
-struct smallest {
+struct iam_graph_smallest {
     size_t vertex;
     void * cost;
 };
 
 void _imatrix_graph_resize(iam_graph_s * graph, const size_t size);
-void _bfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct queue * queue, bool * visited, const size_t vertex, const size_t i, const size_t e);
-void _dfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct stack * stack, bool * visited, const size_t vertex, const size_t i, const size_t e);
-void _dijkstra_helper(const iam_graph_s * graph, const bool * visited, const iam_list_s * table, struct smallest * minimum, void * sum_cost, const size_t current_vertex, const void * current_cost, const size_t j, const size_t e);
+void _bfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct iam_graph_queue * queue, bool * visited, const size_t vertex, const size_t i, const size_t e);
+void _dfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct iam_graph_stack * stack, bool * visited, const size_t vertex, const size_t i, const size_t e);
+void _dijkstra_helper(const iam_graph_s * graph, const bool * visited, const iam_list_s * table, struct iam_graph_smallest * minimum, void * sum_cost, const size_t current_vertex, const void * current_cost, const size_t j, const size_t e);
 void _bellman_ford_helper(const iam_graph_s * graph, const iam_list_s * table, void * sum_cost, const size_t start, const size_t j, const size_t current_vertex, const void * current_cost, const size_t k, const size_t e);
-void _prim_helper(const iam_graph_s * graph, const iam_list_s * table, const bool * visited, struct smallest * minimum, void * distance_cost, const size_t current_vertex, const size_t j, const size_t e);
+void _prim_helper(const iam_graph_s * graph, const iam_list_s * table, const bool * visited, struct iam_graph_smallest * minimum, void * distance_cost, const size_t current_vertex, const size_t j, const size_t e);
 size_t _find_parent(const iam_list_s * table, const size_t vertex);
 void _union_set(const iam_list_s * table, const size_t source, const size_t destination, const set_fn increment_cost);
 
@@ -240,7 +240,7 @@ iam_list_s bfs_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, cons
     }
     memcpy(table.cost + (table.data->size * start), table.data->zero, table.data->size);
 
-    struct queue queue = {
+    struct iam_graph_queue queue = {
         .array = malloc(sizeof(size_t) * graph->length),
     };
 
@@ -283,7 +283,7 @@ iam_list_s dfs_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, cons
     }
     memcpy(table.cost + (table.data->size * start), table.data->zero, table.data->size);
 
-    struct stack stack = {
+    struct iam_graph_stack stack = {
         .array = malloc(sizeof(size_t) * graph->length),
     };
 
@@ -328,7 +328,7 @@ iam_list_s dijkstra_iam_list(const iam_graph_s * graph, const iam_cost_s * cost,
     char * buffer = malloc(2 * cost->size); // allocate for both minimum and sum
     assert(buffer && "[ERROR] Memory allocation failed.");
 
-    struct smallest minimum = {
+    struct iam_graph_smallest minimum = {
         .vertex = start, .cost = buffer,
     };
     memcpy(minimum.cost, table.data->zero, table.data->size);
@@ -413,7 +413,7 @@ iam_list_s prim_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, con
     char * buffer = malloc(2 * cost->size); // allocate for both minimum and sum
     assert(buffer && "[ERROR] Memory allocation failed.");
 
-    struct smallest minimum = {
+    struct iam_graph_smallest minimum = {
         .vertex = start, .cost = buffer,
     };
     memcpy(minimum.cost, table.data->zero, table.data->size);
@@ -536,7 +536,7 @@ void _imatrix_graph_resize(iam_graph_s * graph, const size_t size) {
     graph->vertices = realloc(graph->vertices, size * graph->vertex_size);
 }
 
-void _bfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct queue * queue, bool * visited, const size_t vertex, const size_t i, const size_t e) {
+void _bfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct iam_graph_queue * queue, bool * visited, const size_t vertex, const size_t i, const size_t e) {
     const void * edge = graph->edges + (e * graph->edge_size);
     if (graph->compare(graph->none, edge) && !visited[i]) {
         visited[i] = true;
@@ -548,7 +548,7 @@ void _bfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct que
     table->data->add(table->cost + (i * table->data->size), edge);
 }
 
-void _dfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct stack * stack, bool * visited, const size_t vertex, const size_t i, const size_t e) {
+void _dfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct iam_graph_stack * stack, bool * visited, const size_t vertex, const size_t i, const size_t e) {
     const void * edge = graph->edges + (e * graph->edge_size);
     if (graph->compare(graph->none, edge) && !visited[i]) {
         visited[i] = true;
@@ -560,7 +560,7 @@ void _dfs_helper(const iam_graph_s * graph, const iam_list_s * table, struct sta
     table->data->add(table->cost + (i * table->data->size), edge);
 }
 
-void _dijkstra_helper(const iam_graph_s * graph, const bool * visited, const iam_list_s * table, struct smallest * minimum, void * sum_cost, const size_t current_vertex, const void * current_cost, const size_t j, const size_t e) {
+void _dijkstra_helper(const iam_graph_s * graph, const bool * visited, const iam_list_s * table, struct iam_graph_smallest * minimum, void * sum_cost, const size_t current_vertex, const void * current_cost, const size_t j, const size_t e) {
     if (visited[j]) { return; }
 
     // save edges for access
@@ -608,7 +608,7 @@ void _bellman_ford_helper(const iam_graph_s * graph, const iam_list_s * table, v
     }
 }
 
-void _prim_helper(const iam_graph_s * graph, const iam_list_s * table, const bool * visited, struct smallest * minimum, void * distance_cost, const size_t current_vertex, const size_t j, const size_t e) {
+void _prim_helper(const iam_graph_s * graph, const iam_list_s * table, const bool * visited, struct iam_graph_smallest * minimum, void * distance_cost, const size_t current_vertex, const size_t j, const size_t e) {
     if (visited[j]) { return; }
 
     // save edges for access

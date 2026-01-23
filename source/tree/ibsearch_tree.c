@@ -1,41 +1,76 @@
 #include <tree/ibsearch_tree.h>
 
 #include <assert.h>
-#include <stdlib.h>
+#include <stdlib.h> // imports exit()
 #include <string.h>
 
 #define NIL ((size_t)(-1))
 
-size_t * _ibsearch_tree_floor(ibsearch_tree_s * tree, const void * element);
-size_t * _ibsearch_tree_ceil(ibsearch_tree_s * tree, const void * element);
+struct ibsearch_tree_stack {
+    size_t length;
+    size_t * elements;
+};
 
-size_t * _ibsearch_tree_successor(ibsearch_tree_s * tree, const void * element);
-size_t * _ibsearch_tree_predecessor(ibsearch_tree_s * tree, const void * element);
+struct ibsearch_tree_queue {
+    size_t length, current;
+    size_t * elements;
+};
+
+/// @brief Helper function to get pointer index to floor of element.
+/// @param tree Structure to get pointer index from.
+/// @param element Element to search floor of.
+/// @return Pointer to index of floor element or NULL.
+size_t * _ibsearch_tree_floor(ibsearch_tree_s * const restrict tree, void const * const restrict element);
+
+/// @brief Helper function to get pointer index to ceil of element.
+/// @param tree Structure to get pointer index from.
+/// @param element Element to search ceil of.
+/// @return Pointer to index of ceil element or NULL.
+size_t * _ibsearch_tree_ceil(ibsearch_tree_s * const restrict tree, void const * const restrict element);
+
+/// @brief Helper function to get pointer index to successor of element.
+/// @param tree Structure to get pointer index from.
+/// @param element Element to search successor of.
+/// @return Pointer to index of successor element or NULL.
+size_t * _ibsearch_tree_successor(ibsearch_tree_s * const restrict tree, void const * const restrict element);
+
+/// @brief Helper function to get pointer index to predecessor of element.
+/// @param tree Structure to get pointer index from.
+/// @param element Element to search predecessor of.
+/// @return Pointer to index of predecessor element or NULL.
+size_t * _ibsearch_tree_predecessor(ibsearch_tree_s * const restrict tree, void const * const restrict element);
 
 /// Binary search tree node removal fixup.
 /// @param tree Structure to fix.
 /// @param node Index reference to removed node.
 /// @return Index of hole left behind by fixup.
-size_t _ibsearch_tree_remove_fixup(const ibsearch_tree_s * tree, size_t * node);
+size_t _ibsearch_tree_remove_fixup(ibsearch_tree_s const * const restrict tree, size_t * const restrict node);
 
 /// Fills the hole left after removing an element in the tree's arrays, puts rightmost element into hole.
 /// @param tree Structure to fill.
 /// @param hole Index of hole in structure's arrays.
-void _ibsearch_tree_fill_hole(ibsearch_tree_s * tree, const size_t hole);
+void _ibsearch_tree_fill_hole(ibsearch_tree_s * const tree, size_t const hole);
 
 /// Resizes (reallocates) tree parameter arrays based on changed capacity.
 /// @param tree Structure to resize.
 /// @param size New size.
-void _ibsearch_tree_resize(ibsearch_tree_s * tree, const size_t size);
+void _ibsearch_tree_resize(ibsearch_tree_s * const tree, size_t const size);
 
-ibsearch_tree_s create_ibsearch_tree(const size_t size, const compare_fn compare) {
+ibsearch_tree_s create_ibsearch_tree(size_t const size, compare_fn const compare) {
     assert(compare && "[ERROR] Parameter can't be NULL.");
     assert(size && "[ERROR] Parameter can't be zero.");
 
-    return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size };
+    return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = &standard, };
 }
 
-void destroy_ibsearch_tree(ibsearch_tree_s * tree, const set_fn destroy) {
+ibsearch_tree_s make_ibsearch_tree(size_t const size, compare_fn const compare, memory_s const * const allocator) {
+    assert(compare && "[ERROR] Parameter can't be NULL.");
+    assert(size && "[ERROR] Parameter can't be zero.");
+
+    return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, };
+}
+
+void destroy_ibsearch_tree(ibsearch_tree_s * const tree, set_fn const destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -47,15 +82,19 @@ void destroy_ibsearch_tree(ibsearch_tree_s * tree, const set_fn destroy) {
         tree->length--;
         destroy(tree->elements + (tree->length * tree->size));
     }
-    free(tree->elements);
-    free(tree->parent);
-    free(tree->node[IBSEARCH_TREE_LEFT]);
-    free(tree->node[IBSEARCH_TREE_RIGHT]);
+    tree->allocator->free(tree->elements, tree->allocator->arguments);
+    tree->allocator->free(tree->parent, tree->allocator->arguments);
+    tree->allocator->free(tree->node[IBSEARCH_TREE_LEFT], tree->allocator->arguments);
+    tree->allocator->free(tree->node[IBSEARCH_TREE_RIGHT], tree->allocator->arguments);
 
-    memset(tree, 0, sizeof(ibsearch_tree_s));
+    tree->capacity = tree->length = tree->root = tree->size = 0;
+    tree->compare = NULL;
+    tree->elements = NULL;
+    tree->node[IBSEARCH_TREE_LEFT] = tree->node[IBSEARCH_TREE_RIGHT] = tree->parent = NULL;
+    tree->allocator = NULL;
 }
 
-void clear_ibsearch_tree(ibsearch_tree_s * tree, const set_fn destroy) {
+void clear_ibsearch_tree(ibsearch_tree_s * const tree, set_fn const destroy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -67,10 +106,10 @@ void clear_ibsearch_tree(ibsearch_tree_s * tree, const set_fn destroy) {
         tree->length--;
         destroy(tree->elements + (tree->length * tree->size));
     }
-    free(tree->elements);
-    free(tree->parent);
-    free(tree->node[IBSEARCH_TREE_LEFT]);
-    free(tree->node[IBSEARCH_TREE_RIGHT]);
+    tree->allocator->free(tree->elements, tree->allocator->arguments);
+    tree->allocator->free(tree->parent, tree->allocator->arguments);
+    tree->allocator->free(tree->node[IBSEARCH_TREE_LEFT], tree->allocator->arguments);
+    tree->allocator->free(tree->node[IBSEARCH_TREE_RIGHT], tree->allocator->arguments);
 
     tree->elements = NULL;
     tree->parent = tree->node[IBSEARCH_TREE_LEFT] = tree->node[IBSEARCH_TREE_RIGHT] = NULL;
@@ -79,7 +118,7 @@ void clear_ibsearch_tree(ibsearch_tree_s * tree, const set_fn destroy) {
     tree->capacity = 0;
 }
 
-ibsearch_tree_s copy_ibsearch_tree(const ibsearch_tree_s * tree, const copy_fn copy) {
+ibsearch_tree_s copy_ibsearch_tree(ibsearch_tree_s const * const tree, copy_fn const copy) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(copy && "[ERROR] Parameter can't be NULL.");
 
@@ -87,13 +126,14 @@ ibsearch_tree_s copy_ibsearch_tree(const ibsearch_tree_s * tree, const copy_fn c
     assert(tree->size && "[INVALID] Parameter can't be zero.");
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    const ibsearch_tree_s replica = {
-        .elements = malloc(tree->capacity * tree->size),
-        .parent = malloc(tree->capacity * sizeof(size_t)),
-        .node[IBSEARCH_TREE_LEFT] = malloc(tree->capacity * sizeof(size_t)),
-        .node[IBSEARCH_TREE_RIGHT] = malloc(tree->capacity * sizeof(size_t)),
+    ibsearch_tree_s const replica = {
+        .elements = tree->allocator->alloc(tree->capacity * tree->size, tree->allocator->arguments),
+        .parent = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arguments),
+        .node[IBSEARCH_TREE_LEFT] = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arguments),
+        .node[IBSEARCH_TREE_RIGHT] = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arguments),
 
-        .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare, .size = tree->size,
+        .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare,
+        .size = tree->size, .allocator = tree->allocator,
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
     assert((!replica.capacity || replica.parent) && "[ERROR] Memory allocation failed.");
@@ -110,8 +150,9 @@ ibsearch_tree_s copy_ibsearch_tree(const ibsearch_tree_s * tree, const copy_fn c
     return replica;
 }
 
-bool is_empty_ibsearch_tree(const ibsearch_tree_s * tree) {
+bool is_empty_ibsearch_tree(ibsearch_tree_s const * const tree) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
+
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
@@ -119,9 +160,10 @@ bool is_empty_ibsearch_tree(const ibsearch_tree_s * tree) {
     return !tree->length;
 }
 
-void insert_ibsearch_tree(ibsearch_tree_s * tree, const void * element) {
+void insert_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * const restrict element) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -135,7 +177,7 @@ void insert_ibsearch_tree(ibsearch_tree_s * tree, const void * element) {
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
 
         previous = (*node); // change parent to child
         node = comparison <= 0 ? tree->node[IBSEARCH_TREE_LEFT] + (*node) : tree->node[IBSEARCH_TREE_RIGHT] + (*node);
@@ -149,10 +191,13 @@ void insert_ibsearch_tree(ibsearch_tree_s * tree, const void * element) {
     tree->length++;
 }
 
-void remove_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer) {
+void remove_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -166,7 +211,7 @@ void remove_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * b
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
         if (!comparison) {
             break;
         }
@@ -184,7 +229,7 @@ void remove_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * b
     memcpy(buffer, tree->elements + ((*node) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _ibsearch_tree_remove_fixup(tree, node);
+    size_t const hole = _ibsearch_tree_remove_fixup(tree, node);
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
@@ -192,9 +237,10 @@ void remove_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * b
     }
 }
 
-bool contains_ibsearch_tree(const ibsearch_tree_s * tree, const void * element) {
+bool contains_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void const * const restrict element) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -206,7 +252,7 @@ bool contains_ibsearch_tree(const ibsearch_tree_s * tree, const void * element) 
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
         if (!comparison) {
             return true;
         }
@@ -217,10 +263,11 @@ bool contains_ibsearch_tree(const ibsearch_tree_s * tree, const void * element) 
     return false;
 }
 
-void get_max_ibsearch_tree(const ibsearch_tree_s * tree, void * buffer) {
+void get_max_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != buffer && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -239,10 +286,11 @@ void get_max_ibsearch_tree(const ibsearch_tree_s * tree, void * buffer) {
     memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
 }
 
-void get_min_ibsearch_tree(const ibsearch_tree_s * tree, void * buffer) {
+void get_min_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != buffer && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -261,10 +309,11 @@ void get_min_ibsearch_tree(const ibsearch_tree_s * tree, void * buffer) {
     memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
 }
 
-void remove_max_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
+void remove_max_ibsearch_tree(ibsearch_tree_s * const restrict tree, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != buffer && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -283,9 +332,9 @@ void remove_max_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
     memcpy(buffer, tree->elements + ((*maximum) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = (*maximum);
+    size_t const hole = (*maximum);
 
-    const size_t left_node = tree->node[IBSEARCH_TREE_LEFT][(*maximum)];
+    size_t const left_node = tree->node[IBSEARCH_TREE_LEFT][(*maximum)];
     if (NIL != left_node) {
         tree->parent[left_node] = tree->parent[(*maximum)];
     }
@@ -298,10 +347,11 @@ void remove_max_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
     }
 }
 
-void remove_min_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
+void remove_min_ibsearch_tree(ibsearch_tree_s * const restrict tree, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != buffer && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -320,9 +370,9 @@ void remove_min_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
     memcpy(buffer, tree->elements + ((*minimum) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = (*minimum);
+    size_t const hole = (*minimum);
 
-    const size_t right_node = tree->node[IBSEARCH_TREE_RIGHT][(*minimum)];
+    size_t const right_node = tree->node[IBSEARCH_TREE_RIGHT][(*minimum)];
     if (NIL != right_node) {
         tree->parent[right_node] = tree->parent[(*minimum)];
     }
@@ -335,10 +385,13 @@ void remove_min_ibsearch_tree(ibsearch_tree_s * tree, void * buffer) {
     }
 }
 
-void get_floor_ibsearch_tree(const ibsearch_tree_s * tree, const void * element, void * buffer) {
+void get_floor_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -352,7 +405,7 @@ void get_floor_ibsearch_tree(const ibsearch_tree_s * tree, const void * element,
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (!comparison) {
             floor = n;
             break;
@@ -373,10 +426,13 @@ void get_floor_ibsearch_tree(const ibsearch_tree_s * tree, const void * element,
     memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
 }
 
-void get_ceil_ibsearch_tree(const ibsearch_tree_s * tree, const void * element, void * buffer) {
+void get_ceil_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -390,7 +446,7 @@ void get_ceil_ibsearch_tree(const ibsearch_tree_s * tree, const void * element, 
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (!comparison) {
             ceil = n;
             break;
@@ -411,10 +467,13 @@ void get_ceil_ibsearch_tree(const ibsearch_tree_s * tree, const void * element, 
     memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
 }
 
-void remove_floor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer) {
+void remove_floor_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -435,7 +494,7 @@ void remove_floor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, vo
     memcpy(buffer, tree->elements + ((*floor) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _ibsearch_tree_remove_fixup(tree, floor);
+    size_t const hole = _ibsearch_tree_remove_fixup(tree, floor);
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
@@ -443,10 +502,13 @@ void remove_floor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, vo
     }
 }
 
-void remove_ceil_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer) {
+void remove_ceil_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -467,7 +529,7 @@ void remove_ceil_ibsearch_tree(ibsearch_tree_s * tree, const void * element, voi
     memcpy(buffer, tree->elements + ((*ceil) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _ibsearch_tree_remove_fixup(tree, ceil);
+    size_t const hole = _ibsearch_tree_remove_fixup(tree, ceil);
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
@@ -475,10 +537,13 @@ void remove_ceil_ibsearch_tree(ibsearch_tree_s * tree, const void * element, voi
     }
 }
 
-void get_successor_ibsearch_tree(const ibsearch_tree_s * tree, const void * element, void * buffer) {
+void get_successor_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -490,8 +555,9 @@ void get_successor_ibsearch_tree(const ibsearch_tree_s * tree, const void * elem
     assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
 
     size_t successor = NIL;
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IBSEARCH_TREE_RIGHT][tree->root]) {
-        for (successor = tree->node[IBSEARCH_TREE_RIGHT][tree->root]; NIL != tree->node[IBSEARCH_TREE_LEFT][successor];) {
+    size_t const right = tree->node[IBSEARCH_TREE_RIGHT][tree->root];
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != right) {
+        for (successor = right; NIL != tree->node[IBSEARCH_TREE_LEFT][successor];) {
             successor = tree->node[IBSEARCH_TREE_LEFT][successor];
         }
 
@@ -500,7 +566,7 @@ void get_successor_ibsearch_tree(const ibsearch_tree_s * tree, const void * elem
 
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (comparison < 0) {
             successor = n;
         }
@@ -511,17 +577,20 @@ void get_successor_ibsearch_tree(const ibsearch_tree_s * tree, const void * elem
 SUCCESSOR_CHECK:
     if (NIL == successor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree->");
+        assert(false && "[ERROR] Element not found in tree.");
         exit(EXIT_FAILURE);
     }
 
     memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
 }
 
-void get_predecessor_ibsearch_tree(const ibsearch_tree_s * tree, const void * element, void * buffer) {
+void get_predecessor_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -534,35 +603,39 @@ void get_predecessor_ibsearch_tree(const ibsearch_tree_s * tree, const void * el
 
     size_t predecessor = NIL;
     for (size_t n = tree->root; NIL != n;) {
+        size_t const left = tree->node[IBSEARCH_TREE_LEFT][n];
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
-            if (NIL != tree->node[IBSEARCH_TREE_LEFT][n]) {
-                for (predecessor = tree->node[IBSEARCH_TREE_LEFT][n]; NIL != tree->node[IBSEARCH_TREE_RIGHT][predecessor];) {
+            if (NIL != left) {
+                for (predecessor = left; NIL != tree->node[IBSEARCH_TREE_RIGHT][predecessor];) {
                     predecessor = tree->node[IBSEARCH_TREE_RIGHT][predecessor];
                 }
             }
             break;
         }
 
-        n = comparison < 0 ? tree->node[IBSEARCH_TREE_LEFT][n] : tree->node[IBSEARCH_TREE_RIGHT][n];
+        n = comparison < 0 ? left : tree->node[IBSEARCH_TREE_RIGHT][n];
     }
 
     if (NIL == predecessor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree->");
+        assert(false && "[ERROR] Element not found in tree.");
         exit(EXIT_FAILURE);
     }
 
     memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
 }
 
-void remove_successor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer) {
+void remove_successor_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -583,7 +656,7 @@ void remove_successor_ibsearch_tree(ibsearch_tree_s * tree, const void * element
     memcpy(buffer, tree->elements + ((*successor) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _ibsearch_tree_remove_fixup(tree, successor);
+    size_t const hole = _ibsearch_tree_remove_fixup(tree, successor);
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
@@ -591,10 +664,13 @@ void remove_successor_ibsearch_tree(ibsearch_tree_s * tree, const void * element
     }
 }
 
-void remove_predecessor_ibsearch_tree(ibsearch_tree_s * tree, const void * element, void * buffer) {
+void remove_predecessor_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(tree != element && "Parameters can't be equal.");
+    assert(tree != buffer && "Parameters can't be equal.");
+    assert(buffer != element && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -615,7 +691,7 @@ void remove_predecessor_ibsearch_tree(ibsearch_tree_s * tree, const void * eleme
     memcpy(buffer, tree->elements + ((*predecessor) * tree->size), tree->size);
     tree->length--;
 
-    const size_t hole = _ibsearch_tree_remove_fixup(tree, predecessor);
+    size_t const hole = _ibsearch_tree_remove_fixup(tree, predecessor);
     _ibsearch_tree_fill_hole(tree, hole);
 
     if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
@@ -623,11 +699,14 @@ void remove_predecessor_ibsearch_tree(ibsearch_tree_s * tree, const void * eleme
     }
 }
 
-void update_ibsearch_tree(const ibsearch_tree_s * tree, const void * latter, void * former) {
+void update_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void const * const restrict latter, void * const restrict former) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(tree->length && "[ERROR] Can't get element from empty structure.");
     assert(latter && "[ERROR] Parameter can't be NULL.");
     assert(former && "[ERROR] Parameter can't be NULL.");
+    assert(tree != latter && "Parameters can't be equal.");
+    assert(tree != former && "Parameters can't be equal.");
+    assert(former != latter && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -652,7 +731,7 @@ void update_ibsearch_tree(const ibsearch_tree_s * tree, const void * latter, voi
 
     if (NIL == node) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree->");
+        assert(false && "[ERROR] Element not found in tree.");
         exit(EXIT_FAILURE);
     }
 
@@ -660,9 +739,10 @@ void update_ibsearch_tree(const ibsearch_tree_s * tree, const void * latter, voi
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_ibsearch_tree(const ibsearch_tree_s * tree, const handle_fn handle, void * arguments) {
+void inorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
+    assert(tree != arguments && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
@@ -699,66 +779,68 @@ void inorder_ibsearch_tree(const ibsearch_tree_s * tree, const handle_fn handle,
     }
 }
 
-void preorder_ibsearch_tree(const ibsearch_tree_s * tree, const handle_fn handle, void * arguments) {
+void preorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
+    assert(tree != arguments && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct pre_stack { size_t length; size_t * elements; } stack = {
-        .length = 0, .elements = malloc(tree->length * sizeof(size_t)),
+    struct ibsearch_tree_stack pre_order = {
+        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || stack.elements && "[ERROR] Memory allocation failed.");
+    assert(!tree->length || pre_order.elements && "[ERROR] Memory allocation failed.");
 
     if (tree->length) {
-        stack.elements[stack.length++] = tree->root;
+        pre_order.elements[pre_order.length++] = tree->root;
     }
 
-    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
-        const size_t node = stack.elements[--stack.length];
+    while (pre_order.length && handle(tree->elements + (pre_order.elements[pre_order.length - 1] * tree->size), arguments)) {
+        size_t const node = pre_order.elements[--pre_order.length];
 
-        const size_t right_child = tree->node[IBSEARCH_TREE_RIGHT][node];
+        size_t const right_child = tree->node[IBSEARCH_TREE_RIGHT][node];
         if (NIL != right_child) {
-            stack.elements[stack.length++] = right_child;
+            pre_order.elements[pre_order.length++] = right_child;
         }
 
-        const size_t left_child = tree->node[IBSEARCH_TREE_LEFT][node];
+        size_t const left_child = tree->node[IBSEARCH_TREE_LEFT][node];
         if (NIL != left_child) {
-            stack.elements[stack.length++] = left_child;
+            pre_order.elements[pre_order.length++] = left_child;
         }
     }
 
-    free(stack.elements);
+    tree->allocator->free(pre_order.elements, tree->allocator->arguments);
 }
 
-void postorder_ibsearch_tree(const ibsearch_tree_s * tree, const handle_fn handle, void * arguments) {
+void postorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
+    assert(tree != arguments && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct post_stack { size_t length; size_t * elements; } stack = {
-        .length = 0, .elements = malloc(tree->length * sizeof(size_t)),
+    struct ibsearch_tree_stack post_order = {
+        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || stack.elements && "[ERROR] Memory allocation failed.");
+    assert(!tree->length || post_order.elements && "[ERROR] Memory allocation failed.");
 
     // push root node onto stack and initially save it into variable
     size_t node = tree->root;
     size_t last = NIL;
-    while (stack.length || NIL != node) { // while stack is not empty OR node is valid
+    while (post_order.length || NIL != node) { // while stack is not empty OR node is valid
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
-            stack.elements[stack.length++] = node;
+            post_order.elements[post_order.length++] = node;
             node = tree->node[IBSEARCH_TREE_LEFT][node];
         } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
-            const size_t peek = stack.elements[stack.length - 1];
+            size_t const peek = post_order.elements[post_order.length - 1];
 
-            const size_t peek_right = tree->node[IBSEARCH_TREE_RIGHT][peek];
+            size_t const peek_right = tree->node[IBSEARCH_TREE_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
@@ -766,59 +848,60 @@ void postorder_ibsearch_tree(const ibsearch_tree_s * tree, const handle_fn handl
                     break;
                 }
 
-                last = stack.elements[--stack.length];
+                last = post_order.elements[--post_order.length];
             }
         }
     }
 
-    free(stack.elements);
+    tree->allocator->free(post_order.elements, tree->allocator->arguments);
 }
 
-void levelorder_ibsearch_tree(const ibsearch_tree_s * tree, const handle_fn operate, void * arguments) {
+void levelorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(operate && "[ERROR] Parameter can't be NULL.");
+    assert(handle && "[ERROR] Parameter can't be NULL.");
+    assert(tree != arguments && "Parameters can't be equal.");
 
     assert(tree->compare && "[INVALID] Parameter can't be NULL.");
     assert(tree->size && "[INVALID] Parameter can't be zero.");
     assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create simple queue to manage breath first level order traversal of node indexes
-    struct level_queue { size_t length, current; size_t * elements; } queue = {
-        .length = 0, .current = 0, .elements = malloc(tree->length * sizeof(size_t)),
+    struct ibsearch_tree_queue level_order = {
+        .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || queue.elements && "[ERROR] Memory allocation failed.");
+    assert(!tree->length || level_order.elements && "[ERROR] Memory allocation failed.");
 
     if (tree->length) { // if tree isn't empty push root node
-        queue.elements[queue.current + queue.length++] = tree->root;
+        level_order.elements[level_order.current + level_order.length++] = tree->root;
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && operate(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
+    while (level_order.length && handle(tree->elements + (level_order.elements[level_order.current] * tree->size), arguments)) {
         // pop index
-        const size_t node = queue.elements[queue.current++];
-        queue.length--;
+        size_t const node = level_order.elements[level_order.current++];
+        level_order.length--;
 
         // push left child of popped parent to the top of the queue
-        const size_t left_child = tree->node[IBSEARCH_TREE_LEFT][node];
+        size_t const left_child = tree->node[IBSEARCH_TREE_LEFT][node];
         if (NIL != left_child) {
-            queue.elements[queue.current + queue.length++] = left_child;
+            level_order.elements[level_order.current + level_order.length++] = left_child;
         }
 
         // push right child of popped parent to the top of the queue
-        const size_t right_child = tree->node[IBSEARCH_TREE_RIGHT][node];
+        size_t const right_child = tree->node[IBSEARCH_TREE_RIGHT][node];
         if (NIL != right_child) {
-            queue.elements[queue.current + queue.length++] = right_child;
+            level_order.elements[level_order.current + level_order.length++] = right_child;
         }
     }
 
-    free(queue.elements);
+    tree->allocator->free(level_order.elements, tree->allocator->arguments);
 }
 
-size_t * _ibsearch_tree_floor(ibsearch_tree_s * tree, const void * element) {
+size_t * _ibsearch_tree_floor(ibsearch_tree_s * const restrict tree, void const * const restrict element) {
     size_t * floor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
         if (!comparison) {
             floor = n;
             break;
@@ -833,11 +916,11 @@ size_t * _ibsearch_tree_floor(ibsearch_tree_s * tree, const void * element) {
     return floor;
 }
 
-size_t * _ibsearch_tree_ceil(ibsearch_tree_s * tree, const void * element) {
+size_t * _ibsearch_tree_ceil(ibsearch_tree_s * const restrict tree, void const * const restrict element) {
     size_t * ceil = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
         if (!comparison) {
             ceil = n;
             break;
@@ -852,11 +935,12 @@ size_t * _ibsearch_tree_ceil(ibsearch_tree_s * tree, const void * element) {
     return ceil;
 }
 
-size_t * _ibsearch_tree_successor(ibsearch_tree_s * tree, const void * element) {
+size_t * _ibsearch_tree_successor(ibsearch_tree_s * const restrict tree, void const * const restrict element) {
     size_t * successor = NULL;
 
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IBSEARCH_TREE_RIGHT][tree->root]) {
-        for (successor = tree->node[IBSEARCH_TREE_RIGHT] + tree->root; NIL != *(tree->node[IBSEARCH_TREE_LEFT] + (*successor));) {
+    size_t * const right = tree->node[IBSEARCH_TREE_RIGHT] + tree->root;
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != (*right)) {
+        for (successor = right; NIL != *(tree->node[IBSEARCH_TREE_LEFT] + (*successor));) {
             successor = tree->node[IBSEARCH_TREE_LEFT] + (*successor);
         }
 
@@ -865,7 +949,7 @@ size_t * _ibsearch_tree_successor(ibsearch_tree_s * tree, const void * element) 
 
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
         if (comparison < 0) {
             successor = n;
         }
@@ -876,29 +960,30 @@ size_t * _ibsearch_tree_successor(ibsearch_tree_s * tree, const void * element) 
     return successor;
 }
 
-size_t * _ibsearch_tree_predecessor(ibsearch_tree_s * tree, const void * element) {
+size_t * _ibsearch_tree_predecessor(ibsearch_tree_s * const restrict tree, void const * const restrict element) {
     size_t * predecessor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
+        size_t * const left = tree->node[IBSEARCH_TREE_LEFT] + (*n);
         // calculate and determine next child node, i.e. if left or right child
         const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
-            if (NIL != *(tree->node[IBSEARCH_TREE_LEFT] + (*n))) {
-                for (predecessor = tree->node[IBSEARCH_TREE_LEFT] + (*n); NIL != *(tree->node[IBSEARCH_TREE_RIGHT] + (*predecessor));) {
+            if (NIL != (*left)) {
+                for (predecessor = left; NIL != *(tree->node[IBSEARCH_TREE_RIGHT] + (*predecessor));) {
                     predecessor = tree->node[IBSEARCH_TREE_RIGHT] + (*predecessor);
                 }
             }
             break;
         }
 
-        n = comparison < 0 ? tree->node[IBSEARCH_TREE_LEFT] + (*n) : tree->node[IBSEARCH_TREE_RIGHT] + (*n);
+        n = comparison < 0 ? left : tree->node[IBSEARCH_TREE_RIGHT] + (*n);
     }
 
     return predecessor;
 }
 
-void _ibsearch_tree_fill_hole(ibsearch_tree_s * tree, const size_t hole) {
+void _ibsearch_tree_fill_hole(ibsearch_tree_s * const tree, size_t const hole) {
     if (tree->length && tree->root == tree->length) { // if head node is last array element then change index to removed one
         tree->root = hole;
     }
@@ -913,19 +998,19 @@ void _ibsearch_tree_fill_hole(ibsearch_tree_s * tree, const size_t hole) {
     tree->parent[hole] = tree->parent[tree->length];
 
     // redirect left child of rightmost array node if they don't overlap with removed index
-    const size_t left_last = tree->node[IBSEARCH_TREE_LEFT][tree->length];
+    size_t const left_last = tree->node[IBSEARCH_TREE_LEFT][tree->length];
     if (NIL != left_last) {
         tree->parent[left_last] = hole;
     }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
-    const size_t right_last = tree->node[IBSEARCH_TREE_RIGHT][tree->length];
+    size_t const right_last = tree->node[IBSEARCH_TREE_RIGHT][tree->length];
     if (NIL != right_last) {
         tree->parent[right_last] = hole;
     }
 
     // redirect parent of rightmost array node if they don't overlap with removed index
-    const size_t parent_last = tree->parent[tree->length];
+    size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
         const int comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
         const size_t node_index = comparison <= 0 ? IBSEARCH_TREE_LEFT : IBSEARCH_TREE_RIGHT;
@@ -933,7 +1018,7 @@ void _ibsearch_tree_fill_hole(ibsearch_tree_s * tree, const size_t hole) {
     }
 }
 
-size_t _ibsearch_tree_remove_fixup(const ibsearch_tree_s * tree, size_t * node) {
+size_t _ibsearch_tree_remove_fixup(ibsearch_tree_s const * const restrict tree, size_t * const restrict node) {
     // calculate the rightmost depth of the left child
     size_t left_depth = 0, * left_node = node;
     for (size_t * l = tree->node[IBSEARCH_TREE_LEFT] + (*left_node); NIL != (*l); l = tree->node[IBSEARCH_TREE_RIGHT] + (*l)) {
@@ -948,7 +1033,7 @@ size_t _ibsearch_tree_remove_fixup(const ibsearch_tree_s * tree, size_t * node) 
         right_node = r;
     }
 
-    const size_t hole = left_depth > right_depth ? (*left_node) : (*right_node);
+    size_t const hole = left_depth > right_depth ? (*left_node) : (*right_node);
     memmove(tree->elements + ((*node) * tree->size), tree->elements + (hole * tree->size), tree->size);
     if (left_depth > right_depth) {
         if (NIL != tree->node[IBSEARCH_TREE_LEFT][(*left_node)]) { // if right child exists cut off parent
@@ -965,16 +1050,18 @@ size_t _ibsearch_tree_remove_fixup(const ibsearch_tree_s * tree, size_t * node) 
     return hole;
 }
 
-void _ibsearch_tree_resize(ibsearch_tree_s * tree, const size_t size) {
+void _ibsearch_tree_resize(ibsearch_tree_s * const tree, size_t const size) {
     tree->capacity = size;
 
-    tree->elements = realloc(tree->elements, tree->capacity * tree->size);
-    tree->parent = realloc(tree->parent, tree->capacity * sizeof(size_t));
-    tree->node[IBSEARCH_TREE_LEFT] = realloc(tree->node[IBSEARCH_TREE_LEFT], tree->capacity * sizeof(size_t));
-    tree->node[IBSEARCH_TREE_RIGHT] = realloc(tree->node[IBSEARCH_TREE_RIGHT], tree->capacity * sizeof(size_t));
-
+    tree->elements = tree->allocator->realloc(tree->elements, tree->capacity * tree->size, tree->allocator->arguments);
     assert((!tree->capacity || tree->elements) && "[ERROR] Memory allocation failed.");
+
+    tree->parent = tree->allocator->realloc(tree->parent, tree->capacity * sizeof(size_t), tree->allocator->arguments);
     assert((!tree->capacity || tree->parent) && "[ERROR] Memory allocation failed.");
+
+    tree->node[IBSEARCH_TREE_LEFT] = tree->allocator->realloc(tree->node[IBSEARCH_TREE_LEFT], tree->capacity * sizeof(size_t), tree->allocator->arguments);
     assert((!tree->capacity || tree->node[IBSEARCH_TREE_LEFT]) && "[ERROR] Memory allocation failed.");
+
+    tree->node[IBSEARCH_TREE_RIGHT] = tree->allocator->realloc(tree->node[IBSEARCH_TREE_RIGHT], tree->capacity * sizeof(size_t), tree->allocator->arguments);
     assert((!tree->capacity || tree->node[IBSEARCH_TREE_RIGHT]) && "[ERROR] Memory allocation failed.");
 }
