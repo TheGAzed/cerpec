@@ -1,6 +1,5 @@
 #include <list/istraight_list.h>
 
-#include <assert.h>
 #include <stdlib.h> // import exit()
 #include <string.h>
 
@@ -12,25 +11,25 @@
 void _istraight_list_resize(istraight_list_s * const list, size_t const size);
 
 istraight_list_s create_istraight_list(size_t const size) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
+    error(size && "Paremeter can't be zero.");
 
     return (istraight_list_s) { .head = NIL, .empty = NIL, .size = size, .allocator = &standard, };
 }
 
 istraight_list_s make_istraight_list(size_t const size, memory_s const * const allocator) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(allocator && "[ERROR] Paremeter can't be NULL.");
+    error(size && "Paremeter can't be zero.");
+    error(allocator && "Paremeter can't be NULL.");
 
     return (istraight_list_s) { .head = NIL, .empty = NIL, .size = size, .allocator = allocator, };
 }
 
 void destroy_istraight_list(istraight_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate over each node and destroy its element
     for (size_t i = list->head; i != NIL; i = list->next[i]) {
@@ -47,12 +46,12 @@ void destroy_istraight_list(istraight_list_s * const list, set_fn const destroy)
 }
 
 void clear_istraight_list(istraight_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate over each node and destroy its element
     for (size_t i = list->head; NIL != i; i = list->next[i]) {
@@ -69,12 +68,12 @@ void clear_istraight_list(istraight_list_s * const list, set_fn const destroy) {
 }
 
 istraight_list_s copy_istraight_list(istraight_list_s const * const list, copy_fn const copy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(copy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(copy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // create copy/replica list
     istraight_list_s replica = {
@@ -83,8 +82,8 @@ istraight_list_s copy_istraight_list(istraight_list_s const * const list, copy_f
         .next = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.next) && "[ERROR] Memory allocation failed.");
+    error((!replica.capacity || replica.elements) && "Memory allocation failed.");
+    error((!replica.capacity || replica.next) && "Memory allocation failed.");
 
     // copy each element into replica (aslo make new list hole-less)
     for (size_t i = list->head, * r = &(replica.head), index = 0; NIL != i; i = list->next[i], r = replica.next + index, index++) {
@@ -98,24 +97,25 @@ istraight_list_s copy_istraight_list(istraight_list_s const * const list, copy_f
 }
 
 bool is_empty_istraight_list(istraight_list_s const * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     return !(list->length);
 }
 
 void insert_at_istraight_list(istraight_list_s * const restrict list, void const * const restrict element, size_t const index) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(list != element && "[ERROR] Paremeters can't be equal.");
-    assert(index <= list->length && "[ERROR] Paremeter can't be greater than length.");
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(list != element && "Paremeters can't be equal.");
+    error(index <= list->length && "Paremeter can't be greater than length.");
+    error(list != element && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // if list can't fit elements expand it
     if (list->length == list->capacity) {
@@ -144,15 +144,16 @@ void insert_at_istraight_list(istraight_list_s * const restrict list, void const
     list->length++;
 }
 
-void get_istraight_list(istraight_list_s const * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] List can't be empty.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+void get_istraight_list(istraight_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(list->length && "List can't be empty.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate until node at index isn't reached
     size_t node = list->head;
@@ -164,16 +165,18 @@ void get_istraight_list(istraight_list_s const * const list, size_t const index,
     memcpy(buffer, list->elements + (node * list->size), list->size);
 }
 
-void remove_first_istraight_list(istraight_list_s * const list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(compare && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Paremeter can't be zero.");
-    assert(element != buffer && "[ERROR] Paremeters can't be the same.");
+void remove_first_istraight_list(istraight_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(compare && "Paremeter can't be NULL.");
+    error(list->length && "Paremeter can't be zero.");
+    error(list != element && "Parameters can't be equal.");
+    error(list != buffer && "Paremeters can't be the same.");
+    error(element != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate until node with element isn't reached
     for (size_t * i = &(list->head); NIL != *i; i = list->next + (*i)) {
@@ -204,20 +207,21 @@ void remove_first_istraight_list(istraight_list_s * const list, void const * con
         return; // leave function with found element
     }
 
-    assert(0 && "[ERROR] Element not found in list."); // if element is not found in list then that is an error
+    error(0 && "Element not found in list."); // if element is not found in list then that is an error
     // and exit failure is returned, since the function returns the removed element, element can contain allocated memory
     exit(EXIT_FAILURE);
 }
 
 void remove_at_istraight_list(istraight_list_s * const restrict list, size_t const index, void * const restrict buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Paremeter can't be zero.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(list->length && "Paremeter can't be zero.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // go to node reference at index
     size_t * node = &(list->head);
@@ -246,11 +250,11 @@ void remove_at_istraight_list(istraight_list_s * const restrict list, size_t con
 }
 
 void reverse_istraight_list(istraight_list_s * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     size_t previous = NIL;
     for (size_t i = 0, current = list->head, next = NIL; i < list->length; ++i, previous = current, current = next) {
@@ -261,19 +265,19 @@ void reverse_istraight_list(istraight_list_s * const list) {
 }
 
 void splice_istraight_list(istraight_list_s * const restrict destination, istraight_list_s * const restrict source, size_t const index) {
-    assert(destination && "[ERROR] Paremeter can't be NULL.");
-    assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
+    error(destination && "Paremeter can't be NULL.");
+    error(source && "Paremeter can't be NULL.");
+    error(index <= destination->length && "Paremeter can't be greater than length.");
+    error(source->size == destination->size && "Element sizes must be equal.");
+    error(destination != source && "Parameters can't be equal.");
 
-    assert(destination->size && "[INVALID] Size can't be zero.");
-    assert(destination->length <= destination->capacity && "[INVALID] Length exceeds capacity.");
-    assert(destination->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(destination->size && "Size can't be zero.");
+    valid(destination->length <= destination->capacity && "Length exceeds capacity.");
+    valid(destination->allocator && "Allocator can't be NULL.");
 
-    assert(source->size && "[INVALID] Size can't be zero.");
-    assert(source->length <= source->capacity && "[INVALID] Length exceeds capacity.");
-    assert(source->allocator && "[INVALID] Paremeter can't be NULL.");
-
-    assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
+    valid(source->size && "Size can't be zero.");
+    valid(source->length <= source->capacity && "Length exceeds capacity.");
+    valid(source->allocator && "Allocator can't be NULL.");
 
     // calculate new destination length
     size_t const sum = destination->length + source->length;
@@ -325,14 +329,14 @@ void splice_istraight_list(istraight_list_s * const restrict destination, istrai
 }
 
 istraight_list_s split_istraight_list(istraight_list_s * const list, size_t const index, size_t const length) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Index can't be more than or equal length.");
-    assert(length <= list->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(index + length <= list->length && "[ERROR] Size can't be more than length.");
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Index can't be more than or equal length.");
+    error(length <= list->length && "Paremeter can't be greater than length.");
+    error(index + length <= list->length && "Size can't be more than length.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // go to node reference at index
     size_t * node = &(list->head);
@@ -349,8 +353,8 @@ istraight_list_s split_istraight_list(istraight_list_s * const list, size_t cons
         .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
     };
-    assert((!split_capacity || split.elements) && "[ERROR] Memory allocation failed.");
-    assert((!split_capacity || split.next) && "[ERROR] Memory allocation failed.");
+    error((!split_capacity || split.elements) && "Memory allocation failed.");
+    error((!split_capacity || split.next) && "Memory allocation failed.");
 
     // push list elements into split list and redirect removed element in list
     for (size_t * s = &(split.head); split.length < length; (*node) = list->next[(*node)], s = split.next + (*s)) {
@@ -371,8 +375,8 @@ istraight_list_s split_istraight_list(istraight_list_s * const list, size_t cons
         .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arguments),
     };
-    assert((!replica_capacity || replica.elements) && "[ERROR] Memory allocation failed.");
-    assert((!replica_capacity || replica.next) && "[ERROR] Memory allocation failed.");
+    error((!replica_capacity || replica.elements) && "Memory allocation failed.");
+    error((!replica_capacity || replica.next) && "Memory allocation failed.");
 
     // restart node reference at list head and push its elements into replica
     node = &(list->head);
@@ -393,13 +397,14 @@ istraight_list_s split_istraight_list(istraight_list_s * const list, size_t cons
     return split;
 }
 
-istraight_list_s extract_istraight_list(istraight_list_s * const list, filter_fn const filter, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(filter && "[ERROR] Paremeter can't be NULL.");
+istraight_list_s extract_istraight_list(istraight_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(filter && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // create lists that contain true and false filtered elements
     istraight_list_s negative = { .empty = NIL, .head = NIL, .size = list->size, .allocator = list->allocator, };
@@ -447,27 +452,29 @@ istraight_list_s extract_istraight_list(istraight_list_s * const list, filter_fn
     return positive;
 }
 
-void map_istraight_list(istraight_list_s const * const list, handle_fn const handle, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(handle && "[ERROR] Paremeter can't be NULL.");
+void map_istraight_list(istraight_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(handle && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     for (size_t i = list->head; NIL != i && handle(list->elements + (i * list->size), arguments); i = list->next[i]) {}
 }
 
-void apply_istraight_list(istraight_list_s const * const list, process_fn const process, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(process && "[ERROR] Paremeter can't be NULL.");
+void apply_istraight_list(istraight_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(process && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     char * elements = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
-    assert((!list->length || elements) && "[ERROR] Memory allocation failed.");
+    error((!list->length || elements) && "Memory allocation failed.");
 
     for (size_t i = list->head, index = 0; NIL != i; i = list->next[i]) {
         memcpy(elements + (index * list->size), list->elements + (i * list->size), list->size);
@@ -492,14 +499,14 @@ void _istraight_list_resize(istraight_list_s * const list, size_t const size) {
         list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arguments);
         list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arguments);
 
-        assert((!list->capacity || list->elements) && "[ERROR] Memory allocation failed.");
-        assert((!list->capacity || list->next) && "[ERROR] Memory allocation failed.");
+        error((!list->capacity || list->elements) && "Memory allocation failed.");
+        error((!list->capacity || list->next) && "Memory allocation failed.");
 
         return;
     } // else copy elements into new array in order, and clear hole stack
 
     char * elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments);
-    assert((!list->capacity || elements) && "[ERROR] Memory allocation failed.");
+    error((!list->capacity || elements) && "Memory allocation failed.");
 
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->next[current]) {
         memcpy(elements + (i * list->size), list->elements + (current * list->size), list->size);
@@ -508,7 +515,7 @@ void _istraight_list_resize(istraight_list_s * const list, size_t const size) {
     list->elements = elements;
 
     list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arguments);
-    assert((!list->capacity || list->next) && "[ERROR] Memory allocation failed.");
+    error((!list->capacity || list->next) && "Memory allocation failed.");
 
     for (size_t i = 0, * current = &(list->head); i < list->length; current = list->next + i, i++) {
         (*current) = i;
