@@ -51,28 +51,28 @@ bool is_empty_istack(istack_s const * const stack);
 /// @brief Pushes a single element to the top of the structure.
 /// @param stack Structure to push into.
 /// @param element Element buffer to push.
-void push_istack(istack_s * const stack, void const * const element);
+void push_istack(istack_s * const restrict stack, void const * const restrict element);
 
 /// @brief Pops a single element from the top of the structure.
 /// @param stack Structure to pop from.
 /// @param buffer Element buffer to save pop.
-void pop_istack(istack_s * const stack, void * const buffer);
+void pop_istack(istack_s * const restrict stack, void * const restrict buffer);
 
 /// @brief Peeps a single element from the top of the structure.
 /// @param stack Structure to peep.
 /// @param buffer Element buffer to save peep.
-void peep_istack(istack_s const * const stack, void * const buffer);
+void peep_istack(istack_s const * const restrict stack, void * const restrict buffer);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param stack Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_istack(istack_s const * const stack, handle_fn const handle, void * const arguments);
+void map_istack(istack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param stack Structure to map.
 /// @param process Function pointer to process array of elements using structure length and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void apply_istack(istack_s const * const stack, process_fn const process, void * const arguments);
+void apply_istack(istack_s const * const restrict stack, process_fn const process, void * const restrict arguments);
 
 #endif // ISTACK_H

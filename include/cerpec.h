@@ -2,6 +2,7 @@
 #define CERPEC_H
 
 #include <stdbool.h>
+#include <assert.h>
 #include <stddef.h>
 
 // define chunk size to linearly expand and contract all data structures
@@ -9,6 +10,18 @@
 #   define CERPEC_CHUNK 256
 #elif
 #   error "Chunk size must be greater than zero."
+#endif
+
+#ifndef NVALID
+#   define valid(condition) assert(condition)
+#else
+#   define valid(condition) (void)(0)
+#endif
+
+#ifndef NERROR
+#   define error(condition) assert(condition)
+#else
+#   define error(condition) (void)(0)
 #endif
 
 typedef void * (*alloc_fn)   (const size_t, void *);
