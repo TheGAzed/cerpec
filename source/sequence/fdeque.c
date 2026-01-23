@@ -1,11 +1,10 @@
 #include <sequence/fdeque.h>
 
-#include <assert.h>
 #include <string.h>
 
 fdeque_s create_fdeque(size_t const size, size_t const max) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(max && "[ERROR] Paremeter can't be zero.");
+    error(size && "Paremeter can't be zero.");
+    error(max && "Paremeter can't be zero.");
 
     // create finite queue with allocated memory and check if allocation succeded
     fdeque_s const deque = {
@@ -13,15 +12,15 @@ fdeque_s create_fdeque(size_t const size, size_t const max) {
         .size = size, .max = max,
         .allocator = &standard,
     };
-    assert(deque.elements && "[ERROR] Memory allocation failed.");
+    error(deque.elements && "Memory allocation failed.");
 
     return deque;
 }
 
 fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * allocator) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(max && "[ERROR] Paremeter can't be zero.");
-    assert(allocator && "[ERROR] Paremeter can't be NULL.");
+    error(size && "Paremeter can't be zero.");
+    error(max && "Paremeter can't be zero.");
+    error(allocator && "Paremeter can't be NULL.");
 
     // create finite queue with custom allocated memory and check if allocation succeded
     fdeque_s const deque = {
@@ -29,21 +28,21 @@ fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * alloc
         .size = size, .max = max,
         .allocator = allocator,
     };
-    assert(deque.elements && "[ERROR] Memory allocation failed.");
+    error(deque.elements && "Memory allocation failed.");
 
     return deque;
 }
 
 void destroy_fdeque(fdeque_s * const deque, set_fn const destroy) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+    error(deque && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // divide circular elements array into right and left part
     size_t const absolute = deque->current + deque->length;
@@ -68,15 +67,15 @@ void destroy_fdeque(fdeque_s * const deque, set_fn const destroy) {
 }
 
 void clear_fdeque(fdeque_s * const deque, set_fn const destroy) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+    error(deque && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // divide circular elements array into right and left part
     size_t const absolute = deque->current + deque->length;
@@ -97,15 +96,15 @@ void clear_fdeque(fdeque_s * const deque, set_fn const destroy) {
 }
 
 fdeque_s copy_fdeque(fdeque_s const * const deque, copy_fn const copy) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
+    error(deque && "Parameter can't be NULL.");
+    error(copy && "Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // create initial replica structure with allocated memory (current remains 0)
     fdeque_s const replica = {
@@ -113,7 +112,7 @@ fdeque_s copy_fdeque(fdeque_s const * const deque, copy_fn const copy) {
         .max = deque->max, .size = deque->size, .length = deque->length,
         .allocator = deque->allocator,
     };
-    assert(replica.elements && "[ERROR] Memory allocation failed.");
+    error(replica.elements && "Memory allocation failed.");
 
     // divide circular elements array into right and left part
     size_t const absolute = deque->current + deque->length;
@@ -135,84 +134,87 @@ fdeque_s copy_fdeque(fdeque_s const * const deque, copy_fn const copy) {
 }
 
 bool is_empty_fdeque(fdeque_s const * const deque) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
+    error(deque && "Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     return !(deque->length); // return the negation
 }
 
 bool is_full_fdeque(fdeque_s const * const deque) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
+    error(deque && "Parameter can't be NULL.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     return (deque->length == deque->max); // compare if length is max
 }
 
-void enqueue_front_fdeque(fdeque_s * const deque, void const * const buffer) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(deque->length != deque->max && "[ERROR] Structure is full.");
+void enqueue_front_fdeque(fdeque_s * const restrict deque, void const * const restrict element) {
+    error(deque && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
+    error(deque->length != deque->max && "Structure is full.");
+    error(deque != element && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // if current is zero then set it to max and then it decrements to empty last position
     if (!(deque->current)) {
         deque->current = deque->max;
     }
-    // decrement to get empty front position, set element buffer to array and increment length
+    // decrement to get empty front position, set element element to array and increment length
     deque->current--;
-    memcpy(deque->elements + (deque->current * deque->size), buffer, deque->size);
+    memcpy(deque->elements + (deque->current * deque->size), element, deque->size);
     deque->length++;
 }
 
-void enqueue_back_fdeque(fdeque_s * const deque, void const * const buffer) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(deque->length != deque->max && "[ERROR] Structure is full.");
+void enqueue_back_fdeque(fdeque_s * const restrict deque, void const * const restrict element) {
+    error(deque && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
+    error(deque->length != deque->max && "Structure is full.");
+    error(deque != element && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // calculate position of empty index after last element
     size_t const position = (deque->current + deque->length) % deque->max;
 
-    // copy element buffer to deque's array and increment length
-    memcpy(deque->elements + (position * deque->size), buffer, deque->size);
+    // copy element element to deque's array and increment length
+    memcpy(deque->elements + (position * deque->size), element, deque->size);
     deque->length++;
 }
 
-void dequeue_front_fdeque(fdeque_s * const deque, void * const buffer) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(deque->length && "[ERROR] Structure is empty.");
+void dequeue_front_fdeque(fdeque_s * const restrict deque, void * const restrict buffer) {
+    error(deque && "Parameter can't be NULL.");
+    error(buffer && "Parameter can't be NULL.");
+    error(deque->length && "Structure is empty.");
+    error(deque != buffer && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // copy front element to buffer, increment current index while keeping circularity and decrement length
     memcpy(buffer, deque->elements + (deque->current * deque->size), deque->size);
@@ -220,17 +222,18 @@ void dequeue_front_fdeque(fdeque_s * const deque, void * const buffer) {
     deque->length--;
 }
 
-void dequeue_back_fdeque(fdeque_s * const deque, void * const buffer) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(deque->length && "[ERROR] Structure is empty.");
+void dequeue_back_fdeque(fdeque_s * const restrict deque, void * const restrict buffer) {
+    error(deque && "Parameter can't be NULL.");
+    error(buffer && "Parameter can't be NULL.");
+    error(deque->length && "Structure is empty.");
+    error(deque != buffer && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // decrement length and calculate position of back element, copy it to buffer
     deque->length--;
@@ -239,49 +242,52 @@ void dequeue_back_fdeque(fdeque_s * const deque, void * const buffer) {
     memcpy(buffer, deque->elements + (position * deque->size), deque->size);
 }
 
-void peek_front_fdeque(fdeque_s const * const deque, void * const buffer) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(deque->length && "[ERROR] Structure is empty.");
+void peek_front_fdeque(fdeque_s const * const restrict deque, void * const restrict buffer) {
+    error(deque && "Parameter can't be NULL.");
+    error(buffer && "Parameter can't be NULL.");
+    error(deque->length && "Structure is empty.");
+    error(deque != buffer && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // copy element at current (front) position
     memcpy(buffer, deque->elements + (deque->current * deque->size), deque->size);
 }
 
-void peek_back_fdeque(fdeque_s const * const deque, void * const buffer) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(deque->length && "[ERROR] Structure is empty.");
+void peek_back_fdeque(fdeque_s const * const restrict deque, void * const restrict buffer) {
+    error(deque && "Parameter can't be NULL.");
+    error(buffer && "Parameter can't be NULL.");
+    error(deque->length && "Structure is empty.");
+    error(deque != buffer && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // calculate location of back element and copy it into buffer
     size_t const position = (deque->current + deque->length - 1) % deque->max;
     memcpy(buffer, deque->elements + (position * deque->size), deque->size);
 }
 
-void map_front_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const arguments) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
+void map_front_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+    error(deque && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(deque != arguments && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // divide circular elements array into right and left part
     size_t const absolute = deque->current + deque->length;
@@ -298,16 +304,17 @@ void map_front_fdeque(fdeque_s const * const deque, handle_fn const handle, void
     }
 }
 
-void map_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const arguments) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
+void map_back_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+    error(deque && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(deque != arguments && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // divide circular elements array into right and left part
     size_t const absolute = deque->current + deque->length;
@@ -327,20 +334,21 @@ void map_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void 
     }
 }
 
-void apply_fdeque(fdeque_s const * const deque, process_fn const process, void * const arguments) {
-    assert(deque && "[ERROR] Parameter can't be NULL.");
-    assert(process && "[ERROR] Parameter can't be NULL.");
+void apply_fdeque(fdeque_s const * const restrict deque, process_fn const process, void * const restrict arguments) {
+    error(deque && "Parameter can't be NULL.");
+    error(process && "Parameter can't be NULL.");
+    error(deque != arguments && "Parameters can't be equal.");
 
-    assert(deque->size && "[INVALID] Parameter can't be zero.");
-    assert(deque->max && "[INVALID] Parameter can't be zero.");
-    assert(deque->elements && "[INVALID] Parameter can't be NULL.");
-    assert(deque->allocator && "[ERROR] Paremeter can't be NULL.");
-    assert(deque->length <= deque->max && "[INVALID] Length exceeds maximum.");
-    assert(deque->current < deque->max && "[INVALID] Current exceeds maximum.");
+    valid(deque->size && "Size can't be zero.");
+    valid(deque->max && "Maximum can't be zero.");
+    valid(deque->elements && "Elements array can't be NULL.");
+    valid(deque->allocator && "Allocator can't be NULL.");
+    valid(deque->length <= deque->max && "Length exceeds maximum.");
+    valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // initialize temporary elements array to save elements from circular field into straight
     char * elements_array = deque->allocator->alloc(deque->length * deque->size, deque->allocator->arguments);
-    assert(elements_array && "[ERROR] Memory allocation failed.");
+    error((!deque->length || elements_array) && "Memory allocation failed.");
 
     // divide circular elements array into right and left part
     size_t const absolute = deque->current + deque->length;
