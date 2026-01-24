@@ -3,13 +3,13 @@
 
 #include <cerpec.h>
 
-#define IDOUBLE_LIST_NODE 2
-#define IDOUBLE_LIST_NEXT 0
-#define IDOUBLE_LIST_PREV 1
+#define FDL_NODE 2
+#define FDL_NEXT 0
+#define FDL_PREV 1
 /// @brief Finite doubly linked list data structure.
 typedef struct finite_double_list {
     char * elements; // array to store elements
-    size_t * node[IDOUBLE_LIST_NODE]; // array to store next indexes
+    size_t * node[FDL_NODE]; // array to store next indexes
     size_t size, length, max, head; // list size and head index parameter
     memory_s const * allocator;
 } fdouble_list_s;

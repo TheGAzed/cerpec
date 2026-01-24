@@ -32,4 +32,4 @@ C compiler that supports at least the **C99 standard**, for example:
 
 ### [MISC](source/misc)
 - BINARY HEAP
-- HASH TABLE
+- HASH MAP

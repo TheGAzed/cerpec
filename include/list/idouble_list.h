@@ -9,13 +9,13 @@
 #   error "Chunk size must be greater than zero."
 #endif
 
-#define IDOUBLE_LIST_NODE 2
-#define IDOUBLE_LIST_NEXT 0
-#define IDOUBLE_LIST_PREV 1
+#define IDL_NODE 2
+#define IDL_NEXT 0
+#define IDL_PREV 1
 /// @brief Infinite doubly linked list data structure.
 typedef struct infinite_double_list {
     char * elements; // array to store elements
-    size_t * node[IDOUBLE_LIST_NODE]; // array to store next indexes
+    size_t * node[IDL_NODE]; // array to store next indexes
     size_t size, length, capacity, head; // list size and head index parameter
     memory_s const * allocator;
 } idouble_list_s;

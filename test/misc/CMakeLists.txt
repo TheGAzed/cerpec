@@ -1,7 +1,7 @@
 add_executable(misc_test main.c
         suite/ibinary_heap_test.c
         suite/fbinary_heap_test.c
-        suite/ihash_table_test.c
+        suite/ihash_map_test.c
         suite/fhash_table_test.c
 )
 

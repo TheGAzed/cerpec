@@ -8,8 +8,8 @@ TEST CREATE_01(void) {
 
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_EQ(NULL, test.elements);
-    ASSERT_EQ(NULL, test.node[IDOUBLE_LIST_NEXT]);
-    ASSERT_EQ(NULL, test.node[IDOUBLE_LIST_PREV]);
+    ASSERT_EQ(NULL, test.node[IDL_NEXT]);
+    ASSERT_EQ(NULL, test.node[IDL_PREV]);
 
     destroy_idouble_list(&test, destroy);
 
@@ -32,8 +32,8 @@ TEST CLEAR_01(void) {
 
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_EQ(NULL, test.elements);
-    ASSERT_EQ(NULL, test.node[IDOUBLE_LIST_NEXT]);
-    ASSERT_EQ(NULL, test.node[IDOUBLE_LIST_PREV]);
+    ASSERT_EQ(NULL, test.node[IDL_NEXT]);
+    ASSERT_EQ(NULL, test.node[IDL_PREV]);
 
     destroy_idouble_list(&test, destroy);
 

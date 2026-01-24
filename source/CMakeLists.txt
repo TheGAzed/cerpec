@@ -12,7 +12,7 @@ add_library(${PROJECT_NAME} cerpec.c
 
         graph/imatrix_graph.c
 
-        misc/ihash_table.c misc/ibinary_heap.c
+        misc/ihash_map.c misc/ibinary_heap.c
         misc/fbinary_heap.c misc/fhash_table.c
         set/frb_set.c
 )

@@ -10,8 +10,8 @@ TEST CREATE_01(void) {
 
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(NULL, test.elements);
-    ASSERT_NEQ(NULL, test.node[IDOUBLE_LIST_NEXT]);
-    ASSERT_NEQ(NULL, test.node[IDOUBLE_LIST_PREV]);
+    ASSERT_NEQ(NULL, test.node[FDL_NEXT]);
+    ASSERT_NEQ(NULL, test.node[FDL_PREV]);
 
     destroy_fdouble_list(&test, destroy);
 
@@ -34,8 +34,8 @@ TEST CLEAR_01(void) {
 
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(NULL, test.elements);
-    ASSERT_NEQ(NULL, test.node[IDOUBLE_LIST_NEXT]);
-    ASSERT_NEQ(NULL, test.node[IDOUBLE_LIST_PREV]);
+    ASSERT_NEQ(NULL, test.node[FDL_NEXT]);
+    ASSERT_NEQ(NULL, test.node[FDL_PREV]);
 
     destroy_fdouble_list(&test, destroy);
 
