@@ -1,6 +1,5 @@
 #include <tree/iavl_tree.h>
 
-#include <assert.h>
 #include <stdlib.h> // imports exit()
 #include <string.h>
 
@@ -78,27 +77,28 @@ void _iavl_tree_fill_hole(iavl_tree_s * const tree, size_t const hole);
 void _iavl_tree_resize(iavl_tree_s * const tree, size_t const size);
 
 iavl_tree_s create_iavl_tree(size_t const size, compare_fn const compare) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
+    error(compare && "Parameter can't be NULL.");
+    error(size && "Parameter can't be zero.");
 
     return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = &standard, };
 }
 
 iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, memory_s const * const allocator) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
-    assert(allocator && "[ERROR] Parameter can't be NULL.");
+    error(compare && "Parameter can't be NULL.");
+    error(size && "Parameter can't be zero.");
+    error(allocator && "Parameter can't be NULL.");
 
     return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, };
 }
 
 void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+    error(tree && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     while (tree->length) {
         tree->length--;
@@ -118,12 +118,13 @@ void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy) {
 }
 
 void clear_iavl_tree(iavl_tree_s * const tree, set_fn const destroy) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+    error(tree && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     while (tree->length) {
         tree->length--;
@@ -143,12 +144,13 @@ void clear_iavl_tree(iavl_tree_s * const tree, set_fn const destroy) {
 }
 
 iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
+    error(tree && "Parameter can't be NULL.");
+    error(copy && "Parameter can't be NULL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     iavl_tree_s const replica = {
         .elements = tree->allocator->alloc(tree->capacity * tree->size, tree->allocator->arguments),
@@ -160,10 +162,10 @@ iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy) {
         .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare,
         .size = tree->size, .allocator = tree->allocator,
     };
-    assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.parent) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.node[IAVL_TREE_LEFT]) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.node[IAVL_TREE_RIGHT]) && "[ERROR] Memory allocation failed.");
+    error((!replica.capacity || replica.elements) && "Memory allocation failed.");
+    error((!replica.capacity || replica.parent) && "Memory allocation failed.");
+    error((!replica.capacity || replica.node[IAVL_TREE_LEFT]) && "Memory allocation failed.");
+    error((!replica.capacity || replica.node[IAVL_TREE_RIGHT]) && "Memory allocation failed.");
 
     for (size_t i = 0; i < tree->length; ++i) {
         copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
@@ -177,22 +179,25 @@ iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy) {
 }
 
 bool is_empty_iavl_tree(iavl_tree_s const * const tree) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    error(tree && "Parameter can't be NULL.");
+
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     return !tree->length;
 }
 
 void insert_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     if (tree->length == tree->capacity) {
         _iavl_tree_resize(tree, tree->capacity + IAVL_TREE_CHUNK);
@@ -219,21 +224,22 @@ void insert_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
 }
 
 void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
@@ -249,7 +255,7 @@ void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
 
     if (NIL == (*node)) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -266,17 +272,14 @@ void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
 }
 
 bool contains_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -292,19 +295,20 @@ bool contains_iavl_tree(iavl_tree_s const * const restrict tree, void const * co
 }
 
 void get_max_iavl_tree(iavl_tree_s const * const restrict tree, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t maximum = tree->root;
     for (size_t i = tree->node[IAVL_TREE_RIGHT][maximum]; NIL != i; i = tree->node[IAVL_TREE_RIGHT][i]) {
@@ -315,19 +319,20 @@ void get_max_iavl_tree(iavl_tree_s const * const restrict tree, void * const res
 }
 
 void get_min_iavl_tree(iavl_tree_s const * const restrict tree, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t minimum = tree->root;
     for (size_t i = tree->node[IAVL_TREE_LEFT][minimum]; NIL != i; i = tree->node[IAVL_TREE_LEFT][i]) {
@@ -338,19 +343,20 @@ void get_min_iavl_tree(iavl_tree_s const * const restrict tree, void * const res
 }
 
 void remove_max_iavl_tree(iavl_tree_s * const restrict tree, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t * maximum = &(tree->root);
     for (size_t * i = tree->node[IAVL_TREE_RIGHT] + (*maximum); NIL != (*i); i = tree->node[IAVL_TREE_RIGHT] + (*i)) {
@@ -377,19 +383,20 @@ void remove_max_iavl_tree(iavl_tree_s * const restrict tree, void * const restri
 }
 
 void remove_min_iavl_tree(iavl_tree_s * const restrict tree, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t * minimum = &(tree->root);
     for (size_t * i = tree->node[IAVL_TREE_LEFT] + (*minimum); NIL != (*i); i = tree->node[IAVL_TREE_LEFT] + (*i)) {
@@ -416,21 +423,22 @@ void remove_min_iavl_tree(iavl_tree_s * const restrict tree, void * const restri
 }
 
 void get_floor_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
@@ -449,7 +457,7 @@ void get_floor_iavl_tree(iavl_tree_s const * const restrict tree, void const * c
 
     if (NIL == floor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -457,21 +465,22 @@ void get_floor_iavl_tree(iavl_tree_s const * const restrict tree, void const * c
 }
 
 void get_ceil_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
@@ -490,7 +499,7 @@ void get_ceil_iavl_tree(iavl_tree_s const * const restrict tree, void const * co
 
     if (NIL == ceil) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree->");
+        error(false && "Element not found in tree->");
         exit(EXIT_FAILURE);
     }
 
@@ -498,26 +507,27 @@ void get_ceil_iavl_tree(iavl_tree_s const * const restrict tree, void const * co
 }
 
 void remove_floor_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t * floor = _iavl_tree_floor(tree, element);
     if (NULL == floor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -534,26 +544,27 @@ void remove_floor_iavl_tree(iavl_tree_s * const restrict tree, void const * cons
 }
 
 void remove_ceil_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t * ceil = _iavl_tree_ceil(tree, element);
     if (NULL == ceil) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -570,21 +581,22 @@ void remove_ceil_iavl_tree(iavl_tree_s * const restrict tree, void const * const
 }
 
 void get_successor_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t successor = NIL;
     if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IAVL_TREE_RIGHT][tree->root]) {
@@ -608,7 +620,7 @@ void get_successor_iavl_tree(iavl_tree_s const * const restrict tree, void const
 SUCCESSOR_CHECK:
     if (NIL == successor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in tree->");
+        error(false && "Element not found in tree->");
         exit(EXIT_FAILURE);
     }
 
@@ -616,21 +628,22 @@ SUCCESSOR_CHECK:
 }
 
 void get_predecessor_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t predecessor = NIL;
     for (size_t n = tree->root; NIL != n;) {
@@ -652,7 +665,7 @@ void get_predecessor_iavl_tree(iavl_tree_s const * const restrict tree, void con
 
     if (NIL == predecessor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -660,26 +673,27 @@ void get_predecessor_iavl_tree(iavl_tree_s const * const restrict tree, void con
 }
 
 void remove_successor_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t * successor = _iavl_tree_successor(tree, element);
     if (NULL == successor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -696,26 +710,27 @@ void remove_successor_iavl_tree(iavl_tree_s * const restrict tree, void const * 
 }
 
 void remove_predecessor_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(tree != element && "[ERROR] Parameters can' be equal.");
-    assert(tree != buffer && "[ERROR] Parameters can' be equal.");
-    assert(buffer != element && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can' be equal.");
+    error(tree != buffer && "Parameters can' be equal.");
+    error(buffer != element && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t * predecessor = _iavl_tree_predecessor(tree, element);
     if (NULL == predecessor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -732,22 +747,23 @@ void remove_predecessor_iavl_tree(iavl_tree_s * const restrict tree, void const 
 }
 
 void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict latter, void * const restrict former) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(latter && "[ERROR] Parameter can't be NULL.");
-    assert(former && "[ERROR] Parameter can't be NULL.");
-    assert(tree != latter && "[ERROR] Parameters can' be equal.");
-    assert(tree != former && "[ERROR] Parameters can' be equal.");
-    assert(former != latter && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(latter && "Parameter can't be NULL.");
+    error(former && "Parameter can't be NULL.");
+    error(tree != latter && "Parameters can' be equal.");
+    error(tree != former && "Parameters can' be equal.");
+    error(former != latter && "Parameters can' be equal.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IAVL_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IAVL_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
@@ -763,7 +779,7 @@ void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * cons
 
     if (NIL == node) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -772,13 +788,14 @@ void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * cons
 }
 
 void inorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
-    assert(tree != arguments && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can' be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     bool left_done = false;
     size_t node = tree->root;
@@ -812,65 +829,67 @@ void inorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const 
 }
 
 void preorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
-    assert(tree != arguments && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can' be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct iavl_tree_stack pre_order = {
+    struct iavl_tree_stack stack = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || pre_order.elements && "[ERROR] Memory allocation failed.");
+    error(!tree->length || stack.elements && "Memory allocation failed.");
 
     if (tree->length) {
-        pre_order.elements[pre_order.length++] = tree->root;
+        stack.elements[stack.length++] = tree->root;
     }
 
-    while (pre_order.length && handle(tree->elements + (pre_order.elements[pre_order.length - 1] * tree->size), arguments)) {
-        size_t const node = pre_order.elements[--pre_order.length];
+    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
+        size_t const node = stack.elements[--stack.length];
 
         size_t const right_child = tree->node[IAVL_TREE_RIGHT][node];
         if (NIL != right_child) {
-            pre_order.elements[pre_order.length++] = right_child;
+            stack.elements[stack.length++] = right_child;
         }
 
         size_t const left_child = tree->node[IAVL_TREE_LEFT][node];
         if (NIL != left_child) {
-            pre_order.elements[pre_order.length++] = left_child;
+            stack.elements[stack.length++] = left_child;
         }
     }
 
-    tree->allocator->free(pre_order.elements, tree->allocator->arguments);
+    tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
 void postorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
-    assert(tree != arguments && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can' be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct iavl_tree_stack post_order = {
+    struct iavl_tree_stack stack = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || post_order.elements && "[ERROR] Memory allocation failed.");
+    error(!tree->length || stack.elements && "Memory allocation failed.");
 
     // push root node onto stack and initially save it into variable
     size_t node = tree->root;
     size_t last = NIL;
-    while (post_order.length || NIL != node) { // while stack is not empty OR node is valid
+    while (stack.length || NIL != node) { // while stack is not empty OR node is valid
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
-            post_order.elements[post_order.length++] = node;
+            stack.elements[stack.length++] = node;
             node = tree->node[IAVL_TREE_LEFT][node];
         } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
-            size_t const peek = post_order.elements[post_order.length - 1];
+            size_t const peek = stack.elements[stack.length - 1];
 
             size_t const peek_right = tree->node[IAVL_TREE_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
@@ -880,53 +899,54 @@ void postorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn cons
                     break;
                 }
 
-                last = post_order.elements[--post_order.length];
+                last = stack.elements[--stack.length];
             }
         }
     }
 
-    tree->allocator->free(post_order.elements, tree->allocator->arguments);
+    tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
 void levelorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
-    assert(tree != arguments && "[ERROR] Parameters can' be equal.");
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can' be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     // create simple queue to manage breath first level order traversal of node indexes
-    struct iavl_tree_queue level_order = {
+    struct iavl_tree_queue queue = {
         .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || level_order.elements && "[ERROR] Memory allocation failed.");
+    error(!tree->length || queue.elements && "Memory allocation failed.");
 
     if (tree->length) { // if tree isn't empty push root node
-        level_order.elements[level_order.current + level_order.length++] = tree->root;
+        queue.elements[queue.current + queue.length++] = tree->root;
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (level_order.length && handle(tree->elements + (level_order.elements[level_order.current] * tree->size), arguments)) {
+    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
         // pop index
-        size_t const node = level_order.elements[level_order.current++];
-        level_order.length--;
+        size_t const node = queue.elements[queue.current++];
+        queue.length--;
 
         // push left child of popped parent to the top of the queue
         size_t const left_child = tree->node[IAVL_TREE_LEFT][node];
         if (NIL != left_child) {
-            level_order.elements[level_order.current + level_order.length++] = left_child;
+            queue.elements[queue.current + queue.length++] = left_child;
         }
 
         // push right child of popped parent to the top of the queue
         size_t const right_child = tree->node[IAVL_TREE_RIGHT][node];
         if (NIL != right_child) {
-            level_order.elements[level_order.current + level_order.length++] = right_child;
+            queue.elements[queue.current + queue.length++] = right_child;
         }
     }
 
-    tree->allocator->free(level_order.elements, tree->allocator->arguments);
+    tree->allocator->free(queue.elements, tree->allocator->arguments);
 }
 
 size_t * _iavl_tree_floor(iavl_tree_s * const restrict tree, void const * const restrict element) {
@@ -1188,17 +1208,17 @@ void _iavl_tree_resize(iavl_tree_s * const tree, size_t const size) {
     tree->capacity = size;
 
     tree->elements = tree->allocator->realloc(tree->elements, tree->capacity * tree->size, tree->allocator->arguments);
-    assert((!tree->capacity || tree->elements) && "[ERROR] Memory allocation failed.");
+    error((!tree->capacity || tree->elements) && "Memory allocation failed.");
 
     tree->height = tree->allocator->realloc(tree->height, tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    assert((!tree->capacity || tree->height) && "[ERROR] Memory allocation failed.");
+    error((!tree->capacity || tree->height) && "Memory allocation failed.");
 
     tree->parent = tree->allocator->realloc(tree->parent, tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    assert((!tree->capacity || tree->parent) && "[ERROR] Memory allocation failed.");
+    error((!tree->capacity || tree->parent) && "Memory allocation failed.");
 
     tree->node[IAVL_TREE_LEFT] = tree->allocator->realloc(tree->node[IAVL_TREE_LEFT], tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    assert((!tree->capacity || tree->node[IAVL_TREE_LEFT]) && "[ERROR] Memory allocation failed.");
+    error((!tree->capacity || tree->node[IAVL_TREE_LEFT]) && "Memory allocation failed.");
 
     tree->node[IAVL_TREE_RIGHT] = tree->allocator->realloc(tree->node[IAVL_TREE_RIGHT], tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    assert((!tree->capacity || tree->node[IAVL_TREE_RIGHT]) && "[ERROR] Memory allocation failed.");
+    error((!tree->capacity || tree->node[IAVL_TREE_RIGHT]) && "Memory allocation failed.");
 }

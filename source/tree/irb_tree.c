@@ -1,100 +1,110 @@
 #include <tree/irb_tree.h>
 
-#include <assert.h>
-#include <stdlib.h>
+#include <stdlib.h> // imports exit()
 #include <string.h>
 
 #define NIL (0)
 
+struct irb_tree_stack {
+    size_t length;
+    size_t * elements;
+};
+
+struct irb_tree_queue {
+    size_t length, current;
+    size_t * elements;
+};
+
 /// Left tree rotation that moves one node up in the tree and one node down.
 /// @param tree Structure to rotate.
 /// @param node Index of node to start rotations from.
-void _irb_tree_left_rotate(irb_tree_s * tree, const size_t node);
+void _irb_tree_left_rotate(irb_tree_s * const tree, size_t const node);
 
 /// Right tree rotation that moves one node up in the tree and one node down.
 /// @param tree Structure to rotate.
 /// @param node Index of node to start rotations from.
-void _irb_tree_right_rotate(irb_tree_s * tree, const size_t node);
+void _irb_tree_right_rotate(irb_tree_s * const tree, size_t const node);
 
 /// Replace one subtree with another.
 /// @param tree Structure to replace subtrees in.
 /// @param u First subtree.
 /// @param v Second subtree.
-void _irb_tree_transplant(irb_tree_s * tree, const size_t u, const size_t v);
+void _irb_tree_transplant(irb_tree_s * const tree, size_t const u, size_t const v);
 
 /// Finds the minimum node in subtree.
 /// @param tree Structure to search.
 /// @param node Root of subtree.
 /// @return Minimum node.
-size_t _irb_tree_minimum(const irb_tree_s * tree, const size_t node);
+size_t _irb_tree_minimum(irb_tree_s const * const tree, size_t const node);
 
 /// Red black tree fixup function for tree insert.
 /// @param tree Structure to fixup.
 /// @param node Node to start fixup upwards.
-void _irb_tree_insert_fixup(irb_tree_s * tree, const size_t node);
+void _irb_tree_insert_fixup(irb_tree_s * const tree, size_t const node);
 
 /// Red black tree function to remove node index.
 /// @param tree Structure to remove node.
 /// @param node Node to remove.
-void _irb_tree_remove(irb_tree_s * tree, const size_t node);
+void _irb_tree_remove(irb_tree_s * const tree, size_t const node);
 
 /// Red black tree fixup function for tree removal.
 /// @param tree Structure to fixup.
 /// @param node Node to start fixup upwards.
-void _irb_tree_remove_fixup(irb_tree_s * tree, const size_t node);
+void _irb_tree_remove_fixup(irb_tree_s * const tree, size_t const node);
 
 /// Fills the hole left after removing an element in the tree's arrays, puts rightmost element into hole.
 /// @param tree Structure to fill.
 /// @param hole Index of hole in structure's arrays.
-void _irb_tree_fill_hole(irb_tree_s * tree, const size_t hole);
+void _irb_tree_fill_hole(irb_tree_s * const tree, size_t const hole);
 
 /// Returns the floor node of element parameter.
 /// @param tree Structure to search.
 /// @param element Element to floor.
 /// @return Floor node index of element or NIL, if no such floor exists.
-size_t _irb_tree_floor(const irb_tree_s * tree, const void * element);
+size_t _irb_tree_floor(irb_tree_s const * const restrict tree, void const * const restrict element);
 
 /// Returns the ceil node of element parameter.
 /// @param tree Structure to search.
 /// @param element Element to ceil.
 /// @return Ceil node index of element or NIL, if no such ceil exists.
-size_t _irb_tree_ceil(const irb_tree_s * tree, const void * element);
+size_t _irb_tree_ceil(irb_tree_s const * const restrict tree, void const * const restrict element);
 
 /// Returns the in-order successor node of element parameter.
 /// @param tree Structure to search.
 /// @param element Element to find successor.
 /// @return Successor node index of element or NIL, if no successor exists.
-size_t _irb_tree_successor(const irb_tree_s * tree, const void * element);
+size_t _irb_tree_successor(irb_tree_s const * const restrict tree, void const * const restrict element);
 
 /// Returns the in-order predecessor node of element parameter.
 /// @param tree Structure to search.
 /// @param element Element to find predecessor.
 /// @return Predecessor node index of element or NIL, if no predecessor exists.
-size_t _irb_tree_predecessor(const irb_tree_s * tree, const void * element);
+size_t _irb_tree_predecessor(irb_tree_s const * const restrict tree, void const * const restrict element);
 
 /// Resizes (reallocates) tree parameter arrays based on changed capacity.
 /// @param tree Structure to resize.
 /// @param size New size.
-void _irb_tree_resize(irb_tree_s * tree, const size_t size);
+void _irb_tree_resize(irb_tree_s * const tree, size_t const size);
 
-irb_tree_s create_irb_tree(const size_t size, const compare_fn compare) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
+irb_tree_s create_irb_tree(size_t const size, compare_fn const compare) {
+    error(compare && "Parameter can't be NULL.");
+    error(size && "Parameter can't be zero.");
 
     const irb_tree_s tree = {
         .root = NIL, .compare = compare, .size = size,
-        .elements = malloc(size),
-        .color = malloc(sizeof(bool)),
-        .parent = malloc(sizeof(size_t)),
-        .node[IRB_TREE_LEFT] = malloc(sizeof(size_t)),
-        .node[IRB_TREE_RIGHT] = malloc(sizeof(size_t)),
+        .elements = standard.alloc(size, standard.arguments),
+        .color = standard.alloc(sizeof(bool), standard.arguments),
+        .parent = standard.alloc(sizeof(size_t), standard.arguments),
+        .node[IRB_TREE_LEFT] = standard.alloc(sizeof(size_t), standard.arguments),
+        .node[IRB_TREE_RIGHT] = standard.alloc(sizeof(size_t), standard.arguments),
+        .allocator = &standard,
     };
 
-    assert(tree.elements && "[ERROR] Memory allocation failed.");
-    assert(tree.color && "[ERROR] Memory allocation failed.");
-    assert(tree.parent && "[ERROR] Memory allocation failed.");
-    assert(tree.node[IRB_TREE_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(tree.node[IRB_TREE_RIGHT] && "[ERROR] Memory allocation failed.");
+    error(tree.elements && "Memory allocation failed.");
+    error(tree.color && "Memory allocation failed.");
+    error(tree.parent && "Memory allocation failed.");
+    error(tree.node[IRB_TREE_LEFT] && "Memory allocation failed.");
+    error(tree.node[IRB_TREE_RIGHT] && "Memory allocation failed.");
 
     // set NIL node since the tree uses special NIL nodes
     tree.color[NIL] = IBLACK_TREE_COLOR;
@@ -103,85 +113,112 @@ irb_tree_s create_irb_tree(const size_t size, const compare_fn compare) {
     return tree;
 }
 
-void destroy_irb_tree(irb_tree_s * tree, const set_fn destroy) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, memory_s const * const allocator) {
+    error(compare && "Parameter can't be NULL.");
+    error(size && "Parameter can't be zero.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    const irb_tree_s tree = {
+        .root = NIL, .compare = compare, .size = size,
+        .elements = allocator->alloc(size, allocator->arguments),
+        .color = allocator->alloc(sizeof(bool), allocator->arguments),
+        .parent = allocator->alloc(sizeof(size_t), allocator->arguments),
+        .node[IRB_TREE_LEFT] = allocator->alloc(sizeof(size_t), allocator->arguments),
+        .node[IRB_TREE_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arguments),
+        .allocator = allocator,
+    };
+
+    error(tree.elements && "Memory allocation failed.");
+    error(tree.color && "Memory allocation failed.");
+    error(tree.parent && "Memory allocation failed.");
+    error(tree.node[IRB_TREE_LEFT] && "Memory allocation failed.");
+    error(tree.node[IRB_TREE_RIGHT] && "Memory allocation failed.");
+
+    // set NIL node since the tree uses special NIL nodes
+    tree.color[NIL] = IBLACK_TREE_COLOR;
+    tree.parent[NIL] = tree.node[IRB_TREE_LEFT][NIL] = tree.node[IRB_TREE_RIGHT][NIL] = NIL;
+
+    return tree;
+}
+
+void destroy_irb_tree(irb_tree_s * const tree, set_fn const destroy) {
+    error(tree && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
+
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     while (tree->length) {
         tree->length--;
         destroy(tree->elements + (tree->length * tree->size));
     }
 
-    free(tree->elements);
-    free(tree->color);
-    free(tree->parent);
-    free(tree->node[IRB_TREE_LEFT]);
-    free(tree->node[IRB_TREE_RIGHT]);
+    tree->allocator->free(tree->elements, tree->allocator->arguments);
+    tree->allocator->free(tree->color, tree->allocator->arguments);
+    tree->allocator->free(tree->parent, tree->allocator->arguments);
+    tree->allocator->free(tree->node[IRB_TREE_LEFT], tree->allocator->arguments);
+    tree->allocator->free(tree->node[IRB_TREE_RIGHT], tree->allocator->arguments);
 
     memset(tree, 0, sizeof(irb_tree_s));
 }
 
-void clear_irb_tree(irb_tree_s * tree, const set_fn destroy) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+void clear_irb_tree(irb_tree_s * const tree, set_fn const destroy) {
+    error(tree && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     while (tree->length) {
         tree->length--;
         destroy(tree->elements + (tree->length * tree->size));
     }
 
-    tree->elements = realloc(tree->elements, tree->size);
-    tree->color = realloc(tree->color, sizeof(bool));
-    tree->parent = realloc(tree->parent, sizeof(size_t));
-    tree->node[IRB_TREE_LEFT] = realloc(tree->node[IRB_TREE_LEFT], sizeof(size_t));
-    tree->node[IRB_TREE_RIGHT] = realloc(tree->node[IRB_TREE_RIGHT], sizeof(size_t));
+    tree->elements = tree->allocator->realloc(tree->elements, tree->size, tree->allocator->arguments);
+    tree->color = tree->allocator->realloc(tree->color, sizeof(bool), tree->allocator->arguments);
+    tree->parent = tree->allocator->realloc(tree->parent, sizeof(size_t), tree->allocator->arguments);
+    tree->node[IRB_TREE_LEFT] = tree->allocator->realloc(tree->node[IRB_TREE_LEFT], sizeof(size_t), tree->allocator->arguments);
+    tree->node[IRB_TREE_RIGHT] = tree->allocator->realloc(tree->node[IRB_TREE_RIGHT], sizeof(size_t), tree->allocator->arguments);
 
-    assert(tree->elements && "[ERROR] Memory allocation failed.");
-    assert(tree->color && "[ERROR] Memory allocation failed.");
-    assert(tree->parent && "[ERROR] Memory allocation failed.");
-    assert(tree->node[IRB_TREE_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[ERROR] Memory allocation failed.");
+    error(tree->elements && "Memory allocation failed.");
+    error(tree->color && "Memory allocation failed.");
+    error(tree->parent && "Memory allocation failed.");
+    error(tree->node[IRB_TREE_LEFT] && "Memory allocation failed.");
+    error(tree->node[IRB_TREE_RIGHT] && "Memory allocation failed.");
 
     tree->root = NIL;
     tree->capacity = 0;
 }
 
-irb_tree_s copy_irb_tree(const irb_tree_s * tree, const copy_fn copy) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
+irb_tree_s copy_irb_tree(irb_tree_s const * const tree, copy_fn const copy) {
+    error(tree && "Parameter can't be NULL.");
+    error(copy && "Parameter can't be NULL.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
-    const irb_tree_s replica = {
-        .elements = malloc((tree->capacity + 1) * tree->size),
-        .color = malloc((tree->capacity + 1) * sizeof(bool)),
-        .parent = malloc((tree->capacity + 1) * sizeof(size_t)),
-        .node[IRB_TREE_LEFT] = malloc((tree->capacity + 1) * sizeof(size_t)),
-        .node[IRB_TREE_RIGHT] = malloc((tree->capacity + 1) * sizeof(size_t)),
+    irb_tree_s const replica = {
+        .elements = tree->allocator->alloc((tree->capacity + 1) * tree->size, tree->allocator->arguments),
+        .color = tree->allocator->alloc((tree->capacity + 1) * sizeof(bool), tree->allocator->arguments),
+        .parent = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
+        .node[IRB_TREE_LEFT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
+        .node[IRB_TREE_RIGHT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
+        .allocator = tree->allocator,
 
         .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare, .size = tree->size,
     };
 
     // since the structure always has one additional NIL node malloc must be checked even if capacity is zero
-    assert(replica.elements && "[ERROR] Memory allocation failed.");
-    assert(replica.color && "[ERROR] Memory allocation failed.");
-    assert(replica.parent && "[ERROR] Memory allocation failed.");
-    assert(replica.node[IRB_TREE_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(replica.node[IRB_TREE_RIGHT] && "[ERROR] Memory allocation failed.");
-
-    // set NIL node since the set uses special NIL nodes
-    replica.color[NIL] = IBLACK_TREE_COLOR;
-    replica.parent[NIL] = replica.node[IRB_TREE_LEFT][NIL] = replica.node[IRB_TREE_RIGHT][NIL] = NIL;
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.color && "Memory allocation failed.");
+    error(replica.parent && "Memory allocation failed.");
+    error(replica.node[IRB_TREE_LEFT] && "Memory allocation failed.");
+    error(replica.node[IRB_TREE_RIGHT] && "Memory allocation failed.");
 
     for (size_t i = 1; i < tree->length + 1; ++i) {
         copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
@@ -194,22 +231,26 @@ irb_tree_s copy_irb_tree(const irb_tree_s * tree, const copy_fn copy) {
     return replica;
 }
 
-bool is_empty_irb_tree(const irb_tree_s * tree) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+bool is_empty_irb_tree(irb_tree_s const * const tree) {
+    error(tree && "Parameter can't be NULL.");
+
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     return !(tree->length);
 }
 
-void insert_irb_tree(irb_tree_s * tree, const void * element) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
+void insert_irb_tree(irb_tree_s * const restrict tree, void const * const restrict element) {
+    error(tree && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     if (tree->length == tree->capacity) {
         _irb_tree_resize(tree, tree->capacity + IRB_TREE_CHUNK);
@@ -239,19 +280,23 @@ void insert_irb_tree(irb_tree_s * tree, const void * element) {
     _irb_tree_insert_fixup(tree, (*node));
 }
 
-void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void remove_irb_tree(irb_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
@@ -267,7 +312,7 @@ void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
 
     if (NIL == node) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -283,13 +328,15 @@ void remove_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
     }
 }
 
-bool contains_irb_tree(const irb_tree_s * tree, const void * element) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
+bool contains_irb_tree(irb_tree_s const * const restrict tree, void const * const restrict element) {
+    error(tree && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
+    error(tree != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -305,19 +352,21 @@ bool contains_irb_tree(const irb_tree_s * tree, const void * element) {
     return false;
 }
 
-void get_max_irb_tree(const irb_tree_s * tree, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void get_max_irb_tree(irb_tree_s const * const restrict tree, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != buffer && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t maximum = tree->root;
     for (size_t i = tree->node[IRB_TREE_RIGHT][maximum]; NIL != i; i = tree->node[IRB_TREE_RIGHT][i]) {
@@ -327,19 +376,21 @@ void get_max_irb_tree(const irb_tree_s * tree, void * buffer) {
     memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
 }
 
-void get_min_irb_tree(const irb_tree_s * tree, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void get_min_irb_tree(irb_tree_s const * const restrict tree, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != buffer && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t minimum = tree->root;
     for (size_t i = tree->node[IRB_TREE_LEFT][minimum]; NIL != i; i = tree->node[IRB_TREE_LEFT][i]) {
@@ -349,19 +400,21 @@ void get_min_irb_tree(const irb_tree_s * tree, void * buffer) {
     memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
 }
 
-void remove_max_irb_tree(irb_tree_s * tree, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void remove_max_irb_tree(irb_tree_s * const restrict tree, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != buffer && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t maximum = tree->root;
     for (size_t i = tree->node[IRB_TREE_RIGHT][maximum]; NIL != i; i = tree->node[IRB_TREE_RIGHT][i]) {
@@ -380,19 +433,21 @@ void remove_max_irb_tree(irb_tree_s * tree, void * buffer) {
     }
 }
 
-void remove_min_irb_tree(irb_tree_s * tree, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void remove_min_irb_tree(irb_tree_s * const restrict tree, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != buffer && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t minimum = tree->root;
     for (size_t i = tree->node[IRB_TREE_LEFT][minimum]; NIL != i; i = tree->node[IRB_TREE_LEFT][i]) {
@@ -411,75 +466,87 @@ void remove_min_irb_tree(irb_tree_s * tree, void * buffer) {
     }
 }
 
-void get_floor_irb_tree(const irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void get_floor_irb_tree(irb_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     const size_t floor = _irb_tree_floor(tree, element);
 
     if (NIL == floor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
     memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
 }
 
-void get_ceil_irb_tree(const irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void get_ceil_irb_tree(irb_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     const size_t ceil = _irb_tree_ceil(tree, element);
 
     if (NIL == ceil) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
     memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
 }
 
-void remove_floor_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void remove_floor_irb_tree(irb_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t floor = _irb_tree_floor(tree, element);
+    size_t const floor = _irb_tree_floor(tree, element);
 
     if (NIL == floor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -495,25 +562,29 @@ void remove_floor_irb_tree(irb_tree_s * tree, const void * element, void * buffe
     }
 }
 
-void remove_ceil_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void remove_ceil_irb_tree(irb_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     const size_t ceil = _irb_tree_ceil(tree, element);
 
     if (NIL == ceil) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -529,75 +600,87 @@ void remove_ceil_irb_tree(irb_tree_s * tree, const void * element, void * buffer
     }
 }
 
-void get_successor_irb_tree(const irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void get_successor_irb_tree(irb_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     const size_t successor = _irb_tree_successor(tree, element);
 
     if (NIL == successor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure");
+        error(false && "Element not found in structure");
         exit(EXIT_FAILURE);
     }
 
     memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
 }
 
-void get_predecessor_irb_tree(const irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void get_predecessor_irb_tree(irb_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     const size_t predecessor = _irb_tree_predecessor(tree, element);
 
     if (NIL == predecessor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
     memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
 }
 
-void remove_successor_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void remove_successor_irb_tree(irb_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     const size_t successor = _irb_tree_successor(tree, element);
 
     if (NIL == successor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -613,25 +696,29 @@ void remove_successor_irb_tree(irb_tree_s * tree, const void * element, void * b
     }
 }
 
-void remove_predecessor_irb_tree(irb_tree_s * tree, const void * element, void * buffer) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+void remove_predecessor_irb_tree(irb_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(buffer && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != element && "Parameters can't be equal.");
+    error(tree != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     const size_t predecessor = _irb_tree_predecessor(tree, element);
 
     if (NIL == predecessor) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -647,20 +734,24 @@ void remove_predecessor_irb_tree(irb_tree_s * tree, const void * element, void *
     }
 }
 
-void update_irb_tree(const irb_tree_s * tree, const void * latter, void * former) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(tree->length && "[ERROR] Can't get element from empty structure.");
-    assert(latter && "[ERROR] Parameter can't be NULL.");
-    assert(former && "[ERROR] Parameter can't be NULL.");
+void update_irb_tree(irb_tree_s const * const restrict tree, void const * const restrict latter, void * const restrict former) {
+    error(tree && "Parameter can't be NULL.");
+    error(tree->length && "Can't get element from empty structure.");
+    error(latter && "Parameter can't be NULL.");
+    error(former && "Parameter can't be NULL.");
+    error(tree->elements && "Paremeter can't be NULL.");
+    error(tree->parent && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(NIL != tree->root && "Paremeter can't be NIL.");
+    error(tree != latter && "Parameters can't be equal.");
+    error(tree != former && "Parameters can't be equal.");
+    error(former != latter && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(tree->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != tree->root && "[INVALID] Paremeter can't be NIL.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
@@ -676,7 +767,7 @@ void update_irb_tree(const irb_tree_s * tree, const void * latter, void * former
 
     if (NIL == node) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in structure.");
+        error(false && "Element not found in structure.");
         exit(EXIT_FAILURE);
     }
 
@@ -684,13 +775,15 @@ void update_irb_tree(const irb_tree_s * tree, const void * latter, void * former
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(transform && "[ERROR] Parameter can't be NULL.");
+void inorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     bool left_done = false;
     size_t node = tree->root;
@@ -699,7 +792,7 @@ void inorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void *
             node = tree->node[IRB_TREE_LEFT][node];
         }
 
-        if (!transform(tree->elements + (node * tree->size), arguments)) {
+        if (!handle(tree->elements + (node * tree->size), arguments)) {
             break;
         }
 
@@ -723,25 +816,27 @@ void inorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void *
     }
 }
 
-void preorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(transform && "[ERROR] Parameter can't be NULL.");
+void preorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct pre_stack { size_t length; size_t * elements; } stack = {
-        .length = 0, .elements = malloc(tree->length * sizeof(size_t)),
+    struct irb_tree_stack stack = {
+        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || stack.elements && "[ERROR] Memory allocation failed.");
+    error(!tree->length || stack.elements && "Memory allocation failed.");
 
     if (tree->length) {
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && transform(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
+    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
         const size_t node = stack.elements[--stack.length];
 
         const size_t right_child = tree->node[IRB_TREE_RIGHT][node];
@@ -755,22 +850,24 @@ void preorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void 
         }
     }
 
-    free(stack.elements);
+    tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void postorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(transform && "[ERROR] Parameter can't be NULL.");
+void postorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct post_stack { size_t length; size_t * elements; } stack = {
-        .length = 0, .elements = malloc(tree->length * sizeof(size_t)),
+    struct irb_tree_stack stack = {
+        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || stack.elements && "[ERROR] Memory allocation failed.");
+    error(!tree->length || stack.elements && "Memory allocation failed.");
 
     // push root node onto stack and initially save it into variable
     size_t node = tree->root;
@@ -779,14 +876,14 @@ void postorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
             stack.elements[stack.length++] = node;
             node = tree->node[IRB_TREE_LEFT][node];
-        } else { // else node is invalid, thus pop a new node from the stack, transform on element, and go to node's right child
+        } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
             const size_t peek = stack.elements[stack.length - 1];
 
             const size_t peek_right = tree->node[IRB_TREE_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!transform(tree->elements + (node * tree->size), arguments)) {
+                if (!handle(tree->elements + (node * tree->size), arguments)) {
                     break;
                 }
 
@@ -795,29 +892,31 @@ void postorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void
         }
     }
 
-    free(stack.elements);
+    tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void levelorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, void * arguments) {
-    assert(tree && "[ERROR] Parameter can't be NULL.");
-    assert(transform && "[ERROR] Parameter can't be NULL.");
+void levelorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+    error(tree && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
+    error(tree != arguments && "Parameters can't be equal.");
 
-    assert(tree->compare && "[INVALID] Parameter can't be NULL.");
-    assert(tree->size && "[INVALID] Parameter can't be zero.");
-    assert(tree->length <= tree->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
 
     // create simple queue to manage breath first level order traversal of node indexes
-    struct level_queue { size_t length, current; size_t * elements; } queue = {
-        .length = 0, .current = 0, .elements = malloc(tree->length * sizeof(size_t)),
+    struct irb_tree_queue queue = {
+        .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
-    assert(!tree->length || queue.elements && "[ERROR] Memory allocation failed.");
+    error(!tree->length || queue.elements && "Memory allocation failed.");
 
     if (tree->length) { // if tree isn't empty push root node
         queue.elements[queue.current + queue.length++] = tree->root;
     }
 
-    // while queue isn't empty transform on element, pop parent and push valid children
-    while (queue.length && transform(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
+    // while queue isn't empty handle on element, pop parent and push valid children
+    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
         // pop index
         const size_t node = queue.elements[queue.current++];
         queue.length--;
@@ -835,10 +934,10 @@ void levelorder_irb_tree(const irb_tree_s * tree, const handle_fn transform, voi
         }
     }
 
-    free(queue.elements);
+    tree->allocator->free(queue.elements, tree->allocator->arguments);
 }
 
-void _irb_tree_left_rotate(irb_tree_s * tree, const size_t node) {
+void _irb_tree_left_rotate(irb_tree_s * const tree, size_t const node) {
     const size_t x = node, y = tree->node[IRB_TREE_RIGHT][x], z = tree->node[IRB_TREE_LEFT][y];
 
     tree->node[IRB_TREE_RIGHT][x] = z;
@@ -859,7 +958,7 @@ void _irb_tree_left_rotate(irb_tree_s * tree, const size_t node) {
     tree->parent[x] = y;
 }
 
-void _irb_tree_right_rotate(irb_tree_s * tree, const size_t node) {
+void _irb_tree_right_rotate(irb_tree_s * const tree, size_t const node) {
     const size_t x = node, y = tree->node[IRB_TREE_LEFT][x], z = tree->node[IRB_TREE_RIGHT][y];
 
     tree->node[IRB_TREE_LEFT][x] = z;
@@ -880,7 +979,7 @@ void _irb_tree_right_rotate(irb_tree_s * tree, const size_t node) {
     tree->parent[x] = y;
 }
 
-void _irb_tree_transplant(irb_tree_s * tree, const size_t u, const size_t v) {
+void _irb_tree_transplant(irb_tree_s * const tree, size_t const u, size_t const v) {
     if (NIL == tree->parent[u]) {
         tree->root = v;
     } else if (u == tree->node[IRB_TREE_LEFT][tree->parent[u]]) {
@@ -892,7 +991,7 @@ void _irb_tree_transplant(irb_tree_s * tree, const size_t u, const size_t v) {
     tree->parent[v] = tree->parent[u];
 }
 
-size_t _irb_tree_minimum(const irb_tree_s * tree, const size_t node) {
+size_t _irb_tree_minimum(irb_tree_s const * const tree, size_t const node) {
     size_t n = node;
     while (NIL != tree->node[IRB_TREE_LEFT][n]) { // TREE MINIMUM
         n = tree->node[IRB_TREE_LEFT][n];
@@ -901,7 +1000,7 @@ size_t _irb_tree_minimum(const irb_tree_s * tree, const size_t node) {
     return n;
 }
 
-void _irb_tree_insert_fixup(irb_tree_s * tree, const size_t node) {
+void _irb_tree_insert_fixup(irb_tree_s * const tree, size_t const node) {
     for (size_t child = node; child != tree->root && IRED_TREE_COLOR == tree->color[tree->parent[child]];) {
         if (tree->parent[child] == tree->node[IRB_TREE_LEFT][tree->parent[tree->parent[child]]]) {
             const size_t uncle = tree->node[IRB_TREE_RIGHT][tree->parent[tree->parent[child]]];
@@ -947,7 +1046,7 @@ void _irb_tree_insert_fixup(irb_tree_s * tree, const size_t node) {
     tree->color[tree->root] = IBLACK_TREE_COLOR;
 }
 
-void _irb_tree_remove(irb_tree_s * tree, const size_t node) {
+void _irb_tree_remove(irb_tree_s * const tree, size_t const node) {
     size_t current = node, child = NIL;
     bool original_color = tree->color[current];
     if (NIL == tree->node[IRB_TREE_LEFT][node]) {
@@ -983,7 +1082,7 @@ void _irb_tree_remove(irb_tree_s * tree, const size_t node) {
     tree->parent[NIL] = tree->node[IRB_TREE_LEFT][NIL] = tree->node[IRB_TREE_RIGHT][NIL] = NIL;
 }
 
-void _irb_tree_remove_fixup(irb_tree_s * tree, const size_t node) {
+void _irb_tree_remove_fixup(irb_tree_s * const tree, size_t const node) {
     size_t child = node;
     while (child != tree->root && IBLACK_TREE_COLOR == tree->color[child]) {
         if (child == tree->node[IRB_TREE_LEFT][tree->parent[child]]) {
@@ -1050,7 +1149,7 @@ void _irb_tree_remove_fixup(irb_tree_s * tree, const size_t node) {
     tree->color[child] = IBLACK_TREE_COLOR;
 }
 
-void _irb_tree_fill_hole(irb_tree_s * tree, const size_t hole) {
+void _irb_tree_fill_hole(irb_tree_s * const tree, size_t const hole) {
     const size_t last = tree->length + 1;
     if (tree->length && tree->root == last) { // if head node is last array element then change index to removed one
         tree->root = hole;
@@ -1087,7 +1186,7 @@ void _irb_tree_fill_hole(irb_tree_s * tree, const size_t hole) {
     }
 }
 
-size_t _irb_tree_floor(const irb_tree_s * tree, const void * element) {
+size_t _irb_tree_floor(irb_tree_s const * const restrict tree, void const * const restrict element) {
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -1106,7 +1205,7 @@ size_t _irb_tree_floor(const irb_tree_s * tree, const void * element) {
     return floor;
 }
 
-size_t _irb_tree_ceil(const irb_tree_s * tree, const void * element) {
+size_t _irb_tree_ceil(irb_tree_s const * const restrict tree, void const * const restrict element) {
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -1125,7 +1224,7 @@ size_t _irb_tree_ceil(const irb_tree_s * tree, const void * element) {
     return ceil;
 }
 
-size_t _irb_tree_successor(const irb_tree_s * tree, const void * element) {
+size_t _irb_tree_successor(irb_tree_s const * const restrict tree, void const * const restrict element) {
     size_t successor = NIL;
 
     if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IRB_TREE_RIGHT][tree->root]) {
@@ -1149,7 +1248,7 @@ size_t _irb_tree_successor(const irb_tree_s * tree, const void * element) {
     return successor;
 }
 
-size_t _irb_tree_predecessor(const irb_tree_s * tree, const void * element) {
+size_t _irb_tree_predecessor(irb_tree_s const * const restrict tree, void const * const restrict element) {
     size_t predecessor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -1171,19 +1270,22 @@ size_t _irb_tree_predecessor(const irb_tree_s * tree, const void * element) {
     return predecessor;
 }
 
-void _irb_tree_resize(irb_tree_s * tree, const size_t size) {
+void _irb_tree_resize(irb_tree_s * const tree, size_t const size) {
     tree->capacity = size;
     const size_t resize = tree->capacity + 1;
 
-    tree->elements = realloc(tree->elements, resize * tree->size);
-    tree->color = realloc(tree->color, resize * sizeof(bool));
-    tree->parent = realloc(tree->parent, resize * sizeof(size_t));
-    tree->node[IRB_TREE_LEFT] = realloc(tree->node[IRB_TREE_LEFT], resize * sizeof(size_t));
-    tree->node[IRB_TREE_RIGHT] = realloc(tree->node[IRB_TREE_RIGHT], resize * sizeof(size_t));
+    tree->elements = tree->allocator->realloc(tree->elements, resize * tree->size, tree->allocator->arguments);
+    error(tree->elements && "Memory allocation failed.");
 
-    assert(tree->elements && "[ERROR] Memory allocation failed.");
-    assert(tree->color && "[ERROR] Memory allocation failed.");
-    assert(tree->parent && "[ERROR] Memory allocation failed.");
-    assert(tree->node[IRB_TREE_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(tree->node[IRB_TREE_RIGHT] && "[ERROR] Memory allocation failed.");
+    tree->color = tree->allocator->realloc(tree->color, resize * sizeof(bool), tree->allocator->arguments);
+    error(tree->color && "Memory allocation failed.");
+
+    tree->parent = tree->allocator->realloc(tree->parent, resize * sizeof(size_t), tree->allocator->arguments);
+    error(tree->parent && "Memory allocation failed.");
+
+    tree->node[IRB_TREE_LEFT] = tree->allocator->realloc(tree->node[IRB_TREE_LEFT], resize * sizeof(size_t), tree->allocator->arguments);
+    error(tree->node[IRB_TREE_LEFT] && "Memory allocation failed.");
+
+    tree->node[IRB_TREE_RIGHT] = tree->allocator->realloc(tree->node[IRB_TREE_RIGHT], resize * sizeof(size_t), tree->allocator->arguments);
+    error(tree->node[IRB_TREE_RIGHT] && "Memory allocation failed.");
 }
