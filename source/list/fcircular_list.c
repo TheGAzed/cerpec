@@ -1,50 +1,49 @@
 #include <list/fcircular_list.h>
 
-#include <assert.h>
 #include <stdlib.h> // import exit()
 #include <string.h>
 
 #define NIL ((size_t)(-1))
 
 fcircular_list_s create_fcircular_list(size_t const size, size_t const max) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(max && "[ERROR] Paremeter can't be zero.");
+    error(size && "Paremeter can't be zero.");
+    error(max && "Paremeter can't be zero.");
 
     fcircular_list_s const list =  {
         .empty = NIL, .size = size, .max = max, .allocator = &standard,
         .elements = standard.alloc(size * max, standard.arguments),
         .next = standard.alloc(sizeof(size_t) * max, standard.arguments),
     };
-    assert(list.elements && "[ERROR] Memory allocation failed.");
-    assert(list.next && "[ERROR] Memory allocation failed.");
+    error(list.elements && "Memory allocation failed.");
+    error(list.next && "Memory allocation failed.");
 
     return list;
 }
 
 fcircular_list_s make_fcircular_list(size_t const size, size_t const max, memory_s const * const allocator) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(max && "[ERROR] Paremeter can't be zero.");
-    assert(allocator && "[ERROR] Paremeter can't be NULL.");
+    error(size && "Paremeter can't be zero.");
+    error(max && "Paremeter can't be zero.");
+    error(allocator && "Paremeter can't be NULL.");
 
     fcircular_list_s const list =  {
         .empty = NIL, .size = size, .max = max, .allocator = allocator,
         .elements = allocator->alloc(size * max, allocator->arguments),
         .next = allocator->alloc(sizeof(size_t) * max, allocator->arguments),
     };
-    assert(list.elements && "[ERROR] Memory allocation failed.");
-    assert(list.next && "[ERROR] Memory allocation failed.");
+    error(list.elements && "Memory allocation failed.");
+    error(list.next && "Memory allocation failed.");
 
     return list;
 }
 
 void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -62,13 +61,13 @@ void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy)
 }
 
 void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -81,13 +80,13 @@ void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
 }
 
 fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_fn const copy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(copy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(copy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // create a replica/copy structure
     fcircular_list_s replica = {
@@ -96,8 +95,8 @@ fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_f
         .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert(replica.elements && "[ERROR] Memory allocation failed.");
-    assert(replica.next && "[ERROR] Memory allocation failed.");
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.next && "Memory allocation failed.");
 
     // for each element in list copy it into the replica while keeping circularity and making replica hole-less
     for (size_t l = list->tail, * r = &(replica.tail); replica.length < list->length; l = list->next[l], r = replica.next + (*r)) {
@@ -111,36 +110,37 @@ fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_f
 }
 
 bool is_empty_fcircular_list(fcircular_list_s const * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     return !(list->length);
 }
 
 bool is_full_fcircular_list(fcircular_list_s const * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     return (list->max == list->length);
 }
 
-void insert_at_fcircular_list(fcircular_list_s * const list, void const * const element, size_t const index) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= list->length && "[ERROR] Paremeter can't be greater than length.");
+void insert_at_fcircular_list(fcircular_list_s * const restrict list, void const * const restrict element, size_t const index) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(index <= list->length && "Paremeter can't be greater than length.");
+    error(list != element && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // get the empty node index either from underlying stack or next empty index in array (i.e. length)
     size_t hole = list->length;
@@ -168,16 +168,17 @@ void insert_at_fcircular_list(fcircular_list_s * const list, void const * const 
     list->length++;
 }
 
-void get_fcircular_list(fcircular_list_s const * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't get element from empty list->");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+void get_fcircular_list(fcircular_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(list->length && "Can't get element from empty list->");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     size_t current = list->tail;
     // iterate until current points to node at index, starting from tail
@@ -188,18 +189,20 @@ void get_fcircular_list(fcircular_list_s const * const list, size_t const index,
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_fcircular_list(fcircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(compare && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't get element from empty list.");
-    assert(element != buffer && "[ERROR] Parameters can't be the same.");
+void remove_first_fcircular_list(fcircular_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(compare && "Paremeter can't be NULL.");
+    error(list->length && "Can't get element from empty list.");
+    error(list != element && "Parameters can't be equal.");
+    error(list != buffer && "Parameters can't be equal.");
+    error(element != buffer && "Parameters can't be the same.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate over each element until searched element is found
     for (size_t i = 0, previous = list->tail; i < list->length; ++i, previous = list->next[previous]) {
@@ -236,21 +239,22 @@ void remove_first_fcircular_list(fcircular_list_s * const list, void const * con
         return; // leave function with found element
     }
 
-    assert(0 && "[ERROR] Element not found in list."); // if element is not found in list then that is an error
+    error(0 && "Element not found in list."); // if element is not found in list then that is an error
     // and exit failure is returned, since the function returns the removed element, element can contain allocated memory
     exit(EXIT_FAILURE);
 }
 
-void remove_at_fcircular_list(fcircular_list_s * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't get element from empty list.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than or equal length.");
+void remove_at_fcircular_list(fcircular_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(list->length && "Can't get element from empty list.");
+    error(index < list->length && "Paremeter can't be greater than or equal length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     size_t previous = list->tail;
     // iterate until node previous to index node is reached
@@ -285,12 +289,12 @@ void remove_at_fcircular_list(fcircular_list_s * const list, size_t const index,
 }
 
 void reverse_fcircular_list(fcircular_list_s * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     if (!list->length) { // if list is empty early return to not break the function code
         return;
@@ -308,13 +312,13 @@ void reverse_fcircular_list(fcircular_list_s * const list) {
 }
 
 void shift_next_fcircular_list(fcircular_list_s * const list, size_t const shift) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't shift empty list.");
+    error(list && "Paremeter can't be NULL.");
+    error(list->length && "Can't shift empty list.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -322,23 +326,23 @@ void shift_next_fcircular_list(fcircular_list_s * const list, size_t const shift
     }
 }
 
-void splice_fcircular_list(fcircular_list_s * const destination, fcircular_list_s * const source, size_t const index) {
-    assert(destination && "[ERROR] Paremeter can't be NULL.");
-    assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(destination->length + source->length <= destination->max && "[ERROR] Spliced length exceeds maximum.");
+void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircular_list_s * const restrict source, size_t const index) {
+    error(destination && "Paremeter can't be NULL.");
+    error(source && "Paremeter can't be NULL.");
+    error(index <= destination->length && "Paremeter can't be greater than length.");
+    error(destination->length + source->length <= destination->max && "Spliced length exceeds maximum.");
+    error(source->size == destination->size && "Element sizes must be equal.");
+    error(source != destination && "Parameters can't be equal.");
 
-    assert(destination->size && "[INVALID] Size can't be zero.");
-    assert(destination->length <= destination->max && "[INVALID] Length exceeds maximum.");
-    assert(destination->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(destination->max && "[INVALID] Parameter can't be zero.");
+    valid(destination->size && "Size can't be zero.");
+    valid(destination->max && "Maximum can't be zero.");
+    valid(destination->length <= destination->max && "Length exceeds maximum.");
+    valid(destination->allocator && "Allocator can't be NULL.");
 
-    assert(source->size && "[INVALID] Size can't be zero.");
-    assert(source->length <= source->max && "[INVALID] Length exceeds maximum.");
-    assert(source->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(source->max && "[INVALID] Parameter can't be zero.");
-
-    assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
+    valid(source->size && "Size can't be zero.");
+    valid(source->max && "Maximum can't be zero.");
+    valid(source->length <= source->max && "Length exceeds maximum.");
+    valid(source->allocator && "Allocator can't be NULL.");
 
     size_t const dest_length = destination->length;
 
@@ -400,14 +404,14 @@ void splice_fcircular_list(fcircular_list_s * const destination, fcircular_list_
 }
 
 fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t const index, size_t const length) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Index can't be more than or equal length.");
-    assert(length <= list->length && "[ERROR] Size can't be more than length.");
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Index can't be more than or equal length.");
+    error(length <= list->length && "Size can't be more than length.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     size_t previous = list->tail;
     // iterate to previous node from index
@@ -422,8 +426,8 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
         .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert(split.elements && "[ERROR] Memory allocation failed.");
-    assert(split.next && "[ERROR] Memory allocation failed.");
+    error(split.elements && "Memory allocation failed.");
+    error(split.next && "Memory allocation failed.");
 
     // copy list elements into split list starting from index node (also redirect list's removed nodes)
     for (size_t * s = &(split.tail); split.length < length; s = split.next + (*s)) {
@@ -453,8 +457,8 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
         .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert(replica.elements && "[ERROR] Memory allocation failed.");
-    assert(replica.next && "[ERROR] Memory allocation failed.");
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.next && "Memory allocation failed.");
 
     // copy remaining list element into replica
     for (size_t * r = &(replica.tail); replica.length < replica_length; previous = list->next[previous], r = replica.next + (*r)) {
@@ -474,14 +478,15 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
     return split;
 }
 
-fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn const filter, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(filter && "[ERROR] Paremeter can't be NULL.");
+fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(filter && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // create temporary lists to save filtered elements
     fcircular_list_s negative = {
@@ -536,14 +541,15 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn
     return positive;
 }
 
-void map_fcircular_list(fcircular_list_s const * const list, handle_fn const handle, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(handle && "[ERROR] Paremeter can't be NULL.");
+void map_fcircular_list(fcircular_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(handle && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -554,17 +560,18 @@ void map_fcircular_list(fcircular_list_s const * const list, handle_fn const han
     }
 }
 
-void apply_fcircular_list(fcircular_list_s const * const list, process_fn const process, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(process && "[ERROR] Paremeter can't be NULL.");
+void apply_fcircular_list(fcircular_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(process && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
-    assert((!list->length || elements_array) && "[ERROR] Memory allocation failed.");
+    error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
