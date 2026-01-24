@@ -1,6 +1,5 @@
 #include <list/idouble_list.h>
 
-#include <assert.h>
 #include <stdlib.h> // import exit()
 #include <string.h>
 
@@ -15,25 +14,25 @@ void _idouble_list_resize(idouble_list_s * const list, size_t const size);
 void _idouble_list_fill_hole(idouble_list_s * const list, size_t const hole);
 
 idouble_list_s create_idouble_list(size_t const size) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
+    error(size && "Paremeter can't be zero.");
 
     return (idouble_list_s) { .size = size, .allocator = &standard, };
 }
 
 idouble_list_s make_idouble_list(size_t const size, memory_s const * const allocator) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(allocator && "[ERROR] Paremeter can't be NULL.");
+    error(size && "Paremeter can't be zero.");
+    error(allocator && "Paremeter can't be NULL.");
 
     return (idouble_list_s) { .size = size, .allocator = allocator, };
 }
 
 void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
@@ -54,12 +53,12 @@ void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy) {
 }
 
 void clear_idouble_list(idouble_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
@@ -79,12 +78,12 @@ void clear_idouble_list(idouble_list_s * const list, set_fn const destroy) {
 }
 
 idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn const copy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(copy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(copy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // allocate and set replica of list
     idouble_list_s const replica = {
@@ -94,9 +93,9 @@ idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn cons
         .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
-    assert((!replica.capacity || replica.node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
+    error((!replica.capacity || replica.elements) && "Memory allocation failed.");
+    error((!replica.capacity || replica.node[IDOUBLE_LIST_NEXT]) && "Memory allocation failed.");
+    error((!replica.capacity || replica.node[IDOUBLE_LIST_PREV]) && "Memory allocation failed.");
 
     // copy nodes (elements and indexes) into list
     for (size_t i = 0; i < list->length; ++i) {
@@ -109,24 +108,24 @@ idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn cons
 }
 
 bool is_empty_idouble_list(idouble_list_s const * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     return !(list->length);
 }
 
-void insert_at_idouble_list(idouble_list_s * const list, void const * const element, size_t const index) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= list->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(element != list && "[ERROR] Paremeters can't be the same.");
+void insert_at_idouble_list(idouble_list_s * const restrict list, void const * const restrict element, size_t const index) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(index <= list->length && "Paremeter can't be greater than length.");
+    error(element != list && "Paremeters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // if list is full resize (expand) it
     if (list->length == list->capacity) {
@@ -160,14 +159,15 @@ void insert_at_idouble_list(idouble_list_s * const list, void const * const elem
     list->length++;
 }
 
-void get_idouble_list(idouble_list_s const * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+void get_idouble_list(idouble_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(buffer != list && "Paremeters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -181,19 +181,19 @@ void get_idouble_list(idouble_list_s const * const list, size_t const index, voi
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_idouble_list(idouble_list_s * const list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(compare && "[ERROR] Paremeter can't be NULL.");
-    assert(element != buffer && "[ERROR] Paremeters can't be the same.");
-    assert(list->elements && "[ERROR] Array can't be NULL.");
-    assert(list->node[IDOUBLE_LIST_NEXT] && "[ERROR] Array can't be NULL.");
-    assert(list->node[IDOUBLE_LIST_PREV] && "[ERROR] Array can't be NULL.");
+void remove_first_idouble_list(idouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(compare && "Paremeter can't be NULL.");
+    error(element != buffer && "Paremeters can't be equal.");
+    error(element != list && "Paremeters can't be the same.");
+    error(buffer != list && "Paremeters can't be the same.");
+    error(list->length && "Structure can't be empty.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // for each element in list travel forward
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDOUBLE_LIST_NEXT][current]) {
@@ -222,23 +222,23 @@ void remove_first_idouble_list(idouble_list_s * const list, void const * const r
     }
 
     // if element wasn't found indicate error
-    assert(false && "[ERROR] Element not found in list.");
+    error(false && "Element not found in list.");
     exit(EXIT_FAILURE);
 }
 
-void remove_last_idouble_list(idouble_list_s * const list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(compare && "[ERROR] Paremeter can't be NULL.");
-    assert(element != buffer && "[ERROR] Paremeters can't be the same.");
-    assert(list->elements && "[ERROR] Array can't be NULL.");
-    assert(list->node[IDOUBLE_LIST_NEXT] && "[ERROR] Array can't be NULL.");
-    assert(list->node[IDOUBLE_LIST_PREV] && "[ERROR] Array can't be NULL.");
+void remove_last_idouble_list(idouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(compare && "Paremeter can't be NULL.");
+    error(element != buffer && "Paremeters can't be equal.");
+    error(element != list && "Paremeters can't be the same.");
+    error(buffer != list && "Paremeters can't be the same.");
+    error(list->length && "Structure can't be empty.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // for each element in list travel backwards
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
@@ -269,18 +269,19 @@ void remove_last_idouble_list(idouble_list_s * const list, void const * const re
     }
 
     // if element wasn't found indicate error
-    assert(false && "[ERROR] Element not found in list.");
+    error(false && "Element not found in list.");
     exit(EXIT_FAILURE);
 }
 
-void remove_at_idouble_list(idouble_list_s * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+void remove_at_idouble_list(idouble_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(buffer != list && "Paremeters can't be the same.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -308,11 +309,11 @@ void remove_at_idouble_list(idouble_list_s * const list, size_t const index, voi
 }
 
 void reverse_idouble_list(idouble_list_s * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     size_t current = list->head;
     for (size_t i = 0; i < list->length; ++i) {
@@ -328,12 +329,12 @@ void reverse_idouble_list(idouble_list_s * const list) {
 }
 
 void shift_next_idouble_list(idouble_list_s * const list, size_t const shift) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't shift empty list.");
+    error(list && "Paremeter can't be NULL.");
+    error(list->length && "Can't shift empty list.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -342,12 +343,12 @@ void shift_next_idouble_list(idouble_list_s * const list, size_t const shift) {
 }
 
 void shift_prev_idouble_list(idouble_list_s * const list, size_t const shift) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't shift empty list.");
+    error(list && "Paremeter can't be NULL.");
+    error(list->length && "Can't shift empty list.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -356,20 +357,19 @@ void shift_prev_idouble_list(idouble_list_s * const list, size_t const shift) {
 }
 
 void splice_idouble_list(idouble_list_s * const restrict destination, idouble_list_s * const restrict source, size_t const index) {
-    assert(destination && "[ERROR] Paremeter can't be NULL.");
-    assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(destination != source && "[ERROR] Paremeters can't be the same.");
+    error(destination && "Paremeter can't be NULL.");
+    error(source && "Paremeter can't be NULL.");
+    error(index <= destination->length && "Paremeter can't be greater than length.");
+    error(destination != source && "Paremeters can't be equal.");
+    error(source->size == destination->size && "Element sizes must be equal.");
 
-    assert(destination->size && "[INVALID] Size can't be zero.");
-    assert(destination->length <= destination->capacity && "[INVALID] Length exceeds capacity.");
-    assert(destination->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(destination->size && "Size can't be zero.");
+    valid(destination->length <= destination->capacity && "Length exceeds capacity.");
+    valid(destination->allocator && "Allocator can't be NULL.");
 
-    assert(source->size && "[INVALID] Size can't be zero.");
-    assert(source->length <= source->capacity && "[INVALID] Length exceeds capacity.");
-    assert(source->allocator && "[INVALID] Paremeter can't be NULL.");
-
-    assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
+    valid(source->size && "Size can't be zero.");
+    valid(source->length <= source->capacity && "Length exceeds capacity.");
+    valid(source->allocator && "Allocator can't be NULL.");
 
     // calculate new capacity of destination list and resize it
     size_t const sum = destination->length + source->length;
@@ -424,13 +424,13 @@ void splice_idouble_list(idouble_list_s * const restrict destination, idouble_li
 }
 
 idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const index, size_t const length) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(length <= list->length && "[ERROR] Paremeter can't be greater than length.");
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(length <= list->length && "Paremeter can't be greater than length.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -450,9 +450,9 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
 
         .head = 0, .size = list->size, .length = 0, .capacity = split_capacity, .allocator = list->allocator,
     };
-    assert((!split.capacity || split.elements) && "[ERROR] Memory allocation failed.");
-    assert((!split.capacity || split.node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
-    assert((!split.capacity || split.node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
+    error((!split.capacity || split.elements) && "Memory allocation failed.");
+    error((!split.capacity || split.node[IDOUBLE_LIST_NEXT]) && "Memory allocation failed.");
+    error((!split.capacity || split.node[IDOUBLE_LIST_PREV]) && "Memory allocation failed.");
 
     // push list elements into split list (includes pointer magic)
     size_t * split_current = &(split.head);
@@ -490,13 +490,14 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     return split;
 }
 
-idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const filter, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(filter && "[ERROR] Paremeter can't be NULL.");
+idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(filter && "Paremeter can't be NULL.");
+    error(arguments != list && "Paremeters can't be the same.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // only create positive to save true filtered values
     idouble_list_s positive = { .size = list->size, .allocator = list->allocator, };
@@ -543,13 +544,14 @@ idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const
     return positive;
 }
 
-void map_next_idouble_list(idouble_list_s const * const list, handle_fn const operate, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(operate && "[ERROR] Paremeter can't be NULL.");
+void map_next_idouble_list(idouble_list_s const * const restrict list, handle_fn const operate, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(operate && "Paremeter can't be NULL.");
+    error(arguments != list && "Paremeters can't be the same.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // for each forward element in list call operate function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDOUBLE_LIST_NEXT][current]) {
@@ -559,13 +561,14 @@ void map_next_idouble_list(idouble_list_s const * const list, handle_fn const op
     }
 }
 
-void map_prev_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(handle && "[ERROR] Paremeter can't be NULL.");
+void map_prev_idouble_list(idouble_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(handle && "Paremeter can't be NULL.");
+    error(arguments != list && "Paremeters can't be the same.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
@@ -576,16 +579,17 @@ void map_prev_idouble_list(idouble_list_s const * const list, handle_fn const ha
     }
 }
 
-void apply_idouble_list(idouble_list_s const * const list, process_fn const process, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(process && "[ERROR] Paremeter can't be NULL.");
+void apply_idouble_list(idouble_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(process && "Paremeter can't be NULL.");
+    error(arguments != list && "Paremeters can't be the same.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->capacity && "[INVALID] Length exceeds capacity.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
 
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
-    assert((!list->length || elements_array) && "[ERROR] Memory allocation failed.");
+    error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDOUBLE_LIST_NEXT][current]) {
@@ -607,13 +611,13 @@ void _idouble_list_resize(idouble_list_s * const list, size_t const size) {
     list->capacity = size;
 
     list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arguments);
-    assert((!list->capacity || list->elements) && "[ERROR] Memory allocation failed.");
+    error((!list->capacity || list->elements) && "Memory allocation failed.");
 
     list->node[IDOUBLE_LIST_NEXT] = list->allocator->realloc(list->node[IDOUBLE_LIST_NEXT], list->capacity * sizeof(size_t), list->allocator->arguments);
-    assert((!list->capacity || list->node[IDOUBLE_LIST_NEXT]) && "[ERROR] Memory allocation failed.");
+    error((!list->capacity || list->node[IDOUBLE_LIST_NEXT]) && "Memory allocation failed.");
 
     list->node[IDOUBLE_LIST_PREV] = list->allocator->realloc(list->node[IDOUBLE_LIST_PREV], list->capacity * sizeof(size_t), list->allocator->arguments);
-    assert((!list->capacity || list->node[IDOUBLE_LIST_PREV]) && "[ERROR] Memory allocation failed.");
+    error((!list->capacity || list->node[IDOUBLE_LIST_PREV]) && "Memory allocation failed.");
 }
 
 void _idouble_list_fill_hole(idouble_list_s * list, const size_t hole) {
