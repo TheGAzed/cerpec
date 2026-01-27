@@ -96,12 +96,12 @@ void set_value_ihash_map(ihash_map_s const * const restrict map, void const * co
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_key_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
+void each_key_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Iterates over each value in structure.
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_value_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
+void each_value_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
 
 #endif // IHASH_MAP_H

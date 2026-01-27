@@ -127,6 +127,6 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_irb_set(irb_set_s const * const set, handle_fn const handle, void * const arguments);
+void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * const arguments);
 
 #endif // IRB_SET_H

@@ -103,7 +103,7 @@ istraight_list_s extract_istraight_list(istraight_list_s * const list, filter_fn
 /// @param list Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic void pointer arguments for function pointer.
-void map_istraight_list(istraight_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments);
+void each_istraight_list(istraight_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param list Structure to manage.

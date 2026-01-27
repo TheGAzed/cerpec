@@ -54,10 +54,7 @@ void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy)
     list->allocator->free(list->next, list->allocator->arguments);
 
     // set everything to zero
-    list->max = list->empty = list->length = list->size = list->tail = 0;
-    list->elements = NULL;
-    list->next = NULL;
-    list->allocator = NULL;
+    memset(list, 0, sizeof(fcircular_list_s));
 }
 
 void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
@@ -541,7 +538,7 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, 
     return positive;
 }
 
-void map_fcircular_list(fcircular_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+void each_fcircular_list(fcircular_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
     error(list != arguments && "Parameters can't be equal.");

@@ -45,11 +45,7 @@ void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy) {
     list->allocator->free(list->node[IDL_NEXT], list->allocator->arguments);
     list->allocator->free(list->node[IDL_PREV], list->allocator->arguments);
 
-    list->capacity = list->head = list->length = list->size = 0;
-    list->node[IDL_PREV] = list->node[IDL_NEXT] = NULL;
-    list->elements = NULL;
-
-    list->allocator = NULL;
+    memset(list, 0, sizeof(idouble_list_s));
 }
 
 void clear_idouble_list(idouble_list_s * const list, set_fn const destroy) {
@@ -544,7 +540,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter
     return positive;
 }
 
-void map_next_idouble_list(idouble_list_s const * const restrict list, handle_fn const operate, void * const restrict arguments) {
+void each_next_idouble_list(idouble_list_s const * const restrict list, handle_fn const operate, void * const restrict arguments) {
     error(list && "Paremeter can't be NULL.");
     error(operate && "Paremeter can't be NULL.");
     error(arguments != list && "Paremeters can't be the same.");
@@ -561,7 +557,7 @@ void map_next_idouble_list(idouble_list_s const * const restrict list, handle_fn
     }
 }
 
-void map_prev_idouble_list(idouble_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+void each_prev_idouble_list(idouble_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
     error(arguments != list && "Paremeters can't be the same.");

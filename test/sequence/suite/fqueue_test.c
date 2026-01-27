@@ -141,7 +141,7 @@ TEST MAP_01(void) {
     }
 
     int value = 1;
-    map_fqueue(&test, increment, &value);
+    each_fqueue(&test, increment, &value);
 
     for (int i = 0; i < FQUEUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -162,7 +162,7 @@ TEST MAP_02(void) {
     }
 
     int value = 1;
-    map_fqueue(&test, increment, &value);
+    each_fqueue(&test, increment, &value);
 
     for (int i = 0; i < FQUEUE_CHUNK; ++i) {
         int a = 0;

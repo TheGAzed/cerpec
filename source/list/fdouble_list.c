@@ -64,11 +64,7 @@ void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
     list->allocator->free(list->node[FDL_NEXT], list->allocator->arguments);
     list->allocator->free(list->node[FDL_PREV], list->allocator->arguments);
 
-    list->max = list->head = list->length = list->size = 0;
-    list->node[FDL_PREV] = list->node[FDL_NEXT] = NULL;
-    list->elements = NULL;
-
-    list->allocator = NULL;
+    memset(list, 0, sizeof(fdouble_list_s));
 }
 
 void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
@@ -543,7 +539,7 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const
     return positive;
 }
 
-void map_next_fdouble_list(fdouble_list_s const * const list, handle_fn const operate, void * const arguments) {
+void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const operate, void * const arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(operate && "[ERROR] Paremeter can't be NULL.");
 
@@ -560,7 +556,7 @@ void map_next_fdouble_list(fdouble_list_s const * const list, handle_fn const op
     }
 }
 
-void map_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const arguments) {
+void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const arguments) {
     assert(list && "[ERROR] Paremeter can't be NULL.");
     assert(handle && "[ERROR] Paremeter can't be NULL.");
 

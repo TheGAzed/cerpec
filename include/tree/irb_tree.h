@@ -160,24 +160,24 @@ void update_irb_tree(irb_tree_s const * const restrict tree, void const * const 
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void inorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void in_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Performs a pre-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void preorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void pre_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Performs a post-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void postorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void post_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Performs a level-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void levelorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void level_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 #endif // IRB_TREE_H

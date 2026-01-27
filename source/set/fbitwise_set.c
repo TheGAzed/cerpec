@@ -1,6 +1,5 @@
 #include <set/fbitwise_set.h>
 
-#include <assert.h>
 #include <string.h>
 #include <limits.h>
 
@@ -12,7 +11,7 @@
 int _fbitwise_set_popcount(unsigned const bits);
 
 fbitwise_set_s create_fbitwise_set(size_t const max) {
-    assert(max && "[ERROR] Parameter can't be zero.");
+    error(max && "Parameter can't be zero.");
 
     // ceil to closest multiple of CHAR_BIT (usually 8)
     size_t const mod = max % CHAR_BIT;
@@ -24,7 +23,7 @@ fbitwise_set_s create_fbitwise_set(size_t const max) {
         .allocator = &standard, .max = max,
         .bits = standard.alloc(size, standard.arguments),
     };
-    assert(set.bits && "[ERROR] Memory allocation failed.");
+    error(set.bits && "Memory allocation failed.");
 
     memset(set.bits, 0, size);
 
@@ -32,8 +31,8 @@ fbitwise_set_s create_fbitwise_set(size_t const max) {
 }
 
 fbitwise_set_s make_fbitwise_set(size_t const max, memory_s const * const allocator) {
-    assert(max && "[ERROR] Parameter can't be zero.");
-    assert(allocator && "[ERROR] Parameter can't be NULL.");
+    error(max && "Parameter can't be zero.");
+    error(allocator && "Parameter can't be NULL.");
 
     // ceil to closest multiple of BIT_COUNT (usually 4 * 8 = 32)
     size_t const mod = max % BIT_COUNT;
@@ -45,7 +44,7 @@ fbitwise_set_s make_fbitwise_set(size_t const max, memory_s const * const alloca
         .allocator = allocator, .max = max,
         .bits = allocator->alloc(size, allocator->arguments),
     };
-    assert(set.bits && "[ERROR] Memory allocation failed.");
+    error(set.bits && "Memory allocation failed.");
 
     memset(set.bits, 0, size);
 
@@ -53,24 +52,26 @@ fbitwise_set_s make_fbitwise_set(size_t const max, memory_s const * const alloca
 }
 
 void destroy_fbitwise_set(fbitwise_set_s * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    error(set && "Parameter can't be NULL.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     // free bits array since it only stores indexes
     set->allocator->free(set->bits, set->allocator->arguments);
 
-    set->max = set->length = 0;
-    set->allocator = NULL;
-    set->bits = NULL;
+    memset(set, 0, sizeof(fbitwise_set_s));
 }
 
 void clear_fbitwise_set(fbitwise_set_s * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    error(set && "Parameter can't be NULL.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     // ceil to closest multiple of BIT_COUNT (usually 4 * 8 = 32)
     size_t const mod = set->max % BIT_COUNT;
@@ -81,10 +82,12 @@ void clear_fbitwise_set(fbitwise_set_s * const set) {
 }
 
 fbitwise_set_s copy_fbitwise_set(fbitwise_set_s const * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    error(set && "Parameter can't be NULL.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     // ceil to closest multiple of BIT_COUNT (usually 4 * 8 = 32)
     size_t const mod = set->max % BIT_COUNT;
@@ -96,7 +99,7 @@ fbitwise_set_s copy_fbitwise_set(fbitwise_set_s const * const set) {
         .max = set->max, .length = set->length, .allocator = set->allocator,
         .bits = set->allocator->alloc(size, set->allocator->arguments),
     };
-    assert(replica.bits && "[ERROR] Memory allocation failed.");
+    error(replica.bits && "Memory allocation failed.");
 
     // copy initialize bits
     memcpy(replica.bits, set->bits, size);
@@ -105,36 +108,42 @@ fbitwise_set_s copy_fbitwise_set(fbitwise_set_s const * const set) {
 }
 
 bool is_empty_fbitwise_set(fbitwise_set_s const * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    error(set && "Parameter can't be NULL.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     return !(set->length);
 }
 
 bool is_full_fbitwise_set(fbitwise_set_s const * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    error(set && "Parameter can't be NULL.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     return (set->length == set->max);
 }
 
 void insert_fbitwise_set(fbitwise_set_s * const set, size_t const index) {
-    assert(index < set->max && "[ERROR] Parameter can't exceed maximum.");
+    error(index < set->max && "Parameter can't exceed maximum.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     // calculate bits array index and bit at parameter index
     size_t const idx = index / BIT_COUNT;
     unsigned const relative = (unsigned)(index % BIT_COUNT);
     unsigned const bit = 1U << (BIT_COUNT - relative - 1);
 
-    // assert that bit index is unique (set doesn't contain index)
-    assert(!(set->bits[idx] & bit) && "[ERROR] Structure already contains element.");
+    // error that bit index is unique (set doesn't contain index)
+    error(!(set->bits[idx] & bit) && "Structure already contains element.");
 
     // set bit in bits array by ORing
     set->bits[idx] |= bit;
@@ -142,17 +151,19 @@ void insert_fbitwise_set(fbitwise_set_s * const set, size_t const index) {
 }
 
 void remove_fbitwise_set(fbitwise_set_s * const set, size_t const index) {
-    assert(index < set->max && "[ERROR] Parameter can't exceed maximum.");
+    error(index < set->max && "Parameter can't exceed maximum.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     // calculate bits array index and bit at parameter index
     size_t const idx = index / BIT_COUNT;
     unsigned const relative = (unsigned)(index % BIT_COUNT);
     unsigned const bit = 1U << (BIT_COUNT - relative - 1);
 
-    assert((set->bits[idx] & bit) && "[ERROR] Strucutre already contains element.");
+    error((set->bits[idx] & bit) && "Strucutre already contains element.");
 
     // remove bit in bits array by XORing
     set->bits[idx] ^= bit;
@@ -160,10 +171,12 @@ void remove_fbitwise_set(fbitwise_set_s * const set, size_t const index) {
 }
 
 bool contains_fbitwise_set(fbitwise_set_s const * const set, size_t const index) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    error(set && "Parameter can't be NULL.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     // calculate bits array index and bit at parameter index
     size_t const idx = index / BIT_COUNT;
@@ -174,14 +187,18 @@ bool contains_fbitwise_set(fbitwise_set_s const * const set, size_t const index)
 }
 
 fbitwise_set_s union_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise_set_s const * const set_two) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    error(set_one && "Parameter can't be NULL.");
+    error(set_two && "Parameter can't be NULL.");
 
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_one->max && "[INVALID] Parameter can't be zero.");
+    valid(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
+    valid(set_one->max && "Maximum can't be zero.");
+    valid(set_one->bits && "Bits array can't be NULL.");
+    valid(set_one->allocator && "Allocator can't be NULL.");
 
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_two->max && "[INVALID] Parameter can't be zero.");
+    valid(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
+    valid(set_two->max && "Maximum can't be zero.");
+    valid(set_two->bits && "Bits array can't be NULL.");
+    valid(set_two->allocator && "Allocator can't be NULL.");
 
     // get smallest and biggest set by capacity
     fbitwise_set_s const * const minimum = set_one->max < set_two->max ? set_one : set_two;
@@ -201,14 +218,18 @@ fbitwise_set_s union_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise
 }
 
 fbitwise_set_s intersect_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise_set_s const * const set_two) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    error(set_one && "Parameter can't be NULL.");
+    error(set_two && "Parameter can't be NULL.");
 
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_one->max && "[INVALID] Parameter can't be zero.");
+    valid(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
+    valid(set_one->max && "Maximum can't be zero.");
+    valid(set_one->bits && "Bits array can't be NULL.");
+    valid(set_one->allocator && "Allocator can't be NULL.");
 
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_two->max && "[INVALID] Parameter can't be zero.");
+    valid(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
+    valid(set_two->max && "Maximum can't be zero.");
+    valid(set_two->bits && "Bits array can't be NULL.");
+    valid(set_two->allocator && "Allocator can't be NULL.");
 
     fbitwise_set_s const * const minimum = set_one->max < set_two->max ? set_one : set_two;
     fbitwise_set_s const * const maximum = set_one->max >= set_two->max ? set_one : set_two;
@@ -224,14 +245,18 @@ fbitwise_set_s intersect_fbitwise_set(fbitwise_set_s const * const set_one, fbit
 }
 
 fbitwise_set_s subtract_fbitwise_set(fbitwise_set_s const * const minuend, fbitwise_set_s const * const subtrahend) {
-    assert(minuend && "[ERROR] Parameter can't be NULL.");
-    assert(subtrahend && "[ERROR] Parameter can't be NULL.");
+    error(minuend && "Parameter can't be NULL.");
+    error(subtrahend && "Parameter can't be NULL.");
 
-    assert(minuend->length <= minuend->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(minuend->max && "[INVALID] Parameter can't be zero.");
+    valid(minuend->length <= minuend->max && "Lenght can't be larger than maximum.");
+    valid(minuend->max && "Maximum can't be zero.");
+    valid(minuend->bits && "Bits array can't be NULL.");
+    valid(minuend->allocator && "Allocator can't be NULL.");
 
-    assert(subtrahend->length <= subtrahend->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(subtrahend->max && "[INVALID] Parameter can't be zero.");
+    valid(subtrahend->length <= subtrahend->max && "Lenght can't be larger than maximum.");
+    valid(subtrahend->max && "Maximum can't be zero.");
+    valid(subtrahend->bits && "Bits array can't be NULL.");
+    valid(subtrahend->allocator && "Allocator can't be NULL.");
 
     // get smallest set based on capacity to minimize operations and invalid array access
     fbitwise_set_s const * const minimum = minuend->max < subtrahend->max ? minuend : subtrahend;
@@ -247,14 +272,18 @@ fbitwise_set_s subtract_fbitwise_set(fbitwise_set_s const * const minuend, fbitw
 }
 
 fbitwise_set_s exclude_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise_set_s const * const set_two) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    error(set_one && "Parameter can't be NULL.");
+    error(set_two && "Parameter can't be NULL.");
 
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_one->max && "[INVALID] Parameter can't be zero.");
+    valid(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
+    valid(set_one->max && "Maximum can't be zero.");
+    valid(set_one->bits && "Bits array can't be NULL.");
+    valid(set_one->allocator && "Allocator can't be NULL.");
 
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_two->max && "[INVALID] Parameter can't be zero.");
+    valid(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
+    valid(set_two->max && "Maximum can't be zero.");
+    valid(set_two->bits && "Bits array can't be NULL.");
+    valid(set_two->allocator && "Allocator can't be NULL.");
 
     fbitwise_set_s const * const minimum = set_one->max < set_two->max ? set_one : set_two;
     fbitwise_set_s const * const maximum = set_one->max >= set_two->max ? set_one : set_two;
@@ -270,14 +299,18 @@ fbitwise_set_s exclude_fbitwise_set(fbitwise_set_s const * const set_one, fbitwi
 }
 
 bool is_subset_fbitwise_set(fbitwise_set_s const * const superset, fbitwise_set_s const * const subset) {
-    assert(superset && "[ERROR] Parameter can't be NULL.");
-    assert(subset && "[ERROR] Parameter can't be NULL.");
+    error(superset && "Parameter can't be NULL.");
+    error(subset && "Parameter can't be NULL.");
 
-    assert(superset->length <= superset->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(superset->max && "[INVALID] Parameter can't be zero.");
+    valid(superset->length <= superset->max && "Lenght can't be larger than maximum.");
+    valid(superset->max && "Maximum can't be zero.");
+    valid(superset->bits && "Bits array can't be NULL.");
+    valid(superset->allocator && "Allocator can't be NULL.");
 
-    assert(subset->length <= subset->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(subset->max && "[INVALID] Parameter can't be zero.");
+    valid(subset->length <= subset->max && "Lenght can't be larger than maximum.");
+    valid(subset->max && "Maximum can't be zero.");
+    valid(subset->bits && "Bits array can't be NULL.");
+    valid(subset->allocator && "Allocator can't be NULL.");
 
     // if ANDed sub- and super-set doesn't equals sub's bits then it isn't a subset
     size_t i = 0;
@@ -298,14 +331,18 @@ bool is_subset_fbitwise_set(fbitwise_set_s const * const superset, fbitwise_set_
 }
 
 bool is_proper_subset_fbitwise_set(fbitwise_set_s const * const superset, fbitwise_set_s const * const subset) {
-    assert(superset && "[ERROR] Parameter can't be NULL.");
-    assert(subset && "[ERROR] Parameter can't be NULL.");
+    error(superset && "Parameter can't be NULL.");
+    error(subset && "Parameter can't be NULL.");
 
-    assert(superset->length <= superset->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(superset->max && "[INVALID] Parameter can't be zero.");
+    valid(superset->length <= superset->max && "Lenght can't be larger than maximum.");
+    valid(superset->max && "Maximum can't be zero.");
+    valid(superset->bits && "Bits array can't be NULL.");
+    valid(superset->allocator && "Allocator can't be NULL.");
 
-    assert(subset->length <= subset->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(subset->max && "[INVALID] Parameter can't be zero.");
+    valid(subset->length <= subset->max && "Lenght can't be larger than maximum.");
+    valid(subset->max && "Maximum can't be zero.");
+    valid(subset->bits && "Bits array can't be NULL.");
+    valid(subset->allocator && "Allocator can't be NULL.");
 
     // if ANDed sub- and super-set doesn't equals sub's bits then it isn't a subset
     size_t i = 0;
@@ -326,14 +363,18 @@ bool is_proper_subset_fbitwise_set(fbitwise_set_s const * const superset, fbitwi
 }
 
 bool is_disjoint_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise_set_s const * const set_two) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
+    error(set_one && "Parameter can't be NULL.");
+    error(set_two && "Parameter can't be NULL.");
 
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_one->max && "[INVALID] Parameter can't be zero.");
+    valid(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
+    valid(set_one->max && "Maximum can't be zero.");
+    valid(set_one->bits && "Bits array can't be NULL.");
+    valid(set_one->allocator && "Allocator can't be NULL.");
 
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set_two->max && "[INVALID] Parameter can't be zero.");
+    valid(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
+    valid(set_two->max && "Maximum can't be zero.");
+    valid(set_two->bits && "Bits array can't be NULL.");
+    valid(set_two->allocator && "Allocator can't be NULL.");
 
     for (size_t i = 0; i < set_two->max / BIT_COUNT && i < set_one->max / BIT_COUNT; ++i) {
         if (set_two->bits[i] & set_one->bits[i]) {
@@ -344,12 +385,14 @@ bool is_disjoint_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise_set
     return true;
 }
 
-void map_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const handle, void * const arguments) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
+void each_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const handle, void * const arguments) {
+    error(set && "Parameter can't be NULL.");
+    error(handle && "Parameter can't be NULL.");
 
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->max && "[INVALID] Parameter can't be zero.");
+    valid(set->length <= set->max && "Lenght can't be larger than maximum.");
+    valid(set->max && "Maximum can't be zero.");
+    valid(set->bits && "Bits array can't be NULL.");
+    valid(set->allocator && "Allocator can't be NULL.");
 
     for (size_t i = 0; i < set->max; ++i) {
         size_t temp = i;

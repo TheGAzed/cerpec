@@ -68,7 +68,7 @@ void peep_fstack(fstack_s const * const restrict stack, void * const restrict bu
 /// @param stack Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_fstack(fstack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments);
+void each_fstack(fstack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param stack Structure to map.

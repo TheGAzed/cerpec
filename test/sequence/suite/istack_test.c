@@ -191,7 +191,7 @@ TEST MAP_01(void) {
     }
 
     int value = 1;
-    map_istack(&test, increment, &value);
+    each_istack(&test, increment, &value);
 
     for (int i = ISTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -212,7 +212,7 @@ TEST MAP_02(void) {
     }
 
     int value = 1;
-    map_istack(&test, increment, &value);
+    each_istack(&test, increment, &value);
 
     for (int i = ISTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
@@ -233,7 +233,7 @@ TEST MAP_03(void) {
     }
 
     int value = 1;
-    map_istack(&test, increment, &value);
+    each_istack(&test, increment, &value);
 
     for (int i = ISTACK_CHUNK; i >= 0; --i) {
         int a = 0;

@@ -537,7 +537,7 @@ TEST MAP_NEXT_01(void) {
     }
 
     int value = 1;
-    map_next_fdouble_list(&test, increment, &value);
+    each_next_fdouble_list(&test, increment, &value);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -558,7 +558,7 @@ TEST MAP_NEXT_02(void) {
     }
 
     int value = 1;
-    map_next_fdouble_list(&test, increment, &value);
+    each_next_fdouble_list(&test, increment, &value);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
@@ -579,7 +579,7 @@ TEST MAP_PREV_01(void) {
     }
 
     int value = 1;
-    map_prev_fdouble_list(&test, increment, &value);
+    each_prev_fdouble_list(&test, increment, &value);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -600,7 +600,7 @@ TEST MAP_PREV_02(void) {
     }
 
     int value = 1;
-    map_prev_fdouble_list(&test, increment, &value);
+    each_prev_fdouble_list(&test, increment, &value);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;

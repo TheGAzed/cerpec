@@ -408,7 +408,7 @@ TEST MAP_01(void) {
     }
 
     int value = 1;
-    map_ibinary_heap(&test, increment, &value);
+    each_ibinary_heap(&test, increment, &value);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK - 1; ++i) {
         int a = -1;
@@ -429,7 +429,7 @@ TEST MAP_02(void) {
     }
 
     int value = 1;
-    map_ibinary_heap(&test, increment, &value);
+    each_ibinary_heap(&test, increment, &value);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK; ++i) {
         int a = -1;
@@ -450,7 +450,7 @@ TEST MAP_03(void) {
     }
 
     int value = 1;
-    map_ibinary_heap(&test, increment, &value);
+    each_ibinary_heap(&test, increment, &value);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK + 1; ++i) {
         int a = -1;

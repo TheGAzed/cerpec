@@ -49,9 +49,7 @@ void destroy_fstack(fstack_s * const stack, set_fn const destroy) {
     // free elements array and set everything to zero/NULL
     stack->allocator->free(stack->elements, stack->allocator->arguments);
 
-    stack->length = stack->max = stack->size = 0;
-    stack->elements = NULL;
-    stack->allocator = NULL;
+    memset(stack, 0, sizeof(fstack_s));
 }
 
 void clear_fstack(fstack_s * const stack, set_fn const destroy) {
@@ -173,7 +171,7 @@ void peep_fstack(fstack_s const * const restrict stack, void * const restrict bu
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void map_fstack(fstack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments) {
+void each_fstack(fstack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments) {
     error(stack && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(stack != arguments && "Parameters can't be equal.");

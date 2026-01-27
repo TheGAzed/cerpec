@@ -369,7 +369,7 @@ TEST MAP_FRONT_01(void) {
     }
 
     int value = 1;
-    map_front_fdeque(&test, increment, &value);
+    each_front_fdeque(&test, increment, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -390,7 +390,7 @@ TEST MAP_FRONT_02(void) {
     }
 
     int value = 1;
-    map_front_fdeque(&test, increment, &value);
+    each_front_fdeque(&test, increment, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -411,7 +411,7 @@ TEST MAP_BACK_01(void) {
     }
 
     int value = 1;
-    map_back_fdeque(&test, increment, &value);
+    each_back_fdeque(&test, increment, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -432,7 +432,7 @@ TEST MAP_BACK_02(void) {
     }
 
     int value = 1;
-    map_back_fdeque(&test, increment, &value);
+    each_back_fdeque(&test, increment, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK; ++i) {
         int a = 0;

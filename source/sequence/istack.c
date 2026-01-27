@@ -29,9 +29,7 @@ void destroy_istack(istack_s * const stack, set_fn const destroy) {
     }
     stack->allocator->free(stack->elements, stack->allocator->arguments); // free elements array
 
-    stack->capacity = stack->length = stack->size = 0;
-    stack->elements = NULL;
-    stack->allocator = NULL;
+    memset(stack, 0, sizeof(istack_s));
 }
 
 void clear_istack(istack_s * const stack, set_fn const destroy) {
@@ -144,7 +142,7 @@ void peep_istack(istack_s const * const restrict stack, void * const restrict bu
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void map_istack(istack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments) {
+void each_istack(istack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments) {
     error(stack && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
     error(stack != arguments && "Parameters can't be the same.");

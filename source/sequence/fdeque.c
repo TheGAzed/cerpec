@@ -61,9 +61,7 @@ void destroy_fdeque(fdeque_s * const deque, set_fn const destroy) {
     // free elements array and set all values to zero/NULL
     deque->allocator->free(deque->elements, deque->allocator->arguments);
 
-    deque->current = deque->length = deque->max = deque->size = 0;
-    deque->elements = NULL;
-    deque->allocator = NULL;
+    memset(deque, 0, sizeof(fdeque_s));
 }
 
 void clear_fdeque(fdeque_s * const deque, set_fn const destroy) {
@@ -277,7 +275,7 @@ void peek_back_fdeque(fdeque_s const * const restrict deque, void * const restri
     memcpy(buffer, deque->elements + (position * deque->size), deque->size);
 }
 
-void map_front_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+void each_front_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
     error(deque && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(deque != arguments && "Parameters can't be equal.");
@@ -304,7 +302,7 @@ void map_front_fdeque(fdeque_s const * const restrict deque, handle_fn const han
     }
 }
 
-void map_back_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+void each_back_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
     error(deque && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(deque != arguments && "Parameters can't be equal.");

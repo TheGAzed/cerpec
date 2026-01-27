@@ -6,6 +6,9 @@
 
 #define NIL (size_t)(-1)
 
+/// @brief Fills hole produced by element removal in arrays of elements.
+/// @param map Structure to remove hole from.
+/// @param hole Index of hole in arrays.
 void _fhash_map_fill_hole(fhash_map_s const * const map, size_t const hole);
 
 fhash_map_s create_fhash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, compare_fn const compare_key) {
@@ -102,12 +105,7 @@ void destroy_fhash_map(fhash_map_s * const map, set_fn const destroy_key, set_fn
     map->allocator->free(map->prev, map->allocator->arguments);
 
     // map everything to zero/false
-    map->max = map->key_size = map->length = map->value_size = 0;
-    map->hash_key = NULL;
-    map->compare_key = NULL;
-    map->keys = map->values = NULL;
-    map->next = map->prev = map->hashes = NULL;
-    map->allocator = NULL;
+    memset(map, 0, sizeof(fhash_map_s));
 }
 
 void clear_fhash_map(fhash_map_s * map, const set_fn destroy_key, const set_fn destroy_value) {
@@ -164,11 +162,12 @@ fhash_map_s copy_fhash_map(fhash_map_s const * const map, copy_fn const copy_key
     assert(replica.keys && "[ERROR] Memory allocation failed.");
     assert(replica.values && "[ERROR] Memory allocation failed.");
     assert(replica.hashes && "[ERROR] Memory allocation failed.");
+
     assert(replica.head && "[ERROR] Memory allocation failed.");
     assert(replica.next && "[ERROR] Memory allocation failed.");
     assert(replica.prev && "[ERROR] Memory allocation failed.");
 
-    memcpy(replica.head, map->head, map->max * sizeof(size_t)); // capacity since heads can't be move
+    memcpy(replica.head, map->head, map->max * sizeof(size_t)); // maximum since heads can't be moved
 
     memcpy(replica.next, map->next, map->length * sizeof(size_t));
     memcpy(replica.prev, map->prev, map->length * sizeof(size_t));
@@ -206,10 +205,13 @@ bool is_full_fhash_map(fhash_map_s const * const map) {
     return (map->length == map->max); // if 0 return 'true'
 }
 
-void insert_fhash_map(fhash_map_s * const map, void const * const restrict key, void const * const restrict value) {
+void insert_fhash_map(fhash_map_s * const restrict map, void const * const restrict key, void const * const restrict value) {
     assert(map && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(value && "[ERROR] Parameter can't be NULL.");
+    error(map != key && "Parameters can't be equal.");
+    error(map != value && "Parameters can't be equal.");
+    error(value != key && "Parameters can't be equal.");
 
     assert(map->hash_key && "[INVALID] Parameter can't be NULL.");
     assert(map->key_size && "[INVALID] Parameter can't be zero.");
@@ -248,7 +250,7 @@ void insert_fhash_map(fhash_map_s * const map, void const * const restrict key, 
     map->length++;
 }
 
-void remove_fhash_map(fhash_map_s * const map, void const * const restrict key, void * const restrict key_buffer, void * const restrict value_buffer) {
+void remove_fhash_map(fhash_map_s * const restrict map, void const * const restrict key, void * const restrict key_buffer, void * const restrict value_buffer) {
     assert(map && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(key_buffer && "[ERROR] Parameter can't be NULL.");
@@ -257,6 +259,13 @@ void remove_fhash_map(fhash_map_s * const map, void const * const restrict key, 
     assert(key != value_buffer && "[ERROR] Parameters can't be the same.");
     assert(key_buffer != value_buffer && "[ERROR] Parameters can't be the same.");
     assert(map->length && "[ERROR] Structure is empty.");
+
+    error(map != key && "Parameters can't be equal.");
+    error(map != key_buffer && "Parameters can't be equal.");
+    error(map != value_buffer && "Parameters can't be equal.");
+    error(key != key_buffer && "Parameters can't be equal.");
+    error(key != value_buffer && "Parameters can't be equal.");
+    error(key_buffer != value_buffer && "Parameters can't be equal.");
 
     assert(map->hash_key && "[INVALID] Parameter can't be NULL.");
     assert(map->key_size && "[INVALID] Parameter can't be zero.");
@@ -288,9 +297,10 @@ void remove_fhash_map(fhash_map_s * const map, void const * const restrict key, 
     exit(EXIT_FAILURE); // terminate on error
 }
 
-bool contains_key_fhash_map(fhash_map_s const * const map, void const * const key) {
+bool contains_key_fhash_map(fhash_map_s const * const restrict map, void const * const restrict key) {
     assert(map && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
+    error(map != key && "Parameters can't be equal.");
 
     assert(map->hash_key && "[INVALID] Parameter can't be NULL.");
     assert(map->key_size && "[INVALID] Parameter can't be zero.");
@@ -313,12 +323,16 @@ bool contains_key_fhash_map(fhash_map_s const * const map, void const * const ke
     return false;
 }
 
-void get_value_fhash_map(fhash_map_s const * const map, void const * const restrict key, void * const restrict value_buffer) {
+void get_value_fhash_map(fhash_map_s const * const restrict map, void const * const restrict key, void * const restrict value_buffer) {
     assert(map && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(value_buffer && "[ERROR] Parameter can't be NULL.");
     assert(key != value_buffer && "[ERROR] Parameters can't be the same.");
     assert(map->length && "[ERROR] Structure is empty.");
+
+    error(map != key && "Parameters can't be equal.");
+    error(map != value_buffer && "Parameters can't be equal.");
+    error(value_buffer != key && "Parameters can't be equal.");
 
     assert(map->hash_key && "[INVALID] Parameter can't be NULL.");
     assert(map->key_size && "[INVALID] Parameter can't be zero.");
@@ -343,7 +357,7 @@ void get_value_fhash_map(fhash_map_s const * const map, void const * const restr
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void set_value_fhash_map(fhash_map_s const * const map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer) {
+void set_value_fhash_map(fhash_map_s const * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer) {
     assert(map && "[ERROR] Parameter can't be NULL.");
     assert(key && "[ERROR] Parameter can't be NULL.");
     assert(value_buffer && "[ERROR] Parameter can't be NULL.");
@@ -351,6 +365,13 @@ void set_value_fhash_map(fhash_map_s const * const map, void const * const restr
     assert(key != value && "[ERROR] Parameters can't be the same.");
     assert(value != value_buffer && "[ERROR] Parameters can't be the same.");
     assert(map->length && "[ERROR] Structure is empty.");
+
+    error(map != key && "Parameters can't be equal.");
+    error(map != value && "Parameters can't be equal.");
+    error(map != value_buffer && "Parameters can't be equal.");
+    error(key != value && "Parameters can't be equal.");
+    error(key != value_buffer && "Parameters can't be equal.");
+    error(value != value_buffer && "Parameters can't be equal.");
 
     assert(map->hash_key && "[INVALID] Parameter can't be NULL.");
     assert(map->key_size && "[INVALID] Parameter can't be zero.");
@@ -378,9 +399,10 @@ void set_value_fhash_map(fhash_map_s const * const map, void const * const restr
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void map_key_fhash_map(fhash_map_s const * const map, handle_fn const handle, void * const arguments) {
+void each_key_fhash_map(fhash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
     assert(map && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
+    error(map != arguments && "Parameters can't be equal.");
 
     assert(map->hash_key && "[INVALID] Parameter can't be NULL.");
     assert(map->key_size && "[INVALID] Parameter can't be zero.");
@@ -396,9 +418,10 @@ void map_key_fhash_map(fhash_map_s const * const map, handle_fn const handle, vo
     }
 }
 
-void map_value_fhash_map(fhash_map_s const * const map, handle_fn const handle, void * const arguments) {
+void each_value_fhash_map(fhash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
     assert(map && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
+    error(map != arguments && "Parameters can't be equal.");
 
     assert(map->hash_key && "[INVALID] Parameter can't be NULL.");
     assert(map->key_size && "[INVALID] Parameter can't be zero.");

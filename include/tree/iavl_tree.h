@@ -157,24 +157,24 @@ void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * cons
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void inorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void in_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Performs a pre-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void preorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void pre_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Performs a post-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void postorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void post_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Performs a level-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void levelorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
+void level_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments);
 
 #endif // IAVL_TREE_H

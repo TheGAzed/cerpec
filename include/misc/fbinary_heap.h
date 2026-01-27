@@ -83,6 +83,6 @@ void meld_fbinary_heap(fbinary_heap_s * const restrict destination, fbinary_heap
 /// @param heap Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const arguments);
+void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const arguments);
 
 #endif // FBINARY_HEAP_H

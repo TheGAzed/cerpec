@@ -82,6 +82,6 @@ void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap
 /// @param heap Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const arguments);
+void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const arguments);
 
 #endif // IBINARY_HEAP_H

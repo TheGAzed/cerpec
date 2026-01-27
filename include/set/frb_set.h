@@ -128,6 +128,6 @@ bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * cons
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_frb_set(frb_set_s const * const set, handle_fn const handle, void * const arguments);
+void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const arguments);
 
 #endif // FRB_SET_H

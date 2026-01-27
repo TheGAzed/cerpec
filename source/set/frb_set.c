@@ -121,12 +121,7 @@ void destroy_frb_set(frb_set_s * const set, set_fn const destroy) {
     set->allocator->free(set->node[IRB_SET_RIGHT], set->allocator->arguments);
 
     // make strucutre invalid/set to zero
-    set->max = set->length = set->root = set->size = 0;
-    set->allocator = NULL;
-    set->color = NULL;
-    set->compare = NULL;
-    set->elements = NULL;
-    set->node[IRB_SET_LEFT] = set->node[IRB_SET_RIGHT] = set->parent = NULL;
+    memset(set, 0, sizeof(frb_set_s));
 }
 
 void clear_frb_set(frb_set_s * const set, set_fn const destroy) {
@@ -775,7 +770,7 @@ bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * cons
     return true;
 }
 
-void map_frb_set(frb_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const arguments) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 

@@ -38,11 +38,7 @@ void destroy_istraight_list(istraight_list_s * const list, set_fn const destroy)
     list->allocator->free(list->elements, list->allocator->arguments);
     list->allocator->free(list->next, list->allocator->arguments);
 
-    list->capacity = list->empty = list->head = list->length = list->size = 0;
-    list->elements = NULL;
-    list->next = NULL;
-
-    list->allocator = NULL;
+    memset(list, 0, sizeof(istraight_list_s));
 }
 
 void clear_istraight_list(istraight_list_s * const list, set_fn const destroy) {
@@ -452,7 +448,7 @@ istraight_list_s extract_istraight_list(istraight_list_s * const restrict list, 
     return positive;
 }
 
-void map_istraight_list(istraight_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+void each_istraight_list(istraight_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
     error(list != arguments && "Parameters can't be equal.");

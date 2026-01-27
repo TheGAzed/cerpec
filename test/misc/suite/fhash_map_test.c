@@ -55,7 +55,8 @@ TEST COPY_01(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     fhash_map_s replica = copy_fhash_map(&table, copy, copy);
@@ -78,7 +79,8 @@ TEST COPY_02(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     fhash_map_s replica = copy_fhash_map(&table, copy, copy);
@@ -101,7 +103,8 @@ TEST INSERT_01(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     destroy_fhash_map(&table, destroy, destroy);
@@ -113,7 +116,8 @@ TEST INSERT_02(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     destroy_fhash_map(&table, destroy, destroy);
@@ -125,7 +129,8 @@ TEST REMOVE_01(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
@@ -145,7 +150,8 @@ TEST REMOVE_02(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
@@ -165,7 +171,8 @@ TEST CONTAINS_01(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
@@ -181,7 +188,8 @@ TEST CONTAINS_02(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
@@ -197,7 +205,8 @@ TEST GET_VALUE_01(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
@@ -215,7 +224,8 @@ TEST GET_VALUE_02(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
@@ -233,7 +243,8 @@ TEST SET_VALUE_01(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     int a = -1;
@@ -254,7 +265,8 @@ TEST SET_VALUE_02(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
-        insert_fhash_map(&table, &i, &i);
+        int j = i;
+        insert_fhash_map(&table, &i, &j);
     }
 
     int a = -1;

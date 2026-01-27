@@ -54,10 +54,7 @@ void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy) {
     heap->allocator->free(heap->elements, heap->allocator->arguments);
 
     // make structure invalid
-    heap->capacity = heap->length = heap->size = 0;
-    heap->compare = NULL;
-    heap->elements = NULL;
-    heap->allocator = NULL;
+    memset(heap, 0, sizeof(ibinary_heap_s));
 }
 
 void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy) {
@@ -250,7 +247,7 @@ void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap
     destination->allocator->free(temporary, destination->allocator->arguments);
 }
 
-void map_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const arguments) {
+void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const arguments) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 

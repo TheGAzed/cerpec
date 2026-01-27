@@ -107,6 +107,6 @@ bool is_disjoint_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise_set
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
 /// @note Function does not change the set indexes.
-void map_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const handle, void * const arguments);
+void each_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const handle, void * const arguments);
 
 #endif // FBITWISE_SET_H

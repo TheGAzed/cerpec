@@ -46,11 +46,7 @@ void destroy_ihash_set(ihash_set_s * const set, set_fn const destroy) {
     set->allocator->free(set->next, set->allocator->arguments);
 
     // set everything to zero/false
-    set->capacity = set->empty = set->length = set->size = 0;
-    set->allocator = NULL;
-    set->elements = NULL;
-    set->hash = NULL;
-    set->head = set->next = NULL;
+    memset(set, 0, sizeof(ihash_set_s));
 }
 
 void clear_ihash_set(ihash_set_s * const set, set_fn const destroy) {
@@ -629,7 +625,7 @@ bool is_disjoint_ihash_set(ihash_set_s const * const set_one, ihash_set_s const 
     return true;
 }
 
-void map_ihash_set(ihash_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_ihash_set(ihash_set_s const * const set, handle_fn const handle, void * const arguments) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 

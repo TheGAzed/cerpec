@@ -58,9 +58,7 @@ void destroy_fqueue(fqueue_s * const queue, set_fn const destroy) {
     // free memory array and set everything manually to zero/NULL
     queue->allocator->free(queue->elements, queue->allocator->arguments);
 
-    queue->current = queue->length = queue->max = queue->size = 0;
-    queue->elements = NULL;
-    queue->allocator = NULL;
+    memset(queue, 0, sizeof(fqueue_s));
 }
 
 void clear_fqueue(fqueue_s * const queue, set_fn const destroy) {
@@ -210,7 +208,7 @@ void peek_fqueue(fqueue_s const * const restrict queue, void * const restrict bu
     memcpy(buffer, queue->elements + (queue->current * queue->size), queue->size);
 }
 
-void map_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
+void each_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
     error(queue && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(queue != arguments && "Parameters can't be equal.");

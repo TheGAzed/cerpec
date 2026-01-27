@@ -124,12 +124,7 @@ void destroy_irb_set(irb_set_s * const set, set_fn const destroy) {
     set->allocator->free(set->node[IRB_SET_RIGHT], set->allocator->arguments);
 
     // make strucutre invalid/set to zero
-    set->capacity = set->length = set->root = set->size = 0;
-    set->allocator = NULL;
-    set->color = NULL;
-    set->compare = NULL;
-    set->elements = NULL;
-    set->node[IRB_SET_LEFT] = set->node[IRB_SET_RIGHT] = set->parent = NULL;
+    memset(set, 0, sizeof(irb_set_s));
 }
 
 void clear_irb_set(irb_set_s * const set, set_fn const destroy) {
@@ -804,7 +799,7 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
     return true;
 }
 
-void map_irb_set(irb_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * const arguments) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
@@ -812,7 +807,32 @@ void map_irb_set(irb_set_s const * const set, handle_fn const handle, void * con
     assert(set->size && "[INVALID] Parameter can't be zero.");
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
-    for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), arguments); ++i) {}
+    bool left_done = false;
+    size_t node = set->root;
+    while (NIL != node) {
+        size_t const parent = set->parent[node];
+        size_t const left = set->node[IRB_SET_LEFT][node];
+        size_t const right = set->node[IRB_SET_RIGHT][node];
+
+        while (!left_done && NIL != left) {
+            node = left;
+        }
+
+        if (!handle(set->elements + (node * set->size), arguments)) { break; }
+
+        left_done = true;
+        if (NIL != right) {
+            left_done = false;
+            node = right;
+        } else if (NIL != parent) {
+            while (NIL != parent && node == set->node[IRB_SET_RIGHT][parent]) { node = parent; }
+            if (NIL == parent) { break; }
+
+            node = parent;
+        } else {
+            break;
+        }
+    }
 }
 
 void _irb_set_left_rotate(irb_set_s * const set, size_t const node) {

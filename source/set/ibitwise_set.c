@@ -34,9 +34,7 @@ void destroy_ibitwise_set(ibitwise_set_s * const set) {
     // free bits array since it only stores indexes
     set->allocator->free(set->bits, set->allocator->arguments);
 
-    set->capacity = set->length = 0;
-    set->allocator = NULL;
-    set->bits = NULL;
+    memset(set, 0, sizeof(ibitwise_set_s));
 }
 
 void clear_ibitwise_set(ibitwise_set_s * const set) {
@@ -342,7 +340,7 @@ bool is_disjoint_ibitwise_set(ibitwise_set_s const * const set_one, ibitwise_set
     return true;
 }
 
-void map_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const handle, void * const arguments) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 

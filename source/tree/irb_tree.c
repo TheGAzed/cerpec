@@ -775,7 +775,7 @@ void update_irb_tree(irb_tree_s const * const restrict tree, void const * const 
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void in_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");
@@ -788,35 +788,32 @@ void inorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const ha
     bool left_done = false;
     size_t node = tree->root;
     while (NIL != node) {
-        while (!left_done && NIL != tree->node[IRB_TREE_LEFT][node]) {
-            node = tree->node[IRB_TREE_LEFT][node];
+        size_t const parent = tree->parent[node];
+        size_t const left = tree->node[IRB_TREE_LEFT][node];
+        size_t const right = tree->node[IRB_TREE_RIGHT][node];
+
+        while (!left_done && NIL != left) {
+            node = left;
         }
 
-        if (!handle(tree->elements + (node * tree->size), arguments)) {
-            break;
-        }
+        if (!handle(tree->elements + (node * tree->size), arguments)) { break; }
 
         left_done = true;
-        if (NIL != tree->node[IRB_TREE_RIGHT][node]) {
+        if (NIL != right) {
             left_done = false;
-            node = tree->node[IRB_TREE_RIGHT][node];
-        } else if (NIL != tree->parent[node]) {
-            while (NIL != tree->parent[node] && node == tree->node[IRB_TREE_RIGHT][tree->parent[node]]) {
-                node = tree->parent[node];
-            }
+            node = right;
+        } else if (NIL != parent) {
+            while (NIL != parent && node == tree->node[IRB_TREE_RIGHT][parent]) { node = parent; }
+            if (NIL == parent) { break; }
 
-            if (NIL == tree->parent[node]) {
-                break;
-            }
-
-            node = tree->parent[node];
+            node = parent;
         } else {
             break;
         }
     }
 }
 
-void preorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void pre_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");
@@ -853,7 +850,7 @@ void preorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const h
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void postorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void post_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");
@@ -895,7 +892,7 @@ void postorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const 
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void levelorder_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void level_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");

@@ -43,9 +43,7 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
     }
 
     // set everything to zero
-    queue->current = queue->length = queue->size = 0;
-    queue->tail = NULL;
-    queue->allocator = NULL;
+    memset(queue, 0, sizeof(iqueue_s));
 }
 
 void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
@@ -208,7 +206,7 @@ void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffe
     }
 }
 
-void map_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
+void each_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
     error(queue && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL");
     error(queue != arguments && "Parameters can't be the same.");

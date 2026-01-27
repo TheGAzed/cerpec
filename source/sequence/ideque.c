@@ -39,9 +39,7 @@ void destroy_ideque(ideque_s * const deque, set_fn const destroy) {
     }
 
     // set everything to zero
-    deque->current = deque->length = deque->size = 0;
-    deque->head = NULL;
-    deque->allocator = NULL;
+    memset(deque, 0, sizeof(ideque_s));
 }
 
 void clear_ideque(ideque_s * const deque, set_fn const destroy) {
@@ -284,7 +282,7 @@ void dequeue_back_ideque(ideque_s * const restrict deque, void * const restrict 
     }
 }
 
-void map_front_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+void each_front_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
     error(deque && "Parameter is NULL.");
     error(handle && "Parameter is NULL.");
     error(deque != arguments && "Parameters can't be the same.");
@@ -309,7 +307,7 @@ void map_front_ideque(ideque_s const * const restrict deque, handle_fn const han
     }
 }
 
-void map_back_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+void each_back_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
     error(deque && "Parameter is NULL.");
     error(handle && "Parameter is NULL.");
     error(deque != arguments && "Parameters can't be the same.");

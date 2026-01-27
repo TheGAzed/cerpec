@@ -141,7 +141,7 @@ TEST MAP_01(void) {
     }
 
     int value = 1;
-    map_fstack(&test, increment, &value);
+    each_fstack(&test, increment, &value);
 
     for (int i = FSTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -162,7 +162,7 @@ TEST MAP_02(void) {
     }
 
     int value = 1;
-    map_fstack(&test, increment, &value);
+    each_fstack(&test, increment, &value);
 
     for (int i = FSTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;

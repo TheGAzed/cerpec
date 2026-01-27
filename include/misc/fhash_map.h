@@ -65,44 +65,44 @@ bool is_full_fhash_map(fhash_map_s const * const map);
 /// @param map Structure to insert element into.
 /// @param key Key to insert.
 /// @param value Value to insert.
-void insert_fhash_map(fhash_map_s * const map, void const * const key, void const * const value);
+void insert_fhash_map(fhash_map_s * const restrict map, void const * const restrict key, void const * const restrict value);
 
 /// @brief Removes unique key/value pair from structure.
 /// @param map Structure to remove element into.
 /// @param key Key to remove.
 /// @param key_buffer Key buffer to save removed key.
 /// @param value_buffer Value buffer to save removed value.
-void remove_fhash_map(fhash_map_s * const map, void const * const key, void * const key_buffer, void * const value_buffer);
+void remove_fhash_map(fhash_map_s * const restrict map, void const * const restrict key, void * const restrict key_buffer, void * const restrict value_buffer);
 
 /// @brief Checks if structure contains key.
 /// @param map Structure to check.
 /// @param key Key to check.
 /// @return 'true' if contained, 'false' otherwise.
-bool contains_key_fhash_map(fhash_map_s const * const map, void const * const key);
+bool contains_key_fhash_map(fhash_map_s const * const restrict map, void const * const restrict key);
 
 /// @brief Gets value based on key.
 /// @param map Structure to get value.
 /// @param key Key to value.
 /// @param value_buffer Value buffer to save retrieved value.
-void get_value_fhash_map(fhash_map_s const * const map, void const * const key, void * const value_buffer);
+void get_value_fhash_map(fhash_map_s const * const restrict map, void const * const restrict key, void * const restrict value_buffer);
 
 /// @brief Sets value based on key.
 /// @param map Structure to set value.
 /// @param key Key to value.
 /// @param value New value to insert.
 /// @param value_buffer Old value buffer to save replaced value.
-void set_value_fhash_map(fhash_map_s const * const map, void const * const key, void const * const value, void * const value_buffer);
+void set_value_fhash_map(fhash_map_s const * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer);
 
 /// @brief Iterates over each key in structure.
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_key_fhash_map(fhash_map_s const * const map, handle_fn const handle, void * const arguments);
+void each_key_fhash_map(fhash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Iterates over each value in structure.
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_value_fhash_map(fhash_map_s const * const map, handle_fn const handle, void * const arguments);
+void each_value_fhash_map(fhash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
 
 #endif // FHASH_MAP_H

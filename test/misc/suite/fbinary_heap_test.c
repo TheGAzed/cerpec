@@ -289,7 +289,7 @@ TEST MAP_01(void) {
     }
 
     int value = 1;
-    map_fbinary_heap(&test, increment, &value);
+    each_fbinary_heap(&test, increment, &value);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         int a = -1;
@@ -310,7 +310,7 @@ TEST MAP_02(void) {
     }
 
     int value = 1;
-    map_fbinary_heap(&test, increment, &value);
+    each_fbinary_heap(&test, increment, &value);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         int a = -1;

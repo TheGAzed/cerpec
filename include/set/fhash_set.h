@@ -6,9 +6,10 @@
 /// @brief Finite hash set structure.
 typedef struct finite_hash_set {
     hash_fn hash;
+    compare_fn compare;
     char * elements;
-    size_t * next, * head;
-    size_t size, empty, length, max;
+    size_t * next, * prev, * head, * hashes;
+    size_t size, length, max;
     memory_s const * allocator;
 } fhash_set_s;
 
@@ -16,16 +17,18 @@ typedef struct finite_hash_set {
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param hash Function pointer to hash element into value.
+/// @param compare Function pointer to compare elements.
 /// @return Set structure.
-fhash_set_s create_fhash_set(size_t const size, size_t const max, hash_fn const hash);
+fhash_set_s create_fhash_set(size_t const size, size_t const max, hash_fn const hash, compare_fn const compare);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param hash Function pointer to hash element into value.
+/// @param compare Function pointer to compare elements.
 /// @param allocator Custom allocator structure.
 /// @return Set structure.
-fhash_set_s make_fhash_set(size_t const size, size_t const max, hash_fn const hash, memory_s const * const allocator);
+fhash_set_s make_fhash_set(size_t const size, size_t const max, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param set Structure to destroy.
@@ -120,6 +123,6 @@ bool is_disjoint_fhash_set(fhash_set_s const * const set_one, fhash_set_s const 
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_fhash_set(fhash_set_s const * const set, handle_fn const handle, void * const arguments);
+void each_fhash_set(fhash_set_s const * const set, handle_fn const handle, void * const arguments);
 
 #endif // FHASH_SET_H

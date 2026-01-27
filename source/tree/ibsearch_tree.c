@@ -754,7 +754,7 @@ void update_ibsearch_tree(ibsearch_tree_s const * const restrict tree, void cons
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void in_order_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");
@@ -795,7 +795,7 @@ void inorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_f
     }
 }
 
-void preorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void pre_order_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");
@@ -832,7 +832,7 @@ void preorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void postorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void post_order_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");
@@ -874,7 +874,7 @@ void postorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void levelorder_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void level_order_ibsearch_tree(ibsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can't be equal.");

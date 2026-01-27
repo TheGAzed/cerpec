@@ -56,7 +56,8 @@ TEST COPY_01(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     ihash_map_s replica = copy_ihash_map(&table, copy, copy);
@@ -79,7 +80,8 @@ TEST COPY_02(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     ihash_map_s replica = copy_ihash_map(&table, copy, copy);
@@ -102,7 +104,8 @@ TEST COPY_03(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     ihash_map_s replica = copy_ihash_map(&table, copy, copy);
@@ -125,7 +128,8 @@ TEST INSERT_01(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     destroy_ihash_map(&table, destroy, destroy);
@@ -137,7 +141,8 @@ TEST INSERT_02(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     destroy_ihash_map(&table, destroy, destroy);
@@ -149,7 +154,8 @@ TEST INSERT_03(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     destroy_ihash_map(&table, destroy, destroy);
@@ -161,7 +167,8 @@ TEST REMOVE_01(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
@@ -181,7 +188,8 @@ TEST REMOVE_02(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
@@ -201,7 +209,8 @@ TEST REMOVE_03(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
@@ -221,7 +230,8 @@ TEST CONTAINS_01(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
@@ -237,7 +247,8 @@ TEST CONTAINS_02(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
@@ -253,7 +264,8 @@ TEST CONTAINS_03(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
@@ -269,7 +281,8 @@ TEST GET_VALUE_01(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
@@ -287,7 +300,8 @@ TEST GET_VALUE_02(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
@@ -305,7 +319,8 @@ TEST GET_VALUE_03(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
@@ -323,7 +338,8 @@ TEST SET_VALUE_01(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     int a = -1;
@@ -344,7 +360,8 @@ TEST SET_VALUE_02(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);;
     }
 
     int a = -1;
@@ -365,7 +382,8 @@ TEST SET_VALUE_03(void) {
     ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
-        insert_ihash_map(&table, &i, &i);
+        int j = i;
+        insert_ihash_map(&table, &i, &j);
     }
 
     int a = -1;

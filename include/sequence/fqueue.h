@@ -68,7 +68,7 @@ void peek_fqueue(fqueue_s const * const restrict queue, void * const restrict bu
 /// @param queue Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments);
+void each_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param queue Structure to map.

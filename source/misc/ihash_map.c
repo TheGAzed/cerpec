@@ -66,12 +66,7 @@ void destroy_ihash_map(ihash_map_s * const map, set_fn const destroy_key, set_fn
     map->allocator->free(map->values, map->allocator->arguments);
 
     // map everything to zero/false
-    map->capacity = map->key_size = map->length = map->value_size = 0;
-    map->hash_key = NULL;
-    map->compare_key = NULL;
-    map->keys = map->values = NULL;
-    map->head = map->next = map->prev = map->hashes = NULL;
-    map->allocator = NULL;
+    memset(map, 0, sizeof(ihash_map_s));
 }
 
 void clear_ihash_map(ihash_map_s * map, const set_fn destroy_key, const set_fn destroy_value) {
@@ -170,6 +165,9 @@ void insert_ihash_map(ihash_map_s * const restrict map, void const * const restr
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(value && "Parameter can't be NULL.");
+    error(map != key && "Parameters can't be equal.");
+    error(map != value && "Parameters can't be equal.");
+    error(value != key && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -223,6 +221,13 @@ void remove_ihash_map(ihash_map_s * const restrict map, void const * const restr
     error(key_buffer != value_buffer && "Parameters can't be the same.");
     error(map->length && "Structure is empty.");
 
+    error(map != key && "Parameters can't be equal.");
+    error(map != key_buffer && "Parameters can't be equal.");
+    error(map != value_buffer && "Parameters can't be equal.");
+    error(key != key_buffer && "Parameters can't be equal.");
+    error(key != value_buffer && "Parameters can't be equal.");
+    error(key_buffer != value_buffer && "Parameters can't be equal.");
+
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
     valid(map->value_size && "Value size can't be zero.");
@@ -261,6 +266,7 @@ void remove_ihash_map(ihash_map_s * const restrict map, void const * const restr
 bool contains_key_ihash_map(ihash_map_s const * const restrict map, void const * const restrict key) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
+    error(map != key && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -292,6 +298,9 @@ void get_value_ihash_map(ihash_map_s const * const restrict map, void const * co
     error(value_buffer && "Parameter can't be NULL.");
     error(key != value_buffer && "Parameters can't be the same.");
     error(map->length && "Structure is empty.");
+    error(map != key && "Parameters can't be equal.");
+    error(map != value_buffer && "Parameters can't be equal.");
+    error(value_buffer != key && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -325,6 +334,13 @@ void set_value_ihash_map(ihash_map_s const * const restrict map, void const * co
     error(key != value && "Parameters can't be the same.");
     error(map->length && "Structure is empty.");
 
+    error(map != key && "Parameters can't be equal.");
+    error(map != value && "Parameters can't be equal.");
+    error(map != value_buffer && "Parameters can't be equal.");
+    error(key != value && "Parameters can't be equal.");
+    error(key != value_buffer && "Parameters can't be equal.");
+    error(value != value_buffer && "Parameters can't be equal.");
+
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
     valid(map->value_size && "Value size can't be zero.");
@@ -351,9 +367,10 @@ void set_value_ihash_map(ihash_map_s const * const restrict map, void const * co
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void map_key_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
+void each_key_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
     error(map && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
+    error(map != arguments && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -369,9 +386,10 @@ void map_key_ihash_map(ihash_map_s const * const restrict map, handle_fn const h
     }
 }
 
-void map_value_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
+void each_value_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
     error(map && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
+    error(map != arguments && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");

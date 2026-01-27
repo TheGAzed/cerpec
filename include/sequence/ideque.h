@@ -89,13 +89,13 @@ void peek_back_ideque(ideque_s const * const restrict deque, void * const restri
 /// @param deque Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_front_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
+void each_front_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Iterates over each element in structure starting from the back.
 /// @param deque Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_back_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
+void each_back_ideque(ideque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param deque Structure to map.

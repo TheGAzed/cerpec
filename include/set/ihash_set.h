@@ -119,6 +119,6 @@ bool is_disjoint_ihash_set(ihash_set_s const * const set_one, ihash_set_s const 
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
-void map_ihash_set(ihash_set_s const * const set, handle_fn const handle, void * const arguments);
+void each_ihash_set(ihash_set_s const * const set, handle_fn const handle, void * const arguments);
 
 #endif // IHASH_SET_H

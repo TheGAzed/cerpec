@@ -123,13 +123,13 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const
 /// @param list Structure to iterate over.
 /// @param operate Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic void pointer arguments for function pointer.
-void map_next_fdouble_list(fdouble_list_s const * const list, handle_fn const operate, void * const arguments);
+void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const operate, void * const arguments);
 
 /// @brief Iterates over each previous element in structure based on their order.
 /// @param list Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic void pointer arguments for function pointer.
-void map_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const arguments);
+void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const arguments);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param list Structure to manage.

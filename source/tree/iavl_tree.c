@@ -787,7 +787,7 @@ void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * cons
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void inorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void in_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
@@ -828,7 +828,7 @@ void inorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const 
     }
 }
 
-void preorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void pre_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
@@ -865,7 +865,7 @@ void preorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void postorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void post_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
@@ -907,7 +907,7 @@ void postorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn cons
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void levelorder_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void level_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
