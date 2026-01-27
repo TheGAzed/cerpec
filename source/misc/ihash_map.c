@@ -11,9 +11,9 @@
 void _ihash_table_resize(ihash_map_s * const table, size_t const size);
 
 /// @brief Fills hole/empty node index with last array-based node and fixes/redirects siblings.
-/// @param table Strcuture to fill.
+/// @param map Strcuture to fill.
 /// @param hole Index of hole node.
-void _ihash_table_fill_hole(ihash_map_s const * const table, size_t const hole);
+void _ihash_map_fill_hole(ihash_map_s const * const map, size_t const hole);
 
 ihash_map_s create_ihash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, compare_fn const compare_key) {
     error(hash_key && "Parameter can't be NULL.");
@@ -244,7 +244,7 @@ void remove_ihash_map(ihash_map_s * const restrict map, void const * const restr
         memcpy(value_buffer, map->values + (n * map->value_size), map->value_size);
         map->length--;
 
-        _ihash_table_fill_hole(map, n);
+        _ihash_map_fill_hole(map, n);
 
         // resize (expand) if map can contain a smaller capacity of elements
         if (map->capacity - IHASH_MAP_CHUNK == map->length) {
@@ -364,7 +364,7 @@ void map_key_ihash_map(ihash_map_s const * const restrict map, handle_fn const h
     // iterate over each valid key in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
         if (!handle(map->keys + (i * map->key_size), arguments)) {
-            return; // return since we need to break-off of two loops
+            break; // return since we need to break-off of two loops
         }
     }
 }
@@ -382,7 +382,7 @@ void map_value_ihash_map(ihash_map_s const * const restrict map, handle_fn const
     // iterate over each valid value in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
         if (!handle(map->values + (i * map->value_size), arguments)) {
-            return; // return since we need to break-off of two loops
+            break; // return since we need to break-off of two loops
         }
     }
 }
@@ -429,32 +429,32 @@ void _ihash_table_resize(ihash_map_s * const table, size_t const size) {
     }
 }
 
-void _ihash_table_fill_hole(ihash_map_s const * const table, size_t const hole) {
-    if (NIL == table->prev[table->length]) {
-        size_t const index = table->hashes[table->length] % table->capacity;
-        table->head[index] = hole;
+void _ihash_map_fill_hole(ihash_map_s const * const map, size_t const hole) {
+    if (NIL == map->prev[map->length]) {
+        size_t const index = map->hashes[map->length] % map->capacity;
+        map->head[index] = hole;
     }
 
-    if (NIL == table->prev[hole]) {
-        size_t const index = table->hashes[hole] % table->capacity;
-        table->head[index] = table->next[hole];
+    if (NIL == map->prev[hole]) {
+        size_t const index = map->hashes[hole] % map->capacity;
+        map->head[index] = map->next[hole];
     }
 
     // cut current removed node's siblings from itself
-    if (NIL != table->prev[hole]) { table->next[table->prev[hole]] = table->next[hole]; }
-    if (NIL != table->next[hole]) { table->prev[table->next[hole]] = table->prev[hole]; }
+    if (NIL != map->prev[hole]) { map->next[map->prev[hole]] = map->next[hole]; }
+    if (NIL != map->next[hole]) { map->prev[map->next[hole]] = map->prev[hole]; }
 
     // cut current removed node from its siblings
-    table->next[hole] = table->prev[hole] = hole;
+    map->next[hole] = map->prev[hole] = hole;
 
     // replace element at current index with popped last element like in a stack
-    memmove(table->keys + (hole * table->key_size), table->keys + (table->length * table->key_size), table->key_size);
-    memmove(table->values + (hole * table->value_size), table->values + (table->length * table->value_size), table->value_size);
-    table->hashes[hole] = table->hashes[table->length];
-    table->next[hole] = table->next[table->length];
-    table->prev[hole] = table->prev[table->length];
+    memmove(map->keys + (hole * map->key_size), map->keys + (map->length * map->key_size), map->key_size);
+    memmove(map->values + (hole * map->value_size), map->values + (map->length * map->value_size), map->value_size);
+    map->hashes[hole] = map->hashes[map->length];
+    map->next[hole] = map->next[map->length];
+    map->prev[hole] = map->prev[map->length];
 
     // redirect array's last swapped node's siblings to hole
-    if (NIL != table->next[table->length]) { table->prev[table->next[table->length]] = hole; }
-    if (NIL != table->prev[table->length]) { table->next[table->prev[table->length]] = hole; }
+    if (NIL != map->next[map->length]) { map->prev[map->next[map->length]] = hole; }
+    if (NIL != map->prev[map->length]) { map->next[map->prev[map->length]] = hole; }
 }
