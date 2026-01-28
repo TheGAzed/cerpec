@@ -10,6 +10,21 @@
 /// @param hole Index of hole in arrays.
 void _fhash_set_fill_hole(fhash_set_s const * const set, size_t const hole);
 
+/// @brief Make logic wrapper mainly to repeated assertion for specific structure operations.
+/// @param size Size of single element.
+/// @param max Maximum length of structure.
+/// @param hash Hash function to generate hash values from elements.
+/// @param compare Compare function to compare elements.
+/// @param allocator Custom allocator function.
+/// @return Set structure.
+fhash_set_s _make_wrapper_fhash_set(size_t const size, size_t const max, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
+
+/// @brief Copy logic wrapper mainly to repeated assertion for specific structure operations.
+/// @param set Structure to copy.
+/// @param copy Function pointer to create shallow/deep copy of single element
+/// @return Set structure.
+fhash_set_s _copy_wrapper_fhash_set(fhash_set_s const * const set, copy_fn const copy);
+
 /// @brief Insert logic wrapper mainly to remove repeated code snippeds.
 /// @param set Structure to call insert logic on.
 /// @param hash Hash of element to be inserted.
@@ -60,27 +75,7 @@ fhash_set_s make_fhash_set(size_t const size, size_t const max, hash_fn const ha
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
 
-    fhash_set_s const set = {
-        .size = size, .hash = hash, .allocator = allocator, .max = max, .compare = compare,
-
-        .elements = allocator->alloc(max * size, allocator->arguments),
-        .hashes = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-
-        .head = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-        .next = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-        .prev = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-    };
-    error(set.elements && "Memory allocation failed.");
-    error(set.hashes && "Memory allocation failed.");
-    error(set.head && "Memory allocation failed.");
-    error(set.next && "Memory allocation failed.");
-    error(set.prev && "Memory allocation failed.");
-
-    for (size_t i = 0; i < max; ++i) {
-        set.head[i] = NIL;
-    }
-
-    return set;
+    return _make_wrapper_fhash_set(size, max, hash, compare, allocator);
 }
 
 void destroy_fhash_set(fhash_set_s * const set, set_fn const destroy) {
@@ -149,41 +144,7 @@ fhash_set_s copy_fhash_set(fhash_set_s const * const set, copy_fn const copy) {
     valid(set->next && "Nexts array can't be NULL.");
     valid(set->allocator && "Allocator can't be NULL.");
 
-    // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
-    fhash_set_s const replica = {
-        .max = set->max, .hash = set->hash, .length = set->length, .size = set->size,
-        .allocator = set->allocator, .compare = set->compare,
-
-        .elements = set->allocator->alloc(set->max * set->size, set->allocator->arguments),
-        .hashes = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
-
-        .head = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
-        .next = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
-        .prev = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
-    };
-    error(replica.elements && "Memory allocation failed.");
-    error(replica.hashes && "Memory allocation failed.");
-
-    error(replica.head && "Memory allocation failed.");
-    error(replica.next && "Memory allocation failed.");
-    error(replica.prev && "Memory allocation failed.");
-
-    for (size_t i = 0; i < set->max; ++i) {
-        replica.head[i] = set->head[i]; // initially set replica heads to invalid
-    }
-
-    memcpy(replica.head, set->head, set->max * sizeof(size_t)); // special case - heads index based on maximum length
-
-    memcpy(replica.next, set->next, set->length * sizeof(size_t));
-    memcpy(replica.prev, set->prev, set->length * sizeof(size_t));
-    memcpy(replica.hashes, set->hashes, set->length * sizeof(size_t));
-
-    // for each element continuusly in array call copy function
-    for (size_t i = 0; i < set->length; ++i) {
-        copy(replica.elements + (i * replica.size), set->elements + (i * set->size));
-    }
-
-    return replica;
+    return _copy_wrapper_fhash_set(set, copy);
 }
 
 bool is_empty_fhash_set(fhash_set_s const * const set) {
@@ -324,7 +285,7 @@ fhash_set_s union_fhash_set(fhash_set_s const * const set_one, fhash_set_s const
     fhash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
-    fhash_set_s set_union = copy_fhash_set(maximum, copy);
+    fhash_set_s set_union = _copy_wrapper_fhash_set(maximum, copy);
     for (size_t m = 0; m < minimum->length; ++m) {
         char const * const element = minimum->elements + (m * minimum->size);
 
@@ -373,15 +334,14 @@ fhash_set_s intersect_fhash_set(fhash_set_s const * const set_one, fhash_set_s c
     fhash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
     fhash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
-    fhash_set_s const * const smallest = set_one->max < set_two->max ? set_one : set_two;
+    size_t const smallest_max = set_one->max < set_two->max ? set_one->max : set_two->max;
 
-    fhash_set_s set_intersect = make_fhash_set(smallest->size, smallest->max, smallest->hash, smallest->compare, smallest->allocator);
+    fhash_set_s set_intersect = _make_wrapper_fhash_set(set_one->size, smallest_max, set_one->hash, set_one->compare, set_one->allocator);
     for (size_t min = 0; min < minimum->length; ++min) {
         char const * const element = minimum->elements + (min * minimum->size);
 
         size_t const min_hash = minimum->hashes[min];
         size_t const max_idx = min_hash % maximum->max;
-
 
         // if element is in set push it into intersect
         bool const contains = _contains_wrapper_fhash_set(maximum, element, min_hash, max_idx);
@@ -420,8 +380,8 @@ fhash_set_s subtract_fhash_set(fhash_set_s const * const minuend, fhash_set_s co
     valid(subtrahend->next && "Nexts array can't be NULL.");
     valid(subtrahend->allocator && "Allocator can't be NULL.");
 
-    fhash_set_s set_subtract = make_fhash_set(minuend->size, minuend->max, minuend->hash, minuend->compare, minuend->allocator);
-    for (int min = 0; min < minuend->length; ++min) {
+    fhash_set_s set_subtract = _make_wrapper_fhash_set(minuend->size, minuend->max, minuend->hash, minuend->compare, minuend->allocator);
+    for (size_t min = 0; min < minuend->length; ++min) {
         // get element and set its found flag to false
         char const * const element = minuend->elements + (min * minuend->size);
 
@@ -467,7 +427,7 @@ fhash_set_s exclude_fhash_set(fhash_set_s const * const set_one, fhash_set_s con
 
     fhash_set_s const * const biggest = set_one->max >= set_two->max ? set_one : set_two;
 
-    fhash_set_s set_exclude = make_fhash_set(biggest->size, biggest->max, biggest->hash, biggest->compare, biggest->allocator);
+    fhash_set_s set_exclude = _make_wrapper_fhash_set(biggest->size, biggest->max, biggest->hash, biggest->compare, biggest->allocator);
 
     for (size_t one = 0; one < set_one->length; ++one) {
         // get element and set its found flag to false
@@ -665,6 +625,64 @@ void _fhash_set_fill_hole(fhash_set_s const * const set, size_t const hole) {
     // redirect array's last swapped node's siblings to hole
     if (NIL != set->next[set->length]) { set->prev[set->next[set->length]] = hole; }
     if (NIL != set->prev[set->length]) { set->next[set->prev[set->length]] = hole; }
+}
+
+fhash_set_s _make_wrapper_fhash_set(size_t const size, size_t const max, hash_fn const hash, compare_fn const compare, memory_s const * const allocator) {
+    fhash_set_s const set = {
+        .size = size, .hash = hash, .allocator = allocator, .max = max, .compare = compare,
+
+        .elements = allocator->alloc(max * size, allocator->arguments),
+        .hashes = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+
+        .head = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .next = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .prev = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+    };
+    error(set.elements && "Memory allocation failed.");
+    error(set.hashes && "Memory allocation failed.");
+    error(set.head && "Memory allocation failed.");
+    error(set.next && "Memory allocation failed.");
+    error(set.prev && "Memory allocation failed.");
+
+    for (size_t i = 0; i < max; ++i) {
+        set.head[i] = NIL;
+    }
+
+    return set;
+}
+
+fhash_set_s _copy_wrapper_fhash_set(fhash_set_s const * const set, copy_fn const copy) {
+    // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
+    fhash_set_s const replica = {
+        .max = set->max, .hash = set->hash, .length = set->length, .size = set->size,
+        .allocator = set->allocator, .compare = set->compare,
+
+        .elements = set->allocator->alloc(set->max * set->size, set->allocator->arguments),
+        .hashes = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
+
+        .head = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
+        .next = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
+        .prev = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
+    };
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.hashes && "Memory allocation failed.");
+
+    error(replica.head && "Memory allocation failed.");
+    error(replica.next && "Memory allocation failed.");
+    error(replica.prev && "Memory allocation failed.");
+
+    memcpy(replica.head, set->head, set->max * sizeof(size_t)); // special case - heads index based on maximum length
+
+    memcpy(replica.next, set->next, set->length * sizeof(size_t));
+    memcpy(replica.prev, set->prev, set->length * sizeof(size_t));
+    memcpy(replica.hashes, set->hashes, set->length * sizeof(size_t));
+
+    // for each element continuusly in array call copy function
+    for (size_t i = 0; i < set->length; ++i) {
+        copy(replica.elements + (i * replica.size), set->elements + (i * set->size));
+    }
+
+    return replica;
 }
 
 void _insert_wrapper_fhash_set(fhash_set_s const * const set, size_t const hash, size_t const index) {

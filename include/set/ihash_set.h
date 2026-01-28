@@ -12,24 +12,27 @@
 /// @brief Infinite hash set structure.
 typedef struct infinite_hash_set {
     hash_fn hash;
+    compare_fn compare;
     char * elements;
-    size_t * next, * head;
-    size_t size, empty, length, capacity;
+    size_t * next, * prev, * head, * hashes;
+    size_t size, length, capacity;
     memory_s const * allocator;
 } ihash_set_s;
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
+/// @param compare Function pointer to compare elements.
 /// @param hash Function pointer to hash element into value.
 /// @return Set structure.
-ihash_set_s create_ihash_set(size_t const size, hash_fn const hash);
+ihash_set_s create_ihash_set(size_t const size, hash_fn const hash, compare_fn const compare);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param hash Function pointer to hash element into value.
+/// @param compare Function pointer to compare elements.
 /// @param allocator Custom allocator structure.
 /// @return Set structure.
-ihash_set_s make_ihash_set(size_t const size, hash_fn const hash, memory_s const * const allocator);
+ihash_set_s make_ihash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param set Structure to destroy.
