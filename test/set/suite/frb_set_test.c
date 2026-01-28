@@ -1,7 +1,7 @@
 #include <set/frb_set.h>
 #include <suite.h>
 
-#define FRB_SET_CHUNK 256
+#define FRB_SET_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, compare);

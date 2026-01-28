@@ -3,7 +3,7 @@
 
 #define NIL ((size_t)(-1))
 
-#define FSTRAIGHT_LIST_CHUNK 256
+#define FSTRAIGHT_LIST_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fstraight_list_s test = create_fstraight_list(sizeof(int), FSTRAIGHT_LIST_CHUNK);

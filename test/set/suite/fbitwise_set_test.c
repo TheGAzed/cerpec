@@ -1,7 +1,7 @@
 #include <set/fbitwise_set.h>
 #include <suite.h>
 
-#define FBITWISE_SET_CHUNK 256
+#define FBITWISE_SET_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fbitwise_set_s set = create_fbitwise_set(FBITWISE_SET_CHUNK);

@@ -1,7 +1,7 @@
 #include <sequence/fstack.h>
 #include <suite.h>
 
-#define FSTACK_CHUNK 256
+#define FSTACK_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fstack_s test = create_fstack(sizeof(int), FSTACK_CHUNK);

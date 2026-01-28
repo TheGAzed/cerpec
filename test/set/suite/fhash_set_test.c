@@ -1,7 +1,7 @@
 #include <set/fhash_set.h>
 #include <suite.h>
 
-#define FHASH_SET_CHUNK 256
+#define FHASH_SET_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);

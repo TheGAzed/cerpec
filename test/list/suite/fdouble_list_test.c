@@ -3,7 +3,7 @@
 
 #define NIL ((size_t)(-1))
 
-#define FDOUBLE_LIST_CHUNK 256
+#define FDOUBLE_LIST_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);

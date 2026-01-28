@@ -2,7 +2,7 @@
 
 #include <suite.h>
 
-#define FBINARY_HEAP_CHUNK 256
+#define FBINARY_HEAP_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);

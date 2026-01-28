@@ -2,7 +2,7 @@
 
 #include <suite.h>
 
-#define FHASH_TABLE_CHUNK 256
+#define FHASH_TABLE_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fhash_map_s table = create_fhash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, hash, compare);

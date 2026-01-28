@@ -1,7 +1,7 @@
 #include <list/fcircular_list.h>
 #include <suite.h>
 
-#define FCIRCULAR_LIST_CHUNK 256
+#define FCIRCULAR_LIST_CHUNK CERPEC_CHUNK
 
 #define NIL ((size_t)(-1))
 

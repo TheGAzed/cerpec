@@ -7,7 +7,7 @@
 
 // define chunk size to linearly expand and contract all data structures
 #if !defined(CERPEC_CHUNK)
-#   define CERPEC_CHUNK 256
+#   define CERPEC_CHUNK 512
 #elif
 #   error "Chunk size must be greater than zero."
 #endif

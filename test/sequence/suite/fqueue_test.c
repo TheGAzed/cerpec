@@ -1,7 +1,7 @@
 #include <sequence/fqueue.h>
 #include <suite.h>
 
-#define FQUEUE_CHUNK 256
+#define FQUEUE_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fqueue_s test = create_fqueue(sizeof(int), FQUEUE_CHUNK);

@@ -1,7 +1,7 @@
 #include <sequence/fdeque.h>
 #include <suite.h>
 
-#define FDEQUE_CHUNK 256
+#define FDEQUE_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
     fdeque_s test = create_fdeque(sizeof(int), FDEQUE_CHUNK);
