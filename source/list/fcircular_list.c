@@ -44,6 +44,8 @@ void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy)
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -65,6 +67,8 @@ void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -84,6 +88,8 @@ fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_f
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // create a replica/copy structure
     fcircular_list_s replica = {
@@ -113,6 +119,8 @@ bool is_empty_fcircular_list(fcircular_list_s const * const list) {
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     return !(list->length);
 }
@@ -124,6 +132,8 @@ bool is_full_fcircular_list(fcircular_list_s const * const list) {
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     return (list->max == list->length);
 }
@@ -138,6 +148,8 @@ void insert_at_fcircular_list(fcircular_list_s * const restrict list, void const
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // get the empty node index either from underlying stack or next empty index in array (i.e. length)
     size_t hole = list->length;
@@ -176,6 +188,8 @@ void get_fcircular_list(fcircular_list_s const * const restrict list, size_t con
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     size_t current = list->tail;
     // iterate until current points to node at index, starting from tail
@@ -200,6 +214,8 @@ void remove_first_fcircular_list(fcircular_list_s * const restrict list, void co
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate over each element until searched element is found
     for (size_t i = 0, previous = list->tail; i < list->length; ++i, previous = list->next[previous]) {
@@ -252,6 +268,8 @@ void remove_at_fcircular_list(fcircular_list_s * const restrict list, size_t con
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     size_t previous = list->tail;
     // iterate until node previous to index node is reached
@@ -335,11 +353,15 @@ void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircu
     valid(destination->max && "Maximum can't be zero.");
     valid(destination->length <= destination->max && "Length exceeds maximum.");
     valid(destination->allocator && "Allocator can't be NULL.");
+    valid(destination->elements && "Elements array can't be NULL.");
+    valid(destination->next && "Next array can't be NULL.");
 
     valid(source->size && "Size can't be zero.");
     valid(source->max && "Maximum can't be zero.");
     valid(source->length <= source->max && "Length exceeds maximum.");
     valid(source->allocator && "Allocator can't be NULL.");
+    valid(source->elements && "Elements array can't be NULL.");
+    valid(source->next && "Next array can't be NULL.");
 
     size_t const dest_length = destination->length;
 
@@ -484,6 +506,8 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, 
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // create temporary lists to save filtered elements
     fcircular_list_s negative = {
@@ -547,6 +571,8 @@ void each_fcircular_list(fcircular_list_s const * const restrict list, handle_fn
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -566,6 +592,8 @@ void apply_fcircular_list(fcircular_list_s const * const restrict list, process_
     valid(list->max && "Maximum can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
     valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
     error((!list->length || elements_array) && "Memory allocation failed.");

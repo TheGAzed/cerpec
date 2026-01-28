@@ -1,6 +1,5 @@
 #include <list/fdouble_list.h>
 
-#include <assert.h>
 #include <stdlib.h> // import exit()
 #include <string.h>
 
@@ -10,8 +9,8 @@
 void _fdouble_list_fill_hole(fdouble_list_s * const list, size_t const hole);
 
 fdouble_list_s create_fdouble_list(size_t const size, size_t const max) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(max && "[ERROR] Paremeter can't be zero.");
+    error(size && "Paremeter can't be zero.");
+    error(max && "Paremeter can't be zero.");
 
     fdouble_list_s const list = {
         .max = max, .size = size, .allocator = &standard,
@@ -19,17 +18,17 @@ fdouble_list_s create_fdouble_list(size_t const size, size_t const max) {
         .node[FDL_PREV] = standard.alloc(max * sizeof(size_t), standard.arguments),
         .node[FDL_NEXT] = standard.alloc(max * sizeof(size_t), standard.arguments),
     };
-    assert(list.elements && "[ERROR] Memory allocation failed.");
-    assert(list.node[FDL_PREV] && "[ERROR] Memory allocation failed.");
-    assert(list.node[FDL_NEXT] && "[ERROR] Memory allocation failed.");
+    error(list.elements && "Memory allocation failed.");
+    error(list.node[FDL_PREV] && "Memory allocation failed.");
+    error(list.node[FDL_NEXT] && "Memory allocation failed.");
 
     return list;
 }
 
 fdouble_list_s make_fdouble_list(size_t const size, size_t const max, memory_s const * const allocator) {
-    assert(size && "[ERROR] Paremeter can't be zero.");
-    assert(max && "[ERROR] Paremeter can't be zero.");
-    assert(allocator && "[ERROR] Paremeter can't be NULL.");
+    error(size && "Paremeter can't be zero.");
+    error(max && "Paremeter can't be zero.");
+    error(allocator && "Paremeter can't be NULL.");
 
     fdouble_list_s const list = {
         .max = max, .size = size, .allocator = allocator,
@@ -37,21 +36,24 @@ fdouble_list_s make_fdouble_list(size_t const size, size_t const max, memory_s c
         .node[FDL_PREV] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
         .node[FDL_NEXT] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
     };
-    assert(list.elements && "[ERROR] Memory allocation failed.");
-    assert(list.node[FDL_PREV] && "[ERROR] Memory allocation failed.");
-    assert(list.node[FDL_NEXT] && "[ERROR] Memory allocation failed.");
+    error(list.elements && "Memory allocation failed.");
+    error(list.node[FDL_PREV] && "Memory allocation failed.");
+    error(list.node[FDL_NEXT] && "Memory allocation failed.");
 
     return list;
 }
 
 void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
@@ -68,13 +70,16 @@ void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
 }
 
 void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(destroy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(destroy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
@@ -87,13 +92,16 @@ void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
 }
 
 fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn const copy) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(copy && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
+    error(copy && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // allocate and set replica of list
     fdouble_list_s const replica = {
@@ -103,9 +111,9 @@ fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn cons
         .node[FDL_PREV] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
-    assert(replica.elements && "[ERROR] Memory allocation failed.");
-    assert(replica.node[FDL_NEXT] && "[ERROR] Memory allocation failed.");
-    assert(replica.node[FDL_PREV] && "[ERROR] Memory allocation failed.");
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.node[FDL_NEXT] && "Memory allocation failed.");
+    error(replica.node[FDL_PREV] && "Memory allocation failed.");
 
     // copy nodes (elements and indexes) into list
     for (size_t i = 0; i < list->length; ++i) {
@@ -118,37 +126,47 @@ fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn cons
 }
 
 bool is_empty_fdouble_list(fdouble_list_s const * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     return !(list->length);
 }
 
 bool is_full_fdouble_list(fdouble_list_s const * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     return (list->length == list->max);
 }
 
-void insert_at_fdouble_list(fdouble_list_s * const list, void const * const element, size_t const index) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= list->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(element != list && "[ERROR] Paremeters can't be the same.");
+void insert_at_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, size_t const index) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(index <= list->length && "Paremeter can't be greater than length.");
+    error(element != list && "Paremeters can't be the same.");
+    error(list != element && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -177,15 +195,19 @@ void insert_at_fdouble_list(fdouble_list_s * const list, void const * const elem
     list->length++;
 }
 
-void get_fdouble_list(fdouble_list_s const * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+void get_fdouble_list(fdouble_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -199,20 +221,26 @@ void get_fdouble_list(fdouble_list_s const * const list, size_t const index, voi
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(compare && "[ERROR] Paremeter can't be NULL.");
-    assert(element != buffer && "[ERROR] Paremeters can't be the same.");
-    assert(list->elements && "[ERROR] Array can't be NULL.");
-    assert(list->node[FDL_NEXT] && "[ERROR] Array can't be NULL.");
-    assert(list->node[FDL_PREV] && "[ERROR] Array can't be NULL.");
+void remove_first_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(compare && "Paremeter can't be NULL.");
+    error(element != buffer && "Paremeters can't be the same.");
+    error(list->elements && "Array can't be NULL.");
+    error(list->node[FDL_NEXT] && "Array can't be NULL.");
+    error(list->node[FDL_PREV] && "Array can't be NULL.");
+    error(list != element && "Parameters can't be equal.");
+    error(list != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // for each element in list travel forward
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
@@ -236,24 +264,30 @@ void remove_first_fdouble_list(fdouble_list_s * const list, void const * const e
     }
 
     // if element wasn't found indicate error
-    assert(false && "[ERROR] Element not found in list.");
+    error(false && "Element not found in list.");
     exit(EXIT_FAILURE);
 }
 
-void remove_last_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(element && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(compare && "[ERROR] Paremeter can't be NULL.");
-    assert(element != buffer && "[ERROR] Paremeters can't be the same.");
-    assert(list->elements && "[ERROR] Array can't be NULL.");
-    assert(list->node[FDL_NEXT] && "[ERROR] Array can't be NULL.");
-    assert(list->node[FDL_PREV] && "[ERROR] Array can't be NULL.");
+void remove_last_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+    error(list && "Paremeter can't be NULL.");
+    error(element && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(compare && "Paremeter can't be NULL.");
+    error(element != buffer && "Paremeters can't be the same.");
+    error(list->elements && "Array can't be NULL.");
+    error(list->node[FDL_NEXT] && "Array can't be NULL.");
+    error(list->node[FDL_PREV] && "Array can't be NULL.");
+    error(list != element && "Parameters can't be equal.");
+    error(list != buffer && "Parameters can't be equal.");
+    error(buffer != element && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // for each element in list travel backwards
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
@@ -279,19 +313,23 @@ void remove_last_fdouble_list(fdouble_list_s * const list, void const * const el
     }
 
     // if element wasn't found indicate error
-    assert(false && "[ERROR] Element not found in list.");
+    error(false && "Element not found in list.");
     exit(EXIT_FAILURE);
 }
 
-void remove_at_fdouble_list(fdouble_list_s * const list, size_t const index, void * const buffer) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(buffer && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
+void remove_at_fdouble_list(fdouble_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+    error(list && "Paremeter can't be NULL.");
+    error(buffer && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(list != buffer && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -314,12 +352,15 @@ void remove_at_fdouble_list(fdouble_list_s * const list, size_t const index, voi
 }
 
 void reverse_fdouble_list(fdouble_list_s * const list) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
+    error(list && "Paremeter can't be NULL.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     size_t current = list->head;
     for (size_t i = 0; i < list->length; ++i) {
@@ -335,13 +376,16 @@ void reverse_fdouble_list(fdouble_list_s * const list) {
 }
 
 void shift_next_fdouble_list(fdouble_list_s * const list, size_t const shift) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't shift empty list.");
+    error(list && "Paremeter can't be NULL.");
+    error(list->length && "Can't shift empty list.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -350,13 +394,16 @@ void shift_next_fdouble_list(fdouble_list_s * const list, size_t const shift) {
 }
 
 void shift_prev_fdouble_list(fdouble_list_s * const list, size_t const shift) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(list->length && "[ERROR] Can't shift empty list.");
+    error(list && "Paremeter can't be NULL.");
+    error(list->length && "Can't shift empty list.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // shift tail node by iterating shift number of times
     for (size_t i = 0; i < shift; ++i) {
@@ -364,24 +411,29 @@ void shift_prev_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     }
 }
 
-void splice_fdouble_list(fdouble_list_s * const destination, fdouble_list_s * const source, size_t const index) {
-    assert(destination && "[ERROR] Paremeter can't be NULL.");
-    assert(source && "[ERROR] Paremeter can't be NULL.");
-    assert(index <= destination->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(destination != source && "[ERROR] Paremeters can't be the same.");
-    assert(destination->length + source->length <= destination->max && "[ERROR] Spliced length exceeds maximum.");
+void splice_fdouble_list(fdouble_list_s * const restrict destination, fdouble_list_s * const restrict source, size_t const index) {
+    error(destination && "Paremeter can't be NULL.");
+    error(source && "Paremeter can't be NULL.");
+    error(index <= destination->length && "Paremeter can't be greater than length.");
+    error(destination != source && "Paremeters can't be equal.");
+    error(destination->length + source->length <= destination->max && "Spliced length exceeds maximum.");
+    error(source->size == destination->size && "Element sizes must be equal.");
 
-    assert(destination->size && "[INVALID] Size can't be zero.");
-    assert(destination->length <= destination->max && "[INVALID] Length exceeds maximum.");
-    assert(destination->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(destination->max && "[INVALID] Parameter can't be zero.");
+    valid(destination->size && "Size can't be zero.");
+    valid(destination->length <= destination->max && "Length exceeds maximum.");
+    valid(destination->allocator && "Allocator can't be NULL.");
+    valid(destination->max && "Maximum size can't be zero.");
+    valid(destination->elements && "Elements array can't be NULL.");
+    valid(destination->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(destination->node[FDL_PREV] && "Previous array can't be NULL.");
 
-    assert(source->size && "[INVALID] Size can't be zero.");
-    assert(source->length <= source->max && "[INVALID] Length exceeds maximum.");
-    assert(source->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(source->max && "[INVALID] Parameter can't be zero.");
-
-    assert(source->size == destination->size && "[INVALID] Element sizes must be equal.");
+    valid(source->size && "Size can't be zero.");
+    valid(source->length <= source->max && "Length exceeds maximum.");
+    valid(source->allocator && "Allocator can't be NULL.");
+    valid(source->max && "Maximum size can't be zero.");
+    valid(source->elements && "Elements array can't be NULL.");
+    valid(source->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(source->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = destination->head;
@@ -425,14 +477,17 @@ void splice_fdouble_list(fdouble_list_s * const destination, fdouble_list_s * co
 }
 
 fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const index, size_t const length) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(index < list->length && "[ERROR] Paremeter can't be greater than length.");
-    assert(length <= list->length && "[ERROR] Paremeter can't be greater than length.");
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(length <= list->length && "Paremeter can't be greater than length.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // determine closest direction to index and go there
     size_t current = list->head;
@@ -450,9 +505,9 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
         .node[FDL_NEXT] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
         .node[FDL_PREV] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
     };
-    assert(split.elements && "[ERROR] Memory allocation failed.");
-    assert(split.node[FDL_NEXT] && "[ERROR] Memory allocation failed.");
-    assert(split.node[FDL_PREV] && "[ERROR] Memory allocation failed.");
+    error(split.elements && "Memory allocation failed.");
+    error(split.node[FDL_NEXT] && "Memory allocation failed.");
+    error(split.node[FDL_PREV] && "Memory allocation failed.");
 
     // push list elements into split list (includes pointer magic)
     size_t * split_current = &(split.head);
@@ -485,14 +540,18 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
     return split;
 }
 
-fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const filter, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(filter && "[ERROR] Paremeter can't be NULL.");
+fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(filter && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // only create positive to save true filtered values
     fdouble_list_s positive = {
@@ -501,9 +560,9 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const
         .node[FDL_PREV] = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
         .node[FDL_NEXT] = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
     };
-    assert(positive.elements && "[ERROR] Memory allocation failed.");
-    assert(positive.node[FDL_NEXT] && "[ERROR] Memory allocation failed.");
-    assert(positive.node[FDL_PREV] && "[ERROR] Memory allocation failed.");
+    error(positive.elements && "Memory allocation failed.");
+    error(positive.node[FDL_NEXT] && "Memory allocation failed.");
+    error(positive.node[FDL_PREV] && "Memory allocation failed.");
 
     size_t * pos = &(positive.head);
     size_t const length = list->length; // list length may change
@@ -539,14 +598,18 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const
     return positive;
 }
 
-void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const operate, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(operate && "[ERROR] Paremeter can't be NULL.");
+void each_next_fdouble_list(fdouble_list_s const * const restrict list, handle_fn const operate, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(operate && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // for each forward element in list call operate function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
@@ -556,14 +619,18 @@ void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const o
     }
 }
 
-void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(handle && "[ERROR] Paremeter can't be NULL.");
+void each_prev_fdouble_list(fdouble_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(handle && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
@@ -574,17 +641,21 @@ void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const h
     }
 }
 
-void apply_fdouble_list(fdouble_list_s const * const list, process_fn const process, void * const arguments) {
-    assert(list && "[ERROR] Paremeter can't be NULL.");
-    assert(process && "[ERROR] Paremeter can't be NULL.");
+void apply_fdouble_list(fdouble_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+    error(list && "Paremeter can't be NULL.");
+    error(process && "Paremeter can't be NULL.");
+    error(list != arguments && "Parameters can't be equal.");
 
-    assert(list->size && "[INVALID] Size can't be zero.");
-    assert(list->length <= list->max && "[INVALID] Length exceeds maximum.");
-    assert(list->allocator && "[INVALID] Paremeter can't be NULL.");
-    assert(list->max && "[INVALID] Parameter can't be zero.");
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
-    assert((!list->length || elements_array) && "[ERROR] Memory allocation failed.");
+    error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
@@ -601,7 +672,6 @@ void apply_fdouble_list(fdouble_list_s const * const list, process_fn const proc
 
     list->allocator->free(elements_array, list->allocator->arguments);
 }
-
 
 void _fdouble_list_fill_hole(fdouble_list_s * list, const size_t hole) {
     if (list->head == list->length) { list->head = hole; }

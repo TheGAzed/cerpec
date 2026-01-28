@@ -46,6 +46,8 @@ void destroy_fstraight_list(fstraight_list_s * const list, set_fn const destroy)
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate over each node and destroy its element
     for (size_t i = list->head; i != NIL; i = list->next[i]) {
@@ -65,6 +67,8 @@ void clear_fstraight_list(fstraight_list_s * const list, set_fn const destroy) {
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate over each node and destroy its element
     for (size_t i = list->head; NIL != i; i = list->next[i]) {
@@ -84,6 +88,8 @@ fstraight_list_s copy_fstraight_list(fstraight_list_s const * const list, copy_f
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // create copy/replica list
     fstraight_list_s replica = {
@@ -113,6 +119,8 @@ bool is_empty_fstraight_list(fstraight_list_s const * const list) {
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     return !(list->length);
 }
@@ -124,6 +132,8 @@ bool is_full_fstraight_list(fstraight_list_s const * const list) {
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     return (list->length == list->max);
 }
@@ -139,6 +149,8 @@ void insert_at_fstraight_list(fstraight_list_s * const restrict list, void const
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // go to node reference at index
     size_t * node = &(list->head);
@@ -173,6 +185,8 @@ void get_fstraight_list(fstraight_list_s const * const restrict list, size_t con
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate until node at index isn't reached
     size_t node = list->head;
@@ -197,6 +211,8 @@ void remove_first_fstraight_list(fstraight_list_s * const restrict list, void co
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // iterate until node with element isn't reached
     for (size_t * i = &(list->head); NIL != *i; i = list->next + (*i)) {
@@ -242,6 +258,8 @@ void remove_at_fstraight_list(fstraight_list_s * const restrict list, size_t con
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // go to node reference at index
     size_t * node = &(list->head);
@@ -297,11 +315,15 @@ void splice_fstraight_list(fstraight_list_s * const restrict destination, fstrai
     valid(destination->max && "Maximum can't be zero.");
     valid(destination->allocator && "Allocator can't be NULL.");
     valid(destination->length <= destination->max && "Length exceeds maximum.");
+    valid(destination->elements && "Elements array can't be NULL.");
+    valid(destination->next && "Next array can't be NULL.");
 
     valid(source->size && "Size can't be zero.");
     valid(source->max && "Maximum can't be zero.");
     valid(source->allocator && "Allocator can't be NULL.");
     valid(source->length <= source->max && "Length exceeds maximum.");
+    valid(source->elements && "Elements array can't be NULL.");
+    valid(source->next && "Next array can't be NULL.");
 
     // go to destination node reference at index
     size_t * dest = &(destination->head);
@@ -352,6 +374,8 @@ fstraight_list_s split_fstraight_list(fstraight_list_s * const list, size_t cons
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // go to node reference at index
     size_t * node = &(list->head);
@@ -417,6 +441,8 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, 
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // create lists that will contain positive and negative filtered elements
     fstraight_list_s negative = {
@@ -477,6 +503,8 @@ void each_fstraight_list(fstraight_list_s const * const restrict list, handle_fn
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     for (size_t i = list->head; NIL != i && handle(list->elements + (i * list->size), arguments); i = list->next[i]) {}
 }
@@ -490,6 +518,8 @@ void apply_fstraight_list(fstraight_list_s const * const restrict list, process_
     valid(list->max && "Maximum can't be zero.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
 
     // create temporary array to contain scattered elements
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
