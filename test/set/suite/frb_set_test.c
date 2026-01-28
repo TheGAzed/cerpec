@@ -6,8 +6,8 @@
 TEST CREATE_01(void) {
     frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, compare);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, set.length);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, set.size);
+    ASSERT_EQ(0, set.length);
+    ASSERT_NEQ(0, set.size);
 
     destroy_frb_set(&set, destroy);
 
@@ -19,8 +19,8 @@ TEST DESTROY_01(void) {
 
     destroy_frb_set(&set, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, set.length);
-    ASSERT_EQm("[ERROR] Expected size to be zero.", 0, set.size);
+    ASSERT_EQ(0, set.length);
+    ASSERT_EQ(0, set.size);
 
     PASS();
 }
@@ -30,8 +30,8 @@ TEST CLEAR_01(void) {
 
     clear_frb_set(&set, destroy);
 
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, set.length);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, set.size);
+    ASSERT_EQ(0, set.length);
+    ASSERT_NEQ(0, set.size);
 
     destroy_frb_set(&set, destroy);
 
@@ -72,7 +72,7 @@ TEST REMOVE_01(void) {
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         int buf = 0;
         remove_frb_set(&set, &i, &buf);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, buf);
+        ASSERT_EQ(i, buf);
     }
 
     destroy_frb_set(&set, destroy);
@@ -90,7 +90,7 @@ TEST REMOVE_02(void) {
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         int buf = 0;
         remove_frb_set(&set, &i, &buf);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, buf);
+        ASSERT_EQ(i, buf);
     }
 
     destroy_frb_set(&set, destroy);
@@ -106,7 +106,7 @@ TEST CONTAINS_01(void) {
     }
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set, &i));
+        ASSERT(contains_frb_set(&set, &i));
     }
 
     destroy_frb_set(&set, destroy);
@@ -122,7 +122,7 @@ TEST CONTAINS_02(void) {
     }
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set, &i));
+        ASSERT(contains_frb_set(&set, &i));
     }
 
     destroy_frb_set(&set, destroy);
@@ -142,7 +142,7 @@ TEST UNION_01(void) {
     frb_set_s set_union = union_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_union, &i));
+        ASSERT(contains_frb_set(&set_union, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -164,7 +164,7 @@ TEST UNION_02(void) {
     frb_set_s set_union = union_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_union, &i));
+        ASSERT(contains_frb_set(&set_union, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -189,7 +189,7 @@ TEST UNION_03(void) {
     frb_set_s set_union = union_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_union, &i));
+        ASSERT(contains_frb_set(&set_union, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -214,7 +214,7 @@ TEST UNION_04(void) {
     frb_set_s set_union = union_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_union, &i));
+        ASSERT(contains_frb_set(&set_union, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -239,7 +239,7 @@ TEST UNION_05(void) {
     frb_set_s set_union = union_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_union, &i));
+        ASSERT(contains_frb_set(&set_union, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -264,7 +264,7 @@ TEST UNION_06(void) {
     frb_set_s set_union = union_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_union, &i));
+        ASSERT(contains_frb_set(&set_union, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -286,7 +286,7 @@ TEST INTERSECT_01(void) {
     frb_set_s set_intersect = intersect_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -308,7 +308,7 @@ TEST INTERSECT_02(void) {
     frb_set_s set_intersect = intersect_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -333,7 +333,7 @@ TEST INTERSECT_03(void) {
     frb_set_s set_intersect = intersect_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -358,7 +358,7 @@ TEST INTERSECT_04(void) {
     frb_set_s set_intersect = intersect_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -383,15 +383,15 @@ TEST INTERSECT_05(void) {
     frb_set_s set_intersect = intersect_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 3; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
     for (int i = ((FRB_SET_CHUNK - 1) / 3) * 2; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
     for (int i = (FRB_SET_CHUNK - 1) / 3; i < ((FRB_SET_CHUNK - 1) / 3) * 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -416,15 +416,15 @@ TEST INTERSECT_06(void) {
     frb_set_s set_intersect = intersect_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 3; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
     for (int i = ((FRB_SET_CHUNK) / 3) * 2; i < FRB_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
     for (int i = (FRB_SET_CHUNK) / 3; i < ((FRB_SET_CHUNK) / 3) * 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_intersect, &i));
+        ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -446,7 +446,7 @@ TEST SUBTRACT_01(void) {
     frb_set_s set_subtract = subtract_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -468,7 +468,7 @@ TEST SUBTRACT_02(void) {
     frb_set_s set_subtract = subtract_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -493,11 +493,11 @@ TEST SUBTRACT_03(void) {
     frb_set_s set_subtract = subtract_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT(contains_frb_set(&set_subtract, &i));
     }
 
     for (int i = (FRB_SET_CHUNK - 1) / 2; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -522,11 +522,11 @@ TEST SUBTRACT_04(void) {
     frb_set_s set_subtract = subtract_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT(contains_frb_set(&set_subtract, &i));
     }
 
     for (int i = (FRB_SET_CHUNK) / 2; i < FRB_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -551,7 +551,7 @@ TEST SUBTRACT_05(void) {
     frb_set_s set_subtract = subtract_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT(contains_frb_set(&set_subtract, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -576,7 +576,7 @@ TEST SUBTRACT_06(void) {
     frb_set_s set_subtract = subtract_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_subtract, &i));
+        ASSERT(contains_frb_set(&set_subtract, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -598,7 +598,7 @@ TEST EXCLUDE_01(void) {
     frb_set_s set_exclude = exclude_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT_FALSE(contains_frb_set(&set_exclude, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -620,7 +620,7 @@ TEST EXCLUDE_02(void) {
     frb_set_s set_exclude = exclude_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT_FALSE(contains_frb_set(&set_exclude, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -645,7 +645,7 @@ TEST EXCLUDE_03(void) {
     frb_set_s set_exclude = exclude_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -670,7 +670,7 @@ TEST EXCLUDE_04(void) {
     frb_set_s set_exclude = exclude_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -695,11 +695,11 @@ TEST EXCLUDE_05(void) {
     frb_set_s set_exclude = exclude_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
     for (int i = ((FRB_SET_CHUNK - 1) / 3) * 2; i < FRB_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -724,11 +724,11 @@ TEST EXCLUDE_06(void) {
     frb_set_s set_exclude = exclude_frb_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
     for (int i = ((FRB_SET_CHUNK) / 3) * 2; i < FRB_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_frb_set(&set_exclude, &i));
+        ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
     destroy_frb_set(&set_one, destroy);
@@ -746,7 +746,7 @@ TEST IS_SUBSET_01(void) {
         insert_frb_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_frb_set(&set_one, &set_two));
+    ASSERT(is_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -762,7 +762,7 @@ TEST IS_SUBSET_02(void) {
         insert_frb_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_frb_set(&set_one, &set_two));
+    ASSERT(is_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -779,7 +779,7 @@ TEST IS_SUBSET_03(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_frb_set(&set_one, &set_two));
+    ASSERT(is_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -796,7 +796,7 @@ TEST IS_SUBSET_04(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_frb_set(&set_one, &set_two));
+    ASSERT(is_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -816,7 +816,7 @@ TEST IS_SUBSET_05(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to be subset.", is_subset_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -836,7 +836,7 @@ TEST IS_SUBSET_06(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to be subset.", is_subset_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -852,7 +852,7 @@ TEST IS_PROPER_SUBSET_01(void) {
         insert_frb_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be proper subset.", is_proper_subset_frb_set(&set_one, &set_two));
+    ASSERT(is_proper_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -868,7 +868,7 @@ TEST IS_PROPER_SUBSET_02(void) {
         insert_frb_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be proper subset.", is_proper_subset_frb_set(&set_one, &set_two));
+    ASSERT(is_proper_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -885,7 +885,7 @@ TEST IS_PROPER_SUBSET_03(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -902,7 +902,7 @@ TEST IS_PROPER_SUBSET_04(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -922,7 +922,7 @@ TEST IS_PROPER_SUBSET_05(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -942,7 +942,7 @@ TEST IS_PROPER_SUBSET_06(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -959,7 +959,7 @@ TEST IS_DISJOINT_01(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -976,7 +976,7 @@ TEST IS_DISJOINT_02(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -996,7 +996,7 @@ TEST IS_DISJOINT_03(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be disjoint.", is_disjoint_frb_set(&set_one, &set_two));
+    ASSERT(is_disjoint_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -1016,7 +1016,7 @@ TEST IS_DISJOINT_04(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be disjoint.", is_disjoint_frb_set(&set_one, &set_two));
+    ASSERT(is_disjoint_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -1036,7 +1036,7 @@ TEST IS_DISJOINT_05(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);
@@ -1056,7 +1056,7 @@ TEST IS_DISJOINT_06(void) {
         insert_frb_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_frb_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
     destroy_frb_set(&set_one, destroy);
     destroy_frb_set(&set_two, destroy);

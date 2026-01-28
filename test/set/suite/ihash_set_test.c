@@ -2,13 +2,12 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, set.capacity);
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, set.length);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, set.size);
-    ASSERT_NEQm("[ERROR] Expected empty to not be zero.", 0, set.empty);
-    ASSERT_NEQm("[ERROR] Expected hash to not be NULL.", NULL, set.hash);
+    ASSERT_EQ(0, set.capacity);
+    ASSERT_EQ(0, set.length);
+    ASSERT_NEQ(0, set.size);
+    ASSERT_NEQ(NULL, set.hash);
 
     destroy_ihash_set(&set, destroy);
 
@@ -16,27 +15,27 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     destroy_ihash_set(&set, destroy);
 
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, set.capacity);
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, set.length);
-    ASSERT_EQm("[ERROR] Expected size to be zero.", 0, set.size);
-    ASSERT_EQm("[ERROR] Expected hash to be NULL.", NULL, set.hash);
+    ASSERT_EQ(0, set.capacity);
+    ASSERT_EQ(0, set.length);
+    ASSERT_EQ(0, set.size);
+    ASSERT_EQ(NULL, set.hash);
 
     PASS();
 }
 
 TEST CLEAR_01(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     clear_ihash_set(&set, destroy);
 
-    ASSERT_EQm("[ERROR] Expected capacity to be zero.", 0, set.capacity);
-    ASSERT_EQm("[ERROR] Expected length to be zero.", 0, set.length);
-    ASSERT_NEQm("[ERROR] Expected size to not be zero.", 0, set.size);
-    ASSERT_NEQm("[ERROR] Expected hash to not be NULL.", NULL, set.hash);
+    ASSERT_EQ(0, set.capacity);
+    ASSERT_EQ(0, set.length);
+    ASSERT_NEQ(0, set.size);
+    ASSERT_NEQ(NULL, set.hash);
 
     destroy_ihash_set(&set, destroy);
 
@@ -44,7 +43,7 @@ TEST CLEAR_01(void) {
 }
 
 TEST INSERT_01(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set, &i);
@@ -56,7 +55,7 @@ TEST INSERT_01(void) {
 }
 
 TEST INSERT_02(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set, &i);
@@ -68,7 +67,7 @@ TEST INSERT_02(void) {
 }
 
 TEST INSERT_03(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set, &i);
@@ -80,7 +79,7 @@ TEST INSERT_03(void) {
 }
 
 TEST REMOVE_01(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set, &i);
@@ -89,7 +88,7 @@ TEST REMOVE_01(void) {
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         int buf = 0;
         remove_ihash_set(&set, &i, &buf);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, buf);
+        ASSERT_EQ(i, buf);
     }
 
     destroy_ihash_set(&set, destroy);
@@ -98,7 +97,7 @@ TEST REMOVE_01(void) {
 }
 
 TEST REMOVE_02(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set, &i);
@@ -107,7 +106,7 @@ TEST REMOVE_02(void) {
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         int buf = 0;
         remove_ihash_set(&set, &i, &buf);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, buf);
+        ASSERT_EQ(i, buf);
     }
 
     destroy_ihash_set(&set, destroy);
@@ -116,7 +115,7 @@ TEST REMOVE_02(void) {
 }
 
 TEST REMOVE_03(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set, &i);
@@ -125,7 +124,7 @@ TEST REMOVE_03(void) {
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         int buf = 0;
         remove_ihash_set(&set, &i, &buf);
-        ASSERT_EQm("[ERROR] Expected elements to be equal.", i, buf);
+        ASSERT_EQ(i, buf);
     }
 
     destroy_ihash_set(&set, destroy);
@@ -134,14 +133,14 @@ TEST REMOVE_03(void) {
 }
 
 TEST CONTAINS_01(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set, &i);
     }
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set, &i));
+        ASSERT(contains_ihash_set(&set, &i));
     }
 
     destroy_ihash_set(&set, destroy);
@@ -150,14 +149,14 @@ TEST CONTAINS_01(void) {
 }
 
 TEST CONTAINS_02(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set, &i);
     }
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set, &i));
+        ASSERT(contains_ihash_set(&set, &i));
     }
 
     destroy_ihash_set(&set, destroy);
@@ -166,14 +165,14 @@ TEST CONTAINS_02(void) {
 }
 
 TEST CONTAINS_03(void) {
-    ihash_set_s set = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set, &i);
     }
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set, &i));
+        ASSERT(contains_ihash_set(&set, &i));
     }
 
     destroy_ihash_set(&set, destroy);
@@ -182,8 +181,8 @@ TEST CONTAINS_03(void) {
 }
 
 TEST UNION_01(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -193,7 +192,7 @@ TEST UNION_01(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -204,8 +203,8 @@ TEST UNION_01(void) {
 }
 
 TEST UNION_02(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -215,7 +214,7 @@ TEST UNION_02(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -226,8 +225,8 @@ TEST UNION_02(void) {
 }
 
 TEST UNION_03(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -237,7 +236,7 @@ TEST UNION_03(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -248,8 +247,8 @@ TEST UNION_03(void) {
 }
 
 TEST UNION_04(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -262,7 +261,7 @@ TEST UNION_04(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -273,8 +272,8 @@ TEST UNION_04(void) {
 }
 
 TEST UNION_05(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -287,7 +286,7 @@ TEST UNION_05(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -298,8 +297,8 @@ TEST UNION_05(void) {
 }
 
 TEST UNION_06(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -312,7 +311,7 @@ TEST UNION_06(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -323,8 +322,8 @@ TEST UNION_06(void) {
 }
 
 TEST UNION_07(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -337,7 +336,7 @@ TEST UNION_07(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -348,8 +347,8 @@ TEST UNION_07(void) {
 }
 
 TEST UNION_08(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -362,7 +361,7 @@ TEST UNION_08(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -373,8 +372,8 @@ TEST UNION_08(void) {
 }
 
 TEST UNION_09(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK + 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -387,7 +386,7 @@ TEST UNION_09(void) {
     ihash_set_s set_union = union_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_union, &i));
+        ASSERT(contains_ihash_set(&set_union, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -398,8 +397,8 @@ TEST UNION_09(void) {
 }
 
 TEST INTERSECT_01(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -409,7 +408,7 @@ TEST INTERSECT_01(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -420,8 +419,8 @@ TEST INTERSECT_01(void) {
 }
 
 TEST INTERSECT_02(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -431,7 +430,7 @@ TEST INTERSECT_02(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -442,8 +441,8 @@ TEST INTERSECT_02(void) {
 }
 
 TEST INTERSECT_03(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -453,7 +452,7 @@ TEST INTERSECT_03(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -464,8 +463,8 @@ TEST INTERSECT_03(void) {
 }
 
 TEST INTERSECT_04(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -478,7 +477,7 @@ TEST INTERSECT_04(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -489,8 +488,8 @@ TEST INTERSECT_04(void) {
 }
 
 TEST INTERSECT_05(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -503,7 +502,7 @@ TEST INTERSECT_05(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -514,8 +513,8 @@ TEST INTERSECT_05(void) {
 }
 
 TEST INTERSECT_06(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -528,7 +527,7 @@ TEST INTERSECT_06(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -539,8 +538,8 @@ TEST INTERSECT_06(void) {
 }
 
 TEST INTERSECT_07(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -553,15 +552,15 @@ TEST INTERSECT_07(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 3; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     for (int i = ((IHASH_SET_CHUNK - 1) / 3) * 2; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     for (int i = (IHASH_SET_CHUNK - 1) / 3; i < ((IHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -572,8 +571,8 @@ TEST INTERSECT_07(void) {
 }
 
 TEST INTERSECT_08(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -586,15 +585,15 @@ TEST INTERSECT_08(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 3; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     for (int i = ((IHASH_SET_CHUNK) / 3) * 2; i < IHASH_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     for (int i = (IHASH_SET_CHUNK) / 3; i < ((IHASH_SET_CHUNK) / 3) * 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -605,8 +604,8 @@ TEST INTERSECT_08(void) {
 }
 
 TEST INTERSECT_09(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK + 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -619,15 +618,15 @@ TEST INTERSECT_09(void) {
     ihash_set_s set_intersect = intersect_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 3; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     for (int i = ((IHASH_SET_CHUNK + 1) / 3) * 2; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_intersect, &i));
     }
 
     for (int i = (IHASH_SET_CHUNK + 1) / 3; i < ((IHASH_SET_CHUNK + 1) / 3) * 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_intersect, &i));
+        ASSERT(contains_ihash_set(&set_intersect, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -638,8 +637,8 @@ TEST INTERSECT_09(void) {
 }
 
 TEST SUBTRACT_01(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -649,7 +648,7 @@ TEST SUBTRACT_01(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -660,8 +659,8 @@ TEST SUBTRACT_01(void) {
 }
 
 TEST SUBTRACT_02(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -671,7 +670,7 @@ TEST SUBTRACT_02(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -682,8 +681,8 @@ TEST SUBTRACT_02(void) {
 }
 
 TEST SUBTRACT_03(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -693,7 +692,7 @@ TEST SUBTRACT_03(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -704,8 +703,8 @@ TEST SUBTRACT_03(void) {
 }
 
 TEST SUBTRACT_04(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -718,11 +717,11 @@ TEST SUBTRACT_04(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT(contains_ihash_set(&set_subtract, &i));
     }
 
     for (int i = (IHASH_SET_CHUNK - 1) / 2; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -733,8 +732,8 @@ TEST SUBTRACT_04(void) {
 }
 
 TEST SUBTRACT_05(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -747,11 +746,11 @@ TEST SUBTRACT_05(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT(contains_ihash_set(&set_subtract, &i));
     }
 
     for (int i = (IHASH_SET_CHUNK) / 2; i < IHASH_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -762,8 +761,8 @@ TEST SUBTRACT_05(void) {
 }
 
 TEST SUBTRACT_06(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -776,11 +775,11 @@ TEST SUBTRACT_06(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT(contains_ihash_set(&set_subtract, &i));
     }
 
     for (int i = (IHASH_SET_CHUNK + 1) / 2; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_subtract, &i));
     }
 
 
@@ -792,8 +791,8 @@ TEST SUBTRACT_06(void) {
 }
 
 TEST SUBTRACT_07(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -806,7 +805,7 @@ TEST SUBTRACT_07(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -817,8 +816,8 @@ TEST SUBTRACT_07(void) {
 }
 
 TEST SUBTRACT_08(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -831,7 +830,7 @@ TEST SUBTRACT_08(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -842,8 +841,8 @@ TEST SUBTRACT_08(void) {
 }
 
 TEST SUBTRACT_09(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK + 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -856,7 +855,7 @@ TEST SUBTRACT_09(void) {
     ihash_set_s set_subtract = subtract_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_subtract, &i));
+        ASSERT(contains_ihash_set(&set_subtract, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -867,8 +866,8 @@ TEST SUBTRACT_09(void) {
 }
 
 TEST EXCLUDE_01(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -878,7 +877,7 @@ TEST EXCLUDE_01(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -889,8 +888,8 @@ TEST EXCLUDE_01(void) {
 }
 
 TEST EXCLUDE_02(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -900,7 +899,7 @@ TEST EXCLUDE_02(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -911,8 +910,8 @@ TEST EXCLUDE_02(void) {
 }
 
 TEST EXCLUDE_03(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -922,7 +921,7 @@ TEST EXCLUDE_03(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERT_FALSEm("[ERROR] Expected element to not be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT_FALSE(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -933,8 +932,8 @@ TEST EXCLUDE_03(void) {
 }
 
 TEST EXCLUDE_04(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -947,7 +946,7 @@ TEST EXCLUDE_04(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -958,8 +957,8 @@ TEST EXCLUDE_04(void) {
 }
 
 TEST EXCLUDE_05(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -972,7 +971,7 @@ TEST EXCLUDE_05(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -983,8 +982,8 @@ TEST EXCLUDE_05(void) {
 }
 
 TEST EXCLUDE_06(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -997,7 +996,7 @@ TEST EXCLUDE_06(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -1008,8 +1007,8 @@ TEST EXCLUDE_06(void) {
 }
 
 TEST EXCLUDE_07(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1022,11 +1021,11 @@ TEST EXCLUDE_07(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     for (int i = ((IHASH_SET_CHUNK - 1) / 3) * 2; i < IHASH_SET_CHUNK - 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -1037,8 +1036,8 @@ TEST EXCLUDE_07(void) {
 }
 
 TEST EXCLUDE_08(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1051,11 +1050,11 @@ TEST EXCLUDE_08(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     for (int i = ((IHASH_SET_CHUNK) / 3) * 2; i < IHASH_SET_CHUNK; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -1066,8 +1065,8 @@ TEST EXCLUDE_08(void) {
 }
 
 TEST EXCLUDE_09(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK + 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1080,11 +1079,11 @@ TEST EXCLUDE_09(void) {
     ihash_set_s set_exclude = exclude_ihash_set(&set_one, &set_two, copy);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 3; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     for (int i = ((IHASH_SET_CHUNK + 1) / 3) * 2; i < IHASH_SET_CHUNK + 1; ++i) {
-        ASSERTm("[ERROR] Expected element to be contained.", contains_ihash_set(&set_exclude, &i));
+        ASSERT(contains_ihash_set(&set_exclude, &i));
     }
 
     destroy_ihash_set(&set_one, destroy);
@@ -1095,14 +1094,14 @@ TEST EXCLUDE_09(void) {
 }
 
 TEST IS_SUBSET_01(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1111,14 +1110,14 @@ TEST IS_SUBSET_01(void) {
 }
 
 TEST IS_SUBSET_02(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1127,14 +1126,14 @@ TEST IS_SUBSET_02(void) {
 }
 
 TEST IS_SUBSET_03(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1143,15 +1142,15 @@ TEST IS_SUBSET_03(void) {
 }
 
 TEST IS_SUBSET_04(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1160,15 +1159,15 @@ TEST IS_SUBSET_04(void) {
 }
 
 TEST IS_SUBSET_05(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1177,15 +1176,15 @@ TEST IS_SUBSET_05(void) {
 }
 
 TEST IS_SUBSET_06(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1194,8 +1193,8 @@ TEST IS_SUBSET_06(void) {
 }
 
 TEST IS_SUBSET_07(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1205,7 +1204,7 @@ TEST IS_SUBSET_07(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1214,8 +1213,8 @@ TEST IS_SUBSET_07(void) {
 }
 
 TEST IS_SUBSET_08(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1225,7 +1224,7 @@ TEST IS_SUBSET_08(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1234,8 +1233,8 @@ TEST IS_SUBSET_08(void) {
 }
 
 TEST IS_SUBSET_09(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1245,7 +1244,7 @@ TEST IS_SUBSET_09(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to be subset.", is_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1254,14 +1253,14 @@ TEST IS_SUBSET_09(void) {
 }
 
 TEST IS_PROPER_SUBSET_01(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1270,14 +1269,14 @@ TEST IS_PROPER_SUBSET_01(void) {
 }
 
 TEST IS_PROPER_SUBSET_02(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1286,14 +1285,14 @@ TEST IS_PROPER_SUBSET_02(void) {
 }
 
 TEST IS_PROPER_SUBSET_03(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1302,15 +1301,15 @@ TEST IS_PROPER_SUBSET_03(void) {
 }
 
 TEST IS_PROPER_SUBSET_04(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1319,15 +1318,15 @@ TEST IS_PROPER_SUBSET_04(void) {
 }
 
 TEST IS_PROPER_SUBSET_05(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1336,15 +1335,15 @@ TEST IS_PROPER_SUBSET_05(void) {
 }
 
 TEST IS_PROPER_SUBSET_06(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1353,8 +1352,8 @@ TEST IS_PROPER_SUBSET_06(void) {
 }
 
 TEST IS_PROPER_SUBSET_07(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1364,7 +1363,7 @@ TEST IS_PROPER_SUBSET_07(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1373,8 +1372,8 @@ TEST IS_PROPER_SUBSET_07(void) {
 }
 
 TEST IS_PROPER_SUBSET_08(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1384,7 +1383,7 @@ TEST IS_PROPER_SUBSET_08(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1393,8 +1392,8 @@ TEST IS_PROPER_SUBSET_08(void) {
 }
 
 TEST IS_PROPER_SUBSET_09(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1404,7 +1403,7 @@ TEST IS_PROPER_SUBSET_09(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be proper subset.", is_proper_subset_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_proper_subset_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1413,15 +1412,15 @@ TEST IS_PROPER_SUBSET_09(void) {
 }
 
 TEST IS_DISJOINT_01(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK - 1; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1430,15 +1429,15 @@ TEST IS_DISJOINT_01(void) {
 }
 
 TEST IS_DISJOINT_02(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1447,15 +1446,15 @@ TEST IS_DISJOINT_02(void) {
 }
 
 TEST IS_DISJOINT_03(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < IHASH_SET_CHUNK + 1; ++i) {
         insert_ihash_set(&set_one, &i);
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1464,8 +1463,8 @@ TEST IS_DISJOINT_03(void) {
 }
 
 TEST IS_DISJOINT_04(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1475,7 +1474,7 @@ TEST IS_DISJOINT_04(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1484,8 +1483,8 @@ TEST IS_DISJOINT_04(void) {
 }
 
 TEST IS_DISJOINT_05(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1495,7 +1494,7 @@ TEST IS_DISJOINT_05(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1504,8 +1503,8 @@ TEST IS_DISJOINT_05(void) {
 }
 
 TEST IS_DISJOINT_06(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < (IHASH_SET_CHUNK + 1) / 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1515,7 +1514,7 @@ TEST IS_DISJOINT_06(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERTm("[ERROR] Expected to be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1524,8 +1523,8 @@ TEST IS_DISJOINT_06(void) {
 }
 
 TEST IS_DISJOINT_07(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1535,7 +1534,7 @@ TEST IS_DISJOINT_07(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1544,8 +1543,8 @@ TEST IS_DISJOINT_07(void) {
 }
 
 TEST IS_DISJOINT_08(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1555,7 +1554,7 @@ TEST IS_DISJOINT_08(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
@@ -1564,8 +1563,8 @@ TEST IS_DISJOINT_08(void) {
 }
 
 TEST IS_DISJOINT_09(void) {
-    ihash_set_s set_one = create_ihash_set(sizeof(int), hash);
-    ihash_set_s set_two = create_ihash_set(sizeof(int), hash);
+    ihash_set_s set_one = create_ihash_set(sizeof(int), hash, compare);
+    ihash_set_s set_two = create_ihash_set(sizeof(int), hash, compare);
 
     for (int i = 0; i < ((IHASH_SET_CHUNK + 1) / 3) * 2; ++i) {
         insert_ihash_set(&set_one, &i);
@@ -1575,7 +1574,7 @@ TEST IS_DISJOINT_09(void) {
         insert_ihash_set(&set_two, &i);
     }
 
-    ASSERT_FALSEm("[ERROR] Expected to not be disjoint.", is_disjoint_ihash_set(&set_one, &set_two));
+    ASSERT_FALSE(is_disjoint_ihash_set(&set_one, &set_two));
 
     destroy_ihash_set(&set_one, destroy);
     destroy_ihash_set(&set_two, destroy);
