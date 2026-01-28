@@ -494,9 +494,6 @@ iam_list_s a_star_iam_list(const iam_graph_s * graph, const iam_cost_s * cost, c
     return (iam_list_s) { 0 };
 }
 
-void map_cost_iam_list(const iam_graph_s * graph, const iam_list_s * table, const size_t start, const handle_fn handle, void * arguments) {
-}
-
 void destroy_iam_list(const iam_graph_s * graph, iam_list_s * table) {
     free(table->cost);
     free(table->previous);
@@ -508,17 +505,51 @@ iam_graph_s subgraph_iam_list(const iam_graph_s * graph, const iam_list_s * tabl
     return (iam_graph_s) { 0 };
 }
 
-void map_vertex_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments) {
+void each_vertex_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments) {
     for (char * v = graph->vertices; v < graph->vertices + (graph->length * graph->vertex_size); v += graph->vertex_size) {
         if (!handle(v, arguments)) { return; } // if handler terminates (returns false) end loop
     }
 }
 
-void map_edge_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments) {
+void each_edge_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments) {
     const size_t edge_length = (graph->length * (graph->length - 1)) / 2;
     for (char * e = graph->edges; e < graph->edges + (edge_length * graph->edge_size); e += graph->edge_size) {
-        if (!graph->compare(e, graph->none)) { continue; } // if edge is none continue since handle can't be performed
-        if (!handle(e, arguments)) { return; } // if handler terminates (returns false) end loop
+        // if edge is none continue since handle can't be performed (first condition is false so other won't be checked.)
+        // if handler terminates (returns false) end loop
+        if (graph->compare(e, graph->none) && !handle(e, arguments)) {
+            break;
+        }
+    }
+}
+
+void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index, handle_fn const handle, void * const arguments) {
+    const size_t offset = (index * (index - 1)) / 2;
+    for (size_t i = 0, e = offset; i < index; ++i, e++) {
+        char const * edge = graph->edges + (e * graph->edge_size);
+        char * vertex = graph->vertices + (i * graph->vertex_size);
+
+        // if edge is none continue since handle can't be performed (first condition is false so other won't be checked.)
+        // if handler terminates (returns false) end loop
+        if (graph->compare(edge, graph->none) && !handle(vertex, arguments)) {
+            return;
+        }
+    }
+
+    for (size_t i = index + 1, e = offset + (2 * index); i < graph->length; e += i++) {
+        char const * edge = graph->edges + (e * graph->edge_size);
+        char * vertex = graph->vertices + (i * graph->vertex_size);
+
+        // if edge is none continue since handle can't be performed (first condition is false so other won't be checked.)
+        // if handler terminates (returns false) end loop
+        if (graph->compare(edge, graph->none) && !handle(vertex, arguments)) {
+            return;
+        }
+    }
+}
+
+void each_cost_iam_list(const iam_graph_s * graph, const iam_list_s * table, const size_t start, const handle_fn handle, void * arguments) {
+    for (size_t i = 0; i < graph->length; ++i) {
+        if (!handle(table->cost + (table->data->size * i), arguments)) { break; }
     }
 }
 

@@ -196,13 +196,15 @@ iam_graph_s subgraph_iam_list(const iam_graph_s * graph, const iam_list_s * tabl
 /// @param graph Structure to iterate.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Arguments for operate function pointer.
-void map_vertex_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments);
+void each_vertex_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments);
+
+void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index, handle_fn const handle, void * const arguments);
 
 /// @brief Iterates over each edge element in structure starting from the beginning.
 /// @param graph Structure to iterate.
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Arguments for operate function pointer.
-void map_edge_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments);
+void each_edge_iam_graph(const iam_graph_s * graph, const handle_fn handle, void * arguments);
 
 /// @brief Traverses the costs of the specified structure using a generated table.
 /// @param graph Structure to traverse.
@@ -210,6 +212,6 @@ void map_edge_iam_graph(const iam_graph_s * graph, const handle_fn handle, void 
 /// @param start Starting vertex index.
 /// @param handle Operate function pointer to operate on each vertex.
 /// @param arguments Arguments for operate function pointer.
-void map_cost_iam_list(const iam_graph_s * graph, const iam_list_s * table, const size_t start, const handle_fn handle, void * arguments);
+void each_cost_iam_list(const iam_graph_s * graph, const iam_list_s * table, const size_t start, const handle_fn handle, void * arguments);
 
 #endif // IMATRIX_H
