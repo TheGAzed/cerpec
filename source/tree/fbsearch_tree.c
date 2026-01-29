@@ -653,21 +653,18 @@ void get_successor_fbsearch_tree(fbsearch_tree_s const * const restrict tree, vo
         for (successor = right; NIL != tree->node[FBST_LEFT][successor];) {
             successor = tree->node[FBST_LEFT][successor];
         }
+    } else {
+        for (size_t n = tree->root; NIL != n;) {
+            // calculate and determine next child node, i.e. if left or right child
+            int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+            if (comparison < 0) {
+                successor = n;
+            }
 
-        goto SUCCESSOR_CHECK; // skip to avoid binary tree search
-    }
-
-    for (size_t n = tree->root; NIL != n;) {
-        // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
-        if (comparison < 0) {
-            successor = n;
+            n = comparison < 0 ? tree->node[FBST_LEFT][n] : tree->node[FBST_RIGHT][n];
         }
-
-        n = comparison < 0 ? tree->node[FBST_LEFT][n] : tree->node[FBST_RIGHT][n];
     }
 
-SUCCESSOR_CHECK:
     if (NIL == successor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in tree.");
@@ -1076,18 +1073,16 @@ size_t * _fbsearch_tree_successor(fbsearch_tree_s * const restrict tree, void co
         for (successor = right; NIL != *(tree->node[FBST_LEFT] + (*successor));) {
             successor = tree->node[FBST_LEFT] + (*successor);
         }
+    } else {
+        for (size_t * n = &(tree->root); NIL != (*n);) {
+            // calculate and determine next child node, i.e. if left or right child
+            int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+            if (comparison < 0) {
+                successor = n;
+            }
 
-        return successor;
-    }
-
-    for (size_t * n = &(tree->root); NIL != (*n);) {
-        // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
-        if (comparison < 0) {
-            successor = n;
+            n = comparison < 0 ? tree->node[FBST_LEFT] + (*n) : tree->node[FBST_RIGHT] + (*n);
         }
-
-        n = comparison < 0 ? tree->node[FBST_LEFT] + (*n) : tree->node[FBST_RIGHT] + (*n);
     }
 
     return successor;

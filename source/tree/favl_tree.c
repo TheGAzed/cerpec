@@ -1,16 +1,16 @@
-#include <tree/iavl_tree.h>
+#include <tree/favl_tree.h>
 
 #include <stdlib.h> // imports exit()
 #include <string.h>
 
 #define NIL ((size_t)(-1))
 
-struct iavl_tree_stack {
+struct favl_tree_stack {
     size_t length;
     size_t * elements;
 };
 
-struct iavl_tree_queue {
+struct favl_tree_queue {
     size_t length, current;
     size_t * elements;
 };
@@ -19,86 +19,116 @@ struct iavl_tree_queue {
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search floor of.
 /// @return Pointer to index of floor element or NULL.
-size_t * _iavl_tree_floor(iavl_tree_s * const restrict tree, void const * const restrict element);
+size_t * _favl_tree_floor(favl_tree_s * const restrict tree, void const * const restrict element);
 
 /// @brief Helper function to get pointer index to ceil of element.
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search ceil of.
 /// @return Pointer to index of ceil element or NULL.
-size_t * _iavl_tree_ceil(iavl_tree_s * const restrict tree, void const * const restrict element);
+size_t * _favl_tree_ceil(favl_tree_s * const restrict tree, void const * const restrict element);
 
 /// @brief Helper function to get pointer index to successor of element.
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search successor of.
 /// @return Pointer to index of successor element or NULL.
-size_t * _iavl_tree_successor(iavl_tree_s * const restrict tree, void const * const restrict element);
+size_t * _favl_tree_successor(favl_tree_s * const restrict tree, void const * const restrict element);
 
 /// @brief Helper function to get pointer index to predecessor of element.
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search predecessor of.
 /// @return Pointer to index of predecessor element or NULL.
-size_t * _iavl_tree_predecessor(iavl_tree_s * const restrict tree, void const * const restrict element);
+size_t * _favl_tree_predecessor(favl_tree_s * const restrict tree, void const * const restrict element);
 
 /// Returns the height of the node, or 0 if node is NIL.
 /// @param tree Structure to get height from.
 /// @param node Index of node to get height.
 /// @return '0' if node is NIL, else a natural number height.
-size_t _iavl_tree_get_height(iavl_tree_s const * const tree, size_t const node);
+size_t _favl_tree_get_height(favl_tree_s const * const tree, size_t const node);
 
 /// Left tree rotation that moves one node up in the tree and one node down.
 /// @param tree Structure to rotate.
 /// @param node Index of node to start rotations from.
-void _iavl_tree_left_rotate(iavl_tree_s * const tree, size_t const node);
+void _favl_tree_left_rotate(favl_tree_s * const tree, size_t const node);
 
 /// Right tree rotation that moves one node up in the tree and one node down.
 /// @param tree Structure to rotate.
 /// @param node Index of node to start rotations from.
-void _iavl_tree_right_rotate(iavl_tree_s * const tree, size_t const node);
+void _favl_tree_right_rotate(favl_tree_s * const tree, size_t const node);
 
 /// Rebalances the tree based on height to guarantee AVL property.
 /// @param tree Structure to rebalance.
 /// @param node Index of node to start rebalancing upwards.
-void _iavl_tree_rebalance(iavl_tree_s * const tree, size_t const node);
+void _favl_tree_rebalance(favl_tree_s * const tree, size_t const node);
 
 /// AVL tree node removal fixup.
 /// @param tree Structure to fix.
 /// @param node Index reference to removed node.
 /// @return Index of hole left behind by fixup.
-size_t _iavl_tree_remove_fixup(iavl_tree_s const * const restrict tree, size_t * const restrict node);
+size_t _favl_tree_remove_fixup(favl_tree_s const * const restrict tree, size_t * const restrict node);
 
 /// Fills the hole left after removing an element in the tree's arrays, puts rightmost element into hole.
 /// @param tree Structure to fill.
 /// @param hole Index of hole in structure's arrays.
-void _iavl_tree_fill_hole(iavl_tree_s * const tree, size_t const hole);
+void _favl_tree_fill_hole(favl_tree_s * const tree, size_t const hole);
 
-/// Resizes (reallocates) tree parameter arrays based on changed capacity.
-/// @param tree Structure to resize.
-/// @param size New size.
-void _iavl_tree_resize(iavl_tree_s * const tree, size_t const size);
-
-iavl_tree_s create_iavl_tree(size_t const size, compare_fn const compare) {
-    error(compare && "Parameter can't be NULL.");
+favl_tree_s create_favl_tree(size_t const size, size_t const max, compare_fn const compare) {
     error(size && "Parameter can't be zero.");
+    error(max && "Parameter can't be zero.");
+    error(compare && "Parameter can't be NULL.");
 
-    return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = &standard, };
+    favl_tree_s const tree = {
+        .allocator = &standard, .compare = compare, .max = max, .root = NIL, .size = size,
+        .elements = standard.alloc(size * max, standard.arguments),
+        .height = standard.alloc(sizeof(size_t) * max, standard.arguments),
+        .parent = standard.alloc(sizeof(size_t) * max, standard.arguments),
+        .node[FAVLT_LEFT] = standard.alloc(sizeof(size_t) * max, standard.arguments),
+        .node[FAVLT_RIGHT] = standard.alloc(sizeof(size_t) * max, standard.arguments),
+    };
+    error(tree.elements && "Memory allocation failed.");
+    error(tree.height && "Memory allocation failed.");
+    error(tree.parent && "Memory allocation failed.");
+    error(tree.node[FAVLT_LEFT] && "Memory allocation failed.");
+    error(tree.node[FAVLT_RIGHT] && "Memory allocation failed.");
+
+    return tree;
 }
 
-iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, memory_s const * const allocator) {
-    error(compare && "Parameter can't be NULL.");
+favl_tree_s make_favl_tree(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
     error(size && "Parameter can't be zero.");
-    error(allocator && "Parameter can't be NULL.");
+    error(max && "Parameter can't be zero.");
+    error(compare && "Parameter can't be NULL.");
 
-    return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, };
+    favl_tree_s const tree = {
+        .allocator = allocator, .compare = compare, .max = max, .root = NIL, .size = size,
+        .elements = allocator->alloc(size * max, allocator->arguments),
+        .height = allocator->alloc(sizeof(size_t) * max, allocator->arguments),
+        .parent = allocator->alloc(sizeof(size_t) * max, allocator->arguments),
+        .node[FAVLT_LEFT] = allocator->alloc(sizeof(size_t) * max, allocator->arguments),
+        .node[FAVLT_RIGHT] = allocator->alloc(sizeof(size_t) * max, allocator->arguments),
+    };
+    error(tree.elements && "Memory allocation failed.");
+    error(tree.height && "Memory allocation failed.");
+    error(tree.parent && "Memory allocation failed.");
+    error(tree.node[FAVLT_LEFT] && "Memory allocation failed.");
+    error(tree.node[FAVLT_RIGHT] && "Memory allocation failed.");
+
+    return tree;
 }
 
-void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy) {
+void destroy_favl_tree(favl_tree_s * const tree, set_fn const destroy) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     for (size_t i = 0; i < tree->length; ++i) {
         destroy(tree->elements + (i * tree->size));
@@ -106,97 +136,126 @@ void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy) {
     tree->allocator->free(tree->elements, tree->allocator->arguments);
     tree->allocator->free(tree->height, tree->allocator->arguments);
     tree->allocator->free(tree->parent, tree->allocator->arguments);
-    tree->allocator->free(tree->node[IAVLT_LEFT], tree->allocator->arguments);
-    tree->allocator->free(tree->node[IAVLT_RIGHT], tree->allocator->arguments);
+    tree->allocator->free(tree->node[FAVLT_LEFT], tree->allocator->arguments);
+    tree->allocator->free(tree->node[FAVLT_RIGHT], tree->allocator->arguments);
 
-    memset(tree, 0, sizeof(iavl_tree_s));
+    memset(tree, 0, sizeof(favl_tree_s));
 }
 
-void clear_iavl_tree(iavl_tree_s * const tree, set_fn const destroy) {
+void clear_favl_tree(favl_tree_s * const tree, set_fn const destroy) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     for (size_t i = 0; i < tree->length; ++i) {
         destroy(tree->elements + (i * tree->size));
     }
-    tree->allocator->free(tree->elements, tree->allocator->arguments);
-    tree->allocator->free(tree->height, tree->allocator->arguments);
-    tree->allocator->free(tree->parent, tree->allocator->arguments);
-    tree->allocator->free(tree->node[IAVLT_LEFT], tree->allocator->arguments);
-    tree->allocator->free(tree->node[IAVLT_RIGHT], tree->allocator->arguments);
-
-    tree->elements = NULL;
-    tree->parent = tree->node[IAVLT_LEFT] = tree->node[IAVLT_RIGHT] = NULL;
 
     tree->root = NIL;
-    tree->length = tree->capacity = 0;
+    tree->length = 0;
 }
 
-iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy) {
+favl_tree_s copy_favl_tree(favl_tree_s const * const tree, copy_fn const copy) {
     error(tree && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
-    iavl_tree_s const replica = {
-        .elements = tree->allocator->alloc(tree->capacity * tree->size, tree->allocator->arguments),
-        .height = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arguments),
-        .parent = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arguments),
-        .node[IAVLT_LEFT] = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arguments),
-        .node[IAVLT_RIGHT] = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arguments),
+    favl_tree_s const replica = {
+        .elements = tree->allocator->alloc(tree->max * tree->size, tree->allocator->arguments),
+        .height = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arguments),
+        .parent = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arguments),
+        .node[FAVLT_LEFT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arguments),
+        .node[FAVLT_RIGHT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arguments),
 
-        .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare,
+        .max = tree->max, .root = tree->root, .length = tree->length, .compare = tree->compare,
         .size = tree->size, .allocator = tree->allocator,
     };
-    error((!replica.capacity || replica.elements) && "Memory allocation failed.");
-    error((!replica.capacity || replica.parent) && "Memory allocation failed.");
-    error((!replica.capacity || replica.height) && "Memory allocation failed.");
-    error((!replica.capacity || replica.node[IAVLT_LEFT]) && "Memory allocation failed.");
-    error((!replica.capacity || replica.node[IAVLT_RIGHT]) && "Memory allocation failed.");
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.parent && "Memory allocation failed.");
+    error(replica.height && "Memory allocation failed.");
+    error(replica.node[FAVLT_LEFT] && "Memory allocation failed.");
+    error(replica.node[FAVLT_RIGHT] && "Memory allocation failed.");
 
     for (size_t i = 0; i < tree->length; ++i) {
         copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
     }
     memcpy(replica.height, tree->height, tree->length * sizeof(size_t));
     memcpy(replica.parent, tree->parent, tree->length * sizeof(size_t));
-    memcpy(replica.node[IAVLT_LEFT], tree->node[IAVLT_LEFT], tree->length * sizeof(size_t));
-    memcpy(replica.node[IAVLT_RIGHT], tree->node[IAVLT_RIGHT], tree->length * sizeof(size_t));
+    memcpy(replica.node[FAVLT_LEFT], tree->node[FAVLT_LEFT], tree->length * sizeof(size_t));
+    memcpy(replica.node[FAVLT_RIGHT], tree->node[FAVLT_RIGHT], tree->length * sizeof(size_t));
 
     return replica;
 }
 
-bool is_empty_iavl_tree(iavl_tree_s const * const tree) {
+bool is_empty_favl_tree(favl_tree_s const * const tree) {
     error(tree && "Parameter can't be NULL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     return !tree->length;
 }
 
-void insert_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element) {
+bool is_full_favl_tree(favl_tree_s const * const tree) {
+    error(tree && "Parameter can't be NULL.");
+
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
+
+    return (tree->length == tree->max);
+}
+
+void insert_favl_tree(favl_tree_s * const restrict tree, void const * const restrict element) {
     error(tree && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(tree != element && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
-
-    if (tree->length == tree->capacity) {
-        _iavl_tree_resize(tree, tree->capacity + IAVL_TREE_CHUNK);
-    }
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t previous = NIL; // initially invalid for the head case when tree is empty
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
@@ -205,20 +264,20 @@ void insert_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
         int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
 
         previous = (*node); // change parent to child
-        node = comparison <= 0 ? tree->node[IAVLT_LEFT] + (*node) : tree->node[IAVLT_RIGHT] + (*node);
+        node = comparison <= 0 ? tree->node[FAVLT_LEFT] + (*node) : tree->node[FAVLT_RIGHT] + (*node);
     }
 
     (*node) = tree->length; // change child index from invalid value to next empty index in array
     tree->parent[(*node)] = previous; // make child's parent into parent
-    tree->node[IAVLT_LEFT][(*node)] = tree->node[IAVLT_RIGHT][(*node)] = NIL; // make child's left and right indexes invalid
+    tree->node[FAVLT_LEFT][(*node)] = tree->node[FAVLT_RIGHT][(*node)] = NIL; // make child's left and right indexes invalid
 
     memcpy(tree->elements + ((*node) * tree->size), element, tree->size);
     tree->length++;
 
-    _iavl_tree_rebalance(tree, (*node));
+    _favl_tree_rebalance(tree, (*node));
 }
 
-void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_favl_tree(favl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -227,14 +286,20 @@ void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
@@ -245,7 +310,7 @@ void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
         }
 
         // change parent to child and go to next child node
-        node = comparison < 0 ? tree->node[IAVLT_LEFT] + (*node) : tree->node[IAVLT_RIGHT] + (*node);
+        node = comparison < 0 ? tree->node[FAVLT_LEFT] + (*node) : tree->node[FAVLT_RIGHT] + (*node);
     }
 
     if (NIL == (*node)) {
@@ -257,24 +322,26 @@ void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
     memcpy(buffer, tree->elements + ((*node) * tree->size), tree->size);
     tree->length--;
 
-    size_t const hole = _iavl_tree_remove_fixup(tree, node);
-    _iavl_tree_fill_hole(tree, hole);
-    _iavl_tree_rebalance(tree, (*node));
-
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        _iavl_tree_resize(tree, tree->length);
-    }
+    size_t const hole = _favl_tree_remove_fixup(tree, node);
+    _favl_tree_fill_hole(tree, hole);
+    _favl_tree_rebalance(tree, (*node));
 }
 
-bool contains_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element) {
+bool contains_favl_tree(favl_tree_s const * const restrict tree, void const * const restrict element) {
     error(tree && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(tree != element && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -283,78 +350,96 @@ bool contains_iavl_tree(iavl_tree_s const * const restrict tree, void const * co
             return true;
         }
 
-        node = comparison < 0 ? tree->node[IAVLT_LEFT][node] : tree->node[IAVLT_RIGHT][node];
+        node = comparison < 0 ? tree->node[FAVLT_LEFT][node] : tree->node[FAVLT_RIGHT][node];
     }
 
     return false;
 }
 
-void get_max_iavl_tree(iavl_tree_s const * const restrict tree, void * const restrict buffer) {
+void get_max_favl_tree(favl_tree_s const * const restrict tree, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
     error(tree != buffer && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t maximum = tree->root;
-    for (size_t i = tree->node[IAVLT_RIGHT][maximum]; NIL != i; i = tree->node[IAVLT_RIGHT][i]) {
+    for (size_t i = tree->node[FAVLT_RIGHT][maximum]; NIL != i; i = tree->node[FAVLT_RIGHT][i]) {
         maximum = i;
     }
 
     memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
 }
 
-void get_min_iavl_tree(iavl_tree_s const * const restrict tree, void * const restrict buffer) {
+void get_min_favl_tree(favl_tree_s const * const restrict tree, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
     error(tree != buffer && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t minimum = tree->root;
-    for (size_t i = tree->node[IAVLT_LEFT][minimum]; NIL != i; i = tree->node[IAVLT_LEFT][i]) {
+    for (size_t i = tree->node[FAVLT_LEFT][minimum]; NIL != i; i = tree->node[FAVLT_LEFT][i]) {
         minimum = i;
     }
 
     memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
 }
 
-void remove_max_iavl_tree(iavl_tree_s * const restrict tree, void * const restrict buffer) {
+void remove_max_favl_tree(favl_tree_s * const restrict tree, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
     error(tree != buffer && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t * maximum = &(tree->root);
-    for (size_t * i = tree->node[IAVLT_RIGHT] + (*maximum); NIL != (*i); i = tree->node[IAVLT_RIGHT] + (*i)) {
+    for (size_t * i = tree->node[FAVLT_RIGHT] + (*maximum); NIL != (*i); i = tree->node[FAVLT_RIGHT] + (*i)) {
         maximum = i;
     }
 
@@ -363,38 +448,40 @@ void remove_max_iavl_tree(iavl_tree_s * const restrict tree, void * const restri
 
     size_t const hole = (*maximum);
 
-    size_t const left_node = tree->node[IAVLT_LEFT][(*maximum)];
+    size_t const left_node = tree->node[FAVLT_LEFT][(*maximum)];
     if (NIL != left_node) {
         tree->parent[left_node] = tree->parent[(*maximum)];
     }
     (*maximum) = left_node;
 
-    _iavl_tree_fill_hole(tree, hole);
-    _iavl_tree_rebalance(tree, (*maximum));
-
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        _iavl_tree_resize(tree, tree->length);
-    }
+    _favl_tree_fill_hole(tree, hole);
+    _favl_tree_rebalance(tree, (*maximum));
 }
 
-void remove_min_iavl_tree(iavl_tree_s * const restrict tree, void * const restrict buffer) {
+void remove_min_favl_tree(favl_tree_s * const restrict tree, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
     error(tree != buffer && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t * minimum = &(tree->root);
-    for (size_t * i = tree->node[IAVLT_LEFT] + (*minimum); NIL != (*i); i = tree->node[IAVLT_LEFT] + (*i)) {
+    for (size_t * i = tree->node[FAVLT_LEFT] + (*minimum); NIL != (*i); i = tree->node[FAVLT_LEFT] + (*i)) {
         minimum = i;
     }
 
@@ -403,21 +490,17 @@ void remove_min_iavl_tree(iavl_tree_s * const restrict tree, void * const restri
 
     size_t const hole = (*minimum);
 
-    size_t const right_node = tree->node[IAVLT_RIGHT][(*minimum)];
+    size_t const right_node = tree->node[FAVLT_RIGHT][(*minimum)];
     if (NIL != right_node) {
         tree->parent[right_node] = tree->parent[(*minimum)];
     }
     (*minimum) = right_node;
 
-    _iavl_tree_fill_hole(tree, hole);
-    _iavl_tree_rebalance(tree, (*minimum));
-
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        _iavl_tree_resize(tree, tree->length);
-    }
+    _favl_tree_fill_hole(tree, hole);
+    _favl_tree_rebalance(tree, (*minimum));
 }
 
-void get_floor_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_floor_favl_tree(favl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -426,14 +509,20 @@ void get_floor_iavl_tree(iavl_tree_s const * const restrict tree, void const * c
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
@@ -447,7 +536,7 @@ void get_floor_iavl_tree(iavl_tree_s const * const restrict tree, void const * c
             floor = n;
         }
 
-        n = comparison < 0 ? tree->node[IAVLT_LEFT][n] : tree->node[IAVLT_RIGHT][n];
+        n = comparison < 0 ? tree->node[FAVLT_LEFT][n] : tree->node[FAVLT_RIGHT][n];
     }
 
     if (NIL == floor) {
@@ -459,7 +548,7 @@ void get_floor_iavl_tree(iavl_tree_s const * const restrict tree, void const * c
     memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
 }
 
-void get_ceil_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_ceil_favl_tree(favl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -468,14 +557,20 @@ void get_ceil_iavl_tree(iavl_tree_s const * const restrict tree, void const * co
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
@@ -489,7 +584,7 @@ void get_ceil_iavl_tree(iavl_tree_s const * const restrict tree, void const * co
             ceil = n;
         }
 
-        n = comparison < 0 ? tree->node[IAVLT_LEFT][n] : tree->node[IAVLT_RIGHT][n];
+        n = comparison < 0 ? tree->node[FAVLT_LEFT][n] : tree->node[FAVLT_RIGHT][n];
     }
 
     if (NIL == ceil) {
@@ -501,7 +596,7 @@ void get_ceil_iavl_tree(iavl_tree_s const * const restrict tree, void const * co
     memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
 }
 
-void remove_floor_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_floor_favl_tree(favl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -510,16 +605,22 @@ void remove_floor_iavl_tree(iavl_tree_s * const restrict tree, void const * cons
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
-    size_t * floor = _iavl_tree_floor(tree, element);
+    size_t * floor = _favl_tree_floor(tree, element);
     if (NULL == floor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -529,16 +630,12 @@ void remove_floor_iavl_tree(iavl_tree_s * const restrict tree, void const * cons
     memcpy(buffer, tree->elements + ((*floor) * tree->size), tree->size);
     tree->length--;
 
-    size_t const hole = _iavl_tree_remove_fixup(tree, floor);
-    _iavl_tree_fill_hole(tree, hole);
-    _iavl_tree_rebalance(tree, (*floor));
-
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        _iavl_tree_resize(tree, tree->length);
-    }
+    size_t const hole = _favl_tree_remove_fixup(tree, floor);
+    _favl_tree_fill_hole(tree, hole);
+    _favl_tree_rebalance(tree, (*floor));
 }
 
-void remove_ceil_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_ceil_favl_tree(favl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -547,16 +644,22 @@ void remove_ceil_iavl_tree(iavl_tree_s * const restrict tree, void const * const
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
-    size_t * ceil = _iavl_tree_ceil(tree, element);
+    size_t * ceil = _favl_tree_ceil(tree, element);
     if (NULL == ceil) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -566,16 +669,12 @@ void remove_ceil_iavl_tree(iavl_tree_s * const restrict tree, void const * const
     memcpy(buffer, tree->elements + ((*ceil) * tree->size), tree->size);
     tree->length--;
 
-    size_t const hole = _iavl_tree_remove_fixup(tree, ceil);
-    _iavl_tree_fill_hole(tree, hole);
-    _iavl_tree_rebalance(tree, (*ceil));
-
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        _iavl_tree_resize(tree, tree->length);
-    }
+    size_t const hole = _favl_tree_remove_fixup(tree, ceil);
+    _favl_tree_fill_hole(tree, hole);
+    _favl_tree_rebalance(tree, (*ceil));
 }
 
-void get_successor_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_successor_favl_tree(favl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -584,35 +683,39 @@ void get_successor_iavl_tree(iavl_tree_s const * const restrict tree, void const
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t successor = NIL;
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IAVLT_RIGHT][tree->root]) {
-        for (successor = tree->node[IAVLT_RIGHT][tree->root]; NIL != tree->node[IAVLT_LEFT][successor];) {
-            successor = tree->node[IAVLT_LEFT][successor];
+    size_t const right = tree->node[FAVLT_RIGHT][tree->root];
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != right) {
+        for (successor = right; NIL != tree->node[FAVLT_LEFT][successor];) {
+            successor = tree->node[FAVLT_LEFT][successor];
         }
+    } else {
+        for (size_t n = tree->root; NIL != n;) {
+            // calculate and determine next child node, i.e. if left or right child
+            int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+            if (comparison < 0) {
+                successor = n;
+            }
 
-        goto SUCCESSOR_CHECK;
+            n = comparison < 0 ? tree->node[FAVLT_LEFT][n] : tree->node[FAVLT_RIGHT][n];
+        }
     }
 
-    for (size_t n = tree->root; NIL != n;) {
-        // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
-        if (comparison < 0) {
-            successor = n;
-        }
-
-        n = comparison < 0 ? tree->node[IAVLT_LEFT][n] : tree->node[IAVLT_RIGHT][n];
-    }
-
-SUCCESSOR_CHECK:
     if (NIL == successor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in tree->");
@@ -622,7 +725,7 @@ SUCCESSOR_CHECK:
     memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
 }
 
-void get_predecessor_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_predecessor_favl_tree(favl_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -631,32 +734,39 @@ void get_predecessor_iavl_tree(iavl_tree_s const * const restrict tree, void con
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t predecessor = NIL;
     for (size_t n = tree->root; NIL != n;) {
-        size_t const left = tree->node[IAVLT_LEFT][n];
+        size_t const left = tree->node[FAVLT_LEFT][n];
+
         // calculate and determine next child node, i.e. if left or right child
         int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
             if (NIL != left) {
-                for (predecessor = left; NIL != tree->node[IAVLT_RIGHT][predecessor];) {
-                    predecessor = tree->node[IAVLT_RIGHT][predecessor];
+                for (predecessor = left; NIL != tree->node[FAVLT_RIGHT][predecessor];) {
+                    predecessor = tree->node[FAVLT_RIGHT][predecessor];
                 }
             }
             break;
         }
 
-        n = comparison < 0 ? left : tree->node[IAVLT_RIGHT][n];
+        n = comparison < 0 ? left : tree->node[FAVLT_RIGHT][n];
     }
 
     if (NIL == predecessor) {
@@ -668,7 +778,7 @@ void get_predecessor_iavl_tree(iavl_tree_s const * const restrict tree, void con
     memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
 }
 
-void remove_successor_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_successor_favl_tree(favl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -677,16 +787,22 @@ void remove_successor_iavl_tree(iavl_tree_s * const restrict tree, void const * 
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
-    size_t * successor = _iavl_tree_successor(tree, element);
+    size_t * successor = _favl_tree_successor(tree, element);
     if (NULL == successor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -696,16 +812,12 @@ void remove_successor_iavl_tree(iavl_tree_s * const restrict tree, void const * 
     memcpy(buffer, tree->elements + ((*successor) * tree->size), tree->size);
     tree->length--;
 
-    size_t const hole = _iavl_tree_remove_fixup(tree, successor);
-    _iavl_tree_fill_hole(tree, hole);
-    _iavl_tree_rebalance(tree, (*successor));
-
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        _iavl_tree_resize(tree, tree->length);
-    }
+    size_t const hole = _favl_tree_remove_fixup(tree, successor);
+    _favl_tree_fill_hole(tree, hole);
+    _favl_tree_rebalance(tree, (*successor));
 }
 
-void remove_predecessor_iavl_tree(iavl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_predecessor_favl_tree(favl_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -714,16 +826,22 @@ void remove_predecessor_iavl_tree(iavl_tree_s * const restrict tree, void const 
     error(buffer != element && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
-    size_t * predecessor = _iavl_tree_predecessor(tree, element);
+    size_t * predecessor = _favl_tree_predecessor(tree, element);
     if (NULL == predecessor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -733,16 +851,12 @@ void remove_predecessor_iavl_tree(iavl_tree_s * const restrict tree, void const 
     memcpy(buffer, tree->elements + ((*predecessor) * tree->size), tree->size);
     tree->length--;
 
-    size_t const hole = _iavl_tree_remove_fixup(tree, predecessor);
-    _iavl_tree_fill_hole(tree, hole);
-    _iavl_tree_rebalance(tree, (*predecessor));
-
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
-        _iavl_tree_resize(tree, tree->length);
-    }
+    size_t const hole = _favl_tree_remove_fixup(tree, predecessor);
+    _favl_tree_fill_hole(tree, hole);
+    _favl_tree_rebalance(tree, (*predecessor));
 }
 
-void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * const restrict latter, void * const restrict former) {
+void update_favl_tree(favl_tree_s const * const restrict tree, void const * const restrict latter, void * const restrict former) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(latter && "Parameter can't be NULL.");
@@ -752,14 +866,20 @@ void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * cons
     error(former != latter && "Parameters can' be equal.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IAVLT_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
@@ -770,7 +890,7 @@ void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * cons
         }
 
         // go to next child node
-        node = (comparison < 0) ? tree->node[IAVLT_LEFT][node] : tree->node[IAVLT_RIGHT][node];
+        node = (comparison < 0) ? tree->node[FAVLT_LEFT][node] : tree->node[FAVLT_RIGHT][node];
     }
 
     if (NIL == node) {
@@ -783,21 +903,27 @@ void update_iavl_tree(iavl_tree_s const * const restrict tree, void const * cons
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void in_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void in_order_favl_tree(favl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     bool left_done = false;
     size_t node = tree->root;
     while (NIL != node) {
-        while (!left_done && NIL != tree->node[IAVLT_LEFT][node]) {
-            node = tree->node[IAVLT_LEFT][node];
+        while (!left_done && NIL != tree->node[FAVLT_LEFT][node]) {
+            node = tree->node[FAVLT_LEFT][node];
         }
 
         if (!handle(tree->elements + (node * tree->size), arguments)) {
@@ -805,11 +931,11 @@ void in_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const
         }
 
         left_done = true;
-        if (NIL != tree->node[IAVLT_RIGHT][node]) {
+        if (NIL != tree->node[FAVLT_RIGHT][node]) {
             left_done = false;
-            node = tree->node[IAVLT_RIGHT][node];
+            node = tree->node[FAVLT_RIGHT][node];
         } else if (NIL != tree->parent[node]) {
-            while (NIL != tree->parent[node] && node == tree->node[IAVLT_RIGHT][tree->parent[node]]) {
+            while (NIL != tree->parent[node] && node == tree->node[FAVLT_RIGHT][tree->parent[node]]) {
                 node = tree->parent[node];
             }
 
@@ -824,18 +950,24 @@ void in_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const
     }
 }
 
-void pre_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void pre_order_favl_tree(favl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct iavl_tree_stack stack = {
+    struct favl_tree_stack stack = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
     error(!tree->length || stack.elements && "Memory allocation failed.");
@@ -847,12 +979,12 @@ void pre_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn cons
     while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
         size_t const node = stack.elements[--stack.length];
 
-        size_t const right_child = tree->node[IAVLT_RIGHT][node];
+        size_t const right_child = tree->node[FAVLT_RIGHT][node];
         if (NIL != right_child) {
             stack.elements[stack.length++] = right_child;
         }
 
-        size_t const left_child = tree->node[IAVLT_LEFT][node];
+        size_t const left_child = tree->node[FAVLT_LEFT][node];
         if (NIL != left_child) {
             stack.elements[stack.length++] = left_child;
         }
@@ -861,18 +993,24 @@ void pre_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn cons
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void post_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void post_order_favl_tree(favl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     // create simple stack to manage depth first in-order traversal of node indexes
-    struct iavl_tree_stack stack = {
+    struct favl_tree_stack stack = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
     error(!tree->length || stack.elements && "Memory allocation failed.");
@@ -883,11 +1021,11 @@ void post_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn con
     while (stack.length || NIL != node) { // while stack is not empty OR node is valid
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
             stack.elements[stack.length++] = node;
-            node = tree->node[IAVLT_LEFT][node];
+            node = tree->node[FAVLT_LEFT][node];
         } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
             size_t const peek = stack.elements[stack.length - 1];
 
-            size_t const peek_right = tree->node[IAVLT_RIGHT][peek];
+            size_t const peek_right = tree->node[FAVLT_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
@@ -903,18 +1041,24 @@ void post_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn con
     tree->allocator->free(stack.elements, tree->allocator->arguments);
 }
 
-void level_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void level_order_favl_tree(favl_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
     error(tree != arguments && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
-    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->max && "Maximum size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL.");
+    valid(tree->height && "Height array can't be NULL.");
+    valid(tree->parent && "Parent array can't be NULL.");
+    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
+    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     // create simple queue to manage breath first level order traversal of node indexes
-    struct iavl_tree_queue queue = {
+    struct favl_tree_queue queue = {
         .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
     };
     error(!tree->length || queue.elements && "Memory allocation failed.");
@@ -930,13 +1074,13 @@ void level_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn co
         queue.length--;
 
         // push left child of popped parent to the top of the queue
-        size_t const left_child = tree->node[IAVLT_LEFT][node];
+        size_t const left_child = tree->node[FAVLT_LEFT][node];
         if (NIL != left_child) {
             queue.elements[queue.current + queue.length++] = left_child;
         }
 
         // push right child of popped parent to the top of the queue
-        size_t const right_child = tree->node[IAVLT_RIGHT][node];
+        size_t const right_child = tree->node[FAVLT_RIGHT][node];
         if (NIL != right_child) {
             queue.elements[queue.current + queue.length++] = right_child;
         }
@@ -945,7 +1089,7 @@ void level_order_iavl_tree(iavl_tree_s const * const restrict tree, handle_fn co
     tree->allocator->free(queue.elements, tree->allocator->arguments);
 }
 
-size_t * _iavl_tree_floor(iavl_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _favl_tree_floor(favl_tree_s * const restrict tree, void const * const restrict element) {
     size_t * floor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
@@ -958,13 +1102,13 @@ size_t * _iavl_tree_floor(iavl_tree_s * const restrict tree, void const * const 
             floor = n;
         }
 
-        n = comparison < 0 ? tree->node[IAVLT_LEFT] + (*n) : tree->node[IAVLT_RIGHT] + (*n);
+        n = comparison < 0 ? tree->node[FAVLT_LEFT] + (*n) : tree->node[FAVLT_RIGHT] + (*n);
     }
 
     return floor;
 }
 
-size_t * _iavl_tree_ceil(iavl_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _favl_tree_ceil(favl_tree_s * const restrict tree, void const * const restrict element) {
     size_t * ceil = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
@@ -977,18 +1121,18 @@ size_t * _iavl_tree_ceil(iavl_tree_s * const restrict tree, void const * const r
             ceil = n;
         }
 
-        n = comparison < 0 ? tree->node[IAVLT_LEFT] + (*n) : tree->node[IAVLT_RIGHT] + (*n);
+        n = comparison < 0 ? tree->node[FAVLT_LEFT] + (*n) : tree->node[FAVLT_RIGHT] + (*n);
     }
 
     return ceil;
 }
 
-size_t * _iavl_tree_successor(iavl_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _favl_tree_successor(favl_tree_s * const restrict tree, void const * const restrict element) {
     size_t * successor = NULL;
 
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IAVLT_RIGHT][tree->root]) {
-        for (successor = tree->node[IAVLT_RIGHT] + tree->root; NIL != *(tree->node[IAVLT_LEFT] + (*successor));) {
-            successor = tree->node[IAVLT_LEFT] + (*successor);
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[FAVLT_RIGHT][tree->root]) {
+        for (successor = tree->node[FAVLT_RIGHT] + tree->root; NIL != *(tree->node[FAVLT_LEFT] + (*successor));) {
+            successor = tree->node[FAVLT_LEFT] + (*successor);
         }
 
         return successor;
@@ -1001,13 +1145,13 @@ size_t * _iavl_tree_successor(iavl_tree_s * const restrict tree, void const * co
             successor = n;
         }
 
-        n = comparison < 0 ? tree->node[IAVLT_LEFT] + (*n) : tree->node[IAVLT_RIGHT] + (*n);
+        n = comparison < 0 ? tree->node[FAVLT_LEFT] + (*n) : tree->node[FAVLT_RIGHT] + (*n);
     }
 
     return successor;
 }
 
-size_t * _iavl_tree_predecessor(iavl_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _favl_tree_predecessor(favl_tree_s * const restrict tree, void const * const restrict element) {
     size_t * predecessor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
@@ -1015,28 +1159,28 @@ size_t * _iavl_tree_predecessor(iavl_tree_s * const restrict tree, void const * 
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
-            if (NIL != *(tree->node[IAVLT_LEFT] + (*n))) {
-                for (predecessor = tree->node[IAVLT_LEFT] + (*n); NIL != *(tree->node[IAVLT_RIGHT] + (*predecessor));) {
-                    predecessor = tree->node[IAVLT_RIGHT] + (*predecessor);
+            if (NIL != *(tree->node[FAVLT_LEFT] + (*n))) {
+                for (predecessor = tree->node[FAVLT_LEFT] + (*n); NIL != *(tree->node[FAVLT_RIGHT] + (*predecessor));) {
+                    predecessor = tree->node[FAVLT_RIGHT] + (*predecessor);
                 }
             }
             break;
         }
 
-        n = comparison < 0 ? tree->node[IAVLT_LEFT] + (*n) : tree->node[IAVLT_RIGHT] + (*n);
+        n = comparison < 0 ? tree->node[FAVLT_LEFT] + (*n) : tree->node[FAVLT_RIGHT] + (*n);
     }
 
     return predecessor;
 }
 
-size_t _iavl_tree_get_height(iavl_tree_s const * const tree, size_t const node) {
+size_t _favl_tree_get_height(favl_tree_s const * const tree, size_t const node) {
     return (NIL == node ? 0 : tree->height[node]);
 }
 
-void _iavl_tree_left_rotate(iavl_tree_s * const tree, size_t const node) {
-    const size_t x = node, y = tree->node[IAVLT_RIGHT][x], z = tree->node[IAVLT_LEFT][y];
+void _favl_tree_left_rotate(favl_tree_s * const tree, size_t const node) {
+    const size_t x = node, y = tree->node[FAVLT_RIGHT][x], z = tree->node[FAVLT_LEFT][y];
 
-    tree->node[IAVLT_RIGHT][x] = z;
+    tree->node[FAVLT_RIGHT][x] = z;
     if (NIL != z) {
         tree->parent[z] = x;
     }
@@ -1044,28 +1188,28 @@ void _iavl_tree_left_rotate(iavl_tree_s * const tree, size_t const node) {
 
     if (NIL == tree->parent[x]) {
         tree->root = y;
-    } else if (x == tree->node[IAVLT_LEFT][tree->parent[x]]) {
-        tree->node[IAVLT_LEFT][tree->parent[x]] = y;
+    } else if (x == tree->node[FAVLT_LEFT][tree->parent[x]]) {
+        tree->node[FAVLT_LEFT][tree->parent[x]] = y;
     } else {
-        tree->node[IAVLT_RIGHT][tree->parent[x]] = y;
+        tree->node[FAVLT_RIGHT][tree->parent[x]] = y;
     }
 
-    tree->node[IAVLT_LEFT][y] = x;
+    tree->node[FAVLT_LEFT][y] = x;
     tree->parent[x] = y;
 
-    size_t const x_left_height = _iavl_tree_get_height(tree, tree->node[IAVLT_LEFT][x]);
-    size_t const x_right_height = _iavl_tree_get_height(tree, tree->node[IAVLT_RIGHT][x]);
+    size_t const x_left_height = _favl_tree_get_height(tree, tree->node[FAVLT_LEFT][x]);
+    size_t const x_right_height = _favl_tree_get_height(tree, tree->node[FAVLT_RIGHT][x]);
     tree->height[x] = 1 + (x_right_height > x_left_height ? x_right_height : x_left_height);
 
-    size_t const y_left_height = _iavl_tree_get_height(tree, tree->node[IAVLT_LEFT][y]);
-    size_t const y_right_height = _iavl_tree_get_height(tree, tree->node[IAVLT_RIGHT][y]);
+    size_t const y_left_height = _favl_tree_get_height(tree, tree->node[FAVLT_LEFT][y]);
+    size_t const y_right_height = _favl_tree_get_height(tree, tree->node[FAVLT_RIGHT][y]);
     tree->height[y] = 1 + (y_right_height > y_left_height ? y_right_height : y_left_height);
 }
 
-void _iavl_tree_right_rotate(iavl_tree_s * const tree, size_t const node) {
-    size_t const x = node, y = tree->node[IAVLT_LEFT][x], z = tree->node[IAVLT_RIGHT][y];
+void _favl_tree_right_rotate(favl_tree_s * const tree, size_t const node) {
+    size_t const x = node, y = tree->node[FAVLT_LEFT][x], z = tree->node[FAVLT_RIGHT][y];
 
-    tree->node[IAVLT_LEFT][x] = z;
+    tree->node[FAVLT_LEFT][x] = z;
     if (NIL != z) {
         tree->parent[z] = x;
     }
@@ -1073,33 +1217,33 @@ void _iavl_tree_right_rotate(iavl_tree_s * const tree, size_t const node) {
 
     if (NIL == tree->parent[x]) {
         tree->root = y;
-    } else if (x == tree->node[IAVLT_LEFT][tree->parent[x]]) {
-        tree->node[IAVLT_LEFT][tree->parent[x]] = y;
+    } else if (x == tree->node[FAVLT_LEFT][tree->parent[x]]) {
+        tree->node[FAVLT_LEFT][tree->parent[x]] = y;
     } else {
-        tree->node[IAVLT_RIGHT][tree->parent[x]] = y;
+        tree->node[FAVLT_RIGHT][tree->parent[x]] = y;
     }
 
-    tree->node[IAVLT_RIGHT][y] = x;
+    tree->node[FAVLT_RIGHT][y] = x;
     tree->parent[x] = y;
 
-    size_t const x_left_height = _iavl_tree_get_height(tree, tree->node[IAVLT_LEFT][x]);
-    size_t const x_right_height = _iavl_tree_get_height(tree, tree->node[IAVLT_RIGHT][x]);
+    size_t const x_left_height = _favl_tree_get_height(tree, tree->node[FAVLT_LEFT][x]);
+    size_t const x_right_height = _favl_tree_get_height(tree, tree->node[FAVLT_RIGHT][x]);
     tree->height[x] = 1 + (x_right_height > x_left_height ? x_right_height : x_left_height);
 
-    size_t const y_left_height = _iavl_tree_get_height(tree, tree->node[IAVLT_LEFT][y]);
-    size_t const y_right_height = _iavl_tree_get_height(tree, tree->node[IAVLT_RIGHT][y]);
+    size_t const y_left_height = _favl_tree_get_height(tree, tree->node[FAVLT_LEFT][y]);
+    size_t const y_right_height = _favl_tree_get_height(tree, tree->node[FAVLT_RIGHT][y]);
     tree->height[y] = 1 + (y_right_height > y_left_height ? y_right_height : y_left_height);
 }
 
-void _iavl_tree_rebalance(iavl_tree_s * const tree, size_t const node) {
+void _favl_tree_rebalance(favl_tree_s * const tree, size_t const node) {
     for (size_t n = node; NIL != n && NIL != tree->parent[n]; n = tree->parent[n]) {
         // calculate left child's height
-        size_t const left = tree->node[IAVLT_LEFT][n];
-        size_t const left_height = _iavl_tree_get_height(tree, left);
+        size_t const left = tree->node[FAVLT_LEFT][n];
+        size_t const left_height = _favl_tree_get_height(tree, left);
 
         // calculate right child's height
-        size_t const right = tree->node[IAVLT_RIGHT][n];
-        size_t const right_height = _iavl_tree_get_height(tree, right);
+        size_t const right = tree->node[FAVLT_RIGHT][n];
+        size_t const right_height = _favl_tree_get_height(tree, right);
 
         // set new height for each element popped from stack
         tree->height[n] = 1 + (left_height > right_height ? left_height : right_height);
@@ -1112,38 +1256,38 @@ void _iavl_tree_rebalance(iavl_tree_s * const tree, size_t const node) {
         }
 
         if (left_height < right_height) {
-            size_t const left_grand_height = _iavl_tree_get_height(tree, tree->node[IAVLT_LEFT][right]);
-            size_t const right_grand_height = _iavl_tree_get_height(tree, tree->node[IAVLT_RIGHT][right]);
+            size_t const left_grand_height = _favl_tree_get_height(tree, tree->node[FAVLT_LEFT][right]);
+            size_t const right_grand_height = _favl_tree_get_height(tree, tree->node[FAVLT_RIGHT][right]);
 
             if (left_grand_height > right_grand_height) {
-                _iavl_tree_right_rotate(tree, right);
+                _favl_tree_right_rotate(tree, right);
             }
-            _iavl_tree_left_rotate(tree, n);
+            _favl_tree_left_rotate(tree, n);
         }
 
         if (left_height > right_height) {
-            size_t const left_grand_height = _iavl_tree_get_height(tree, tree->node[IAVLT_LEFT][left]);
-            size_t const right_grand_height = _iavl_tree_get_height(tree, tree->node[IAVLT_RIGHT][left]);
+            size_t const left_grand_height = _favl_tree_get_height(tree, tree->node[FAVLT_LEFT][left]);
+            size_t const right_grand_height = _favl_tree_get_height(tree, tree->node[FAVLT_RIGHT][left]);
 
             if (left_grand_height < right_grand_height) {
-                _iavl_tree_left_rotate(tree, left);
+                _favl_tree_left_rotate(tree, left);
             }
-            _iavl_tree_right_rotate(tree, n);
+            _favl_tree_right_rotate(tree, n);
         }
     }
 }
 
-size_t _iavl_tree_remove_fixup(iavl_tree_s const * const restrict tree, size_t * const restrict node) {
+size_t _favl_tree_remove_fixup(favl_tree_s const * const restrict tree, size_t * const restrict node) {
     // calculate the rightmost depth of the left child
     size_t left_depth = 0, * left_node = node;
-    for (size_t * l = tree->node[IAVLT_LEFT] + (*left_node); NIL != (*l); l = tree->node[IAVLT_RIGHT] + (*l)) {
+    for (size_t * l = tree->node[FAVLT_LEFT] + (*left_node); NIL != (*l); l = tree->node[FAVLT_RIGHT] + (*l)) {
         left_depth++;
         left_node = l;
     }
 
     // calculate the leftmost depth of the right child
     size_t right_depth = 0, * right_node = node;
-    for (size_t * r = tree->node[IAVLT_RIGHT] + (*right_node); NIL != (*r); r = tree->node[IAVLT_LEFT] + (*r)) {
+    for (size_t * r = tree->node[FAVLT_RIGHT] + (*right_node); NIL != (*r); r = tree->node[FAVLT_LEFT] + (*r)) {
         right_depth++;
         right_node = r;
     }
@@ -1151,42 +1295,42 @@ size_t _iavl_tree_remove_fixup(iavl_tree_s const * const restrict tree, size_t *
     size_t const hole = left_depth > right_depth ? (*left_node) : (*right_node);
     memmove(tree->elements + ((*node) * tree->size), tree->elements + (hole * tree->size), tree->size);
     if (left_depth > right_depth) {
-        if (NIL != tree->node[IAVLT_LEFT][(*left_node)]) { // if right child exists cut off parent
-            tree->parent[tree->node[IAVLT_LEFT][(*left_node)]] = tree->parent[(*left_node)];
+        if (NIL != tree->node[FAVLT_LEFT][(*left_node)]) { // if right child exists cut off parent
+            tree->parent[tree->node[FAVLT_LEFT][(*left_node)]] = tree->parent[(*left_node)];
         }
-        (*left_node) = tree->node[IAVLT_LEFT][(*left_node)]; // cut off new hole index
+        (*left_node) = tree->node[FAVLT_LEFT][(*left_node)]; // cut off new hole index
     } else {
-        if (NIL != tree->node[IAVLT_RIGHT][(*right_node)]) { // if left child exists cut off parent
-            tree->parent[tree->node[IAVLT_RIGHT][(*right_node)]] = tree->parent[(*right_node)];
+        if (NIL != tree->node[FAVLT_RIGHT][(*right_node)]) { // if left child exists cut off parent
+            tree->parent[tree->node[FAVLT_RIGHT][(*right_node)]] = tree->parent[(*right_node)];
         }
-        (*right_node) = tree->node[IAVLT_RIGHT][(*right_node)]; // cut off new hole index
+        (*right_node) = tree->node[FAVLT_RIGHT][(*right_node)]; // cut off new hole index
     }
 
     return hole;
 }
 
-void _iavl_tree_fill_hole(iavl_tree_s * const tree, size_t const hole) {
+void _favl_tree_fill_hole(favl_tree_s * const tree, size_t const hole) {
     if (tree->length && tree->root == tree->length) { // if head node is last array element then change index to removed one
         tree->root = hole;
     }
 
     // cut hole node from the rest of the tree
-    tree->node[IAVLT_LEFT][hole] = tree->node[IAVLT_RIGHT][hole] = tree->parent[hole] = hole;
+    tree->node[FAVLT_LEFT][hole] = tree->node[FAVLT_RIGHT][hole] = tree->parent[hole] = hole;
 
     // replace removed element with rightmost array one (or fill hole with valid element)
     memmove(tree->elements + (hole * tree->size), tree->elements + (tree->length * tree->size), tree->size);
-    tree->node[IAVLT_LEFT][hole] = tree->node[IAVLT_LEFT][tree->length];
-    tree->node[IAVLT_RIGHT][hole] = tree->node[IAVLT_RIGHT][tree->length];
+    tree->node[FAVLT_LEFT][hole] = tree->node[FAVLT_LEFT][tree->length];
+    tree->node[FAVLT_RIGHT][hole] = tree->node[FAVLT_RIGHT][tree->length];
     tree->parent[hole] = tree->parent[tree->length];
 
     // redirect left child of rightmost array node if they don't overlap with removed index
-    size_t const left_last = tree->node[IAVLT_LEFT][tree->length];
+    size_t const left_last = tree->node[FAVLT_LEFT][tree->length];
     if (NIL != left_last) {
         tree->parent[left_last] = hole;
     }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
-    size_t const right_last = tree->node[IAVLT_RIGHT][tree->length];
+    size_t const right_last = tree->node[FAVLT_RIGHT][tree->length];
     if (NIL != right_last) {
         tree->parent[right_last] = hole;
     }
@@ -1195,26 +1339,7 @@ void _iavl_tree_fill_hole(iavl_tree_s * const tree, size_t const hole) {
     size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
         const int comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
-        const size_t node_index = comparison <= 0 ? IAVLT_LEFT : IAVLT_RIGHT;
+        const size_t node_index = comparison <= 0 ? FAVLT_LEFT : FAVLT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }
-}
-
-void _iavl_tree_resize(iavl_tree_s * const tree, size_t const size) {
-    tree->capacity = size;
-
-    tree->elements = tree->allocator->realloc(tree->elements, tree->capacity * tree->size, tree->allocator->arguments);
-    error((!tree->capacity || tree->elements) && "Memory allocation failed.");
-
-    tree->height = tree->allocator->realloc(tree->height, tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    error((!tree->capacity || tree->height) && "Memory allocation failed.");
-
-    tree->parent = tree->allocator->realloc(tree->parent, tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    error((!tree->capacity || tree->parent) && "Memory allocation failed.");
-
-    tree->node[IAVLT_LEFT] = tree->allocator->realloc(tree->node[IAVLT_LEFT], tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    error((!tree->capacity || tree->node[IAVLT_LEFT]) && "Memory allocation failed.");
-
-    tree->node[IAVLT_RIGHT] = tree->allocator->realloc(tree->node[IAVLT_RIGHT], tree->capacity * sizeof(size_t), tree->allocator->arguments);
-    error((!tree->capacity || tree->node[IAVLT_RIGHT]) && "Memory allocation failed.");
 }

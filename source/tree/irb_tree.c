@@ -1225,18 +1225,16 @@ size_t _irb_tree_successor(irb_tree_s const * const restrict tree, void const * 
         for (successor = tree->node[IRBT_RIGHT][tree->root]; NIL != tree->node[IRBT_LEFT][successor];) {
             successor = tree->node[IRBT_LEFT][successor];
         }
+    } else {
+        for (size_t n = tree->root; NIL != n;) {
+            // calculate and determine next child node, i.e. if left or right child
+            const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+            if (comparison < 0) {
+                successor = n;
+            }
 
-        return successor;
-    }
-
-    for (size_t n = tree->root; NIL != n;) {
-        // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
-        if (comparison < 0) {
-            successor = n;
+            n = comparison < 0 ? tree->node[IRBT_LEFT][n] : tree->node[IRBT_RIGHT][n];
         }
-
-        n = comparison < 0 ? tree->node[IRBT_LEFT][n] : tree->node[IRBT_RIGHT][n];
     }
 
     return successor;

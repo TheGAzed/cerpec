@@ -10,7 +10,7 @@ int main(const int argc, char **argv) {
     RUN_SUITE(irb_tree_test);
 
     RUN_SUITE(fbsearch_tree_test);
-    //RUN_SUITE(favl_tree_test);
+    RUN_SUITE(favl_tree_test);
     //RUN_SUITE(frb_tree_test);
 
     GREATEST_MAIN_END();
