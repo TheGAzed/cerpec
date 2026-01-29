@@ -95,20 +95,20 @@ irb_tree_s create_irb_tree(size_t const size, compare_fn const compare) {
         .elements = standard.alloc(size, standard.arguments),
         .color = standard.alloc(sizeof(bool), standard.arguments),
         .parent = standard.alloc(sizeof(size_t), standard.arguments),
-        .node[IRB_TREE_LEFT] = standard.alloc(sizeof(size_t), standard.arguments),
-        .node[IRB_TREE_RIGHT] = standard.alloc(sizeof(size_t), standard.arguments),
+        .node[IRBT_LEFT] = standard.alloc(sizeof(size_t), standard.arguments),
+        .node[IRBT_RIGHT] = standard.alloc(sizeof(size_t), standard.arguments),
         .allocator = &standard,
     };
 
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
     error(tree.parent && "Memory allocation failed.");
-    error(tree.node[IRB_TREE_LEFT] && "Memory allocation failed.");
-    error(tree.node[IRB_TREE_RIGHT] && "Memory allocation failed.");
+    error(tree.node[IRBT_LEFT] && "Memory allocation failed.");
+    error(tree.node[IRBT_RIGHT] && "Memory allocation failed.");
 
     // set NIL node since the tree uses special NIL nodes
-    tree.color[NIL] = IBLACK_TREE_COLOR;
-    tree.parent[NIL] = tree.node[IRB_TREE_LEFT][NIL] = tree.node[IRB_TREE_RIGHT][NIL] = NIL;
+    tree.color[NIL] = IBLACK_COLOR;
+    tree.parent[NIL] = tree.node[IRBT_LEFT][NIL] = tree.node[IRBT_RIGHT][NIL] = NIL;
 
     return tree;
 }
@@ -122,20 +122,20 @@ irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, memory_s c
         .elements = allocator->alloc(size, allocator->arguments),
         .color = allocator->alloc(sizeof(bool), allocator->arguments),
         .parent = allocator->alloc(sizeof(size_t), allocator->arguments),
-        .node[IRB_TREE_LEFT] = allocator->alloc(sizeof(size_t), allocator->arguments),
-        .node[IRB_TREE_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arguments),
+        .node[IRBT_LEFT] = allocator->alloc(sizeof(size_t), allocator->arguments),
+        .node[IRBT_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arguments),
         .allocator = allocator,
     };
 
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
     error(tree.parent && "Memory allocation failed.");
-    error(tree.node[IRB_TREE_LEFT] && "Memory allocation failed.");
-    error(tree.node[IRB_TREE_RIGHT] && "Memory allocation failed.");
+    error(tree.node[IRBT_LEFT] && "Memory allocation failed.");
+    error(tree.node[IRBT_RIGHT] && "Memory allocation failed.");
 
     // set NIL node since the tree uses special NIL nodes
-    tree.color[NIL] = IBLACK_TREE_COLOR;
-    tree.parent[NIL] = tree.node[IRB_TREE_LEFT][NIL] = tree.node[IRB_TREE_RIGHT][NIL] = NIL;
+    tree.color[NIL] = IBLACK_COLOR;
+    tree.parent[NIL] = tree.node[IRBT_LEFT][NIL] = tree.node[IRBT_RIGHT][NIL] = NIL;
 
     return tree;
 }
@@ -149,16 +149,14 @@ void destroy_irb_tree(irb_tree_s * const tree, set_fn const destroy) {
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    while (tree->length) {
-        tree->length--;
-        destroy(tree->elements + (tree->length * tree->size));
+    for (size_t i = 0; i < tree->length; ++i) {
+        destroy(tree->elements + (i * tree->size));
     }
-
     tree->allocator->free(tree->elements, tree->allocator->arguments);
     tree->allocator->free(tree->color, tree->allocator->arguments);
     tree->allocator->free(tree->parent, tree->allocator->arguments);
-    tree->allocator->free(tree->node[IRB_TREE_LEFT], tree->allocator->arguments);
-    tree->allocator->free(tree->node[IRB_TREE_RIGHT], tree->allocator->arguments);
+    tree->allocator->free(tree->node[IRBT_LEFT], tree->allocator->arguments);
+    tree->allocator->free(tree->node[IRBT_RIGHT], tree->allocator->arguments);
 
     memset(tree, 0, sizeof(irb_tree_s));
 }
@@ -172,25 +170,24 @@ void clear_irb_tree(irb_tree_s * const tree, set_fn const destroy) {
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    while (tree->length) {
-        tree->length--;
-        destroy(tree->elements + (tree->length * tree->size));
+    for (size_t i = 0; i < tree->length; ++i) {
+        destroy(tree->elements + (i * tree->size));
     }
 
     tree->elements = tree->allocator->realloc(tree->elements, tree->size, tree->allocator->arguments);
     tree->color = tree->allocator->realloc(tree->color, sizeof(bool), tree->allocator->arguments);
     tree->parent = tree->allocator->realloc(tree->parent, sizeof(size_t), tree->allocator->arguments);
-    tree->node[IRB_TREE_LEFT] = tree->allocator->realloc(tree->node[IRB_TREE_LEFT], sizeof(size_t), tree->allocator->arguments);
-    tree->node[IRB_TREE_RIGHT] = tree->allocator->realloc(tree->node[IRB_TREE_RIGHT], sizeof(size_t), tree->allocator->arguments);
+    tree->node[IRBT_LEFT] = tree->allocator->realloc(tree->node[IRBT_LEFT], sizeof(size_t), tree->allocator->arguments);
+    tree->node[IRBT_RIGHT] = tree->allocator->realloc(tree->node[IRBT_RIGHT], sizeof(size_t), tree->allocator->arguments);
 
     error(tree->elements && "Memory allocation failed.");
     error(tree->color && "Memory allocation failed.");
     error(tree->parent && "Memory allocation failed.");
-    error(tree->node[IRB_TREE_LEFT] && "Memory allocation failed.");
-    error(tree->node[IRB_TREE_RIGHT] && "Memory allocation failed.");
+    error(tree->node[IRBT_LEFT] && "Memory allocation failed.");
+    error(tree->node[IRBT_RIGHT] && "Memory allocation failed.");
 
     tree->root = NIL;
-    tree->capacity = 0;
+    tree->length = tree->capacity = 0;
 }
 
 irb_tree_s copy_irb_tree(irb_tree_s const * const tree, copy_fn const copy) {
@@ -206,8 +203,8 @@ irb_tree_s copy_irb_tree(irb_tree_s const * const tree, copy_fn const copy) {
         .elements = tree->allocator->alloc((tree->capacity + 1) * tree->size, tree->allocator->arguments),
         .color = tree->allocator->alloc((tree->capacity + 1) * sizeof(bool), tree->allocator->arguments),
         .parent = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
-        .node[IRB_TREE_LEFT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
-        .node[IRB_TREE_RIGHT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
+        .node[IRBT_LEFT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
+        .node[IRBT_RIGHT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arguments),
         .allocator = tree->allocator,
 
         .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare, .size = tree->size,
@@ -217,16 +214,16 @@ irb_tree_s copy_irb_tree(irb_tree_s const * const tree, copy_fn const copy) {
     error(replica.elements && "Memory allocation failed.");
     error(replica.color && "Memory allocation failed.");
     error(replica.parent && "Memory allocation failed.");
-    error(replica.node[IRB_TREE_LEFT] && "Memory allocation failed.");
-    error(replica.node[IRB_TREE_RIGHT] && "Memory allocation failed.");
+    error(replica.node[IRBT_LEFT] && "Memory allocation failed.");
+    error(replica.node[IRBT_RIGHT] && "Memory allocation failed.");
 
     for (size_t i = 1; i < tree->length + 1; ++i) {
         copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
     }
     memcpy(replica.color, tree->color, (tree->length + 1) * sizeof(bool));
     memcpy(replica.parent, tree->parent, (tree->length + 1) * sizeof(size_t));
-    memcpy(replica.node[IRB_TREE_LEFT], tree->node[IRB_TREE_LEFT], (tree->length + 1) * sizeof(size_t));
-    memcpy(replica.node[IRB_TREE_RIGHT], tree->node[IRB_TREE_RIGHT], (tree->length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRBT_LEFT], tree->node[IRBT_LEFT], (tree->length + 1) * sizeof(size_t));
+    memcpy(replica.node[IRBT_RIGHT], tree->node[IRBT_RIGHT], (tree->length + 1) * sizeof(size_t));
 
     return replica;
 }
@@ -265,14 +262,14 @@ void insert_irb_tree(irb_tree_s * const restrict tree, void const * const restri
         previous = (*node); // change parent to child
 
         // go to next child node
-        node = (comparison <= 0) ? tree->node[IRB_TREE_LEFT] + (*node) : tree->node[IRB_TREE_RIGHT] + (*node);
+        node = (comparison <= 0) ? tree->node[IRBT_LEFT] + (*node) : tree->node[IRBT_RIGHT] + (*node);
     }
 
     (*node) = tree->length + 1; // change child index from invalid value to next empty index in array
     tree->parent[(*node)] = previous; // make child's parent into parent
     // make child's left and right indexes invalid
-    tree->node[IRB_TREE_LEFT][(*node)] = tree->node[IRB_TREE_RIGHT][(*node)] = NIL;
-    tree->color[(*node)] = IRED_TREE_COLOR;
+    tree->node[IRBT_LEFT][(*node)] = tree->node[IRBT_RIGHT][(*node)] = NIL;
+    tree->color[(*node)] = IRED_COLOR;
 
     memcpy(tree->elements + ((*node) * tree->size), element, tree->size);
     tree->length++;
@@ -286,8 +283,8 @@ void remove_irb_tree(irb_tree_s * const restrict tree, void const * const restri
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -307,7 +304,7 @@ void remove_irb_tree(irb_tree_s * const restrict tree, void const * const restri
         }
 
         // go to next child node
-        node = (comparison < 0) ? tree->node[IRB_TREE_LEFT][node] : tree->node[IRB_TREE_RIGHT][node];
+        node = (comparison < 0) ? tree->node[IRBT_LEFT][node] : tree->node[IRBT_RIGHT][node];
     }
 
     if (NIL == node) {
@@ -346,7 +343,7 @@ bool contains_irb_tree(irb_tree_s const * const restrict tree, void const * cons
         }
 
         // go to next child node
-        node = (comparison < 0) ? tree->node[IRB_TREE_LEFT][node] : tree->node[IRB_TREE_RIGHT][node];
+        node = (comparison < 0) ? tree->node[IRBT_LEFT][node] : tree->node[IRBT_RIGHT][node];
     }
 
     return false;
@@ -358,8 +355,8 @@ void get_max_irb_tree(irb_tree_s const * const restrict tree, void * const restr
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != buffer && "Parameters can't be equal.");
 
@@ -369,7 +366,7 @@ void get_max_irb_tree(irb_tree_s const * const restrict tree, void * const restr
     valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t maximum = tree->root;
-    for (size_t i = tree->node[IRB_TREE_RIGHT][maximum]; NIL != i; i = tree->node[IRB_TREE_RIGHT][i]) {
+    for (size_t i = tree->node[IRBT_RIGHT][maximum]; NIL != i; i = tree->node[IRBT_RIGHT][i]) {
         maximum = i;
     }
 
@@ -382,8 +379,8 @@ void get_min_irb_tree(irb_tree_s const * const restrict tree, void * const restr
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != buffer && "Parameters can't be equal.");
 
@@ -393,7 +390,7 @@ void get_min_irb_tree(irb_tree_s const * const restrict tree, void * const restr
     valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t minimum = tree->root;
-    for (size_t i = tree->node[IRB_TREE_LEFT][minimum]; NIL != i; i = tree->node[IRB_TREE_LEFT][i]) {
+    for (size_t i = tree->node[IRBT_LEFT][minimum]; NIL != i; i = tree->node[IRBT_LEFT][i]) {
         minimum = i;
     }
 
@@ -406,8 +403,8 @@ void remove_max_irb_tree(irb_tree_s * const restrict tree, void * const restrict
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != buffer && "Parameters can't be equal.");
 
@@ -417,7 +414,7 @@ void remove_max_irb_tree(irb_tree_s * const restrict tree, void * const restrict
     valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t maximum = tree->root;
-    for (size_t i = tree->node[IRB_TREE_RIGHT][maximum]; NIL != i; i = tree->node[IRB_TREE_RIGHT][i]) {
+    for (size_t i = tree->node[IRBT_RIGHT][maximum]; NIL != i; i = tree->node[IRBT_RIGHT][i]) {
         maximum = i;
     }
 
@@ -439,8 +436,8 @@ void remove_min_irb_tree(irb_tree_s * const restrict tree, void * const restrict
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != buffer && "Parameters can't be equal.");
 
@@ -450,7 +447,7 @@ void remove_min_irb_tree(irb_tree_s * const restrict tree, void * const restrict
     valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t minimum = tree->root;
-    for (size_t i = tree->node[IRB_TREE_LEFT][minimum]; NIL != i; i = tree->node[IRB_TREE_LEFT][i]) {
+    for (size_t i = tree->node[IRBT_LEFT][minimum]; NIL != i; i = tree->node[IRBT_LEFT][i]) {
         minimum = i;
     }
 
@@ -472,8 +469,8 @@ void get_floor_irb_tree(irb_tree_s const * const restrict tree, void const * con
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -501,8 +498,8 @@ void get_ceil_irb_tree(irb_tree_s const * const restrict tree, void const * cons
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -530,8 +527,8 @@ void remove_floor_irb_tree(irb_tree_s * const restrict tree, void const * const 
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -568,8 +565,8 @@ void remove_ceil_irb_tree(irb_tree_s * const restrict tree, void const * const r
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -606,8 +603,8 @@ void get_successor_irb_tree(irb_tree_s const * const restrict tree, void const *
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -635,8 +632,8 @@ void get_predecessor_irb_tree(irb_tree_s const * const restrict tree, void const
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -664,8 +661,8 @@ void remove_successor_irb_tree(irb_tree_s * const restrict tree, void const * co
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -702,8 +699,8 @@ void remove_predecessor_irb_tree(irb_tree_s * const restrict tree, void const * 
     error(buffer && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != element && "Parameters can't be equal.");
     error(tree != buffer && "Parameters can't be equal.");
@@ -741,8 +738,8 @@ void update_irb_tree(irb_tree_s const * const restrict tree, void const * const 
     error(former && "Parameter can't be NULL.");
     error(tree->elements && "Paremeter can't be NULL.");
     error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[IRB_TREE_RIGHT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_LEFT] && "Paremeter can't be NULL.");
+    error(tree->node[IRBT_RIGHT] && "Paremeter can't be NULL.");
     error(NIL != tree->root && "Paremeter can't be NIL.");
     error(tree != latter && "Parameters can't be equal.");
     error(tree != former && "Parameters can't be equal.");
@@ -762,7 +759,7 @@ void update_irb_tree(irb_tree_s const * const restrict tree, void const * const 
         }
 
         // go to next child node
-        node = (comparison < 0) ? tree->node[IRB_TREE_LEFT][node] : tree->node[IRB_TREE_RIGHT][node];
+        node = (comparison < 0) ? tree->node[IRBT_LEFT][node] : tree->node[IRBT_RIGHT][node];
     }
 
     if (NIL == node) {
@@ -789,8 +786,8 @@ void in_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const h
     size_t node = tree->root;
     while (NIL != node) {
         size_t const parent = tree->parent[node];
-        size_t const left = tree->node[IRB_TREE_LEFT][node];
-        size_t const right = tree->node[IRB_TREE_RIGHT][node];
+        size_t const left = tree->node[IRBT_LEFT][node];
+        size_t const right = tree->node[IRBT_RIGHT][node];
 
         while (!left_done && NIL != left) {
             node = left;
@@ -803,7 +800,7 @@ void in_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const h
             left_done = false;
             node = right;
         } else if (NIL != parent) {
-            while (NIL != parent && node == tree->node[IRB_TREE_RIGHT][parent]) { node = parent; }
+            while (NIL != parent && node == tree->node[IRBT_RIGHT][parent]) { node = parent; }
             if (NIL == parent) { break; }
 
             node = parent;
@@ -836,12 +833,12 @@ void pre_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const 
     while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
         const size_t node = stack.elements[--stack.length];
 
-        const size_t right_child = tree->node[IRB_TREE_RIGHT][node];
+        const size_t right_child = tree->node[IRBT_RIGHT][node];
         if (NIL != right_child) {
             stack.elements[stack.length++] = right_child;
         }
 
-        const size_t left_child = tree->node[IRB_TREE_LEFT][node];
+        const size_t left_child = tree->node[IRBT_LEFT][node];
         if (NIL != left_child) {
             stack.elements[stack.length++] = left_child;
         }
@@ -872,11 +869,11 @@ void post_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn const
     while (stack.length || NIL != node) { // while stack is not empty OR node is valid
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
             stack.elements[stack.length++] = node;
-            node = tree->node[IRB_TREE_LEFT][node];
+            node = tree->node[IRBT_LEFT][node];
         } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
             const size_t peek = stack.elements[stack.length - 1];
 
-            const size_t peek_right = tree->node[IRB_TREE_RIGHT][peek];
+            const size_t peek_right = tree->node[IRBT_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
@@ -919,13 +916,13 @@ void level_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn cons
         queue.length--;
 
         // push left child of popped parent to the top of the queue
-        const size_t left_child = tree->node[IRB_TREE_LEFT][node];
+        const size_t left_child = tree->node[IRBT_LEFT][node];
         if (NIL != left_child) {
             queue.elements[queue.current + queue.length++] = left_child;
         }
 
         // push right child of popped parent to the top of the queue
-        const size_t right_child = tree->node[IRB_TREE_RIGHT][node];
+        const size_t right_child = tree->node[IRBT_RIGHT][node];
         if (NIL != right_child) {
             queue.elements[queue.current + queue.length++] = right_child;
         }
@@ -935,9 +932,9 @@ void level_order_irb_tree(irb_tree_s const * const restrict tree, handle_fn cons
 }
 
 void _irb_tree_left_rotate(irb_tree_s * const tree, size_t const node) {
-    const size_t x = node, y = tree->node[IRB_TREE_RIGHT][x], z = tree->node[IRB_TREE_LEFT][y];
+    const size_t x = node, y = tree->node[IRBT_RIGHT][x], z = tree->node[IRBT_LEFT][y];
 
-    tree->node[IRB_TREE_RIGHT][x] = z;
+    tree->node[IRBT_RIGHT][x] = z;
     if (NIL != z) {
         tree->parent[z] = x;
     }
@@ -945,20 +942,20 @@ void _irb_tree_left_rotate(irb_tree_s * const tree, size_t const node) {
 
     if (NIL == tree->parent[x]) {
         tree->root = y;
-    } else if (x == tree->node[IRB_TREE_LEFT][tree->parent[x]]) {
-        tree->node[IRB_TREE_LEFT][tree->parent[x]] = y;
+    } else if (x == tree->node[IRBT_LEFT][tree->parent[x]]) {
+        tree->node[IRBT_LEFT][tree->parent[x]] = y;
     } else {
-        tree->node[IRB_TREE_RIGHT][tree->parent[x]] = y;
+        tree->node[IRBT_RIGHT][tree->parent[x]] = y;
     }
 
-    tree->node[IRB_TREE_LEFT][y] = x;
+    tree->node[IRBT_LEFT][y] = x;
     tree->parent[x] = y;
 }
 
 void _irb_tree_right_rotate(irb_tree_s * const tree, size_t const node) {
-    const size_t x = node, y = tree->node[IRB_TREE_LEFT][x], z = tree->node[IRB_TREE_RIGHT][y];
+    const size_t x = node, y = tree->node[IRBT_LEFT][x], z = tree->node[IRBT_RIGHT][y];
 
-    tree->node[IRB_TREE_LEFT][x] = z;
+    tree->node[IRBT_LEFT][x] = z;
     if (NIL != z) {
         tree->parent[z] = x;
     }
@@ -966,23 +963,23 @@ void _irb_tree_right_rotate(irb_tree_s * const tree, size_t const node) {
 
     if (NIL == tree->parent[x]) {
         tree->root = y;
-    } else if (x == tree->node[IRB_TREE_LEFT][tree->parent[x]]) {
-        tree->node[IRB_TREE_LEFT][tree->parent[x]] = y;
+    } else if (x == tree->node[IRBT_LEFT][tree->parent[x]]) {
+        tree->node[IRBT_LEFT][tree->parent[x]] = y;
     } else {
-        tree->node[IRB_TREE_RIGHT][tree->parent[x]] = y;
+        tree->node[IRBT_RIGHT][tree->parent[x]] = y;
     }
 
-    tree->node[IRB_TREE_RIGHT][y] = x;
+    tree->node[IRBT_RIGHT][y] = x;
     tree->parent[x] = y;
 }
 
 void _irb_tree_transplant(irb_tree_s * const tree, size_t const u, size_t const v) {
     if (NIL == tree->parent[u]) {
         tree->root = v;
-    } else if (u == tree->node[IRB_TREE_LEFT][tree->parent[u]]) {
-        tree->node[IRB_TREE_LEFT][tree->parent[u]] = v;
+    } else if (u == tree->node[IRBT_LEFT][tree->parent[u]]) {
+        tree->node[IRBT_LEFT][tree->parent[u]] = v;
     } else {
-        tree->node[IRB_TREE_RIGHT][tree->parent[u]] = v;
+        tree->node[IRBT_RIGHT][tree->parent[u]] = v;
     }
 
     tree->parent[v] = tree->parent[u];
@@ -990,160 +987,160 @@ void _irb_tree_transplant(irb_tree_s * const tree, size_t const u, size_t const 
 
 size_t _irb_tree_minimum(irb_tree_s const * const tree, size_t const node) {
     size_t n = node;
-    while (NIL != tree->node[IRB_TREE_LEFT][n]) { // TREE MINIMUM
-        n = tree->node[IRB_TREE_LEFT][n];
+    while (NIL != tree->node[IRBT_LEFT][n]) { // TREE MINIMUM
+        n = tree->node[IRBT_LEFT][n];
     }
 
     return n;
 }
 
 void _irb_tree_insert_fixup(irb_tree_s * const tree, size_t const node) {
-    for (size_t child = node; child != tree->root && IRED_TREE_COLOR == tree->color[tree->parent[child]];) {
-        if (tree->parent[child] == tree->node[IRB_TREE_LEFT][tree->parent[tree->parent[child]]]) {
-            const size_t uncle = tree->node[IRB_TREE_RIGHT][tree->parent[tree->parent[child]]];
+    for (size_t child = node; child != tree->root && IRED_COLOR == tree->color[tree->parent[child]];) {
+        if (tree->parent[child] == tree->node[IRBT_LEFT][tree->parent[tree->parent[child]]]) {
+            const size_t uncle = tree->node[IRBT_RIGHT][tree->parent[tree->parent[child]]];
 
-            if (NIL != uncle && IRED_TREE_COLOR == tree->color[uncle]) {
-                tree->color[tree->parent[child]] = tree->color[uncle] = IBLACK_TREE_COLOR;
-                tree->color[tree->parent[tree->parent[child]]] = IRED_TREE_COLOR;
+            if (NIL != uncle && IRED_COLOR == tree->color[uncle]) {
+                tree->color[tree->parent[child]] = tree->color[uncle] = IBLACK_COLOR;
+                tree->color[tree->parent[tree->parent[child]]] = IRED_COLOR;
                 child = tree->parent[tree->parent[child]];
             } else {
-                if (child == tree->node[IRB_TREE_RIGHT][tree->parent[child]]) {
+                if (child == tree->node[IRBT_RIGHT][tree->parent[child]]) {
                     child = tree->parent[child];
                     _irb_tree_left_rotate(tree, child);
                 }
 
-                tree->color[tree->parent[child]] = IBLACK_TREE_COLOR;
-                tree->color[tree->parent[tree->parent[child]]] = IRED_TREE_COLOR;
+                tree->color[tree->parent[child]] = IBLACK_COLOR;
+                tree->color[tree->parent[tree->parent[child]]] = IRED_COLOR;
                 _irb_tree_right_rotate(tree, tree->parent[tree->parent[child]]);
             }
         } else {
-            const size_t uncle = tree->node[IRB_TREE_LEFT][tree->parent[tree->parent[child]]];
+            const size_t uncle = tree->node[IRBT_LEFT][tree->parent[tree->parent[child]]];
 
-            if (NIL != uncle && IRED_TREE_COLOR == tree->color[uncle]) {
-                tree->color[tree->parent[child]] = tree->color[uncle] = IBLACK_TREE_COLOR;
-                tree->color[tree->parent[tree->parent[child]]] = IRED_TREE_COLOR;
+            if (NIL != uncle && IRED_COLOR == tree->color[uncle]) {
+                tree->color[tree->parent[child]] = tree->color[uncle] = IBLACK_COLOR;
+                tree->color[tree->parent[tree->parent[child]]] = IRED_COLOR;
                 child = tree->parent[tree->parent[child]];
             } else {
-                if (child == tree->node[IRB_TREE_LEFT][tree->parent[child]]) {
+                if (child == tree->node[IRBT_LEFT][tree->parent[child]]) {
                     child = tree->parent[child];
                     _irb_tree_right_rotate(tree, child);
                 }
 
-                tree->color[tree->parent[child]] = IBLACK_TREE_COLOR;
-                tree->color[tree->parent[tree->parent[child]]] = IRED_TREE_COLOR;
+                tree->color[tree->parent[child]] = IBLACK_COLOR;
+                tree->color[tree->parent[tree->parent[child]]] = IRED_COLOR;
                 _irb_tree_left_rotate(tree, tree->parent[tree->parent[child]]);
             }
         }
     }
 
     // fix NIL node
-    tree->color[NIL] = IBLACK_TREE_COLOR;
-    tree->parent[NIL] = tree->node[IRB_TREE_LEFT][NIL] = tree->node[IRB_TREE_RIGHT][NIL] = NIL;
+    tree->color[NIL] = IBLACK_COLOR;
+    tree->parent[NIL] = tree->node[IRBT_LEFT][NIL] = tree->node[IRBT_RIGHT][NIL] = NIL;
 
-    tree->color[tree->root] = IBLACK_TREE_COLOR;
+    tree->color[tree->root] = IBLACK_COLOR;
 }
 
 void _irb_tree_remove(irb_tree_s * const tree, size_t const node) {
     size_t current = node, child = NIL;
     bool original_color = tree->color[current];
-    if (NIL == tree->node[IRB_TREE_LEFT][node]) {
-        child = tree->node[IRB_TREE_RIGHT][node];
-        _irb_tree_transplant(tree, node, tree->node[IRB_TREE_RIGHT][node]);
-    } else if (NIL == tree->node[IRB_TREE_RIGHT][node]) {
-        child = tree->node[IRB_TREE_LEFT][node];
-        _irb_tree_transplant(tree, node, tree->node[IRB_TREE_LEFT][node]);
+    if (NIL == tree->node[IRBT_LEFT][node]) {
+        child = tree->node[IRBT_RIGHT][node];
+        _irb_tree_transplant(tree, node, tree->node[IRBT_RIGHT][node]);
+    } else if (NIL == tree->node[IRBT_RIGHT][node]) {
+        child = tree->node[IRBT_LEFT][node];
+        _irb_tree_transplant(tree, node, tree->node[IRBT_LEFT][node]);
     } else {
-        current = _irb_tree_minimum(tree, tree->node[IRB_TREE_RIGHT][node]);
+        current = _irb_tree_minimum(tree, tree->node[IRBT_RIGHT][node]);
         original_color = tree->color[current];
-        child = tree->node[IRB_TREE_RIGHT][current];
+        child = tree->node[IRBT_RIGHT][current];
 
         if (tree->parent[current] == node) {
             tree->parent[child] = current;
         } else {
-            _irb_tree_transplant(tree, current, tree->node[IRB_TREE_RIGHT][current]);
-            tree->node[IRB_TREE_RIGHT][current] = tree->node[IRB_TREE_RIGHT][node];
-            tree->parent[tree->node[IRB_TREE_RIGHT][current]] = current;
+            _irb_tree_transplant(tree, current, tree->node[IRBT_RIGHT][current]);
+            tree->node[IRBT_RIGHT][current] = tree->node[IRBT_RIGHT][node];
+            tree->parent[tree->node[IRBT_RIGHT][current]] = current;
         }
         _irb_tree_transplant(tree, node, current);
-        tree->node[IRB_TREE_LEFT][current] = tree->node[IRB_TREE_LEFT][node];
-        tree->parent[tree->node[IRB_TREE_LEFT][current]] = current;
+        tree->node[IRBT_LEFT][current] = tree->node[IRBT_LEFT][node];
+        tree->parent[tree->node[IRBT_LEFT][current]] = current;
         tree->color[current] = tree->color[node];
     }
 
-    if (IBLACK_TREE_COLOR == original_color) {
+    if (IBLACK_COLOR == original_color) {
         _irb_tree_remove_fixup(tree, child);
     }
 
     // fix NIL node
-    tree->color[NIL] = IBLACK_TREE_COLOR;
-    tree->parent[NIL] = tree->node[IRB_TREE_LEFT][NIL] = tree->node[IRB_TREE_RIGHT][NIL] = NIL;
+    tree->color[NIL] = IBLACK_COLOR;
+    tree->parent[NIL] = tree->node[IRBT_LEFT][NIL] = tree->node[IRBT_RIGHT][NIL] = NIL;
 }
 
 void _irb_tree_remove_fixup(irb_tree_s * const tree, size_t const node) {
     size_t child = node;
-    while (child != tree->root && IBLACK_TREE_COLOR == tree->color[child]) {
-        if (child == tree->node[IRB_TREE_LEFT][tree->parent[child]]) {
-            size_t sibling = tree->node[IRB_TREE_RIGHT][tree->parent[child]];
-            if (IRED_TREE_COLOR == tree->color[sibling]) {
-                tree->color[sibling] = IBLACK_TREE_COLOR;
-                tree->color[tree->parent[child]] = IRED_TREE_COLOR;
+    while (child != tree->root && IBLACK_COLOR == tree->color[child]) {
+        if (child == tree->node[IRBT_LEFT][tree->parent[child]]) {
+            size_t sibling = tree->node[IRBT_RIGHT][tree->parent[child]];
+            if (IRED_COLOR == tree->color[sibling]) {
+                tree->color[sibling] = IBLACK_COLOR;
+                tree->color[tree->parent[child]] = IRED_COLOR;
                 _irb_tree_left_rotate(tree, tree->parent[child]);
-                sibling = tree->node[IRB_TREE_RIGHT][tree->parent[child]];
+                sibling = tree->node[IRBT_RIGHT][tree->parent[child]];
             }
 
-            const size_t left_nibling = tree->node[IRB_TREE_LEFT][sibling];
-            const size_t right_nibling = tree->node[IRB_TREE_RIGHT][sibling];
+            const size_t left_nibling = tree->node[IRBT_LEFT][sibling];
+            const size_t right_nibling = tree->node[IRBT_RIGHT][sibling];
 
-            if (IBLACK_TREE_COLOR == tree->color[left_nibling] && IBLACK_TREE_COLOR == tree->color[right_nibling]) {
-                tree->color[sibling] = IRED_TREE_COLOR;
+            if (IBLACK_COLOR == tree->color[left_nibling] && IBLACK_COLOR == tree->color[right_nibling]) {
+                tree->color[sibling] = IRED_COLOR;
                 child = tree->parent[child];
             } else {
-                if (IBLACK_TREE_COLOR == tree->color[tree->node[IRB_TREE_RIGHT][sibling]]) {
-                    tree->color[tree->node[IRB_TREE_LEFT][sibling]] = IBLACK_TREE_COLOR;
-                    tree->color[sibling] = IRED_TREE_COLOR;
+                if (IBLACK_COLOR == tree->color[tree->node[IRBT_RIGHT][sibling]]) {
+                    tree->color[tree->node[IRBT_LEFT][sibling]] = IBLACK_COLOR;
+                    tree->color[sibling] = IRED_COLOR;
                     _irb_tree_right_rotate(tree, sibling);
-                    sibling = tree->node[IRB_TREE_RIGHT][tree->parent[child]];
+                    sibling = tree->node[IRBT_RIGHT][tree->parent[child]];
                 }
 
                 tree->color[sibling] = tree->color[tree->parent[child]];
-                tree->color[tree->parent[child]] = IBLACK_TREE_COLOR;
-                tree->color[tree->node[IRB_TREE_RIGHT][sibling]] = IBLACK_TREE_COLOR;
+                tree->color[tree->parent[child]] = IBLACK_COLOR;
+                tree->color[tree->node[IRBT_RIGHT][sibling]] = IBLACK_COLOR;
                 _irb_tree_left_rotate(tree, tree->parent[child]);
                 child = tree->root;
             }
         } else {
-            size_t sibling = tree->node[IRB_TREE_LEFT][tree->parent[child]];
-            if (IRED_TREE_COLOR == tree->color[sibling]) {
-                tree->color[sibling] = IBLACK_TREE_COLOR;
-                tree->color[tree->parent[child]] = IRED_TREE_COLOR;
+            size_t sibling = tree->node[IRBT_LEFT][tree->parent[child]];
+            if (IRED_COLOR == tree->color[sibling]) {
+                tree->color[sibling] = IBLACK_COLOR;
+                tree->color[tree->parent[child]] = IRED_COLOR;
                 _irb_tree_right_rotate(tree, tree->parent[child]);
-                sibling = tree->node[IRB_TREE_LEFT][tree->parent[child]];
+                sibling = tree->node[IRBT_LEFT][tree->parent[child]];
             }
 
-            const size_t left_nibling = tree->node[IRB_TREE_LEFT][sibling];
-            const size_t right_nibling = tree->node[IRB_TREE_RIGHT][sibling];
+            const size_t left_nibling = tree->node[IRBT_LEFT][sibling];
+            const size_t right_nibling = tree->node[IRBT_RIGHT][sibling];
 
-            if (IBLACK_TREE_COLOR == tree->color[left_nibling] && IBLACK_TREE_COLOR == tree->color[right_nibling]) {
-                tree->color[sibling] = IRED_TREE_COLOR;
+            if (IBLACK_COLOR == tree->color[left_nibling] && IBLACK_COLOR == tree->color[right_nibling]) {
+                tree->color[sibling] = IRED_COLOR;
                 child = tree->parent[child];
             } else {
-                if (IBLACK_TREE_COLOR == tree->color[tree->node[IRB_TREE_LEFT][sibling]]) {
-                    tree->color[tree->node[IRB_TREE_RIGHT][sibling]] = IBLACK_TREE_COLOR;
-                    tree->color[sibling] = IRED_TREE_COLOR;
+                if (IBLACK_COLOR == tree->color[tree->node[IRBT_LEFT][sibling]]) {
+                    tree->color[tree->node[IRBT_RIGHT][sibling]] = IBLACK_COLOR;
+                    tree->color[sibling] = IRED_COLOR;
                     _irb_tree_left_rotate(tree, sibling);
-                    sibling = tree->node[IRB_TREE_LEFT][tree->parent[child]];
+                    sibling = tree->node[IRBT_LEFT][tree->parent[child]];
                 }
 
                 tree->color[sibling] = tree->color[tree->parent[child]];
-                tree->color[tree->parent[child]] = IBLACK_TREE_COLOR;
-                tree->color[tree->node[IRB_TREE_LEFT][sibling]] = IBLACK_TREE_COLOR;
+                tree->color[tree->parent[child]] = IBLACK_COLOR;
+                tree->color[tree->node[IRBT_LEFT][sibling]] = IBLACK_COLOR;
                 _irb_tree_right_rotate(tree, tree->parent[child]);
                 child = tree->root;
             }
         }
     }
 
-    tree->color[child] = IBLACK_TREE_COLOR;
+    tree->color[child] = IBLACK_COLOR;
 }
 
 void _irb_tree_fill_hole(irb_tree_s * const tree, size_t const hole) {
@@ -1153,23 +1150,23 @@ void _irb_tree_fill_hole(irb_tree_s * const tree, size_t const hole) {
     }
 
     // cut hole node from the rest of the tree
-    tree->node[IRB_TREE_LEFT][hole] = tree->node[IRB_TREE_RIGHT][hole] = tree->parent[hole] = hole;
+    tree->node[IRBT_LEFT][hole] = tree->node[IRBT_RIGHT][hole] = tree->parent[hole] = hole;
 
     // replace removed element with rightmost array one (or fill hole with valid element)
     memmove(tree->elements + (hole * tree->size), tree->elements + (last * tree->size), tree->size);
-    tree->node[IRB_TREE_LEFT][hole] = tree->node[IRB_TREE_LEFT][last];
-    tree->node[IRB_TREE_RIGHT][hole] = tree->node[IRB_TREE_RIGHT][last];
+    tree->node[IRBT_LEFT][hole] = tree->node[IRBT_LEFT][last];
+    tree->node[IRBT_RIGHT][hole] = tree->node[IRBT_RIGHT][last];
     tree->parent[hole] = tree->parent[last];
     tree->color[hole] = tree->color[last];
 
     // redirect left child of rightmost array node if they don't overlap with removed index
-    const size_t left_last = tree->node[IRB_TREE_LEFT][last];
+    const size_t left_last = tree->node[IRBT_LEFT][last];
     if (NIL != left_last) {
         tree->parent[left_last] = hole;
     }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
-    const size_t right_last = tree->node[IRB_TREE_RIGHT][last];
+    const size_t right_last = tree->node[IRBT_RIGHT][last];
     if (NIL != right_last) {
         tree->parent[right_last] = hole;
     }
@@ -1178,7 +1175,7 @@ void _irb_tree_fill_hole(irb_tree_s * const tree, size_t const hole) {
     const size_t parent_last = tree->parent[last];
     if (NIL != parent_last) {
         const int comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size));
-        const size_t node_index = comparison <= 0 ? IRB_TREE_LEFT : IRB_TREE_RIGHT;
+        const size_t node_index = comparison <= 0 ? IRBT_LEFT : IRBT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }
 }
@@ -1196,7 +1193,7 @@ size_t _irb_tree_floor(irb_tree_s const * const restrict tree, void const * cons
             floor = n;
         }
 
-        n = comparison < 0 ? tree->node[IRB_TREE_LEFT][n] : tree->node[IRB_TREE_RIGHT][n];
+        n = comparison < 0 ? tree->node[IRBT_LEFT][n] : tree->node[IRBT_RIGHT][n];
     }
 
     return floor;
@@ -1215,7 +1212,7 @@ size_t _irb_tree_ceil(irb_tree_s const * const restrict tree, void const * const
             ceil = n;
         }
 
-        n = comparison < 0 ? tree->node[IRB_TREE_LEFT][n] : tree->node[IRB_TREE_RIGHT][n];
+        n = comparison < 0 ? tree->node[IRBT_LEFT][n] : tree->node[IRBT_RIGHT][n];
     }
 
     return ceil;
@@ -1224,9 +1221,9 @@ size_t _irb_tree_ceil(irb_tree_s const * const restrict tree, void const * const
 size_t _irb_tree_successor(irb_tree_s const * const restrict tree, void const * const restrict element) {
     size_t successor = NIL;
 
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IRB_TREE_RIGHT][tree->root]) {
-        for (successor = tree->node[IRB_TREE_RIGHT][tree->root]; NIL != tree->node[IRB_TREE_LEFT][successor];) {
-            successor = tree->node[IRB_TREE_LEFT][successor];
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IRBT_RIGHT][tree->root]) {
+        for (successor = tree->node[IRBT_RIGHT][tree->root]; NIL != tree->node[IRBT_LEFT][successor];) {
+            successor = tree->node[IRBT_LEFT][successor];
         }
 
         return successor;
@@ -1239,7 +1236,7 @@ size_t _irb_tree_successor(irb_tree_s const * const restrict tree, void const * 
             successor = n;
         }
 
-        n = comparison < 0 ? tree->node[IRB_TREE_LEFT][n] : tree->node[IRB_TREE_RIGHT][n];
+        n = comparison < 0 ? tree->node[IRBT_LEFT][n] : tree->node[IRBT_RIGHT][n];
     }
 
     return successor;
@@ -1253,15 +1250,15 @@ size_t _irb_tree_predecessor(irb_tree_s const * const restrict tree, void const 
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
-            if (NIL != tree->node[IRB_TREE_LEFT][n]) {
-                for (predecessor = tree->node[IRB_TREE_LEFT][n]; NIL != tree->node[IRB_TREE_RIGHT][predecessor];) {
-                    predecessor = tree->node[IRB_TREE_RIGHT][predecessor];
+            if (NIL != tree->node[IRBT_LEFT][n]) {
+                for (predecessor = tree->node[IRBT_LEFT][n]; NIL != tree->node[IRBT_RIGHT][predecessor];) {
+                    predecessor = tree->node[IRBT_RIGHT][predecessor];
                 }
             }
             break;
         }
 
-        n = comparison < 0 ? tree->node[IRB_TREE_LEFT][n] : tree->node[IRB_TREE_RIGHT][n];
+        n = comparison < 0 ? tree->node[IRBT_LEFT][n] : tree->node[IRBT_RIGHT][n];
     }
 
     return predecessor;
@@ -1280,9 +1277,9 @@ void _irb_tree_resize(irb_tree_s * const tree, size_t const size) {
     tree->parent = tree->allocator->realloc(tree->parent, resize * sizeof(size_t), tree->allocator->arguments);
     error(tree->parent && "Memory allocation failed.");
 
-    tree->node[IRB_TREE_LEFT] = tree->allocator->realloc(tree->node[IRB_TREE_LEFT], resize * sizeof(size_t), tree->allocator->arguments);
-    error(tree->node[IRB_TREE_LEFT] && "Memory allocation failed.");
+    tree->node[IRBT_LEFT] = tree->allocator->realloc(tree->node[IRBT_LEFT], resize * sizeof(size_t), tree->allocator->arguments);
+    error(tree->node[IRBT_LEFT] && "Memory allocation failed.");
 
-    tree->node[IRB_TREE_RIGHT] = tree->allocator->realloc(tree->node[IRB_TREE_RIGHT], resize * sizeof(size_t), tree->allocator->arguments);
-    error(tree->node[IRB_TREE_RIGHT] && "Memory allocation failed.");
+    tree->node[IRBT_RIGHT] = tree->allocator->realloc(tree->node[IRBT_RIGHT], resize * sizeof(size_t), tree->allocator->arguments);
+    error(tree->node[IRBT_RIGHT] && "Memory allocation failed.");
 }

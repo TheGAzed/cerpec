@@ -9,15 +9,15 @@
 #   error "Chunk size must be greater than zero."
 #endif
 
-#define IAVL_TREE_NODE_COUNT 2
-#define IAVL_TREE_LEFT  0
-#define IAVL_TREE_RIGHT 1
+#define IAVLT_NODE_COUNT 2
+#define IAVLT_LEFT  0
+#define IAVLT_RIGHT 1
 /// Infinite Adelson Velsky and Landis tree structure.
 typedef struct infinite_adelson_velsky_landis_tree {
     compare_fn compare;
     char * elements;
     size_t * parent;
-    size_t * node[IAVL_TREE_NODE_COUNT];
+    size_t * node[IAVLT_NODE_COUNT];
     size_t * height;
     size_t size, length, capacity, root;
     memory_s const * allocator;

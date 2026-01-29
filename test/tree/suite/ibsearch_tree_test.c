@@ -7,7 +7,7 @@ TEST CREATE_01(void) {
     ASSERT_EQ(0, test.capacity);
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(sizeof(int), test.size);
-    ASSERT_NEQ( 0, test.size);
+    ASSERT_NEQ(0, test.size);
     ASSERT_EQ(NULL, test.elements);
 
     destroy_ibsearch_tree(&test, destroy);

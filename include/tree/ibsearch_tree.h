@@ -10,8 +10,8 @@
 #endif
 
 #define IBSEARCH_TREE_NODE_COUNT 2
-#define IBSEARCH_TREE_LEFT  0
-#define IBSEARCH_TREE_RIGHT 1
+#define IBST_LEFT  0
+#define IBST_RIGHT 1
 
 /// Infinite binary search tree structure.
 typedef struct infinite_binary_search_tree {
