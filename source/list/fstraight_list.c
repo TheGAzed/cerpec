@@ -215,8 +215,8 @@ void remove_first_fstraight_list(fstraight_list_s * const restrict list, void co
     valid(list->next && "Next array can't be NULL.");
 
     // iterate until node with element isn't reached
-    for (size_t * i = &(list->head); NIL != *i; i = list->next + (*i)) {
-        char const * found = list->elements + ((*i) * list->size); // save found element
+    for (size_t * n = &(list->head); NIL != *n; n = list->next + (*n)) {
+        char const * found = list->elements + ((*n) * list->size); // save found element
         if (0 != compare(element, found)) { // if element isn't equal continue
             continue;
         }
@@ -226,8 +226,8 @@ void remove_first_fstraight_list(fstraight_list_s * const restrict list, void co
         list->length--;
 
         // save removed node as hole and redirect nodes
-        size_t const hole = (*i);
-        (*i) = list->next[(*i)];
+        size_t const hole = (*n);
+        (*n) = list->next[(*n)];
 
         // push hole index onto stack (minimize holes by checking if node isn't the rightmost)
         if (hole != list->length) {
@@ -281,7 +281,7 @@ void remove_at_fstraight_list(fstraight_list_s * const restrict list, size_t con
         list->empty = hole;
     }
 
-    // reset empty stack if list is empty since holes don't matter atp
+    // reset empty stack if list is empty as holes don't matter atp
     if (!list->length) {
         list->empty = NIL;
     }
@@ -446,17 +446,15 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, 
 
     // create lists that will contain positive and negative filtered elements
     fstraight_list_s negative = {
-        .empty = NIL, .head = NIL, .size = list->size, .max = list->max,
+        .empty = NIL, .head = NIL, .size = list->size, .max = list->max, .allocator = list->allocator,
         .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
-        .allocator = list->allocator,
     };
 
     fstraight_list_s positive = {
-        .empty = NIL, .head = NIL, .size = list->size, .max = list->max,
+        .empty = NIL, .head = NIL, .size = list->size, .max = list->max, .allocator = list->allocator,
         .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
-        .allocator = list->allocator,
     };
 
     // for each element in list check if filter returns true for current element and pushes it propper list

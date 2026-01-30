@@ -80,10 +80,9 @@ icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_f
 
     // create a replica/copy structure
     icircular_list_s replica = {
-        .empty = NIL, .size = list->size, .capacity = list->capacity, .tail = 0, .length = 0,
+        .empty = NIL, .size = list->size, .capacity = list->capacity, .allocator = list->allocator,
         .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
-        .allocator = list->allocator,
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");
     error((!replica.capacity || replica.next) && "Memory allocation failed.");
@@ -144,7 +143,8 @@ void insert_at_icircular_list(icircular_list_s * const restrict list, void const
     // if length is zero (current points to list's tail index) the list will circle around, else it's added normally
     (*current) = hole;
 
-    if (index == list->length) { // special case when index is equal to length (new tail is added)
+    // special case when index is equal to length (new tail is added)
+    if (index == list->length) {
         list->tail = hole;
     }
 
@@ -164,8 +164,8 @@ void get_icircular_list(icircular_list_s const * const restrict list, size_t con
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->tail != NIL && "Tail can't be NIL.");
 
-    size_t current = list->tail;
     // iterate until current points to node at index, starting from tail
+    size_t current = list->tail;
     for (size_t i = 0; (index != list->length - 1) && i <= index; ++i) {
         current = list->next[current];
     }
@@ -281,7 +281,8 @@ void reverse_icircular_list(icircular_list_s * const list) {
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->tail != NIL && "Tail can't be NIL.");
 
-    if (!list->length) { // if list is empty early return to not break the function code
+    // if list is empty early return to not break the function code
+    if (!list->length) {
         return;
     }
 
@@ -298,7 +299,6 @@ void reverse_icircular_list(icircular_list_s * const list) {
 
 void shift_next_icircular_list(icircular_list_s * const list, size_t const shift) {
     error(list && "Paremeter can't be NULL.");
-    error(list->length && "Can't shift empty list.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -306,7 +306,7 @@ void shift_next_icircular_list(icircular_list_s * const list, size_t const shift
     valid(list->tail != NIL && "Tail can't be NIL.");
 
     // shift tail node by iterating shift number of times
-    for (size_t i = 0; i < shift; ++i) {
+    for (size_t i = 0; i < shift && list->length; ++i) {
         list->tail = list->next[list->tail];
     }
 }
@@ -330,9 +330,9 @@ void splice_icircular_list(icircular_list_s * const restrict destination, icircu
 
     size_t const dest_length = destination->length;
 
-    size_t const sum = destination->length + source->length;
-    size_t const mod = sum % ICIRCULAR_LIST_CHUNK;
-    _icircular_list_resize(destination, mod ? sum - mod + ICIRCULAR_LIST_CHUNK : sum);
+    size_t const length = destination->length + source->length;
+    size_t const mod = length % ICIRCULAR_LIST_CHUNK;
+    _icircular_list_resize(destination, mod ? length - mod + ICIRCULAR_LIST_CHUNK : length);
 
     size_t dest_prev = destination->tail;
     // iterate to previous node from index

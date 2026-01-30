@@ -130,10 +130,10 @@ void insert_at_idouble_list(idouble_list_s * const restrict list, void const * c
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? IDL_NEXT : IDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? IDL_NEXT : IDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     list->node[IDL_NEXT][list->length] = current;
@@ -167,10 +167,10 @@ void get_idouble_list(idouble_list_s const * const restrict list, size_t const i
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? IDL_NEXT : IDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? IDL_NEXT : IDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     // copy retrieved element into buffer
@@ -281,10 +281,10 @@ void remove_at_idouble_list(idouble_list_s * const restrict list, size_t const i
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? IDL_NEXT : IDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? IDL_NEXT : IDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     // copy removed node element into buffer
@@ -326,28 +326,26 @@ void reverse_idouble_list(idouble_list_s * const list) {
 
 void shift_next_idouble_list(idouble_list_s * const list, size_t const shift) {
     error(list && "Paremeter can't be NULL.");
-    error(list->length && "Can't shift empty list.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
     valid(list->allocator && "Allocator can't be NULL.");
 
     // shift tail node by iterating shift number of times
-    for (size_t i = 0; i < shift; ++i) {
+    for (size_t i = 0; i < shift && list->length; ++i) {
         list->head = list->node[IDL_NEXT][list->head];
     }
 }
 
 void shift_prev_idouble_list(idouble_list_s * const list, size_t const shift) {
     error(list && "Paremeter can't be NULL.");
-    error(list->length && "Can't shift empty list.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
     valid(list->allocator && "Allocator can't be NULL.");
 
     // shift tail node by iterating shift number of times
-    for (size_t i = 0; i < shift; ++i) {
+    for (size_t i = 0; i < shift && list->length; ++i) {
         list->head = list->node[IDL_PREV][list->head];
     }
 }
@@ -368,16 +366,16 @@ void splice_idouble_list(idouble_list_s * const restrict destination, idouble_li
     valid(source->allocator && "Allocator can't be NULL.");
 
     // calculate new capacity of destination list and resize it
-    size_t const sum = destination->length + source->length;
-    size_t const mod = sum % IDOUBLE_LIST_CHUNK;
-    _idouble_list_resize(destination, mod ? sum - mod + IDOUBLE_LIST_CHUNK : sum);
+    size_t const length = destination->length + source->length;
+    size_t const mod = length % IDOUBLE_LIST_CHUNK;
+    _idouble_list_resize(destination, mod ? length - mod + IDOUBLE_LIST_CHUNK : length);
 
     // determine closest direction to index and go there
     size_t current = destination->head;
-    size_t const real_index = index <= (destination->length >> 1) ? index : destination->length - index;
-    bool const node_index = real_index == index ? IDL_NEXT : IDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = destination->node[node_index][current];
+    size_t const closest_index = index <= (destination->length / 2) ? index : destination->length - index;
+    bool const closest_node = closest_index == index ? IDL_NEXT : IDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = destination->node[closest_node][current];
     }
 
     // just copy source's elements and indexes relative to destination's node array (just increment them by length)
@@ -430,10 +428,10 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? IDL_NEXT : IDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? IDL_NEXT : IDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     // create split list
@@ -444,7 +442,7 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
         .node[IDL_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
         .node[IDL_PREV] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
 
-        .head = 0, .size = list->size, .length = 0, .capacity = split_capacity, .allocator = list->allocator,
+        .size = list->size, .capacity = split_capacity, .allocator = list->allocator,
     };
     error((!split.capacity || split.elements) && "Memory allocation failed.");
     error((!split.capacity || split.node[IDL_NEXT]) && "Memory allocation failed.");

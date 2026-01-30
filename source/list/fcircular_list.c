@@ -75,6 +75,7 @@ void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
         current = list->next[current];
         destroy(list->elements + (current * list->size));
     }
+
     // set only non important parameters to zero/nil
     list->length = list->tail = 0;
     list->empty = NIL;
@@ -169,7 +170,8 @@ void insert_at_fcircular_list(fcircular_list_s * const restrict list, void const
     // if length is zero (current points to list's tail index) the list will circle around, else it's added normally
     (*current) = hole;
 
-    if (index == list->length) { // special case when index is equal to length (new tail is added)
+    // special case when index is equal to length (new tail is added)
+    if (index == list->length) {
         list->tail = hole;
     }
 
@@ -271,8 +273,8 @@ void remove_at_fcircular_list(fcircular_list_s * const restrict list, size_t con
     valid(list->elements && "Elements array can't be NULL.");
     valid(list->next && "Next array can't be NULL.");
 
-    size_t previous = list->tail;
     // iterate until node previous to index node is reached
+    size_t previous = list->tail;
     for (size_t i = 0; i < index; ++i) {
         previous = list->next[previous];
     }
@@ -328,7 +330,6 @@ void reverse_fcircular_list(fcircular_list_s * const list) {
 
 void shift_next_fcircular_list(fcircular_list_s * const list, size_t const shift) {
     error(list && "Paremeter can't be NULL.");
-    error(list->length && "Can't shift empty list.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -336,7 +337,7 @@ void shift_next_fcircular_list(fcircular_list_s * const list, size_t const shift
     valid(list->allocator && "Allocator can't be NULL.");
 
     // shift tail node by iterating shift number of times
-    for (size_t i = 0; i < shift; ++i) {
+    for (size_t i = 0; i < shift && list->length; ++i) {
         list->tail = list->next[list->tail];
     }
 }
@@ -365,14 +366,14 @@ void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircu
 
     size_t const dest_length = destination->length;
 
-    size_t dest_prev = destination->tail;
     // iterate to previous node from index
+    size_t dest_prev = destination->tail;
     for (size_t i = 0; i < index; ++i) {
         dest_prev = destination->next[dest_prev];
     }
 
-    size_t src_prev = source->tail; // save previous source node
     // copy source elements into destination while destination's hole stack isn't empty and source has elements
+    size_t src_prev = source->tail; // save previous source node
     while (NIL != destination->empty && source->length) {
         // pop empty hole index from stack
         const size_t hole = destination->empty;
@@ -576,7 +577,7 @@ void each_fcircular_list(fcircular_list_s const * const restrict list, handle_fn
 
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
-        current = list->next[current];
+        current = list->next[current]; // go to next node to avoid initial tail handle
         if (!handle(list->elements + (current * list->size), arguments)) {
             return;
         }
@@ -595,6 +596,7 @@ void apply_fcircular_list(fcircular_list_s const * const restrict list, process_
     valid(list->elements && "Elements array can't be NULL.");
     valid(list->next && "Next array can't be NULL.");
 
+    // create temporary continuous array for list element
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
     error((!list->length || elements_array) && "Memory allocation failed.");
 

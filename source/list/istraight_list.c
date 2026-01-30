@@ -74,9 +74,9 @@ istraight_list_s copy_istraight_list(istraight_list_s const * const list, copy_f
     // create copy/replica list
     istraight_list_s replica = {
         .capacity = list->capacity, .empty = NIL, .head = NIL, .length = list->length, .size = list->size,
+        .allocator = list->allocator,
         .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
-        .allocator = list->allocator,
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");
     error((!replica.capacity || replica.next) && "Memory allocation failed.");
@@ -175,8 +175,8 @@ void remove_first_istraight_list(istraight_list_s * const restrict list, void co
     valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate until node with element isn't reached
-    for (size_t * i = &(list->head); NIL != *i; i = list->next + (*i)) {
-        char const * found = list->elements + ((*i) * list->size); // save found element
+    for (size_t * n = &(list->head); NIL != *n; n = list->next + (*n)) {
+        char const * found = list->elements + ((*n) * list->size); // save found element
         if (0 != compare(element, found)) { // if element isn't equal continue
             continue;
         }
@@ -186,8 +186,8 @@ void remove_first_istraight_list(istraight_list_s * const restrict list, void co
         list->length--;
 
         // save removed node as hole and redirect nodes
-        size_t const hole = (*i);
-        (*i) = list->next[(*i)];
+        size_t const hole = (*n);
+        (*n) = list->next[(*n)];
 
         // push hole index onto stack (minimize holes by checking if node isn't the rightmost)
         if (hole != list->length) {
@@ -344,8 +344,7 @@ istraight_list_s split_istraight_list(istraight_list_s * const list, size_t cons
     size_t const split_mod = length % ISTRAIGHT_LIST_CHUNK;
     size_t const split_capacity = split_mod ? length - split_mod + ISTRAIGHT_LIST_CHUNK : length;
     istraight_list_s split = {
-        .capacity = split_capacity, .empty = NIL, .head = NIL, .size = list->size,
-        .allocator = list->allocator,
+        .capacity = split_capacity, .empty = NIL, .head = NIL, .size = list->size, .allocator = list->allocator,
         .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
     };
@@ -366,8 +365,7 @@ istraight_list_s split_istraight_list(istraight_list_s * const list, size_t cons
     size_t const replica_mod = replica_length % ISTRAIGHT_LIST_CHUNK;
     size_t const replica_capacity = replica_mod ? replica_length - replica_mod + ISTRAIGHT_LIST_CHUNK : replica_length;
     istraight_list_s replica = {
-        .capacity = replica_capacity, .empty = NIL, .head = NIL, .size = list->size,
-        .allocator = list->allocator,
+        .capacity = replica_capacity, .empty = NIL, .head = NIL, .size = list->size, .allocator = list->allocator,
         .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arguments),
         .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arguments),
     };

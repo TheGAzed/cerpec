@@ -82,7 +82,7 @@ void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // call destroy function for each element in list
-    for (size_t current = list->head, i = list->length; i; i--) {
+    for (size_t i = 0, current = list->head; i < list->length; ++i) {
         destroy(list->elements + (current * list->size));
         current = list->node[FDL_NEXT][current];
     }
@@ -170,10 +170,10 @@ void insert_at_fdouble_list(fdouble_list_s * const restrict list, void const * c
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? FDL_NEXT : FDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? FDL_NEXT : FDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     list->node[FDL_NEXT][list->length] = current;
@@ -211,10 +211,10 @@ void get_fdouble_list(fdouble_list_s const * const restrict list, size_t const i
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? FDL_NEXT : FDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? FDL_NEXT : FDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     // copy retrieved element into buffer
@@ -245,7 +245,8 @@ void remove_first_fdouble_list(fdouble_list_s * const restrict list, void const 
     // for each element in list travel forward
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
         char const * const found = list->elements + (current * list->size);
-        if (0 != compare(element, found)) { // if element isn't found continue
+        // if element isn't found continue
+        if (0 != compare(element, found)) {
             continue;
         } // else remove element and return successfully
 
@@ -294,7 +295,8 @@ void remove_last_fdouble_list(fdouble_list_s * const restrict list, void const *
         current = list->node[FDL_PREV][current];
 
         char const * found = list->elements + (current * list->size);
-        if (0 != compare(element, found)) { // if element isn't found continue
+        // if element isn't found continue
+        if (0 != compare(element, found)) {
             continue;
         } // else remove element and return successfully
 
@@ -333,10 +335,10 @@ void remove_at_fdouble_list(fdouble_list_s * const restrict list, size_t const i
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? FDL_NEXT : FDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? FDL_NEXT : FDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     // copy removed node element into buffer
@@ -377,7 +379,6 @@ void reverse_fdouble_list(fdouble_list_s * const list) {
 
 void shift_next_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     error(list && "Paremeter can't be NULL.");
-    error(list->length && "Can't shift empty list.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -388,14 +389,13 @@ void shift_next_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // shift tail node by iterating shift number of times
-    for (size_t i = 0; i < shift; ++i) {
+    for (size_t i = 0; i < shift && list->length; ++i) {
         list->head = list->node[FDL_NEXT][list->head];
     }
 }
 
 void shift_prev_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     error(list && "Paremeter can't be NULL.");
-    error(list->length && "Can't shift empty list.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -406,7 +406,7 @@ void shift_prev_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // shift tail node by iterating shift number of times
-    for (size_t i = 0; i < shift; ++i) {
+    for (size_t i = 0; i < shift && list->length; ++i) {
         list->head = list->node[FDL_PREV][list->head];
     }
 }
@@ -437,10 +437,10 @@ void splice_fdouble_list(fdouble_list_s * const restrict destination, fdouble_li
 
     // determine closest direction to index and go there
     size_t current = destination->head;
-    size_t const real_index = index <= (destination->length >> 1) ? index : destination->length - index;
-    bool const node_index = real_index == index ? FDL_NEXT : FDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = destination->node[node_index][current];
+    size_t const closest_index = index <= (destination->length / 2) ? index : destination->length - index;
+    bool const closest_node = closest_index == index ? FDL_NEXT : FDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = destination->node[closest_node][current];
     }
 
     // just copy source's elements and indexes relative to destination's node array (just increment them by length)
@@ -491,15 +491,15 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
 
     // determine closest direction to index and go there
     size_t current = list->head;
-    size_t const real_index = index <= (list->length >> 1) ? index : list->length - index;
-    bool const node_index = real_index == index ? FDL_NEXT : FDL_PREV;
-    for (size_t i = 0; i < real_index; ++i) {
-        current = list->node[node_index][current];
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? FDL_NEXT : FDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
     }
 
     // create split list
     fdouble_list_s split = {
-        .head = 0, .size = list->size, .length = 0, .max = list->max, .allocator = list->allocator,
+        .size = list->size, .max = list->max, .allocator = list->allocator,
 
         .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
         .node[FDL_NEXT] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
@@ -654,6 +654,7 @@ void apply_fdouble_list(fdouble_list_s const * const restrict list, process_fn c
     valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
+    // create temporary continuous array for list element
     char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
     error((!list->length || elements_array) && "Memory allocation failed.");
 
