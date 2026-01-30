@@ -4,6 +4,7 @@ add_executable(tree_test main.c
         suite/irb_tree_test.c
         suite/fbsearch_tree_test.c
         suite/favl_tree_test.c
+        suite/frb_tree_test.c
 )
 
 target_include_directories(tree_test PUBLIC suite)

@@ -90,7 +90,7 @@ irb_tree_s create_irb_tree(size_t const size, compare_fn const compare) {
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
-    const irb_tree_s tree = {
+    irb_tree_s const tree = {
         .root = NIL, .compare = compare, .size = size,
         .elements = standard.alloc(size, standard.arguments),
         .color = standard.alloc(sizeof(bool), standard.arguments),
@@ -99,7 +99,6 @@ irb_tree_s create_irb_tree(size_t const size, compare_fn const compare) {
         .node[IRBT_RIGHT] = standard.alloc(sizeof(size_t), standard.arguments),
         .allocator = &standard,
     };
-
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
     error(tree.parent && "Memory allocation failed.");
@@ -117,7 +116,7 @@ irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, memory_s c
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
-    const irb_tree_s tree = {
+    irb_tree_s const tree = {
         .root = NIL, .compare = compare, .size = size,
         .elements = allocator->alloc(size, allocator->arguments),
         .color = allocator->alloc(sizeof(bool), allocator->arguments),
@@ -126,7 +125,6 @@ irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, memory_s c
         .node[IRBT_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arguments),
         .allocator = allocator,
     };
-
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
     error(tree.parent && "Memory allocation failed.");
@@ -481,8 +479,7 @@ void get_floor_irb_tree(irb_tree_s const * const restrict tree, void const * con
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t floor = _irb_tree_floor(tree, element);
-
+    size_t const floor = _irb_tree_floor(tree, element);
     if (NIL == floor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -510,8 +507,7 @@ void get_ceil_irb_tree(irb_tree_s const * const restrict tree, void const * cons
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t ceil = _irb_tree_ceil(tree, element);
-
+    size_t const ceil = _irb_tree_ceil(tree, element);
     if (NIL == ceil) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -540,7 +536,6 @@ void remove_floor_irb_tree(irb_tree_s * const restrict tree, void const * const 
     valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t const floor = _irb_tree_floor(tree, element);
-
     if (NIL == floor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -577,8 +572,7 @@ void remove_ceil_irb_tree(irb_tree_s * const restrict tree, void const * const r
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t ceil = _irb_tree_ceil(tree, element);
-
+    size_t const ceil = _irb_tree_ceil(tree, element);
     if (NIL == ceil) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -615,8 +609,7 @@ void get_successor_irb_tree(irb_tree_s const * const restrict tree, void const *
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t successor = _irb_tree_successor(tree, element);
-
+    size_t const successor = _irb_tree_successor(tree, element);
     if (NIL == successor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure");
@@ -644,8 +637,7 @@ void get_predecessor_irb_tree(irb_tree_s const * const restrict tree, void const
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t predecessor = _irb_tree_predecessor(tree, element);
-
+    size_t const predecessor = _irb_tree_predecessor(tree, element);
     if (NIL == predecessor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -673,8 +665,7 @@ void remove_successor_irb_tree(irb_tree_s * const restrict tree, void const * co
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t successor = _irb_tree_successor(tree, element);
-
+    size_t const successor = _irb_tree_successor(tree, element);
     if (NIL == successor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -711,8 +702,7 @@ void remove_predecessor_irb_tree(irb_tree_s * const restrict tree, void const * 
     valid(tree->compare && "Compare function can't be NULL.");
     valid(tree->allocator && "Allocator can't be NULL.");
 
-    const size_t predecessor = _irb_tree_predecessor(tree, element);
-
+    size_t const predecessor = _irb_tree_predecessor(tree, element);
     if (NIL == predecessor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
