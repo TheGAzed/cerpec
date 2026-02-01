@@ -11,7 +11,7 @@ add_library(${PROJECT_NAME} cerpec.c
         tree/ibsearch_tree.c tree/iavl_tree.c tree/irb_tree.c
         tree/fbsearch_tree.c tree/favl_tree.c
 
-        graph/imatrix_graph.c
+        graph/iam_graph.c
 
         misc/ihash_map.c misc/ibinary_heap.c
         misc/fbinary_heap.c misc/fhash_map.c
