@@ -22,17 +22,18 @@ void _imatrix_graph_resize(iam_graph_s * const graph, size_t const size);
 size_t _find_parent(iam_list_s const * const table, size_t const vertex);
 void _union_set(iam_list_s const * const table, size_t const source, size_t const destination, set_fn const increment_cost);
 
-iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, copy_fn const add, void * const zero, void * const infinite) {
+iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, copy_fn const convert, copy_fn const sum, void * const zero, void * const infinite) {
     error(size && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
-    error(add && "Parameter can't be NULL.");
+    error(convert && "Parameter can't be NULL.");
+    error(sum && "Parameter can't be NULL.");
     error(zero && "Parameter can't be NULL.");
     error(infinite && "Parameter can't be NULL.");
     error(compare(infinite, zero) > 0 && "Infinite must be greater than zero.");
     error(compare(zero, infinite) < 0 && "Zero must be smaller than infinity.");
 
     return (iam_cost_s) {
-        .compare = compare, .size = size, .zero = zero, .infinite = infinite, .add = add,
+        .compare = compare, .size = size, .zero = zero, .infinite = infinite, .sum = sum, .convert = convert,
     };
 }
 
@@ -442,7 +443,7 @@ iam_list_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->add(table.costs + (i * table.data->size), edge);
+            table.data->convert(table.costs + (i * table.data->size), edge);
         }
 
         for (size_t i = vertex + 1, e = offset + (2 * vertex); i < graph->vertex_length; e += i++) {
@@ -454,7 +455,7 @@ iam_list_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->add(table.costs + (i * table.data->size), edge);
+            table.data->convert(table.costs + (i * table.data->size), edge);
         }
     }
 
@@ -515,7 +516,7 @@ iam_list_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->add(table.costs + (i * table.data->size), edge);
+            table.data->convert(table.costs + (i * table.data->size), edge);
         }
 
         for (size_t i = vertex + 1, e = offset + (2 * vertex); i < graph->vertex_length; e += i++) {
@@ -527,7 +528,7 @@ iam_list_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->add(table.costs + (i * table.data->size), edge);
+            table.data->convert(table.costs + (i * table.data->size), edge);
         }
     }
 
@@ -594,9 +595,8 @@ iam_list_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const 
             const void * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            memcpy(sum_cost, current_cost, cost->size);
             bool const can_add = graph->compare(edge_weight, graph->none);
-            memmove(sum_cost, can_add ? cost->add(sum_cost, edge_weight) : cost->infinite, cost->size);
+            memmove(sum_cost, can_add ? cost->sum(cost->convert(sum_cost, edge_weight), current_cost) : cost->infinite, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
             if (table.data->compare(sum_cost, g_cost) < 0) {
@@ -619,9 +619,8 @@ iam_list_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const 
             const void * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            memcpy(sum_cost, current_cost, cost->size);
             bool const can_add = graph->compare(edge_weight, graph->none);
-            memmove(sum_cost, can_add ? cost->add(sum_cost, edge_weight) : cost->infinite, cost->size);
+            memmove(sum_cost, can_add ? cost->sum(cost->convert(sum_cost, edge_weight), current_cost) : cost->infinite, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
             if (table.data->compare(sum_cost, g_cost) < 0) {
@@ -644,16 +643,21 @@ iam_list_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const 
     return table;
 }
 
-iam_list_s bellman_ford_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start) {
+iam_list_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic) {
     error(graph && "Parameter can't be NULL.");
     error(cost && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
+    error(end < graph->vertex_length && "Parameter can't exceed length.");
+    error(heuristic && "Parameter can't be NULL.");
 
     valid(graph->compare && "Compare function can't be NULL.");
     valid(graph->edge_size && "Edge size can't be zero.");
     valid(graph->vertex_size && "Edge size can't be zero.");
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
+
+    bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arguments);
+    error((!graph->vertex_length || visited) && "Memory allocation failed.");
 
     const iam_list_s table = {
         .data = cost, .graph = graph,
@@ -664,59 +668,95 @@ iam_list_s bellman_ford_iam_graph(iam_graph_s const * const graph, iam_cost_s co
     error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
 
     for (size_t i = 0; i < graph->vertex_length; ++i) {
+        visited[i] = false;
         memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
         table.previous[i] = IAM_NIL;
     }
     memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
 
-    void * sum_cost = graph->allocator->alloc(cost->size, graph->allocator->arguments);
-    error(sum_cost && "Memory allocation failed.");
+    // allocate for all costs to later free at once
+    char * buffer = graph->allocator->alloc(4 * cost->size, graph->allocator->arguments);
+    error(buffer && "[ERROR] Memory allocation failed.");
 
-    for (size_t i = 0; i < graph->vertex_length - 1; ++i) {
-        for (size_t j = 0; j < graph->vertex_length; ++j) {
-            const size_t current_vertex = j;
-            const void * current_cost = table.costs + (j * cost->size);
+    struct iam_graph_smallest minimum = {
+        .vertex = start, .cost = buffer,
+    };
+    memcpy(minimum.cost, table.data->zero, table.data->size);
 
-            const size_t offset = (current_vertex * (current_vertex - 1)) / 2;
-            for (size_t k = 0, e = offset; k < current_vertex; ++k, e++) {
-                if (k == start) { continue; }
+    char * sum_cost = buffer + cost->size;
+    char * h_cost = buffer + (2 * cost->size);
+    char * f_cost = buffer + (3 * cost->size);
+    for (size_t i = 0; i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
+        const size_t current = minimum.vertex;
+        const void * current_cost = table.costs + (minimum.vertex * table.data->size);
 
-                // save edges for access
-                const void * edge_weight = graph->edges + (e * graph->edge_size);
-                void * g_cost = table.costs + (j * table.data->size);
+        minimum.vertex = IAM_NIL;
+        memcpy(minimum.cost, table.data->infinite, table.data->size);
 
-                memcpy(sum_cost, current_cost, cost->size);
-                bool const can_add = graph->compare(edge_weight, graph->none) && cost->compare(sum_cost, cost->infinite);
-                memmove(sum_cost, can_add ? cost->add(sum_cost, edge_weight) : cost->infinite, cost->size);
+        visited[current] = true;
 
-                // if sum's cost is smaller destroy table's non-infinite and set it to sum
-                if (table.data->compare(sum_cost, g_cost) < 0) {
-                    table.previous[j] = current_vertex;
-                    memcpy(g_cost, sum_cost, table.data->size);
-                }
+        const size_t offset = (current * (current - 1)) / 2;
+        for (size_t j = 0, e = offset; j < current; ++j, e++) {
+            if (visited[j]) { continue; }
+
+            // save edges for access
+            const void * edge_weight = graph->edges + (e * graph->edge_size);
+            void * g_cost = table.costs + (j * table.data->size);
+
+            bool const can_add = graph->compare(edge_weight, graph->none);
+            memmove(sum_cost, can_add ? cost->sum(cost->convert(sum_cost, edge_weight), current_cost) : cost->infinite, cost->size);
+
+            // if G's cost is smaller destroy table's non-infinite and set it to sum
+            if (table.data->compare(sum_cost, g_cost) < 0) {
+                table.previous[j] = current;
+                memcpy(g_cost, sum_cost, table.data->size);
             }
 
-            for (size_t k = current_vertex + 1, e = offset + (2 * current_vertex); k < graph->vertex_length; e += k++) {
-                if (k == start) { continue; }
+            // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
+            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size));
+            // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
+            bool const can_sum = cost->compare(g_cost, cost->infinite) && cost->compare(h_cost, cost->infinite);
+            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost) : cost->infinite, cost->size);
 
-                // save edges for access
-                const void * edge_weight = graph->edges + (e * graph->edge_size);
-                void * g_cost = table.costs + (j * table.data->size);
+            // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
+            if (table.data->compare(minimum.cost, f_cost) > 0) {
+                memcpy(minimum.cost, f_cost, table.data->size);
+                minimum.vertex = j;
+            }
+        }
 
-                memcpy(sum_cost, current_cost, cost->size);
-                bool const can_add = graph->compare(edge_weight, graph->none) && cost->compare(sum_cost, cost->infinite);
-                memmove(sum_cost, can_add ? cost->add(sum_cost, edge_weight) : cost->infinite, cost->size);
+        for (size_t j = current + 1, e = offset + (2 * current); j < graph->vertex_length; e += j++) {
+            if (visited[j]) { continue; }
 
-                // if sum's cost is smaller destroy table's non-infinite and set it to sum
-                if (table.data->compare(sum_cost, g_cost) < 0) {
-                    table.previous[j] = current_vertex;
-                    memcpy(g_cost, sum_cost, table.data->size);
-                }
+            // save edges for access
+            const void * edge_weight = graph->edges + (e * graph->edge_size);
+            void * g_cost = table.costs + (j * table.data->size);
+
+            bool const can_add = graph->compare(edge_weight, graph->none);
+            memmove(sum_cost, can_add ? cost->sum(cost->convert(sum_cost, edge_weight), current_cost) : cost->infinite, cost->size);
+
+            // if G's cost is smaller destroy table's non-infinite and set it to sum
+            if (table.data->compare(sum_cost, g_cost) < 0) {
+                table.previous[j] = current;
+                memcpy(g_cost, sum_cost, table.data->size);
+            }
+
+            // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
+            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size));
+            // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
+            bool const can_sum = cost->compare(g_cost, cost->infinite) && cost->compare(h_cost, cost->infinite);
+            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost) : cost->infinite, cost->size);
+
+            // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
+            if (table.data->compare(minimum.cost, f_cost) > 0) {
+                memcpy(minimum.cost, f_cost, table.data->size);
+                minimum.vertex = j;
             }
         }
     }
 
-    graph->allocator->free(sum_cost, graph->allocator->arguments);
+    graph->allocator->free(visited, graph->allocator->arguments);
+    graph->allocator->free(buffer, graph->allocator->arguments);
 
     return table;
 }
@@ -776,9 +816,8 @@ iam_list_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * con
             const void * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            memcpy(weight_cost, table.data->zero, cost->size);
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            memmove(weight_cost, can_add ? cost->add(weight_cost, edge_weight) : cost->infinite, cost->size);
+            bool const can_convert = graph->compare(edge_weight, graph->none);
+            memmove(weight_cost, can_convert ? cost->convert(weight_cost, edge_weight) : cost->infinite, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
             if (table.data->compare(weight_cost, g_cost) < 0) {
@@ -801,9 +840,8 @@ iam_list_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * con
             const void * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            memcpy(weight_cost, table.data->zero, cost->size);
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            memmove(weight_cost, can_add ? cost->add(weight_cost, edge_weight) : cost->infinite, cost->size);
+            bool const can_convert = graph->compare(edge_weight, graph->none);
+            memmove(weight_cost, can_convert ? cost->convert(weight_cost, edge_weight) : cost->infinite, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
             if (table.data->compare(weight_cost, g_cost) < 0) {
@@ -886,127 +924,6 @@ iam_list_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const * 
     }
 
     graph->allocator->free(kruskal_edges, graph->allocator->arguments);
-
-    return table;
-}
-
-iam_list_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic, copy_fn const sum) {
-    error(graph && "Parameter can't be NULL.");
-    error(cost && "Parameter can't be NULL.");
-    error(start < graph->vertex_length && "Parameter can't exceed length.");
-    error(end < graph->vertex_length && "Parameter can't exceed length.");
-    error(heuristic && "Parameter can't be NULL.");
-    error(sum && "Parameter can't be NULL.");
-
-    valid(graph->compare && "Compare function can't be NULL.");
-    valid(graph->edge_size && "Edge size can't be zero.");
-    valid(graph->vertex_size && "Edge size can't be zero.");
-    valid(graph->none && "Non-edge can't be NULL.");
-    valid(graph->allocator && "Allocator can't be NULL.");
-
-    bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arguments);
-    error((!graph->vertex_length || visited) && "Memory allocation failed.");
-
-    const iam_list_s table = {
-        .data = cost, .graph = graph,
-        .costs = graph->allocator->alloc(graph->vertex_length * cost->size, graph->allocator->arguments),
-        .previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arguments),
-    };
-    error((!graph->vertex_length || table.costs) && "Memory allocation failed.");
-    error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
-
-    for (size_t i = 0; i < graph->vertex_length; ++i) {
-        visited[i] = false;
-        memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_NIL;
-    }
-    memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
-
-    // allocate for all costs to later free at once
-    char * buffer = graph->allocator->alloc(4 * cost->size, graph->allocator->arguments);
-    error(buffer && "[ERROR] Memory allocation failed.");
-
-    struct iam_graph_smallest minimum = {
-        .vertex = start, .cost = buffer,
-    };
-    memcpy(minimum.cost, table.data->zero, table.data->size);
-
-    char * sum_cost = buffer + cost->size;
-    char * h_cost = buffer + (2 * cost->size);
-    char * f_cost = buffer + (3 * cost->size);
-    for (size_t i = 0; i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
-        const size_t current = minimum.vertex;
-        const void * current_cost = table.costs + (minimum.vertex * table.data->size);
-
-        minimum.vertex = IAM_NIL;
-        memcpy(minimum.cost, table.data->infinite, table.data->size);
-
-        visited[current] = true;
-
-        const size_t offset = (current * (current - 1)) / 2;
-        for (size_t j = 0, e = offset; j < current; ++j, e++) {
-            if (visited[j]) { continue; }
-
-            // save edges for access
-            const void * edge_weight = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (j * table.data->size);
-
-            memcpy(sum_cost, current_cost, cost->size);
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            memmove(sum_cost, can_add ? cost->add(sum_cost, edge_weight) : cost->infinite, cost->size);
-
-            // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum_cost, g_cost) < 0) {
-                table.previous[j] = current;
-                memcpy(g_cost, sum_cost, table.data->size);
-            }
-
-            // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
-            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size));
-            // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
-            bool const can_sum = cost->compare(g_cost, cost->infinite) && cost->compare(h_cost, cost->infinite);
-            memcpy(f_cost, can_sum ? sum(h_cost, g_cost) : cost->infinite, cost->size);
-
-            // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
-            if (table.data->compare(minimum.cost, f_cost) > 0) {
-                memcpy(minimum.cost, f_cost, table.data->size);
-                minimum.vertex = j;
-            }
-        }
-
-        for (size_t j = current + 1, e = offset + (2 * current); j < graph->vertex_length; e += j++) {
-            if (visited[j]) { continue; }
-
-            // save edges for access
-            const void * edge_weight = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (j * table.data->size);
-
-            memcpy(sum_cost, current_cost, cost->size);
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            memmove(sum_cost, can_add ? cost->add(sum_cost, edge_weight) : cost->infinite, cost->size);
-
-            // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum_cost, g_cost) < 0) {
-                table.previous[j] = current;
-                memcpy(g_cost, sum_cost, table.data->size);
-            }
-
-            // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
-            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size));
-            // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
-            bool const can_sum = cost->compare(g_cost, cost->infinite) && cost->compare(h_cost, cost->infinite);
-            memcpy(f_cost, can_sum ? sum(h_cost, g_cost) : cost->infinite, cost->size);
-
-            // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
-            if (table.data->compare(minimum.cost, f_cost) > 0) {
-                memcpy(minimum.cost, f_cost, table.data->size);
-                minimum.vertex = j;
-            }
-        }
-    }
-
-    graph->allocator->free(visited, graph->allocator->arguments);
-    graph->allocator->free(buffer, graph->allocator->arguments);
 
     return table;
 }

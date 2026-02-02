@@ -12,7 +12,7 @@ void * copy(void * destination, void const * source) {
     return destination;
 }
 
-void * add(void * a, const void * b) {
+void * sum(void * a, const void * b) {
     int * ai = a;
     const int * bi = b;
 

@@ -30,7 +30,7 @@ typedef struct infinite_adjacency_matrix_graph_edge {
 /// @brief Cost value of size that is comparable and is bound to <0, inf>
 typedef struct infinite_adjacency_matrix_graph_cost {
     compare_fn compare;
-    copy_fn add;
+    copy_fn sum, convert;
     size_t size;
     void * infinite, * zero;
 } iam_cost_s;
@@ -45,11 +45,12 @@ typedef struct infinite_matrix_graph_table {
 /// @brief Composes a structure via its parametric properties.
 /// @param size Size of cost.
 /// @param compare Compare function pointer to do costs comparison.
-/// @param add Add function pointer to sum an edge (weight) into a cost.
+/// @param convert Convert function pointer to convert an edge (weight) into a cost.
+/// @param sum Add function pointer to sum two cost.
 /// @param zero A cost of zero representing an instantly reachable cost.
 /// @param infinite An infinte cost representing an impossiblely reachable cost.
 /// @return Cost structure.
-iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, copy_fn const add, void * const zero, void * const infinite);
+iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, copy_fn const convert, copy_fn const sum, void * const zero, void * const infinite);
 
 /// @brief Creates an empty structure.
 /// @param vertex_size Size of a single vertex element.
@@ -171,22 +172,14 @@ iam_list_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
 /// @return Dijkstra lookup table with subgraph of shortest paths from start node to all other nodes.
 iam_list_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
 
-/// @brief Generate a Bellman-Ford lookup array table with nodes' edge sums and previous indexes.
-/// @param graph Structure to generate from.
-/// @param start Starting vertex index.
-/// @param cost Cost structure that defines the distance properties in table.
-/// @return Bellman-Ford lookup table with subgraph of shortest paths from start node to all other nodes.
-iam_list_s bellman_ford_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start);
-
 /// @brief Generate an A* lookup array table with nodes' edges and previous indexes.
 /// @param graph Structure to generate from.
 /// @param start Starting vertex index.
 /// @param end Last vertex index.
-/// @param sum Function pointer to add source cost into destination one.
 /// @param cost Cost structure that defines the distance properties in table.
-/// @param heuristic Function pointer to determine heuristic distance based on two vectices.
+/// @param heuristic Function pointer to calculate heuristic cost based on two vectices.
 /// @return A* lookup table with subgraph of shortest paths from start to end node.
-iam_list_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic, copy_fn const sum);
+iam_list_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic);
 
 /// @brief Generate a Prim lookup array table with nodes' edges and previous indexes.
 /// @param graph Structure to generate from.
@@ -213,6 +206,8 @@ void destroy_iam_list(iam_list_s * const table);
 /// @param copy_vertex Function pointer to create a deep/shallow copy of a single vertex element.
 /// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element.
 /// @return Matrix graph structure.
+/// @note The algorithm should be used for minimum spanning tree implementations like Prim and Kruskal,
+/// but one can also generate trees from path finding implementations.
 iam_graph_s subgraph_iam_list(iam_list_s const * const table, copy_fn const copy_vertex, copy_fn const copy_edge);
 
 /// @brief Iterates over each vertex element in structure starting from the beginning.
@@ -234,12 +229,20 @@ void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index
 /// @param arguments Arguments for operate function pointer.
 void each_edge_iam_graph(iam_graph_s const * const graph, handle_fn const handle, void * const arguments);
 
-/// @brief Traverses the costs of the specified structure using a generated table.
-/// @param table Structure to reference.
+/// @brief Iterates over each cost element in structure starting from the beginning.
+/// @param table Structure to iterate.
 /// @param handle Operate function pointer to operate on each vertex.
 /// @param arguments Arguments for operate function pointer.
 void each_cost_iam_list(iam_list_s const * const table, handle_fn const handle, void * const arguments);
 
+/// @brief Traverses the costs paths of the specified structure using a generated table.
+/// @param table Structure to traverse.
+/// @param end End vertex index to recursively travel to from starting vertex.
+/// @param handle Operate function pointer to operate on each vertex.
+/// @param arguments Arguments for operate function pointer.
+/// @return 'true' if path exists, 'false' otherwise.
+/// @note The algorithm shoul be used with shortest path find implementations, i.e. Dijkstra and A*,
+/// to traverse the path from 'end' vertex to the start one, but one can also traverse MSP tables with it.
 bool each_path_iam_list(iam_list_s const * const table, size_t const end, handle_fn const handle, void * const arguments);
 
 #endif // IAM_GRAPH_H
