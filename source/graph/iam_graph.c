@@ -164,6 +164,73 @@ bool is_empty_iam_graph(iam_graph_s const * const graph) {
     return !(graph->vertex_length);
 }
 
+bool is_complete_iam_graph(iam_graph_s const * const graph) {
+    error(graph && "Parameter can't be NULL.");
+
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->edge_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
+
+    return graph->edge_length == ((graph->vertex_length * (graph->vertex_length - 1)) / 2);
+}
+
+bool is_connected_iam_graph(iam_graph_s const * const graph) {
+    error(graph && "Parameter can't be NULL.");
+
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->edge_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
+
+    // early return since an empty graph is NOT connected
+    // also avoid unnecessary allocation and invalid memory access
+    if (!graph->vertex_length) { return false; }
+
+    bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arguments);
+    error(visited && "Memory allocation failed.");
+    memset(visited, 0, sizeof(bool) * graph->vertex_length); // set visited to false
+
+    struct iam_graph_stack stack = {
+        .array = graph->allocator->alloc(sizeof(size_t) * graph->vertex_length, graph->allocator->arguments),
+    };
+    error(stack.array && "Memory allocation failed.");
+
+    stack.array[stack.length++] = 0;
+    visited[0] = true;
+    size_t visited_count = 1;
+
+    while (stack.length) {
+        size_t const vertex = stack.array[--stack.length];
+
+        size_t const offset = (vertex * (vertex - 1)) / 2;
+        for (size_t i = 0, e = offset; i < vertex; ++i, e++) {
+            void const * edge = graph->edges + (e * graph->edge_size);
+            if (graph->compare(graph->none, edge) && !visited[i]) {
+                visited[i] = true;
+                stack.array[stack.length++] = i;
+                visited_count++;
+            }
+        }
+
+        for (size_t i = vertex + 1, e = offset + (2 * vertex); i < graph->vertex_length; e += i++) {
+            void const * edge = graph->edges + (e * graph->edge_size);
+            if (graph->compare(graph->none, edge) && !visited[i]) {
+                visited[i] = true;
+                stack.array[stack.length++] = i;
+                visited_count++;
+            }
+        }
+    }
+
+    graph->allocator->free(stack.array, graph->allocator->arguments);
+    graph->allocator->free(visited, graph->allocator->arguments);
+
+    return graph->vertex_length == visited_count;
+}
+
 size_t insert_vertex_iam_graph(iam_graph_s * const graph, void const * const vertex) {
     error(graph && "Parameter can't be NULL.");
     error(vertex && "Parameter can't be NULL.");
@@ -426,8 +493,10 @@ iam_list_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
     };
     error((!graph->vertex_length || queue.array) && "Memory allocation failed.");
 
-    visited[start] = 1;
-    queue.array[queue.length++] = start;
+    if (graph->vertex_length) {
+        visited[start] = true;
+        queue.array[queue.length++] = start;
+    }
 
     while (queue.length && end != queue.array[queue.current]) {
         const size_t vertex = queue.array[queue.current++];
@@ -500,8 +569,10 @@ iam_list_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
     };
     error((!graph->vertex_length || stack.array) && "Memory allocation failed.");
 
-    visited[start] = 1;
-    stack.array[stack.length++] = start;
+    if (graph->vertex_length) {
+        visited[start] = true;
+        stack.array[stack.length++] = start;
+    }
 
     while (stack.length && end != stack.array[stack.length - 1]) {
         const size_t vertex = stack.array[--stack.length];
@@ -578,7 +649,7 @@ iam_list_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const 
     memcpy(minimum.cost, table.data->zero, table.data->size);
 
     char * sum_cost = buffer + cost->size;
-    for (size_t i = 0; i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
+    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
         const size_t current = minimum.vertex;
         const void * current_cost = table.costs + (minimum.vertex * table.data->size);
 
@@ -686,7 +757,7 @@ iam_list_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * 
     char * sum_cost = buffer + cost->size;
     char * h_cost = buffer + (2 * cost->size);
     char * f_cost = buffer + (3 * cost->size);
-    for (size_t i = 0; i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
+    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
         const size_t current = minimum.vertex;
         const void * current_cost = table.costs + (minimum.vertex * table.data->size);
 
@@ -800,7 +871,7 @@ iam_list_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * con
     memcpy(minimum.cost, table.data->zero, table.data->size);
 
     char * weight_cost = buffer + cost->size;
-    for (size_t i = 0; i < graph->vertex_length - 1 && IAM_NIL != minimum.vertex; ++i) {
+    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && IAM_NIL != minimum.vertex; ++i) {
         const size_t current = minimum.vertex;
 
         minimum.vertex = IAM_NIL;

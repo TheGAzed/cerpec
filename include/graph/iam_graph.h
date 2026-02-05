@@ -13,10 +13,9 @@
 
 /// @brief Infinte adjacency matrix graph data structure.
 typedef struct infinite_adjacency_matrix_graph {
-    char * vertices; // array of elements
-    char * edges;    // array of elements
-    void * none;     // non-edge
-    compare_fn compare; // comapres edges and determines if they're smaller, bigger or equal
+    char * vertices, * edges; // arrays of elements
+    void * none;              // non-edge
+    compare_fn compare;       // comapres edges and determines if they're smaller, bigger or equal
     size_t vertex_size, edge_size, vertex_length, edge_length, capacity; // size of single element, structure length and its capacity
     memory_s const * allocator;
 } iam_graph_s;
@@ -95,6 +94,17 @@ iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_v
 /// @return 'true' if empty, 'false' if not.
 bool is_empty_iam_graph(iam_graph_s const * const graph);
 
+/// @brief A graph is complete if every distinct pair of vertices is connected by a unique edge.
+/// @param graph Structure to check.
+/// @return 'true' if graph is complete, 'false' otherwise.
+bool is_complete_iam_graph(iam_graph_s const * const graph);
+
+/// @brief A graph is connected if a path exists between every pair of vertices
+/// @param graph Structure to check.
+/// @return 'true' if graph is connected, 'false' otherwise.
+/// @note The algorithm uses DFS to determine connectivity.
+bool is_connected_iam_graph(iam_graph_s const * const graph);
+
 /// @brief Inserts a single vertex element into the structure.
 /// @param graph Structure to insert into.
 /// @param vertex Element buffer to insert.
@@ -146,6 +156,10 @@ bool contains_edge_iam_graph(iam_graph_s const * const graph, size_t const index
 /// @param buffer Element buffer to save edge.
 void get_edge_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two, void * const buffer);
 
+/// @brief Calculates the number of edges that are incident to the vertex index.
+/// @param graph Structure to get from.
+/// @param index Vertex index.
+/// @return Degree of vertex.
 size_t degree_iam_graph(iam_graph_s const * const graph, size_t const index);
 
 /// @brief Traverses the vertices of the specified structure using breadth first search.
