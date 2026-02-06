@@ -526,15 +526,17 @@ idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter
 
         _idouble_list_fill_hole(list, current);
 
-        // shrink list if smaller chunk is available
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
-        }
-
         pos = positive.node[IDL_NEXT] + (positive.length - 1);
         current = (next == list->length) ? current : next; // nex may point to last node in array, which gets swapped
     }
     (*pos) = 0;
+
+    // shrink list if smaller chunk is available
+    size_t const list_mod = list->length % IDOUBLE_LIST_CHUNK;
+    size_t const list_capacity = list_mod ? list->length - list_mod + IDOUBLE_LIST_CHUNK : list->length;
+    if (list->capacity != list_capacity) {
+        _idouble_list_resize(list, list_capacity);
+    }
 
     return positive;
 }
