@@ -527,7 +527,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter
         _idouble_list_fill_hole(list, current);
 
         pos = positive.node[IDL_NEXT] + (positive.length - 1);
-        current = (next == list->length) ? current : next; // nex may point to last node in array, which gets swapped
+        current = (next == list->length) ? current : next; // next may point to last node in array, which gets swapped
     }
     (*pos) = 0;
 
