@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+void _istack_resize(istack_s * const stack, size_t const size);
+
 istack_s create_istack(size_t const size) {
     error(size && "Paremeter can't be zero.");
 
@@ -95,9 +97,7 @@ void push_istack(istack_s * const restrict stack, void const * const restrict el
     valid(stack->allocator && "Allocator can't be NULL.");
 
     if (stack->length == stack->capacity) { // if length is equal to capacity the array must expand linearly
-        stack->capacity += ISTACK_CHUNK;
-        stack->elements = stack->allocator->realloc(stack->elements, stack->capacity * stack->size, stack->allocator->arguments);
-        error(stack->elements && "Memory allocation failed.");
+        _istack_resize(stack, stack->capacity + ISTACK_CHUNK);
     }
 
     // push element knowing the elements array can fit it
@@ -121,9 +121,7 @@ void pop_istack(istack_s * const restrict stack, void * const restrict buffer) {
     memcpy(buffer, stack->elements + (stack->length * stack->size), stack->size);
 
     if (stack->length == (stack->capacity - ISTACK_CHUNK)) { // if array can be shrunk
-        stack->capacity -= ISTACK_CHUNK;
-        stack->elements = stack->allocator->realloc(stack->elements, stack->capacity * stack->size, stack->allocator->arguments);
-        error(!stack->capacity || stack->elements && "Memory allocation failed.");
+        _istack_resize(stack, stack->length);
     }
 }
 
@@ -166,4 +164,11 @@ void apply_istack(istack_s const * const restrict stack, process_fn const proces
 
     // process stack elements as an array (as a whole)
     process(stack->elements, stack->length, arguments);
+}
+
+void _istack_resize(istack_s * const stack, size_t const size) {
+    stack->capacity = size;
+
+    stack->elements = stack->allocator->realloc(stack->elements, stack->capacity * stack->size, stack->allocator->arguments);
+    error(!stack->capacity || stack->elements && "Memory allocation failed.");
 }

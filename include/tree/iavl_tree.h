@@ -5,7 +5,7 @@
 
 #if !defined(IAVL_TREE_CHUNK)
 #   define IAVL_TREE_CHUNK CERPEC_CHUNK
-#elif
+#elif IAVL_TREE_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
 #endif
 

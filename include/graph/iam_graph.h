@@ -5,7 +5,7 @@
 
 #if !defined(IAM_GRAPH_CHUNK)
 #   define IAM_GRAPH_CHUNK CERPEC_CHUNK
-#elif
+#elif IAM_GRAPH_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
 #endif
 

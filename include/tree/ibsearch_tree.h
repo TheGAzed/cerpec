@@ -5,7 +5,7 @@
 
 #if !defined(IBSEARCH_TREE_CHUNK)
 #   define IBSEARCH_TREE_CHUNK CERPEC_CHUNK
-#elif
+#elif IBSEARCH_TREE_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
 #endif
 

@@ -466,15 +466,16 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
 
         _idouble_list_fill_hole(list, current);
 
-        // shrink list if smaller chunk is available
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
-        }
-
         split_current = split.node[IDL_NEXT] + (split.length - 1);
         current = (next == list->length) ? current : next;
     }
     (*split_current) = 0;
+
+    size_t const list_mod = list->length % IDOUBLE_LIST_CHUNK;
+    size_t const list_capacity = list_mod ? list->length - list_mod + IDOUBLE_LIST_CHUNK : list->length;
+    if (list->capacity != list_capacity) {
+        _idouble_list_resize(list, list_capacity);
+    }
 
     // if split list contains head node change list's head to current (or last non removed) node
     if (!index || (index >= list->length)) {
