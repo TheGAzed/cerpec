@@ -5,22 +5,22 @@
 #define FBINARY_HEAP_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     ASSERT_NEQ(NULL, heap.compare);
     ASSERT_NEQ(NULL, heap.elements);
     ASSERT_EQ(0, heap.length);
     ASSERT_NEQ(0, heap.size);
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     ASSERT_EQ(NULL, heap.compare);
     ASSERT_EQ(NULL, heap.elements);
@@ -31,28 +31,28 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
-    clear_fbinary_heap(&heap, destroy);
+    clear_fbinary_heap(&heap, intdst);
 
     ASSERT_NEQ(NULL, heap.compare);
     ASSERT_NEQ(NULL, heap.elements);
     ASSERT_EQ(0, heap.length);
     ASSERT_NEQ(0, heap.size);
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST COPY_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
     }
 
-    fbinary_heap_s replica = copy_fbinary_heap(&heap, copy);
+    fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         int a = 0, b = 0;
@@ -62,20 +62,20 @@ TEST COPY_01(void) {
         ASSERT_EQ(a, b);
     }
 
-    destroy_fbinary_heap(&heap, destroy);
-    destroy_fbinary_heap(&replica, destroy);
+    destroy_fbinary_heap(&heap, intdst);
+    destroy_fbinary_heap(&replica, intdst);
 
     PASS();
 }
 
 TEST COPY_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
     }
 
-    fbinary_heap_s replica = copy_fbinary_heap(&heap, copy);
+    fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         int a = 0, b = 0;
@@ -85,38 +85,38 @@ TEST COPY_02(void) {
         ASSERT_EQ(a, b);
     }
 
-    destroy_fbinary_heap(&heap, destroy);
-    destroy_fbinary_heap(&replica, destroy);
+    destroy_fbinary_heap(&heap, intdst);
+    destroy_fbinary_heap(&replica, intdst);
 
     PASS();
 }
 
 TEST PUSH_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
     }
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST PUSH_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
     }
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST POP_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -129,13 +129,13 @@ TEST POP_01(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST POP_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -148,13 +148,13 @@ TEST POP_02(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST PEEP_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -164,13 +164,13 @@ TEST PEEP_01(void) {
     peep_fbinary_heap(&heap, &a);
     ASSERT_EQ(0, a);
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST PEEP_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -180,13 +180,13 @@ TEST PEEP_02(void) {
     peep_fbinary_heap(&heap, &a);
     ASSERT_EQ(0, a);
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST REPLACE_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -201,13 +201,13 @@ TEST REPLACE_01(void) {
     peep_fbinary_heap(&heap, &c);
     ASSERT_EQ(1, c);
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST REPLACE_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -222,14 +222,14 @@ TEST REPLACE_02(void) {
     peep_fbinary_heap(&heap, &c);
     ASSERT_EQ(1, c);
 
-    destroy_fbinary_heap(&heap, destroy);
+    destroy_fbinary_heap(&heap, intdst);
 
     PASS();
 }
 
 TEST MELD_01(void) {
-    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
-    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < (FBINARY_HEAP_CHUNK - 1) / 2; ++i) {
         push_fbinary_heap(&one, &i);
@@ -248,15 +248,15 @@ TEST MELD_01(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_fbinary_heap(&one, destroy);
-    destroy_fbinary_heap(&two, destroy);
+    destroy_fbinary_heap(&one, intdst);
+    destroy_fbinary_heap(&two, intdst);
 
     PASS();
 }
 
 TEST MELD_02(void) {
-    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
-    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < (FBINARY_HEAP_CHUNK) / 2; ++i) {
         push_fbinary_heap(&one, &i);
@@ -275,21 +275,21 @@ TEST MELD_02(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_fbinary_heap(&one, destroy);
-    destroy_fbinary_heap(&two, destroy);
+    destroy_fbinary_heap(&one, intdst);
+    destroy_fbinary_heap(&two, intdst);
 
     PASS();
 }
 
 TEST MAP_01(void) {
-    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&test, &i);
     }
 
     int value = 1;
-    each_fbinary_heap(&test, increment, &value);
+    each_fbinary_heap(&test, intincrement, &value);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         int a = -1;
@@ -297,20 +297,20 @@ TEST MAP_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fbinary_heap(&test, destroy);
+    destroy_fbinary_heap(&test, intdst);
 
     PASS();
 }
 
 TEST MAP_02(void) {
-    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, compare);
+    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&test, &i);
     }
 
     int value = 1;
-    each_fbinary_heap(&test, increment, &value);
+    each_fbinary_heap(&test, intincrement, &value);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         int a = -1;
@@ -318,7 +318,7 @@ TEST MAP_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fbinary_heap(&test, destroy);
+    destroy_fbinary_heap(&test, intdst);
 
     PASS();
 }

@@ -177,18 +177,21 @@ void insert_ihash_map(ihash_map_s * const restrict map, void const * const restr
 
     // resize (expand) if map can't contain new element
     if (map->length == map->capacity) {
-        _ihash_table_resize(map, map->capacity + IHASH_MAP_CHUNK);
+        size_t const capacity = map->length ? map->length * CERPEC_FACTOR : IHASH_MAP_CHUNK;
+        _ihash_table_resize(map, capacity);
     }
 
     // calculate hash values and index in array
     size_t const hash = map->hash_key(key);
     size_t const index = hash % map->capacity;
 
+#ifndef NERROR
     // check if element is in map or not
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         void const * const current_key = map->keys + (n * map->key_size);
-        error((hash != map->hashes[n] || map->compare_key(key, current_key)) && "Element already in map.");
+        error((hash != map->hashes[n] || map->compare_key(key, current_key)) && "Key must be unique.");
     }
+#endif
 
     size_t const current = map->length; // index of currently inserted element
 
@@ -252,8 +255,8 @@ void remove_ihash_map(ihash_map_s * const restrict map, void const * const restr
         _ihash_map_fill_hole(map, n);
 
         // resize (expand) if map can contain a smaller capacity of elements
-        if (map->capacity - IHASH_MAP_CHUNK == map->length) {
-            _ihash_table_resize(map, map->capacity - IHASH_MAP_CHUNK);
+        if (map->length <= map->capacity / CERPEC_FACTOR && (map->length > IHASH_MAP_CHUNK || !map->length)) {
+            _ihash_table_resize(map, map->length);
         }
 
         return; // return to avoid errorion and termination at the end of function if element wasn't found
@@ -317,7 +320,7 @@ void get_value_ihash_map(ihash_map_s const * const restrict map, void const * co
         const char * current_key = map->keys + (n * map->key_size);
         if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
             memcpy(value_buffer, map->values + (n * map->value_size), map->value_size); // copy retrieved element into buffer
-            return; // return to avoid errorion and termination at the end of function if key wasn't found
+            return; // return to avoid error and termination at the end of function if key wasn't found
         }
     }
 
@@ -427,9 +430,7 @@ void _ihash_table_resize(ihash_map_s * const table, size_t const size) {
     table->hashes = table->allocator->realloc(table->hashes, size * sizeof(size_t), table->allocator->arguments);
     error((!table->capacity || table->hashes) && "Memory allocation failed.");
 
-    for (size_t i = 0; i < table->capacity; ++i) {
-        table->head[i] = NIL;
-    }
+    for (size_t i = 0; i < table->capacity; ++i) { table->head[i] = NIL; }
 
     // reset lists by pushing hashes to their valid list
     for (size_t i = 0; i < table->length; ++i) {

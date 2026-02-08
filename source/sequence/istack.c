@@ -97,7 +97,8 @@ void push_istack(istack_s * const restrict stack, void const * const restrict el
     valid(stack->allocator && "Allocator can't be NULL.");
 
     if (stack->length == stack->capacity) { // if length is equal to capacity the array must expand linearly
-        _istack_resize(stack, stack->capacity + ISTACK_CHUNK);
+        size_t const capacity = stack->length ? stack->length * CERPEC_FACTOR : ISTACK_CHUNK;
+        _istack_resize(stack, capacity);
     }
 
     // push element knowing the elements array can fit it
@@ -120,7 +121,7 @@ void pop_istack(istack_s * const restrict stack, void * const restrict buffer) {
     stack->length--;
     memcpy(buffer, stack->elements + (stack->length * stack->size), stack->size);
 
-    if (stack->length == (stack->capacity - ISTACK_CHUNK)) { // if array can be shrunk
+    if (stack->length <= stack->capacity / CERPEC_FACTOR && (stack->length > ISTACK_CHUNK || !stack->length)) {
         _istack_resize(stack, stack->length);
     }
 }

@@ -7,6 +7,8 @@
 #   define IHASH_MAP_CHUNK CERPEC_CHUNK
 #elif IHASH_MAP_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IHASH_MAP_CHUNK & (IHASH_MAP_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 /// @brief Infinite hash table data structure.

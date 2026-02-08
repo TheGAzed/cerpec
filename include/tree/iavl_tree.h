@@ -7,6 +7,8 @@
 #   define IAVL_TREE_CHUNK CERPEC_CHUNK
 #elif IAVL_TREE_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IAVL_TREE_CHUNK & (IAVL_TREE_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 #define IAVLT_NODE_COUNT 2

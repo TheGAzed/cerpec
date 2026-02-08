@@ -248,7 +248,8 @@ void insert_irb_tree(irb_tree_s * const restrict tree, void const * const restri
     valid(tree->allocator && "Allocator can't be NULL.");
 
     if (tree->length == tree->capacity) {
-        _irb_tree_resize(tree, tree->capacity + IRB_TREE_CHUNK);
+        size_t const capacity = tree->length ? tree->length * CERPEC_FACTOR : IRB_TREE_CHUNK;
+        _irb_tree_resize(tree, capacity);
     }
 
     size_t previous = NIL; // initially invalid for the head case when tree is empty
@@ -318,7 +319,7 @@ void remove_irb_tree(irb_tree_s * const restrict tree, void const * const restri
 
     _irb_tree_fill_hole(tree, node);
 
-    if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IRB_TREE_CHUNK || !tree->length)) {
         _irb_tree_resize(tree, tree->length);
     }
 }
@@ -423,7 +424,7 @@ void remove_max_irb_tree(irb_tree_s * const restrict tree, void * const restrict
 
     _irb_tree_fill_hole(tree, maximum);
 
-    if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IRB_TREE_CHUNK || !tree->length)) {
         _irb_tree_resize(tree, tree->length);
     }
 }
@@ -456,7 +457,7 @@ void remove_min_irb_tree(irb_tree_s * const restrict tree, void * const restrict
 
     _irb_tree_fill_hole(tree, minimum);
 
-    if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IRB_TREE_CHUNK || !tree->length)) {
         _irb_tree_resize(tree, tree->length);
     }
 }
@@ -549,7 +550,7 @@ void remove_floor_irb_tree(irb_tree_s * const restrict tree, void const * const 
 
     _irb_tree_fill_hole(tree, floor);
 
-    if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IRB_TREE_CHUNK || !tree->length)) {
         _irb_tree_resize(tree, tree->length);
     }
 }
@@ -586,7 +587,7 @@ void remove_ceil_irb_tree(irb_tree_s * const restrict tree, void const * const r
 
     _irb_tree_fill_hole(tree, ceil);
 
-    if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IRB_TREE_CHUNK || !tree->length)) {
         _irb_tree_resize(tree, tree->length);
     }
 }
@@ -679,7 +680,7 @@ void remove_successor_irb_tree(irb_tree_s * const restrict tree, void const * co
 
     _irb_tree_fill_hole(tree, successor);
 
-    if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IRB_TREE_CHUNK || !tree->length)) {
         _irb_tree_resize(tree, tree->length);
     }
 }
@@ -716,7 +717,7 @@ void remove_predecessor_irb_tree(irb_tree_s * const restrict tree, void const * 
 
     _irb_tree_fill_hole(tree, predecessor);
 
-    if (tree->length == tree->capacity - IRB_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IRB_TREE_CHUNK || !tree->length)) {
         _irb_tree_resize(tree, tree->length);
     }
 }

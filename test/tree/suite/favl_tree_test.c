@@ -4,22 +4,22 @@
 #define FAVL_TREE_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(0, test.size);
     ASSERT_NEQ(NULL, test.elements);
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(0, test.size);
@@ -29,44 +29,44 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
-    clear_favl_tree(&test, destroy);
+    clear_favl_tree(&test, intdst);
 
     ASSERT_EQ(0, test.length);
     ASSERT_NEQ(0, test.size);
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST INSERT_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&test, &i);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST INSERT_02(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&test, &i);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&test, &i);
@@ -78,13 +78,13 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_02(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&test, &i);
@@ -96,13 +96,13 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&test, &i);
@@ -112,13 +112,13 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_favl_tree(&test, &i));
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_02(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&test, &i);
@@ -128,13 +128,13 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_favl_tree(&test, &i));
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MAX_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&test, &i);
@@ -149,13 +149,13 @@ TEST GET_MAX_01(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MAX_02(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&test, &i);
@@ -170,13 +170,13 @@ TEST GET_MAX_02(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MIN_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&test, &i);
@@ -191,13 +191,13 @@ TEST GET_MIN_01(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MIN_02(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&test, &i);
@@ -212,13 +212,13 @@ TEST GET_MIN_02(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MAX_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&test, &i);
@@ -230,13 +230,13 @@ TEST REMOVE_MAX_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MAX_02(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&test, &i);
@@ -248,13 +248,13 @@ TEST REMOVE_MAX_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MIN_01(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&test, &i);
@@ -266,13 +266,13 @@ TEST REMOVE_MIN_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MIN_02(void) {
-    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s test = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&test, &i);
@@ -284,13 +284,13 @@ TEST REMOVE_MIN_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_favl_tree(&test, destroy);
+    destroy_favl_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_FLOOR_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -304,13 +304,13 @@ TEST GET_FLOOR_01(void) {
 
     ASSERT_EQ(a - 1, floor);
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_FLOOR_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -324,13 +324,13 @@ TEST GET_FLOOR_02(void) {
 
     ASSERT_EQ(a - 1, floor);
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_CEIL_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -344,13 +344,13 @@ TEST GET_CEIL_01(void) {
 
     ASSERT_EQ(a + 1, ceil);
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_CEIL_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -364,13 +364,13 @@ TEST GET_CEIL_02(void) {
 
     ASSERT_EQ(a + 1, ceil);
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_FLOOR_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -386,13 +386,13 @@ TEST REMOVE_FLOOR_01(void) {
         a = b;
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_FLOOR_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -408,13 +408,13 @@ TEST REMOVE_FLOOR_02(void) {
         a = b;
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_CEIL_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -430,13 +430,13 @@ TEST REMOVE_CEIL_01(void) {
         a = b;
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_CEIL_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -452,13 +452,13 @@ TEST REMOVE_CEIL_02(void) {
         a = b;
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_SUCCESSOR_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -470,13 +470,13 @@ TEST GET_SUCCESSOR_01(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_SUCCESSOR_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -488,13 +488,13 @@ TEST GET_SUCCESSOR_02(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_PREDECESSOR_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -506,13 +506,13 @@ TEST GET_PREDECESSOR_01(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_PREDECESSOR_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -524,13 +524,13 @@ TEST GET_PREDECESSOR_02(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_SUCCESSOR_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -542,13 +542,13 @@ TEST REMOVE_SUCCESSOR_01(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_SUCCESSOR_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -560,13 +560,13 @@ TEST REMOVE_SUCCESSOR_02(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_PREDECESSOR_01(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK - 1; ++i) {
         insert_favl_tree(&tree, &i);
@@ -578,13 +578,13 @@ TEST REMOVE_PREDECESSOR_01(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_PREDECESSOR_02(void) {
-    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, compare);
+    favl_tree_s tree = create_favl_tree(sizeof(int), FAVL_TREE_CHUNK, intcmp);
 
     for (int i = 0; i < FAVL_TREE_CHUNK; ++i) {
         insert_favl_tree(&tree, &i);
@@ -596,7 +596,7 @@ TEST REMOVE_PREDECESSOR_02(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_favl_tree(&tree, destroy);
+    destroy_favl_tree(&tree, intdst);
 
     PASS();
 }

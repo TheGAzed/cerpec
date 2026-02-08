@@ -7,6 +7,8 @@
 #   define IBSEARCH_TREE_CHUNK CERPEC_CHUNK
 #elif IBSEARCH_TREE_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IBSEARCH_TREE_CHUNK & (IBSEARCH_TREE_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 #define IBSEARCH_TREE_NODE_COUNT 2

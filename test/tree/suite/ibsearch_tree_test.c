@@ -2,7 +2,7 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     ASSERT_EQ(0, test.capacity);
     ASSERT_EQ(0, test.length);
@@ -10,15 +10,15 @@ TEST CREATE_01(void) {
     ASSERT_NEQ(0, test.size);
     ASSERT_EQ(NULL, test.elements);
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     ASSERT_EQ(0, test.capacity);
     ASSERT_EQ(0, test.length);
@@ -29,56 +29,56 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
-    clear_ibsearch_tree(&test, destroy);
+    clear_ibsearch_tree(&test, intdst);
 
     ASSERT_EQ(0, test.length);
     ASSERT_NEQ(0, test.size);
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST INSERT_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&test, &i);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST INSERT_02(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&test, &i);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST INSERT_03(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&test, &i);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -90,13 +90,13 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_02(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -108,13 +108,13 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_03(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -126,13 +126,13 @@ TEST REMOVE_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -142,13 +142,13 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_ibsearch_tree(&test, &i));
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_02(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -158,13 +158,13 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_ibsearch_tree(&test, &i));
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_03(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -174,13 +174,13 @@ TEST CONTAINS_03(void) {
         ASSERT(contains_ibsearch_tree(&test, &i));
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MAX_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -195,13 +195,13 @@ TEST GET_MAX_01(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MAX_02(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -216,13 +216,13 @@ TEST GET_MAX_02(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MAX_03(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -237,13 +237,13 @@ TEST GET_MAX_03(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MIN_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -258,13 +258,13 @@ TEST GET_MIN_01(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MIN_02(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -279,13 +279,13 @@ TEST GET_MIN_02(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_MIN_03(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -300,13 +300,13 @@ TEST GET_MIN_03(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MAX_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -318,13 +318,13 @@ TEST REMOVE_MAX_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MAX_02(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -336,13 +336,13 @@ TEST REMOVE_MAX_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MAX_03(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -354,13 +354,13 @@ TEST REMOVE_MAX_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MIN_01(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -372,13 +372,13 @@ TEST REMOVE_MIN_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MIN_02(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -390,13 +390,13 @@ TEST REMOVE_MIN_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST REMOVE_MIN_03(void) {
-    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&test, &i);
@@ -408,13 +408,13 @@ TEST REMOVE_MIN_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ibsearch_tree(&test, destroy);
+    destroy_ibsearch_tree(&test, intdst);
 
     PASS();
 }
 
 TEST GET_FLOOR_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -428,13 +428,13 @@ TEST GET_FLOOR_01(void) {
 
     ASSERT_EQ(a - 1, floor);
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_FLOOR_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -448,13 +448,13 @@ TEST GET_FLOOR_02(void) {
 
     ASSERT_EQ(a - 1, floor);
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_FLOOR_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -468,13 +468,13 @@ TEST GET_FLOOR_03(void) {
 
     ASSERT_EQ(a - 1, floor);
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_CEIL_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -488,13 +488,13 @@ TEST GET_CEIL_01(void) {
 
     ASSERT_EQ(a + 1, ceil);
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_CEIL_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -508,13 +508,13 @@ TEST GET_CEIL_02(void) {
 
     ASSERT_EQ(a + 1, ceil);
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_CEIL_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -528,13 +528,13 @@ TEST GET_CEIL_03(void) {
 
     ASSERT_EQ(a + 1, ceil);
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_FLOOR_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -550,13 +550,13 @@ TEST REMOVE_FLOOR_01(void) {
         a = b;
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_FLOOR_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -572,13 +572,13 @@ TEST REMOVE_FLOOR_02(void) {
         a = b;
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_FLOOR_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -594,13 +594,13 @@ TEST REMOVE_FLOOR_03(void) {
         a = b;
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_CEIL_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -616,13 +616,13 @@ TEST REMOVE_CEIL_01(void) {
         a = b;
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_CEIL_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -638,13 +638,13 @@ TEST REMOVE_CEIL_02(void) {
         a = b;
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_CEIL_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -660,13 +660,13 @@ TEST REMOVE_CEIL_03(void) {
         a = b;
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_SUCCESSOR_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -678,13 +678,13 @@ TEST GET_SUCCESSOR_01(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_SUCCESSOR_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -696,13 +696,13 @@ TEST GET_SUCCESSOR_02(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_SUCCESSOR_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -714,13 +714,13 @@ TEST GET_SUCCESSOR_03(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_PREDECESSOR_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -732,13 +732,13 @@ TEST GET_PREDECESSOR_01(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_PREDECESSOR_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -750,13 +750,13 @@ TEST GET_PREDECESSOR_02(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST GET_PREDECESSOR_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -768,13 +768,13 @@ TEST GET_PREDECESSOR_03(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_SUCCESSOR_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -786,13 +786,13 @@ TEST REMOVE_SUCCESSOR_01(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_SUCCESSOR_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -804,13 +804,13 @@ TEST REMOVE_SUCCESSOR_02(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_SUCCESSOR_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -822,13 +822,13 @@ TEST REMOVE_SUCCESSOR_03(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_PREDECESSOR_01(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -840,13 +840,13 @@ TEST REMOVE_PREDECESSOR_01(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_PREDECESSOR_02(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -858,13 +858,13 @@ TEST REMOVE_PREDECESSOR_02(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }
 
 TEST REMOVE_PREDECESSOR_03(void) {
-    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), compare);
+    ibsearch_tree_s tree = create_ibsearch_tree(sizeof(int), intcmp);
 
     for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
         insert_ibsearch_tree(&tree, &i);
@@ -876,7 +876,7 @@ TEST REMOVE_PREDECESSOR_03(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_ibsearch_tree(&tree, destroy);
+    destroy_ibsearch_tree(&tree, intdst);
 
     PASS();
 }

@@ -216,7 +216,8 @@ void insert_irb_set(irb_set_s * const set, void const * const element) {
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     if (set->length == set->capacity) {
-        _irb_set_resize(set, set->capacity + IRB_SET_CHUNK);
+        size_t const capacity = set->length ? set->length * CERPEC_FACTOR : IRB_SET_CHUNK;
+        _irb_set_resize(set, capacity);
     }
 
     size_t previous = NIL; // initially invalid for the head case when set is empty
@@ -317,7 +318,7 @@ void remove_irb_set(irb_set_s * const set, void const * const element, void * co
 
     _irb_set_fill_hole(set, node);
 
-    if (set->length == set->capacity - IRB_SET_CHUNK) {
+    if (set->length <= set->capacity / CERPEC_FACTOR && (set->length > IRB_SET_CHUNK || !set->length)) {
         _irb_set_resize(set, set->length);
     }
 }
@@ -393,7 +394,8 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
         } // else add minimum's element to set union
 
         if (set_union.length == set_union.capacity) {
-            _irb_set_resize(&set_union, set_union.capacity + IRB_SET_CHUNK);
+            size_t const capacity = set_union.length ? set_union.length * CERPEC_FACTOR : IRB_SET_CHUNK;
+            _irb_set_resize(&set_union, capacity);
         }
 
         size_t previous = NIL; // initially invalid for the head case when set is empty
@@ -466,7 +468,8 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
         } // else add minimum's element to set union
 
         if (set_intersect.length == set_intersect.capacity) {
-            _irb_set_resize(&set_intersect, set_intersect.capacity + IRB_SET_CHUNK);
+            size_t const capacity = set_intersect.length ? set_intersect.length * CERPEC_FACTOR : IRB_SET_CHUNK;
+            _irb_set_resize(&set_intersect, capacity);
         }
 
         size_t previous = NIL; // initially invalid for the head case when set is empty
@@ -535,7 +538,8 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
         } // else add minuend's element to set union
 
         if (set_subtract.length == set_subtract.capacity) {
-            _irb_set_resize(&set_subtract, set_subtract.capacity + IRB_SET_CHUNK);
+            size_t const capacity = set_subtract.length ? set_subtract.length * CERPEC_FACTOR : IRB_SET_CHUNK;
+            _irb_set_resize(&set_subtract, capacity);
         }
 
         size_t previous = NIL; // initially invalid for the head case when set is empty
@@ -604,7 +608,8 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         } // else add minimum's element to set union
 
         if (set_exclude.length == set_exclude.capacity) {
-            _irb_set_resize(&set_exclude, set_exclude.capacity + IRB_SET_CHUNK);
+            size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : IRB_SET_CHUNK;
+            _irb_set_resize(&set_exclude, capacity);
         }
 
         size_t previous = NIL; // initially invalid for the head case when set is empty
@@ -653,7 +658,8 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         } // else add minimum's element to set union
 
         if (set_exclude.length == set_exclude.capacity) {
-            _irb_set_resize(&set_exclude, set_exclude.capacity + IRB_SET_CHUNK);
+            size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : IRB_SET_CHUNK;
+            _irb_set_resize(&set_exclude, capacity);
         }
 
         size_t previous = NIL; // initially invalid for the head case when set is empty

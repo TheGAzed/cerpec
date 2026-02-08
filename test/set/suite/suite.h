@@ -3,7 +3,7 @@
 
 #include <greatest.h>
 
-#include <test.h>
+#include <dodac.h>
 
 SUITE_EXTERN(ibitwise_set_test);
 SUITE_EXTERN(ihash_set_test);

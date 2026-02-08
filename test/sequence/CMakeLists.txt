@@ -8,5 +8,5 @@ add_executable(sequence_test main.c
 )
 
 target_include_directories(sequence_test PUBLIC suite)
-target_link_libraries(sequence_test PRIVATE GREATEST TEST CERPEC)
+target_link_libraries(sequence_test PRIVATE GREATEST CERPEC)
 add_test(NAME SEQUENCE_TEST COMMAND sequence_test)

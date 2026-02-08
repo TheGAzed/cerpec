@@ -195,7 +195,8 @@ void insert_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
     valid(tree->allocator && "Allocator can't be NULL.");
 
     if (tree->length == tree->capacity) {
-        _iavl_tree_resize(tree, tree->capacity + IAVL_TREE_CHUNK);
+        size_t const capacity = tree->length ? tree->length * CERPEC_FACTOR : IAVL_TREE_CHUNK;
+        _iavl_tree_resize(tree, capacity);
     }
 
     size_t previous = NIL; // initially invalid for the head case when tree is empty
@@ -261,7 +262,7 @@ void remove_iavl_tree(iavl_tree_s * const restrict tree, void const * const rest
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*node));
 
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IAVL_TREE_CHUNK || !tree->length)) {
         _iavl_tree_resize(tree, tree->length);
     }
 }
@@ -372,7 +373,7 @@ void remove_max_iavl_tree(iavl_tree_s * const restrict tree, void * const restri
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*maximum));
 
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IAVL_TREE_CHUNK || !tree->length)) {
         _iavl_tree_resize(tree, tree->length);
     }
 }
@@ -412,7 +413,7 @@ void remove_min_iavl_tree(iavl_tree_s * const restrict tree, void * const restri
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*minimum));
 
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IAVL_TREE_CHUNK || !tree->length)) {
         _iavl_tree_resize(tree, tree->length);
     }
 }
@@ -533,7 +534,7 @@ void remove_floor_iavl_tree(iavl_tree_s * const restrict tree, void const * cons
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*floor));
 
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IAVL_TREE_CHUNK || !tree->length)) {
         _iavl_tree_resize(tree, tree->length);
     }
 }
@@ -570,7 +571,7 @@ void remove_ceil_iavl_tree(iavl_tree_s * const restrict tree, void const * const
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*ceil));
 
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IAVL_TREE_CHUNK || !tree->length)) {
         _iavl_tree_resize(tree, tree->length);
     }
 }
@@ -700,7 +701,7 @@ void remove_successor_iavl_tree(iavl_tree_s * const restrict tree, void const * 
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*successor));
 
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IAVL_TREE_CHUNK || !tree->length)) {
         _iavl_tree_resize(tree, tree->length);
     }
 }
@@ -737,7 +738,7 @@ void remove_predecessor_iavl_tree(iavl_tree_s * const restrict tree, void const 
     _iavl_tree_fill_hole(tree, hole);
     _iavl_tree_rebalance(tree, (*predecessor));
 
-    if (tree->length == tree->capacity - IAVL_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IAVL_TREE_CHUNK || !tree->length)) {
         _iavl_tree_resize(tree, tree->length);
     }
 }

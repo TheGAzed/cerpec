@@ -2,11 +2,17 @@
 
 #include <stdlib.h> // import exit()
 #include <string.h>
+#include <limits.h>
 
 /// @brief Resizes structure to new size.
 /// @param list Strcuture to resize.
 /// @param size New size to be used.
 void _idouble_list_resize(idouble_list_s * const list, size_t const size);
+
+/// @brief Ceils (rounds up) a size to the nearest power of two or chunk.
+/// @param size Size to ceil.
+/// @return Ceiled size.
+size_t _idouble_list_ceil_size(size_t const size);
 
 /// @brief Fills hole/empty node index with last array-based node and fixes/redirects siblings.
 /// @param list Strcuture to fill.
@@ -125,7 +131,8 @@ void insert_at_idouble_list(idouble_list_s * const restrict list, void const * c
 
     // if list is full resize (expand) it
     if (list->length == list->capacity) {
-        _idouble_list_resize(list, list->capacity + IDOUBLE_LIST_CHUNK);
+        size_t const capacity = list->length ? list->length * CERPEC_FACTOR : IDOUBLE_LIST_CHUNK;
+        _idouble_list_resize(list, capacity);
     }
 
     // determine closest direction to index and go there
@@ -210,8 +217,8 @@ void remove_first_idouble_list(idouble_list_s * const restrict list, void const 
         _idouble_list_fill_hole(list, current);
 
         // if smaller capacity exists then resize (shrink) list
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
+        if (list->length <= list->capacity / CERPEC_FACTOR && (list->length > IDOUBLE_LIST_CHUNK || !list->length)) {
+            _idouble_list_resize(list, list->length);
         }
 
         return;
@@ -257,8 +264,8 @@ void remove_last_idouble_list(idouble_list_s * const restrict list, void const *
         _idouble_list_fill_hole(list, current);
 
         // if smaller capacity exists then resize (shrink) list
-        if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-            _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
+        if (list->length <= list->capacity / CERPEC_FACTOR && (list->length > IDOUBLE_LIST_CHUNK || !list->length)) {
+            _idouble_list_resize(list, list->length);
         }
 
         return;
@@ -299,8 +306,8 @@ void remove_at_idouble_list(idouble_list_s * const restrict list, size_t const i
     _idouble_list_fill_hole(list, current);
 
     // if smaller capacity exists then resize (shrink) list
-    if (list->length == list->capacity - IDOUBLE_LIST_CHUNK) {
-        _idouble_list_resize(list, list->capacity - IDOUBLE_LIST_CHUNK);
+    if (list->length <= list->capacity / CERPEC_FACTOR && (list->length > IDOUBLE_LIST_CHUNK || !list->length)) {
+        _idouble_list_resize(list, list->length);
     }
 }
 
@@ -366,9 +373,10 @@ void splice_idouble_list(idouble_list_s * const restrict destination, idouble_li
     valid(source->allocator && "Allocator can't be NULL.");
 
     // calculate new capacity of destination list and resize it
-    size_t const length = destination->length + source->length;
-    size_t const mod = length % IDOUBLE_LIST_CHUNK;
-    _idouble_list_resize(destination, mod ? length - mod + IDOUBLE_LIST_CHUNK : length);
+    size_t const sum = destination->length + source->length;
+    size_t const max = destination->capacity > source->capacity ? destination->capacity : source->capacity;
+    size_t const capacity = sum > max ? CERPEC_FACTOR * max : max;
+    _idouble_list_resize(destination, capacity);
 
     // determine closest direction to index and go there
     size_t current = destination->head;
@@ -435,8 +443,7 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     }
 
     // create split list
-    size_t const split_mod = length % IDOUBLE_LIST_CHUNK;
-    size_t const split_capacity = split_mod ? length - split_mod + IDOUBLE_LIST_CHUNK : length;
+    size_t const split_capacity = _idouble_list_ceil_size(length);
     idouble_list_s split = {
         .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
         .node[IDL_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
@@ -471,8 +478,8 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     }
     (*split_current) = 0;
 
-    size_t const list_mod = list->length % IDOUBLE_LIST_CHUNK;
-    size_t const list_capacity = list_mod ? list->length - list_mod + IDOUBLE_LIST_CHUNK : list->length;
+    // shrink resize original list if necessary
+    size_t const list_capacity = _idouble_list_ceil_size(list->length);
     if (list->capacity != list_capacity) {
         _idouble_list_resize(list, list_capacity);
     }
@@ -509,7 +516,8 @@ idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter
 
         (*pos) = positive.length; // set head and next nodes to next index
         if (positive.length == positive.capacity) { // expand capacity if needed
-            _idouble_list_resize(&positive, positive.capacity + IDOUBLE_LIST_CHUNK);
+            size_t const capacity = positive.length ? positive.length * CERPEC_FACTOR : IDOUBLE_LIST_CHUNK;
+            _idouble_list_resize(&positive, capacity);
         }
         positive.node[IDL_PREV][positive.length] = positive.length - 1; // set previous node indexes to one minus current
         positive.node[IDL_PREV][0] = positive.length; // set first node's prev to positive length
@@ -532,8 +540,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter
     (*pos) = 0;
 
     // shrink list if smaller chunk is available
-    size_t const list_mod = list->length % IDOUBLE_LIST_CHUNK;
-    size_t const list_capacity = list_mod ? list->length - list_mod + IDOUBLE_LIST_CHUNK : list->length;
+    size_t const list_capacity = _idouble_list_ceil_size(list->length);
     if (list->capacity != list_capacity) {
         _idouble_list_resize(list, list_capacity);
     }
@@ -635,4 +642,14 @@ void _idouble_list_fill_hole(idouble_list_s * list, const size_t hole) {
     // redirect array's last swapped node's siblings to hole
     list->node[IDL_PREV][list->node[IDL_NEXT][list->length]] = hole;
     list->node[IDL_NEXT][list->node[IDL_PREV][list->length]] = hole;
+}
+
+size_t _idouble_list_ceil_size(size_t const size) {
+    size_t s = size > IDOUBLE_LIST_CHUNK ? size : size ? IDOUBLE_LIST_CHUNK : 0;
+
+    if (!(s & (s - 1))) { return s; }
+
+    for (size_t i = 1; i < sizeof(size_t) * CHAR_BIT; i *= 2) { s |= (s >> i); }
+
+    return (s - (s / 2)) << 1;
 }

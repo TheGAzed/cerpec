@@ -10,7 +10,7 @@ TEST CREATE_01(void) {
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(0, test.size);
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -18,7 +18,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     fstack_s test = create_fstack(sizeof(int), FSTACK_CHUNK);
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     ASSERT_EQ(0, test.length);
     ASSERT_NEQ(sizeof(int), test.size);
@@ -30,13 +30,13 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     fstack_s test = create_fstack(sizeof(int), FSTACK_CHUNK);
 
-    clear_fstack(&test, destroy);
+    clear_fstack(&test, intdst);
 
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(0, test.size);
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -48,7 +48,7 @@ TEST PUSH_01(void) {
         push_fstack(&test, &i);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -60,7 +60,7 @@ TEST PUSH_02(void) {
         push_fstack(&test, &i);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -76,7 +76,7 @@ TEST PEEP_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -92,7 +92,7 @@ TEST PEEP_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -110,7 +110,7 @@ TEST POP_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -128,7 +128,7 @@ TEST POP_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -141,7 +141,7 @@ TEST MAP_01(void) {
     }
 
     int value = 1;
-    each_fstack(&test, increment, &value);
+    each_fstack(&test, intincrement, &value);
 
     for (int i = FSTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -149,7 +149,7 @@ TEST MAP_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -162,7 +162,7 @@ TEST MAP_02(void) {
     }
 
     int value = 1;
-    each_fstack(&test, increment, &value);
+    each_fstack(&test, intincrement, &value);
 
     for (int i = FSTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
@@ -170,7 +170,7 @@ TEST MAP_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -182,8 +182,7 @@ TEST APPLY_01(void) {
         push_fstack(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_fstack(&test, sort, &cmp);
+    apply_fstack(&test, intqsort, NULL);
 
     for (int i = FSTACK_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -191,7 +190,7 @@ TEST APPLY_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -203,8 +202,7 @@ TEST APPLY_02(void) {
         push_fstack(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_fstack(&test, sort, &cmp);
+    apply_fstack(&test, intqsort, NULL);
 
     for (int i = FSTACK_CHUNK - 1; i >= 0; --i) {
         int a = 0;
@@ -212,7 +210,7 @@ TEST APPLY_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -224,8 +222,7 @@ TEST APPLY_03(void) {
         push_fstack(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare_reverse, };
-    apply_fstack(&test, sort, &cmp);
+    apply_fstack(&test, intrqsort, NULL);
 
     for (int i = 0; i < FSTACK_CHUNK - 1; ++i) {
         int a = 0;
@@ -233,7 +230,7 @@ TEST APPLY_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }
@@ -245,8 +242,7 @@ TEST APPLY_04(void) {
         push_fstack(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare_reverse, };
-    apply_fstack(&test, sort, &cmp);
+    apply_fstack(&test, intrqsort, NULL);
 
     for (int i = 0; i < FSTACK_CHUNK; ++i) {
         int a = 0;
@@ -254,7 +250,7 @@ TEST APPLY_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fstack(&test, destroy);
+    destroy_fstack(&test, intdst);
 
     PASS();
 }

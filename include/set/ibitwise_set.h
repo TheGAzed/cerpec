@@ -3,6 +3,7 @@
 
 #include <cerpec.h>
 
+// doesn't need to check if chunk is power of 2 since it works with bit indexes needs to resize linearly
 #if !defined(IBITWISE_SET_CHUNK)
 #   define IBITWISE_SET_CHUNK CERPEC_CHUNK
 #elif IBITWISE_SET_CHUNK <= 0

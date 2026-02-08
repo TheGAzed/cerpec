@@ -7,6 +7,8 @@
 #   define IDOUBLE_LIST_CHUNK CERPEC_CHUNK
 #elif IDOUBLE_LIST_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IDOUBLE_LIST_CHUNK & (IDOUBLE_LIST_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 #define IDL_NODE 2

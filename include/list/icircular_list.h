@@ -7,6 +7,8 @@
 #   define ICIRCULAR_LIST_CHUNK CERPEC_CHUNK
 #elif ICIRCULAR_LIST_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (ICIRCULAR_LIST_CHUNK & (ICIRCULAR_LIST_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 /// @brief Infinite circular list data structure.

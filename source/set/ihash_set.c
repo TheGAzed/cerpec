@@ -157,18 +157,21 @@ void insert_ihash_set(ihash_set_s * const set, void const * const element) {
 
     // resize (expand) if set can't contain new element
     if (set->length == set->capacity) {
-        _ihash_set_resize(set, set->capacity + IHASH_SET_CHUNK);
+        size_t const capacity = set->length ? set->length * CERPEC_FACTOR : IHASH_SET_CHUNK;
+        _ihash_set_resize(set, capacity);
     }
 
     // calculate hash value and index in array
     size_t const hash = set->hash(element);
     size_t const index = hash % set->capacity;
 
+#ifndef NERROR
     // check if element is in set or not
     for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
         void const * const current = set->elements + (n * set->size);
-        error((hash != set->hashes[n] || set->compare(element, current)) && "Element already in map.");
+        error((hash != set->hashes[n] || set->compare(element, current)) && "Key must be unique.");
     }
+#endif
 
     _insert_wrapper_ihash_set(set, hash, index);
     memcpy(set->elements + (set->length * set->size), element, set->size);
@@ -204,7 +207,7 @@ void remove_ihash_set(ihash_set_s * const set, void const * const element, void 
         _ihash_set_fill_hole(set, n);
 
         // resize (expand) if set can contain a smaller capacity of elements
-        if (set->capacity - IHASH_SET_CHUNK == set->length) {
+        if (set->length <= set->capacity / CERPEC_FACTOR && (set->length > IHASH_SET_CHUNK || !set->length)) {
             _ihash_set_resize(set, set->length);
         }
 
@@ -271,7 +274,8 @@ ihash_set_s union_ihash_set(ihash_set_s const * const set_one, ihash_set_s const
         if (!contains) {
             // expand union set if necessary
             if (set_union.length == set_union.capacity) {
-                _ihash_set_resize(&set_union, set_union.capacity + IHASH_SET_CHUNK);
+                size_t const capacity = set_union.length ? set_union.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
+                _ihash_set_resize(&set_union, capacity);
             }
 
             // index may change due to increase in capacity
@@ -321,7 +325,8 @@ ihash_set_s intersect_ihash_set(ihash_set_s const * const set_one, ihash_set_s c
         if (contains) {
             // expand intersect set if necessary
             if (set_intersect.length == set_intersect.capacity) {
-                _ihash_set_resize(&set_intersect, set_intersect.capacity + IHASH_SET_CHUNK);
+                size_t const capacity = set_intersect.length ? set_intersect.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
+                _ihash_set_resize(&set_intersect, capacity);
             }
 
             size_t const intersect_index = min_hash % set_intersect.capacity;
@@ -367,7 +372,8 @@ ihash_set_s subtract_ihash_set(ihash_set_s const * const minuend, ihash_set_s co
         if (!contains) {
             // expand subtract set if necessary
             if (set_subtract.length == set_subtract.capacity) {
-                _ihash_set_resize(&set_subtract, set_subtract.capacity + IHASH_SET_CHUNK);
+                size_t const capacity = set_subtract.length ? set_subtract.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
+                _ihash_set_resize(&set_subtract, capacity);
             }
 
             size_t const subtract_index = hash % set_subtract.capacity;
@@ -413,7 +419,8 @@ ihash_set_s exclude_ihash_set(ihash_set_s const * const set_one, ihash_set_s con
         if (!contains) {
             // expand exclude set if necessary
             if (set_exclude.length == set_exclude.capacity) {
-                _ihash_set_resize(&set_exclude, set_exclude.capacity + IHASH_SET_CHUNK);
+                size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
+                _ihash_set_resize(&set_exclude, capacity);
             }
 
             size_t const exclude_index = hash % set_exclude.capacity;
@@ -435,7 +442,8 @@ ihash_set_s exclude_ihash_set(ihash_set_s const * const set_one, ihash_set_s con
         if (!contains) {
             // expand exclude set if necessary
             if (set_exclude.length == set_exclude.capacity) {
-                _ihash_set_resize(&set_exclude, set_exclude.capacity + IHASH_SET_CHUNK);
+                size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
+                _ihash_set_resize(&set_exclude, capacity);
             }
 
             size_t const exclude_index = hash % set_exclude.capacity;

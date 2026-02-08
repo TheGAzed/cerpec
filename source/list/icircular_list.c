@@ -2,6 +2,7 @@
 
 #include <stdlib.h> // import exit()
 #include <string.h>
+#include <limits.h>
 
 #define NIL ((size_t)(-1))
 
@@ -9,6 +10,11 @@
 /// @param list Strcuture to resize.
 /// @param size New size to be used.
 void _icircular_list_resize(icircular_list_s * const list, size_t const size);
+
+/// @brief Ceils (rounds up) a size to the nearest power of two or chunk.
+/// @param size Size to ceil.
+/// @return Ceiled size.
+size_t _icircular_list_ceil_size(size_t const size);
 
 icircular_list_s create_icircular_list(size_t const size) {
     error(size && "Paremeter can't be zero.");
@@ -122,7 +128,8 @@ void insert_at_icircular_list(icircular_list_s * const restrict list, void const
 
     // if length has reached capacity increase capacity linearly and call resize function to expand nodes
     if (list->length == list->capacity) {
-        _icircular_list_resize(list, list->capacity + ICIRCULAR_LIST_CHUNK);
+        size_t const capacity = list->length ? list->length * CERPEC_FACTOR : ICIRCULAR_LIST_CHUNK;
+        _icircular_list_resize(list, capacity);
     }
 
     // get the empty node index either from underlying stack or next empty index in array (i.e. length)
@@ -217,8 +224,8 @@ void remove_first_icircular_list(icircular_list_s * const restrict list, void co
         }
 
         // if length has reached smaller capacity decrease capacity and resize the list
-        if (list->length == list->capacity - ICIRCULAR_LIST_CHUNK) {
-            _icircular_list_resize(list, list->capacity - ICIRCULAR_LIST_CHUNK);
+        if (list->length <= list->capacity / CERPEC_FACTOR && (list->length > ICIRCULAR_LIST_CHUNK || !list->length)) {
+            _icircular_list_resize(list, list->length);
         }
 
         return; // leave function with found element
@@ -268,8 +275,8 @@ void remove_at_icircular_list(icircular_list_s * const restrict list, size_t con
     }
 
     // if length has reached smaller capacity decrease capacity and resize the list
-    if (list->length == list->capacity - ICIRCULAR_LIST_CHUNK) {
-        _icircular_list_resize(list, list->capacity - ICIRCULAR_LIST_CHUNK);
+    if (list->length <= list->capacity / CERPEC_FACTOR && (list->length > ICIRCULAR_LIST_CHUNK || !list->length)) {
+        _icircular_list_resize(list, list->length);
     }
 }
 
@@ -330,9 +337,10 @@ void splice_icircular_list(icircular_list_s * const restrict destination, icircu
 
     size_t const dest_length = destination->length;
 
-    size_t const length = destination->length + source->length;
-    size_t const mod = length % ICIRCULAR_LIST_CHUNK;
-    _icircular_list_resize(destination, mod ? length - mod + ICIRCULAR_LIST_CHUNK : length);
+    size_t const sum = destination->length + source->length;
+    size_t const max = destination->capacity > source->capacity ? destination->capacity : source->capacity;
+    size_t const capacity = sum > max ? CERPEC_FACTOR * max : max;
+    _icircular_list_resize(destination, capacity);
 
     size_t dest_prev = destination->tail;
     // iterate to previous node from index
@@ -414,8 +422,7 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
     }
 
     // create split list
-    size_t const split_mod = length % ICIRCULAR_LIST_CHUNK;
-    size_t const split_capacity = split_mod ? length - split_mod + ICIRCULAR_LIST_CHUNK : length;
+    size_t const split_capacity = _icircular_list_ceil_size(length);
     icircular_list_s split = {
         .capacity = split_capacity, .empty = NIL, .size = list->size,
         .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
@@ -447,8 +454,7 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
 
     // create replica of parameter list to remove holes in it
     size_t const replica_length = list->length - length;
-    size_t const replica_mod = replica_length % ICIRCULAR_LIST_CHUNK;
-    size_t const replica_capacity = replica_mod ? replica_length - replica_mod + ICIRCULAR_LIST_CHUNK : replica_length;
+    size_t const replica_capacity = _icircular_list_ceil_size(replica_length);
     icircular_list_s replica = {
         .capacity = replica_capacity, .empty = NIL, .size = list->size,
         .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arguments),
@@ -499,9 +505,12 @@ icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, 
         char const * element = list->elements + (current * list->size); // save current element
         if (filter(element, arguments)) { // if element is valid push into positive list
             (*pos) = pos_idx;
+
             if (positive.length == positive.capacity) { // expand capacity if needed
-                _icircular_list_resize(&positive, positive.capacity + ICIRCULAR_LIST_CHUNK);
+                size_t const capacity = positive.length ? positive.length * CERPEC_FACTOR : ICIRCULAR_LIST_CHUNK;
+                _icircular_list_resize(&positive, capacity);
             }
+
             positive.next[pos_idx] = 0; // make list circular
             // copy element into list
             memcpy(positive.elements + (pos_idx * positive.size), element, list->size);
@@ -511,9 +520,12 @@ icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, 
             pos_idx++;
         } else { // else push into negative list
             (*neg) = neg_idx;
+
             if (negative.length == negative.capacity) { // expand capacity if needed
-                _icircular_list_resize(&negative, negative.capacity + ICIRCULAR_LIST_CHUNK);
+                size_t const capacity = negative.length ? negative.length * CERPEC_FACTOR : ICIRCULAR_LIST_CHUNK;
+                _icircular_list_resize(&negative, capacity);
             }
+
             negative.next[neg_idx] = 0; // make list circular
             // copy element into list
             memcpy(negative.elements + (neg_idx * negative.size), element, list->size);
@@ -622,4 +634,14 @@ void _icircular_list_resize(icircular_list_s * const list, size_t const size) {
     }
 
     list->empty = NIL;
+}
+
+size_t _icircular_list_ceil_size(size_t const size) {
+    size_t s = size > ICIRCULAR_LIST_CHUNK ? size : size ? ICIRCULAR_LIST_CHUNK : 0;
+
+    if (!(s & (s - 1))) { return s; }
+
+    for (size_t i = 1; i < sizeof(size_t) * CHAR_BIT; i *= 2) { s |= (s >> i); }
+
+    return (s - (s / 2)) << 1;
 }

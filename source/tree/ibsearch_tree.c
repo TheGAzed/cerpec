@@ -168,7 +168,8 @@ void insert_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * co
     valid(tree->allocator && "Allocator can't be NULL.");
 
     if (tree->length == tree->capacity) {
-        _ibsearch_tree_resize(tree, tree->capacity + IBSEARCH_TREE_CHUNK);
+        size_t const capacity = tree->length ? tree->length * CERPEC_FACTOR : IBSEARCH_TREE_CHUNK;
+        _ibsearch_tree_resize(tree, capacity);
     }
 
     size_t previous = NIL; // initially invalid for the head case when tree is empty
@@ -231,7 +232,7 @@ void remove_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const * co
     size_t const hole = _ibsearch_tree_remove_fixup(tree, node);
     _ibsearch_tree_fill_hole(tree, hole);
 
-    if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IBSEARCH_TREE_CHUNK || !tree->length)) {
         _ibsearch_tree_resize(tree, tree->length);
     }
 }
@@ -341,7 +342,7 @@ void remove_max_ibsearch_tree(ibsearch_tree_s * const restrict tree, void * cons
 
     _ibsearch_tree_fill_hole(tree, hole);
 
-    if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IBSEARCH_TREE_CHUNK || !tree->length)) {
         _ibsearch_tree_resize(tree, tree->length);
     }
 }
@@ -380,7 +381,7 @@ void remove_min_ibsearch_tree(ibsearch_tree_s * const restrict tree, void * cons
 
     _ibsearch_tree_fill_hole(tree, hole);
 
-    if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IBSEARCH_TREE_CHUNK || !tree->length)) {
         _ibsearch_tree_resize(tree, tree->length);
     }
 }
@@ -500,7 +501,7 @@ void remove_floor_ibsearch_tree(ibsearch_tree_s * const restrict tree, void cons
     size_t const hole = _ibsearch_tree_remove_fixup(tree, floor);
     _ibsearch_tree_fill_hole(tree, hole);
 
-    if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IBSEARCH_TREE_CHUNK || !tree->length)) {
         _ibsearch_tree_resize(tree, tree->length);
     }
 }
@@ -536,7 +537,7 @@ void remove_ceil_ibsearch_tree(ibsearch_tree_s * const restrict tree, void const
     size_t const hole = _ibsearch_tree_remove_fixup(tree, ceil);
     _ibsearch_tree_fill_hole(tree, hole);
 
-    if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IBSEARCH_TREE_CHUNK || !tree->length)) {
         _ibsearch_tree_resize(tree, tree->length);
     }
 }
@@ -666,7 +667,7 @@ void remove_successor_ibsearch_tree(ibsearch_tree_s * const restrict tree, void 
     size_t const hole = _ibsearch_tree_remove_fixup(tree, successor);
     _ibsearch_tree_fill_hole(tree, hole);
 
-    if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IBSEARCH_TREE_CHUNK || !tree->length)) {
         _ibsearch_tree_resize(tree, tree->length);
     }
 }
@@ -702,7 +703,7 @@ void remove_predecessor_ibsearch_tree(ibsearch_tree_s * const restrict tree, voi
     size_t const hole = _ibsearch_tree_remove_fixup(tree, predecessor);
     _ibsearch_tree_fill_hole(tree, hole);
 
-    if (tree->length == tree->capacity - IBSEARCH_TREE_CHUNK) {
+    if (tree->length <= tree->capacity / CERPEC_FACTOR && (tree->length > IBSEARCH_TREE_CHUNK || !tree->length)) {
         _ibsearch_tree_resize(tree, tree->length);
     }
 }

@@ -3,7 +3,7 @@
 
 #include <greatest.h>
 
-#include <test.h>
+#include <dodac.h>
 
 SUITE_EXTERN(istraight_list_test);
 SUITE_EXTERN(icircular_list_test);

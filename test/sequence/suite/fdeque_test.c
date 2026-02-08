@@ -10,7 +10,7 @@ TEST CREATE_01(void) {
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(0, test.size);
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -18,7 +18,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     fdeque_s test = create_fdeque(sizeof(int), FDEQUE_CHUNK);
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     ASSERT_EQ(0, test.length);
     ASSERT_NEQ(sizeof(int), test.size);
@@ -30,13 +30,13 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     fdeque_s test = create_fdeque(sizeof(int), FDEQUE_CHUNK);
 
-    clear_fdeque(&test, destroy);
+    clear_fdeque(&test, intdst);
 
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(0, test.size);
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -48,7 +48,7 @@ TEST ENQUEUE_FRONT_01(void) {
         enqueue_front_fdeque(&test, &i);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -60,7 +60,7 @@ TEST ENQUEUE_FRONT_02(void) {
         enqueue_front_fdeque(&test, &i);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -72,7 +72,7 @@ TEST ENQUEUE_BACK_01(void) {
         enqueue_back_fdeque(&test, &i);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -84,7 +84,7 @@ TEST ENQUEUE_BACK_02(void) {
         enqueue_back_fdeque(&test, &i);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -100,7 +100,7 @@ TEST PEEK_FRONT_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -116,7 +116,7 @@ TEST PEEK_FRONT_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -132,7 +132,7 @@ TEST PEEK_FRONT_04(void) {
         ASSERT_EQ(0, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -148,7 +148,7 @@ TEST PEEK_FRONT_05(void) {
         ASSERT_EQ(0, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -164,7 +164,7 @@ TEST PEEK_BACK_01(void) {
         ASSERT_EQ(0, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -180,7 +180,7 @@ TEST PEEK_BACK_02(void) {
         ASSERT_EQ(0, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -196,7 +196,7 @@ TEST PEEK_BACK_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -212,7 +212,7 @@ TEST PEEK_BACK_05(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -230,7 +230,7 @@ TEST DEQUEUE_FRONT_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -248,7 +248,7 @@ TEST DEQUEUE_FRONT_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -266,7 +266,7 @@ TEST DEQUEUE_FRONT_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -284,7 +284,7 @@ TEST DEQUEUE_FRONT_05(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -302,7 +302,7 @@ TEST DEQUEUE_BACK_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -320,7 +320,7 @@ TEST DEQUEUE_BACK_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -338,7 +338,7 @@ TEST DEQUEUE_BACK_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -356,7 +356,7 @@ TEST DEQUEUE_BACK_05(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -369,7 +369,7 @@ TEST MAP_FRONT_01(void) {
     }
 
     int value = 1;
-    each_front_fdeque(&test, increment, &value);
+    each_front_fdeque(&test, intincrement, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -377,7 +377,7 @@ TEST MAP_FRONT_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -390,7 +390,7 @@ TEST MAP_FRONT_02(void) {
     }
 
     int value = 1;
-    each_front_fdeque(&test, increment, &value);
+    each_front_fdeque(&test, intincrement, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -398,7 +398,7 @@ TEST MAP_FRONT_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -411,7 +411,7 @@ TEST MAP_BACK_01(void) {
     }
 
     int value = 1;
-    each_back_fdeque(&test, increment, &value);
+    each_back_fdeque(&test, intincrement, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -419,7 +419,7 @@ TEST MAP_BACK_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -432,7 +432,7 @@ TEST MAP_BACK_02(void) {
     }
 
     int value = 1;
-    each_back_fdeque(&test, increment, &value);
+    each_back_fdeque(&test, intincrement, &value);
 
     for (int i = 0; i < FDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -440,7 +440,7 @@ TEST MAP_BACK_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -452,8 +452,7 @@ TEST APPLY_01(void) {
         enqueue_back_fdeque(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_fdeque(&test, sort, &cmp);
+    apply_fdeque(&test, intqsort, NULL);
 
     for (int i = FDEQUE_CHUNK - 2; i >= 0; --i) {
         int a = 0;
@@ -461,7 +460,7 @@ TEST APPLY_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -473,8 +472,7 @@ TEST APPLY_02(void) {
         enqueue_back_fdeque(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_fdeque(&test, sort, &cmp);
+    apply_fdeque(&test, intqsort, NULL);
 
     for (int i = FDEQUE_CHUNK - 1; i >= 0; --i) {
         int a = 0;
@@ -482,7 +480,7 @@ TEST APPLY_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -494,8 +492,7 @@ TEST APPLY_03(void) {
         enqueue_back_fdeque(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare_reverse, };
-    apply_fdeque(&test, sort, &cmp);
+    apply_fdeque(&test, intrqsort, NULL);
 
     for (int i = 0; i < FDEQUE_CHUNK - 1; ++i) {
         int a = 0;
@@ -503,7 +500,7 @@ TEST APPLY_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }
@@ -515,8 +512,7 @@ TEST APPLY_04(void) {
         enqueue_back_fdeque(&test, &i);
     }
 
-    struct compare cmp = { .compare_element = compare_reverse, };
-    apply_fdeque(&test, sort, &cmp);
+    apply_fdeque(&test, intrqsort, NULL);
 
     for (int i = 0; i < FDEQUE_CHUNK; ++i) {
         int a = 0;
@@ -524,7 +520,7 @@ TEST APPLY_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdeque(&test, destroy);
+    destroy_fdeque(&test, intdst);
 
     PASS();
 }

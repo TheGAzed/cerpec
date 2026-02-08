@@ -7,6 +7,8 @@
 #   define IRB_TREE_CHUNK CERPEC_CHUNK
 #elif IRB_TREE_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IRB_TREE_CHUNK & (IRB_TREE_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 #define IRBT_NODE_COUNT 2

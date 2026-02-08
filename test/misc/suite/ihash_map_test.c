@@ -3,7 +3,7 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     ASSERT_EQ(0, table.capacity);
     ASSERT_EQ(0, table.length);
@@ -13,15 +13,15 @@ TEST CREATE_01(void) {
     ASSERT_EQ(NULL, table.keys);
     ASSERT_EQ(NULL, table.values);
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     ASSERT_EQ(0, table.capacity);
     ASSERT_EQ(0, table.length);
@@ -35,9 +35,9 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
-    clear_ihash_map(&table, destroy, destroy);
+    clear_ihash_map(&table, intdst, intdst);
 
     ASSERT_EQ(0, table.capacity);
     ASSERT_EQ(0, table.length);
@@ -47,20 +47,20 @@ TEST CLEAR_01(void) {
     ASSERT_EQ(NULL, table.keys);
     ASSERT_EQ(NULL, table.values);
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST COPY_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
         int j = i;
         insert_ihash_map(&table, &i, &j);
     }
 
-    ihash_map_s replica = copy_ihash_map(&table, copy, copy);
+    ihash_map_s replica = copy_ihash_map(&table, intcpy, intcpy);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
         ASSERT(contains_key_ihash_map(&replica, &i));
@@ -70,21 +70,21 @@ TEST COPY_01(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_ihash_map(&replica, destroy, destroy);
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&replica, intdst, intdst);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST COPY_02(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
         int j = i;
         insert_ihash_map(&table, &i, &j);
     }
 
-    ihash_map_s replica = copy_ihash_map(&table, copy, copy);
+    ihash_map_s replica = copy_ihash_map(&table, intcpy, intcpy);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
         ASSERT(contains_key_ihash_map(&replica, &i));
@@ -94,21 +94,21 @@ TEST COPY_02(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_ihash_map(&replica, destroy, destroy);
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&replica, intdst, intdst);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST COPY_03(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
         int j = i;
         insert_ihash_map(&table, &i, &j);
     }
 
-    ihash_map_s replica = copy_ihash_map(&table, copy, copy);
+    ihash_map_s replica = copy_ihash_map(&table, intcpy, intcpy);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
         ASSERT(contains_key_ihash_map(&replica, &i));
@@ -118,53 +118,53 @@ TEST COPY_03(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_ihash_map(&replica, destroy, destroy);
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&replica, intdst, intdst);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST INSERT_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
         int j = i;
         insert_ihash_map(&table, &i, &j);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST INSERT_02(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
         int j = i;
         insert_ihash_map(&table, &i, &j);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST INSERT_03(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
         int j = i;
         insert_ihash_map(&table, &i, &j);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST REMOVE_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -179,13 +179,13 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST REMOVE_02(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -200,13 +200,13 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST REMOVE_03(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -221,13 +221,13 @@ TEST REMOVE_03(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -238,13 +238,13 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_key_ihash_map(&table, &i));
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_02(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -255,13 +255,13 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_key_ihash_map(&table, &i));
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_03(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -272,13 +272,13 @@ TEST CONTAINS_03(void) {
         ASSERT(contains_key_ihash_map(&table, &i));
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST GET_VALUE_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -291,13 +291,13 @@ TEST GET_VALUE_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST GET_VALUE_02(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -310,13 +310,13 @@ TEST GET_VALUE_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST GET_VALUE_03(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -329,13 +329,13 @@ TEST GET_VALUE_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST SET_VALUE_01(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -351,13 +351,13 @@ TEST SET_VALUE_01(void) {
     get_value_ihash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST SET_VALUE_02(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -373,13 +373,13 @@ TEST SET_VALUE_02(void) {
     get_value_ihash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }
 
 TEST SET_VALUE_03(void) {
-    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), hash, compare);
+    ihash_map_s table = create_ihash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
     for (int i = 0; i < IHASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -395,7 +395,7 @@ TEST SET_VALUE_03(void) {
     get_value_ihash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_ihash_map(&table, destroy, destroy);
+    destroy_ihash_map(&table, intdst, intdst);
 
     PASS();
 }

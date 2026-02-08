@@ -4,21 +4,21 @@
 #define FHASH_SET_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     ASSERT_EQ(0, set.length);
     ASSERT_NEQ(0, set.size);
     ASSERT_NEQ(NULL, set.hash);
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     ASSERT_EQ(0, set.length);
     ASSERT_EQ(0, set.size);
@@ -28,45 +28,45 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
-    clear_fhash_set(&set, destroy);
+    clear_fhash_set(&set, intdst);
 
     ASSERT_EQ(0, set.length);
     ASSERT_NEQ(0, set.size);
     ASSERT_NEQ(NULL, set.hash);
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST INSERT_01(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set, &i);
     }
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST INSERT_02(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set, &i);
     }
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST REMOVE_01(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set, &i);
@@ -78,13 +78,13 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, buf);
     }
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST REMOVE_02(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set, &i);
@@ -96,13 +96,13 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, buf);
     }
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_01(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set, &i);
@@ -112,13 +112,13 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_fhash_set(&set, &i));
     }
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST CONTAINS_02(void) {
-    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set, &i);
@@ -128,58 +128,58 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_fhash_set(&set, &i));
     }
 
-    destroy_fhash_set(&set, destroy);
+    destroy_fhash_set(&set, intdst);
 
     PASS();
 }
 
 TEST UNION_01(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_fhash_set(&set_union, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_union, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_union, intdst);
 
     PASS();
 }
 
 TEST UNION_02(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT(contains_fhash_set(&set_union, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_union, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_union, intdst);
 
     PASS();
 }
 
 TEST UNION_03(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -189,22 +189,22 @@ TEST UNION_03(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_fhash_set(&set_union, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_union, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_union, intdst);
 
     PASS();
 }
 
 TEST UNION_04(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -214,22 +214,22 @@ TEST UNION_04(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT(contains_fhash_set(&set_union, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_union, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_union, intdst);
 
     PASS();
 }
 
 TEST UNION_05(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -239,22 +239,22 @@ TEST UNION_05(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_fhash_set(&set_union, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_union, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_union, intdst);
 
     PASS();
 }
 
 TEST UNION_06(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -264,66 +264,66 @@ TEST UNION_06(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_union = union_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT(contains_fhash_set(&set_union, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_union, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_union, intdst);
 
     PASS();
 }
 
 TEST INTERSECT_01(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_fhash_set(&set_intersect, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_intersect, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_intersect, intdst);
 
     PASS();
 }
 
 TEST INTERSECT_02(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT(contains_fhash_set(&set_intersect, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_intersect, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_intersect, intdst);
 
     PASS();
 }
 
 TEST INTERSECT_03(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -333,22 +333,22 @@ TEST INTERSECT_03(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_intersect, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_intersect, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_intersect, intdst);
 
     PASS();
 }
 
 TEST INTERSECT_04(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -358,22 +358,22 @@ TEST INTERSECT_04(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_intersect, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_intersect, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_intersect, intdst);
 
     PASS();
 }
 
 TEST INTERSECT_05(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -383,7 +383,7 @@ TEST INTERSECT_05(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 3; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_intersect, &i));
@@ -397,16 +397,16 @@ TEST INTERSECT_05(void) {
         ASSERT(contains_fhash_set(&set_intersect, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_intersect, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_intersect, intdst);
 
     PASS();
 }
 
 TEST INTERSECT_06(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -416,7 +416,7 @@ TEST INTERSECT_06(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_intersect = intersect_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 3; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_intersect, &i));
@@ -430,60 +430,60 @@ TEST INTERSECT_06(void) {
         ASSERT(contains_fhash_set(&set_intersect, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_intersect, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_intersect, intdst);
 
     PASS();
 }
 
 TEST SUBTRACT_01(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_subtract, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_subtract, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_subtract, intdst);
 
     PASS();
 }
 
 TEST SUBTRACT_02(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_subtract, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_subtract, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_subtract, intdst);
 
     PASS();
 }
 
 TEST SUBTRACT_03(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -493,7 +493,7 @@ TEST SUBTRACT_03(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         ASSERT(contains_fhash_set(&set_subtract, &i));
@@ -503,16 +503,16 @@ TEST SUBTRACT_03(void) {
         ASSERT_FALSE(contains_fhash_set(&set_subtract, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_subtract, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_subtract, intdst);
 
     PASS();
 }
 
 TEST SUBTRACT_04(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -522,7 +522,7 @@ TEST SUBTRACT_04(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         ASSERT(contains_fhash_set(&set_subtract, &i));
@@ -532,16 +532,16 @@ TEST SUBTRACT_04(void) {
         ASSERT_FALSE(contains_fhash_set(&set_subtract, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_subtract, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_subtract, intdst);
 
     PASS();
 }
 
 TEST SUBTRACT_05(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -551,22 +551,22 @@ TEST SUBTRACT_05(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 3; ++i) {
         ASSERT(contains_fhash_set(&set_subtract, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_subtract, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_subtract, intdst);
 
     PASS();
 }
 
 TEST SUBTRACT_06(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -576,66 +576,66 @@ TEST SUBTRACT_06(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_subtract = subtract_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 3; ++i) {
         ASSERT(contains_fhash_set(&set_subtract, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_subtract, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_subtract, intdst);
 
     PASS();
 }
 
 TEST EXCLUDE_01(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_exclude, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_exclude, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_exclude, intdst);
 
     PASS();
 }
 
 TEST EXCLUDE_02(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT_FALSE(contains_fhash_set(&set_exclude, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_exclude, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_exclude, intdst);
 
     PASS();
 }
 
 TEST EXCLUDE_03(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -645,22 +645,22 @@ TEST EXCLUDE_03(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_fhash_set(&set_exclude, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_exclude, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_exclude, intdst);
 
     PASS();
 }
 
 TEST EXCLUDE_04(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -670,22 +670,22 @@ TEST EXCLUDE_04(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         ASSERT(contains_fhash_set(&set_exclude, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_exclude, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_exclude, intdst);
 
     PASS();
 }
 
 TEST EXCLUDE_05(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -695,7 +695,7 @@ TEST EXCLUDE_05(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 3; ++i) {
         ASSERT(contains_fhash_set(&set_exclude, &i));
@@ -705,16 +705,16 @@ TEST EXCLUDE_05(void) {
         ASSERT(contains_fhash_set(&set_exclude, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_exclude, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_exclude, intdst);
 
     PASS();
 }
 
 TEST EXCLUDE_06(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -724,7 +724,7 @@ TEST EXCLUDE_06(void) {
         insert_fhash_set(&set_two, &i);
     }
 
-    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, copy);
+    fhash_set_s set_exclude = exclude_fhash_set(&set_one, &set_two, intcpy);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 3; ++i) {
         ASSERT(contains_fhash_set(&set_exclude, &i));
@@ -734,16 +734,16 @@ TEST EXCLUDE_06(void) {
         ASSERT(contains_fhash_set(&set_exclude, &i));
     }
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
-    destroy_fhash_set(&set_exclude, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
+    destroy_fhash_set(&set_exclude, intdst);
 
     PASS();
 }
 
 TEST IS_SUBSET_01(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -751,15 +751,15 @@ TEST IS_SUBSET_01(void) {
 
     ASSERT(is_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_SUBSET_02(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -767,15 +767,15 @@ TEST IS_SUBSET_02(void) {
 
     ASSERT(is_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_SUBSET_03(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -784,15 +784,15 @@ TEST IS_SUBSET_03(void) {
 
     ASSERT(is_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_SUBSET_04(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -801,15 +801,15 @@ TEST IS_SUBSET_04(void) {
 
     ASSERT(is_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_SUBSET_05(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -821,15 +821,15 @@ TEST IS_SUBSET_05(void) {
 
     ASSERT_FALSE(is_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_SUBSET_06(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -841,15 +841,15 @@ TEST IS_SUBSET_06(void) {
 
     ASSERT_FALSE(is_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_PROPER_SUBSET_01(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -857,15 +857,15 @@ TEST IS_PROPER_SUBSET_01(void) {
 
     ASSERT(is_proper_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_PROPER_SUBSET_02(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -873,15 +873,15 @@ TEST IS_PROPER_SUBSET_02(void) {
 
     ASSERT(is_proper_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_PROPER_SUBSET_03(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -890,15 +890,15 @@ TEST IS_PROPER_SUBSET_03(void) {
 
     ASSERT_FALSE(is_proper_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_PROPER_SUBSET_04(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -907,15 +907,15 @@ TEST IS_PROPER_SUBSET_04(void) {
 
     ASSERT_FALSE(is_proper_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_PROPER_SUBSET_05(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -927,15 +927,15 @@ TEST IS_PROPER_SUBSET_05(void) {
 
     ASSERT_FALSE(is_proper_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_PROPER_SUBSET_06(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -947,15 +947,15 @@ TEST IS_PROPER_SUBSET_06(void) {
 
     ASSERT_FALSE(is_proper_subset_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_DISJOINT_01(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK - 1; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -964,15 +964,15 @@ TEST IS_DISJOINT_01(void) {
 
     ASSERT_FALSE(is_disjoint_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_DISJOINT_02(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < FHASH_SET_CHUNK; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -981,15 +981,15 @@ TEST IS_DISJOINT_02(void) {
 
     ASSERT_FALSE(is_disjoint_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_DISJOINT_03(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK - 1) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -1001,15 +1001,15 @@ TEST IS_DISJOINT_03(void) {
 
     ASSERT(is_disjoint_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_DISJOINT_04(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < (FHASH_SET_CHUNK) / 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -1021,15 +1021,15 @@ TEST IS_DISJOINT_04(void) {
 
     ASSERT(is_disjoint_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_DISJOINT_05(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -1041,15 +1041,15 @@ TEST IS_DISJOINT_05(void) {
 
     ASSERT_FALSE(is_disjoint_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }
 
 TEST IS_DISJOINT_06(void) {
-    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
-    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, hash, compare);
+    fhash_set_s set_one = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
+    fhash_set_s set_two = create_fhash_set(sizeof(int), FHASH_SET_CHUNK, inthshmurmur, intcmp);
 
     for (int i = 0; i < ((FHASH_SET_CHUNK) / 3) * 2; ++i) {
         insert_fhash_set(&set_one, &i);
@@ -1061,8 +1061,8 @@ TEST IS_DISJOINT_06(void) {
 
     ASSERT_FALSE(is_disjoint_fhash_set(&set_one, &set_two));
 
-    destroy_fhash_set(&set_one, destroy);
-    destroy_fhash_set(&set_two, destroy);
+    destroy_fhash_set(&set_one, intdst);
+    destroy_fhash_set(&set_two, intdst);
 
     PASS();
 }

@@ -2,6 +2,7 @@
 
 #include <stdlib.h> // import exit()
 #include <string.h>
+#include <limits.h>
 
 #define NIL ((size_t)(-1))
 
@@ -9,6 +10,11 @@
 /// @param list Strcuture to resize.
 /// @param size New size to be used.
 void _istraight_list_resize(istraight_list_s * const list, size_t const size);
+
+/// @brief Ceils (rounds up) a size to the nearest power of two or chunk.
+/// @param size Size to ceil.
+/// @return Ceiled size.
+size_t _istraight_list_ceil_size(size_t const size);
 
 istraight_list_s create_istraight_list(size_t const size) {
     error(size && "Paremeter can't be zero.");
@@ -115,7 +121,8 @@ void insert_at_istraight_list(istraight_list_s * const restrict list, void const
 
     // if list can't fit elements expand it
     if (list->length == list->capacity) {
-        _istraight_list_resize(list, list->capacity + ISTRAIGHT_LIST_CHUNK);
+        size_t const capacity = list->length ? list->length * CERPEC_FACTOR : ISTRAIGHT_LIST_CHUNK;
+        _istraight_list_resize(list, capacity);
     }
 
     // go to node reference at index
@@ -196,8 +203,8 @@ void remove_first_istraight_list(istraight_list_s * const restrict list, void co
         }
 
         // shrink list to save space if smaller capacity is available
-        if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
-            _istraight_list_resize(list, list->capacity - ISTRAIGHT_LIST_CHUNK);
+        if (list->length <= list->capacity / CERPEC_FACTOR && (list->length > ISTRAIGHT_LIST_CHUNK || !list->length)) {
+            _istraight_list_resize(list, list->length);
         }
 
         return; // leave function with found element
@@ -240,7 +247,7 @@ void remove_at_istraight_list(istraight_list_s * const restrict list, size_t con
     }
 
     // shrink list to save space if smaller capacity is available
-    if (list->length == list->capacity - ISTRAIGHT_LIST_CHUNK) {
+    if (list->length <= list->capacity / CERPEC_FACTOR && (list->length > ISTRAIGHT_LIST_CHUNK || !list->length)) {
         _istraight_list_resize(list, list->capacity - ISTRAIGHT_LIST_CHUNK);
     }
 }
@@ -277,8 +284,9 @@ void splice_istraight_list(istraight_list_s * const restrict destination, istrai
 
     // calculate new destination length
     size_t const sum = destination->length + source->length;
-    size_t const mod = sum % ISTRAIGHT_LIST_CHUNK;
-    _istraight_list_resize(destination, mod ? sum - mod + ISTRAIGHT_LIST_CHUNK : sum);
+    size_t const max = destination->capacity > source->capacity ? destination->capacity : source->capacity;
+    size_t const capacity = sum > max ? CERPEC_FACTOR * max : max;
+    _istraight_list_resize(destination, capacity);
 
     // go to destination node reference at index
     size_t * dest = &(destination->head);
@@ -341,8 +349,7 @@ istraight_list_s split_istraight_list(istraight_list_s * const list, size_t cons
     }
 
     // create split list structure
-    size_t const split_mod = length % ISTRAIGHT_LIST_CHUNK;
-    size_t const split_capacity = split_mod ? length - split_mod + ISTRAIGHT_LIST_CHUNK : length;
+    size_t const split_capacity = _istraight_list_ceil_size(length);
     istraight_list_s split = {
         .capacity = split_capacity, .empty = NIL, .head = NIL, .size = list->size, .allocator = list->allocator,
         .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
@@ -362,8 +369,7 @@ istraight_list_s split_istraight_list(istraight_list_s * const list, size_t cons
 
     // create replica list structure for list to remove holes
     size_t const replica_length = list->length - length;
-    size_t const replica_mod = replica_length % ISTRAIGHT_LIST_CHUNK;
-    size_t const replica_capacity = replica_mod ? replica_length - replica_mod + ISTRAIGHT_LIST_CHUNK : replica_length;
+    size_t const replica_capacity = _istraight_list_ceil_size(replica_length);
     istraight_list_s replica = {
         .capacity = replica_capacity, .empty = NIL, .head = NIL, .size = list->size, .allocator = list->allocator,
         .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arguments),
@@ -413,7 +419,8 @@ istraight_list_s extract_istraight_list(istraight_list_s * const restrict list, 
         if (filter(element, arguments)) { // if filter value is positive push it into positive
             (*pos) = pos_idx;
             if (positive.length == positive.capacity) {
-                _istraight_list_resize(&positive, positive.capacity + ISTRAIGHT_LIST_CHUNK);
+                size_t const capacity = positive.length ? positive.length * CERPEC_FACTOR : ISTRAIGHT_LIST_CHUNK;
+                _istraight_list_resize(&positive, capacity);
             }
             positive.next[pos_idx] = NIL;
 
@@ -425,7 +432,8 @@ istraight_list_s extract_istraight_list(istraight_list_s * const restrict list, 
         } else { // else push it into negative
             (*neg) = neg_idx;
             if (negative.length == negative.capacity) {
-                _istraight_list_resize(&negative, negative.capacity + ISTRAIGHT_LIST_CHUNK);
+                size_t const capacity = negative.length ? negative.length * CERPEC_FACTOR : ISTRAIGHT_LIST_CHUNK;
+                _istraight_list_resize(&negative, capacity);
             }
             negative.next[neg_idx] = NIL;
 
@@ -517,4 +525,14 @@ void _istraight_list_resize(istraight_list_s * const list, size_t const size) {
     }
 
     list->empty = NIL;
+}
+
+size_t _istraight_list_ceil_size(size_t const size) {
+    size_t s = size > ISTRAIGHT_LIST_CHUNK ? size : size ? ISTRAIGHT_LIST_CHUNK : 0;
+
+    if (!(s & (s - 1))) { return s; }
+
+    for (size_t i = 1; i < sizeof(size_t) * CHAR_BIT; i *= 2) { s |= (s >> i); }
+
+    return (s - (s / 2)) << 1;
 }

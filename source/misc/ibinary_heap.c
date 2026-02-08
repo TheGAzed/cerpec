@@ -118,7 +118,8 @@ void push_ibinary_heap(ibinary_heap_s * const heap, void const * const element) 
     assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
 
     if (heap->length == heap->capacity) {
-        _ibinary_heap_resize(heap, heap->capacity + IBINARY_HEAP_CHUNK);
+        size_t const capacity = heap->length ? heap->length * CERPEC_FACTOR : IBINARY_HEAP_CHUNK;
+        _ibinary_heap_resize(heap, capacity);
     }
 
     // append element to the end of the structure
@@ -157,7 +158,7 @@ void pop_ibinary_heap(ibinary_heap_s * const heap, void * const buffer) {
 
     _ibinary_heapify_down(heap, 0, temporary);
 
-    if (heap->length == heap->capacity - IBINARY_HEAP_CHUNK) {
+    if (heap->length <= heap->capacity / CERPEC_FACTOR && (heap->length > IBINARY_HEAP_CHUNK || !heap->length)) {
         _ibinary_heap_resize(heap, heap->length);
     }
 
@@ -221,8 +222,9 @@ void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap
 
     // calculate new destination length
     size_t const sum = destination->length + source->length;
-    size_t const mod = sum % IBINARY_HEAP_CHUNK;
-    _ibinary_heap_resize(destination, mod ? sum - mod + IBINARY_HEAP_CHUNK : sum);
+    size_t const max = destination->capacity > source->capacity ? destination->capacity : source->capacity;
+    size_t const capacity = sum > max ? CERPEC_FACTOR * max : max;
+    _ibinary_heap_resize(destination, capacity);
 
     // copy source elements into destination array
     memcpy(destination->elements + (destination->length * destination->size), source->elements, source->length * source->size);

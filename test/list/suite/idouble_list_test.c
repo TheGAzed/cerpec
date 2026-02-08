@@ -11,14 +11,14 @@ TEST CREATE_01(void) {
     ASSERT_EQ(NULL, test.node[IDL_NEXT]);
     ASSERT_EQ(NULL, test.node[IDL_PREV]);
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     ASSERT_EQ(0, test.size);
 
@@ -28,14 +28,14 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     idouble_list_s test = create_idouble_list(sizeof(int));
 
-    clear_idouble_list(&test, destroy);
+    clear_idouble_list(&test, intdst);
 
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_EQ(NULL, test.elements);
     ASSERT_EQ(NULL, test.node[IDL_NEXT]);
     ASSERT_EQ(NULL, test.node[IDL_PREV]);
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -47,7 +47,7 @@ TEST COPY_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(&test, copy);
+    idouble_list_s replica = copy_idouble_list(&test, intcpy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -59,8 +59,8 @@ TEST COPY_01(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&replica, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&replica, intdst);
 
     PASS();
 }
@@ -72,7 +72,7 @@ TEST COPY_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(&test, copy);
+    idouble_list_s replica = copy_idouble_list(&test, intcpy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -84,8 +84,8 @@ TEST COPY_02(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&replica, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&replica, intdst);
 
     PASS();
 }
@@ -97,7 +97,7 @@ TEST COPY_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(&test, copy);
+    idouble_list_s replica = copy_idouble_list(&test, intcpy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -109,8 +109,8 @@ TEST COPY_03(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&replica, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&replica, intdst);
 
     PASS();
 }
@@ -120,7 +120,7 @@ TEST IS_EMPTY_01(void) {
 
     ASSERT(is_empty_idouble_list(&test));
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -133,7 +133,7 @@ TEST IS_EMPTY_02(void) {
 
     ASSERT_FALSE(is_empty_idouble_list(&test));
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -145,7 +145,7 @@ TEST INSERT_AT_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -157,7 +157,7 @@ TEST INSERT_AT_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -169,7 +169,7 @@ TEST INSERT_AT_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -187,7 +187,7 @@ TEST GET_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -205,7 +205,7 @@ TEST GET_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -223,7 +223,7 @@ TEST GET_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -237,11 +237,11 @@ TEST REMOVE_FIRST_01(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        remove_first_idouble_list(&test, &i, &t, compare);
+        remove_first_idouble_list(&test, &i, &t, intcmp);
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -255,11 +255,11 @@ TEST REMOVE_FIRST_02(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int t = 0;
-        remove_first_idouble_list(&test, &i, &t, compare);
+        remove_first_idouble_list(&test, &i, &t, intcmp);
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -273,11 +273,11 @@ TEST REMOVE_FIRST_03(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        remove_first_idouble_list(&test, &i, &t, compare);
+        remove_first_idouble_list(&test, &i, &t, intcmp);
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -295,7 +295,7 @@ TEST REMOVE_AT_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -313,7 +313,7 @@ TEST REMOVE_AT_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -331,7 +331,7 @@ TEST REMOVE_AT_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -351,7 +351,7 @@ TEST REVERSE_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -371,7 +371,7 @@ TEST REVERSE_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -391,7 +391,7 @@ TEST REVERSE_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -412,7 +412,7 @@ TEST SHIFT_NEXT_01(void) {
         shift_next_idouble_list(&test, 1);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -433,7 +433,7 @@ TEST SHIFT_NEXT_02(void) {
         shift_next_idouble_list(&test, 1);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -454,7 +454,7 @@ TEST SHIFT_NEXT_03(void) {
         shift_next_idouble_list(&test, 1);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -475,7 +475,7 @@ TEST SHIFT_PREV_01(void) {
         ASSERT_EQ(IDOUBLE_LIST_CHUNK - 1 - 1 - i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -496,7 +496,7 @@ TEST SHIFT_PREV_02(void) {
         ASSERT_EQ(IDOUBLE_LIST_CHUNK - 1 - i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -517,7 +517,7 @@ TEST SHIFT_PREV_03(void) {
         ASSERT_EQ(IDOUBLE_LIST_CHUNK + 1 - 1 - i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -542,8 +542,8 @@ TEST SPLICE_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&one, destroy);
-    destroy_idouble_list(&two, destroy);
+    destroy_idouble_list(&one, intdst);
+    destroy_idouble_list(&two, intdst);
 
     PASS();
 }
@@ -568,8 +568,8 @@ TEST SPLICE_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&one, destroy);
-    destroy_idouble_list(&two, destroy);
+    destroy_idouble_list(&one, intdst);
+    destroy_idouble_list(&two, intdst);
 
     PASS();
 }
@@ -594,8 +594,8 @@ TEST SPLICE_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&one, destroy);
-    destroy_idouble_list(&two, destroy);
+    destroy_idouble_list(&one, intdst);
+    destroy_idouble_list(&two, intdst);
 
     PASS();
 }
@@ -621,8 +621,8 @@ TEST SPLIT_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&split, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&split, intdst);
 
     PASS();
 }
@@ -648,8 +648,8 @@ TEST SPLIT_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&split, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&split, intdst);
 
     PASS();
 }
@@ -675,8 +675,8 @@ TEST SPLIT_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&split, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&split, intdst);
 
     PASS();
 }
@@ -688,7 +688,7 @@ TEST EXTRACT_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s extract = extract_idouble_list(&test, odd, NULL);
+    idouble_list_s extract = extract_idouble_list(&test, intodd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_idouble_list(&test, (size_t)(i) / 2, &s);
@@ -701,8 +701,8 @@ TEST EXTRACT_01(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&extract, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&extract, intdst);
 
     PASS();
 }
@@ -714,7 +714,7 @@ TEST EXTRACT_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s extract = extract_idouble_list(&test, odd, NULL);
+    idouble_list_s extract = extract_idouble_list(&test, intodd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; i += 2) {
         int s = 0;
         get_idouble_list(&test, (size_t)(i) / 2, &s);
@@ -727,8 +727,8 @@ TEST EXTRACT_02(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&extract, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&extract, intdst);
 
     PASS();
 }
@@ -740,7 +740,7 @@ TEST EXTRACT_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s extract = extract_idouble_list(&test, odd, NULL);
+    idouble_list_s extract = extract_idouble_list(&test, intodd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; i += 2) {
         int s = 0;
         get_idouble_list(&test, (size_t)(i) / 2, &s);
@@ -753,8 +753,8 @@ TEST EXTRACT_03(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_idouble_list(&test, destroy);
-    destroy_idouble_list(&extract, destroy);
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&extract, intdst);
 
     PASS();
 }
@@ -767,7 +767,7 @@ TEST MAP_NEXT_01(void) {
     }
 
     int value = 1;
-    each_next_idouble_list(&test, increment, &value);
+    each_next_idouble_list(&test, intincrement, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -775,7 +775,7 @@ TEST MAP_NEXT_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -788,7 +788,7 @@ TEST MAP_NEXT_02(void) {
     }
 
     int value = 1;
-    each_next_idouble_list(&test, increment, &value);
+    each_next_idouble_list(&test, intincrement, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
@@ -796,7 +796,7 @@ TEST MAP_NEXT_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -809,7 +809,7 @@ TEST MAP_NEXT_03(void) {
     }
 
     int value = 1;
-    each_next_idouble_list(&test, increment, &value);
+    each_next_idouble_list(&test, intincrement, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -817,7 +817,7 @@ TEST MAP_NEXT_03(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -830,7 +830,7 @@ TEST MAP_PREV_01(void) {
     }
 
     int value = 1;
-    each_prev_idouble_list(&test, increment, &value);
+    each_prev_idouble_list(&test, intincrement, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -838,7 +838,7 @@ TEST MAP_PREV_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -851,7 +851,7 @@ TEST MAP_PREV_02(void) {
     }
 
     int value = 1;
-    each_prev_idouble_list(&test, increment, &value);
+    each_prev_idouble_list(&test, intincrement, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
@@ -859,7 +859,7 @@ TEST MAP_PREV_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -872,7 +872,7 @@ TEST MAP_PREV_03(void) {
     }
 
     int value = 1;
-    each_prev_idouble_list(&test, increment, &value);
+    each_prev_idouble_list(&test, intincrement, &value);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -880,7 +880,7 @@ TEST MAP_PREV_03(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -892,8 +892,7 @@ TEST APPLY_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_idouble_list(&test, sort, &cmp);
+    apply_idouble_list(&test, intqsort, NULL);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -901,7 +900,7 @@ TEST APPLY_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -913,8 +912,7 @@ TEST APPLY_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_idouble_list(&test, sort, &cmp);
+    apply_idouble_list(&test, intqsort, NULL);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
@@ -922,7 +920,7 @@ TEST APPLY_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -934,8 +932,7 @@ TEST APPLY_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_idouble_list(&test, sort, &cmp);
+    apply_idouble_list(&test, intqsort, NULL);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -943,7 +940,7 @@ TEST APPLY_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -956,8 +953,7 @@ TEST APPLY_04(void) {
         insert_at_idouble_list(&test, &reverse, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_idouble_list(&test, sort, &cmp);
+    apply_idouble_list(&test, intqsort, NULL);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -965,7 +961,7 @@ TEST APPLY_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -978,8 +974,7 @@ TEST APPLY_05(void) {
         insert_at_idouble_list(&test, &reverse, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_idouble_list(&test, sort, &cmp);
+    apply_idouble_list(&test, intqsort, NULL);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int a = 0;
@@ -987,7 +982,7 @@ TEST APPLY_05(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }
@@ -1000,8 +995,7 @@ TEST APPLY_06(void) {
         insert_at_idouble_list(&test, &reverse, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_idouble_list(&test, sort, &cmp);
+    apply_idouble_list(&test, intqsort, NULL);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -1009,7 +1003,7 @@ TEST APPLY_06(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_idouble_list(&test, destroy);
+    destroy_idouble_list(&test, intdst);
 
     PASS();
 }

@@ -9,5 +9,5 @@ add_executable(list_test main.c
 )
 
 target_include_directories(list_test PUBLIC suite)
-target_link_libraries(list_test PRIVATE GREATEST TEST CERPEC)
+target_link_libraries(list_test PRIVATE GREATEST CERPEC)
 add_test(NAME LIST_TEST COMMAND list_test)

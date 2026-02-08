@@ -7,6 +7,8 @@
 #   define IBINARY_HEAP_CHUNK CERPEC_CHUNK
 #elif IBINARY_HEAP_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IBINARY_HEAP_CHUNK & (IBINARY_HEAP_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 /// @brief Inifinite binary heap structure.

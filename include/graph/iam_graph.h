@@ -7,6 +7,8 @@
 #   define IAM_GRAPH_CHUNK CERPEC_CHUNK
 #elif IAM_GRAPH_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IAM_GRAPH_CHUNK & (IAM_GRAPH_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 #define IAM_NIL ((size_t)(-1))
@@ -39,7 +41,7 @@ typedef struct infinite_matrix_graph_table {
     iam_cost_s const * data;
     size_t * previous;
     char * costs;
-} iam_list_s;
+} iam_table_s;
 
 /// @brief Composes a structure via its parametric properties.
 /// @param size Size of cost.
@@ -99,11 +101,17 @@ bool is_empty_iam_graph(iam_graph_s const * const graph);
 /// @return 'true' if graph is complete, 'false' otherwise.
 bool is_complete_iam_graph(iam_graph_s const * const graph);
 
-/// @brief A graph is connected if a path exists between every pair of vertices
+/// @brief A graph is connected if a path exists between every pair of vertices.
 /// @param graph Structure to check.
 /// @return 'true' if graph is connected, 'false' otherwise.
 /// @note The algorithm uses DFS to determine connectivity.
 bool is_connected_iam_graph(iam_graph_s const * const graph);
+
+/// @brief A graph is a tree if it's connected and contains no cycles.
+/// @param graph Structure to check.
+/// @return 'true' if graph is a tree, 'false' otherwise.
+/// @note The algorithm uses DFS to determine tree-ness.
+bool is_tree_iam_graph(iam_graph_s const * const graph);
 
 /// @brief Inserts a single vertex element into the structure.
 /// @param graph Structure to insert into.
@@ -168,7 +176,7 @@ size_t degree_iam_graph(iam_graph_s const * const graph, size_t const index);
 /// @param start Starting vertex index.
 /// @param end Last vertex index, or 'IAM_NIL' if all vertex shortest path.
 /// @return Breadth first search lookup table with subgraph from start node to all other nodes.
-iam_list_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
+iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
 
 /// @brief Traverses the vertices of the specified structure using depth first search.
 /// @param graph Structure to traverse.
@@ -176,7 +184,7 @@ iam_list_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
 /// @param start Starting vertex index.
 /// @param end Last vertex index, or 'IAM_NIL' if all vertex paths.
 /// @return Depth first search lookup table with subgraph from start node to all other nodes.
-iam_list_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
+iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
 
 /// @brief Generate a Dijkstra lookup array table with nodes' edge sums and previous indexes.
 /// @param graph Structure to generate from.
@@ -184,7 +192,7 @@ iam_list_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * con
 /// @param end Last vertex index, or 'IAM_NIL' if all vertex shortest path.
 /// @param cost Cost structure that defines the distance properties in table.
 /// @return Dijkstra lookup table with subgraph of shortest paths from start node to all other nodes.
-iam_list_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
+iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
 
 /// @brief Generate an A* lookup array table with nodes' edges and previous indexes.
 /// @param graph Structure to generate from.
@@ -193,14 +201,14 @@ iam_list_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const 
 /// @param cost Cost structure that defines the distance properties in table.
 /// @param heuristic Function pointer to calculate heuristic cost based on two vectices.
 /// @return A* lookup table with subgraph of shortest paths from start to end node.
-iam_list_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic);
+iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic);
 
 /// @brief Generate a Prim lookup array table with nodes' edges and previous indexes.
 /// @param graph Structure to generate from.
 /// @param start Starting vertex index.
 /// @param cost Cost structure that defines the distance properties in table.
 /// @return Prim lookup table with subgraph of minimum spanning tree from start node to all other nodes.
-iam_list_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start);
+iam_table_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start);
 
 /// @brief Generate a Kruskal lookup array table with nodes' ranks and previous indexes.
 /// @param graph Structure to generate from.
@@ -209,11 +217,11 @@ iam_list_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * con
 /// @param arguments Arguments for sorting function.
 /// @param increment Function pointer to increment rank cost by one.
 /// @return Kruskal lookup table with subgraph of minimum spanning tree from start node to all other nodes.
-iam_list_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, process_fn const sort, void * const arguments, set_fn const increment);
+iam_table_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, process_fn const sort, void * const arguments, set_fn const increment);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param table Structure to destroy.
-void destroy_iam_list(iam_list_s * const table);
+void destroy_iam_list(iam_table_s * const table);
 
 /// @brief Creates a subgraph copy of specified graph based on its table.
 /// @param table Structure to reference.
@@ -222,7 +230,7 @@ void destroy_iam_list(iam_list_s * const table);
 /// @return Matrix graph structure.
 /// @note The algorithm should be used for minimum spanning tree implementations like Prim and Kruskal,
 /// but one can also generate trees from path finding implementations.
-iam_graph_s subgraph_iam_list(iam_list_s const * const table, copy_fn const copy_vertex, copy_fn const copy_edge);
+iam_graph_s subgraph_iam_list(iam_table_s const * const table, copy_fn const copy_vertex, copy_fn const copy_edge);
 
 /// @brief Iterates over each vertex element in structure starting from the beginning.
 /// @param graph Structure to iterate.
@@ -247,7 +255,7 @@ void each_edge_iam_graph(iam_graph_s const * const graph, handle_fn const handle
 /// @param table Structure to iterate.
 /// @param handle Operate function pointer to operate on each vertex.
 /// @param arguments Arguments for operate function pointer.
-void each_cost_iam_list(iam_list_s const * const table, handle_fn const handle, void * const arguments);
+void each_cost_iam_list(iam_table_s const * const table, handle_fn const handle, void * const arguments);
 
 /// @brief Traverses the costs paths of the specified structure using a generated table.
 /// @param table Structure to traverse.
@@ -257,6 +265,6 @@ void each_cost_iam_list(iam_list_s const * const table, handle_fn const handle, 
 /// @return 'true' if path exists, 'false' otherwise.
 /// @note The algorithm shoul be used with shortest path find implementations, i.e. Dijkstra and A*,
 /// to traverse the path from 'end' vertex to the start one, but one can also traverse MSP tables with it.
-bool each_path_iam_list(iam_list_s const * const table, size_t const end, handle_fn const handle, void * const arguments);
+bool each_path_iam_list(iam_table_s const * const table, size_t const end, handle_fn const handle, void * const arguments);
 
 #endif // IAM_GRAPH_H

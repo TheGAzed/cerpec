@@ -8,5 +8,5 @@ add_executable(tree_test main.c
 )
 
 target_include_directories(tree_test PUBLIC suite)
-target_link_libraries(tree_test PRIVATE GREATEST TEST CERPEC)
+target_link_libraries(tree_test PRIVATE GREATEST CERPEC)
 add_test(NAME TREE_TEST COMMAND tree_test)

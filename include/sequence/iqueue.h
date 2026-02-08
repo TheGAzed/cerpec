@@ -3,6 +3,7 @@
 
 #include <cerpec.h>
 
+// doesn't need to check if chunk is power of 2 since it doesn't resize (only add/removes list nodes)
 #if !defined(IQUEUE_CHUNK)
 #   define IQUEUE_CHUNK CERPEC_CHUNK
 #elif IQUEUE_CHUNK <= 0

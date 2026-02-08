@@ -7,6 +7,8 @@
 #   define IHASH_SET_CHUNK CERPEC_CHUNK
 #elif IHASH_SET_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (IHASH_SET_CHUNK & (IHASH_SET_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 /// @brief Infinite hash set structure.

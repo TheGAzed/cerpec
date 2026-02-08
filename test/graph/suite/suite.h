@@ -3,7 +3,7 @@
 
 #include <greatest.h>
 
-#include <test.h>
+#include <dodac.h>
 
 SUITE_EXTERN(iam_graph_test);
 

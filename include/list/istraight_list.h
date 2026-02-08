@@ -7,6 +7,8 @@
 #   define ISTRAIGHT_LIST_CHUNK CERPEC_CHUNK
 #elif ISTRAIGHT_LIST_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (ISTRAIGHT_LIST_CHUNK & (ISTRAIGHT_LIST_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 /// @brief Infinite straight list data structure.

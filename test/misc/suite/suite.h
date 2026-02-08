@@ -3,7 +3,7 @@
 
 #include <greatest.h>
 
-#include <test.h>
+#include <dodac.h>
 
 SUITE_EXTERN(ibinary_heap_test);
 SUITE_EXTERN(ihash_map_test);

@@ -6,5 +6,5 @@ add_executable(misc_test main.c
 )
 
 target_include_directories(misc_test PUBLIC suite)
-target_link_libraries(misc_test PRIVATE GREATEST TEST CERPEC)
+target_link_libraries(misc_test PRIVATE GREATEST CERPEC)
 add_test(NAME MISC_TEST COMMAND misc_test)

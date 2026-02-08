@@ -12,14 +12,14 @@ TEST CREATE_01(void) {
     ASSERT_EQ(NULL, test.elements);
     ASSERT_EQ(NULL, test.next);
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
     istraight_list_s test = create_istraight_list(sizeof(int));
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     ASSERT_EQ(0, test.size);
 
@@ -29,7 +29,7 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     istraight_list_s test = create_istraight_list(sizeof(int));
 
-    clear_istraight_list(&test, destroy);
+    clear_istraight_list(&test, intdst);
 
     ASSERT_EQ(NIL, test.head);
     ASSERT_EQ(NIL, test.empty);
@@ -37,7 +37,7 @@ TEST CLEAR_01(void) {
     ASSERT_EQ(NULL, test.elements);
     ASSERT_EQ(NULL, test.next);
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -49,7 +49,7 @@ TEST COPY_01(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s replica = copy_istraight_list(&test, copy);
+    istraight_list_s replica = copy_istraight_list(&test, intcpy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -62,8 +62,8 @@ TEST COPY_01(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&replica, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&replica, intdst);
 
     PASS();
 }
@@ -75,7 +75,7 @@ TEST COPY_02(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s replica = copy_istraight_list(&test, copy);
+    istraight_list_s replica = copy_istraight_list(&test, intcpy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -88,8 +88,8 @@ TEST COPY_02(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&replica, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&replica, intdst);
 
     PASS();
 }
@@ -101,7 +101,7 @@ TEST COPY_03(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s replica = copy_istraight_list(&test, copy);
+    istraight_list_s replica = copy_istraight_list(&test, intcpy);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -114,8 +114,8 @@ TEST COPY_03(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&replica, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&replica, intdst);
 
     PASS();
 }
@@ -125,7 +125,7 @@ TEST IS_EMPTY_01(void) {
 
     ASSERT(is_empty_istraight_list(&test));
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -138,7 +138,7 @@ TEST IS_EMPTY_02(void) {
 
     ASSERT_FALSE(is_empty_istraight_list(&test));
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -150,7 +150,7 @@ TEST INSERT_AT_01(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -162,7 +162,7 @@ TEST INSERT_AT_02(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -174,7 +174,7 @@ TEST INSERT_AT_03(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -192,7 +192,7 @@ TEST GET_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -210,7 +210,7 @@ TEST GET_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -228,7 +228,7 @@ TEST GET_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -242,11 +242,11 @@ TEST REMOVE_FIRST_01(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        remove_first_istraight_list(&test, &i, &t, compare);
+        remove_first_istraight_list(&test, &i, &t, intcmp);
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -260,11 +260,11 @@ TEST REMOVE_FIRST_02(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int t = 0;
-        remove_first_istraight_list(&test, &i, &t, compare);
+        remove_first_istraight_list(&test, &i, &t, intcmp);
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -278,11 +278,11 @@ TEST REMOVE_FIRST_03(void) {
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        remove_first_istraight_list(&test, &i, &t, compare);
+        remove_first_istraight_list(&test, &i, &t, intcmp);
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -300,7 +300,7 @@ TEST REMOVE_AT_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -318,7 +318,7 @@ TEST REMOVE_AT_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -336,7 +336,7 @@ TEST REMOVE_AT_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -356,7 +356,7 @@ TEST REVERSE_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -376,7 +376,7 @@ TEST REVERSE_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -396,7 +396,7 @@ TEST REVERSE_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -421,8 +421,8 @@ TEST SPLICE_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&one, destroy);
-    destroy_istraight_list(&two, destroy);
+    destroy_istraight_list(&one, intdst);
+    destroy_istraight_list(&two, intdst);
 
     PASS();
 }
@@ -447,8 +447,8 @@ TEST SPLICE_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&one, destroy);
-    destroy_istraight_list(&two, destroy);
+    destroy_istraight_list(&one, intdst);
+    destroy_istraight_list(&two, intdst);
 
     PASS();
 }
@@ -473,8 +473,8 @@ TEST SPLICE_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&one, destroy);
-    destroy_istraight_list(&two, destroy);
+    destroy_istraight_list(&one, intdst);
+    destroy_istraight_list(&two, intdst);
 
     PASS();
 }
@@ -500,8 +500,8 @@ TEST SPLIT_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&split, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&split, intdst);
 
     PASS();
 }
@@ -527,8 +527,8 @@ TEST SPLIT_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&split, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&split, intdst);
 
     PASS();
 }
@@ -554,8 +554,8 @@ TEST SPLIT_03(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&split, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&split, intdst);
 
     PASS();
 }
@@ -567,7 +567,7 @@ TEST EXTRACT_01(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s extract = extract_istraight_list(&test, odd, NULL);
+    istraight_list_s extract = extract_istraight_list(&test, intodd, NULL);
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_istraight_list(&test, (size_t)(i) / 2, &s);
@@ -580,8 +580,8 @@ TEST EXTRACT_01(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&extract, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&extract, intdst);
 
     PASS();
 }
@@ -593,7 +593,7 @@ TEST EXTRACT_02(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s extract = extract_istraight_list(&test, odd, NULL);
+    istraight_list_s extract = extract_istraight_list(&test, intodd, NULL);
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; i += 2) {
         int s = 0;
         get_istraight_list(&test, (size_t)(i) / 2, &s);
@@ -606,8 +606,8 @@ TEST EXTRACT_02(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&extract, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&extract, intdst);
 
     PASS();
 }
@@ -619,7 +619,7 @@ TEST EXTRACT_03(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s extract = extract_istraight_list(&test, odd, NULL);
+    istraight_list_s extract = extract_istraight_list(&test, intodd, NULL);
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; i += 2) {
         int s = 0;
         get_istraight_list(&test, (size_t)(i) / 2, &s);
@@ -632,8 +632,8 @@ TEST EXTRACT_03(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_istraight_list(&test, destroy);
-    destroy_istraight_list(&extract, destroy);
+    destroy_istraight_list(&test, intdst);
+    destroy_istraight_list(&extract, intdst);
 
     PASS();
 }
@@ -646,7 +646,7 @@ TEST MAP_01(void) {
     }
 
     int value = 1;
-    each_istraight_list(&test, increment, &value);
+    each_istraight_list(&test, intincrement, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -654,7 +654,7 @@ TEST MAP_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -667,7 +667,7 @@ TEST MAP_02(void) {
     }
 
     int value = 1;
-    each_istraight_list(&test, increment, &value);
+    each_istraight_list(&test, intincrement, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int a = 0;
@@ -675,7 +675,7 @@ TEST MAP_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -688,7 +688,7 @@ TEST MAP_03(void) {
     }
 
     int value = 1;
-    each_istraight_list(&test, increment, &value);
+    each_istraight_list(&test, intincrement, &value);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -696,7 +696,7 @@ TEST MAP_03(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -708,8 +708,7 @@ TEST APPLY_01(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_istraight_list(&test, sort, &cmp);
+    apply_istraight_list(&test, intqsort, NULL);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -717,7 +716,7 @@ TEST APPLY_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -729,8 +728,7 @@ TEST APPLY_02(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_istraight_list(&test, sort, &cmp);
+    apply_istraight_list(&test, intqsort, NULL);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int a = 0;
@@ -738,7 +736,7 @@ TEST APPLY_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -750,8 +748,7 @@ TEST APPLY_03(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_istraight_list(&test, sort, &cmp);
+    apply_istraight_list(&test, intqsort, NULL);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -759,7 +756,7 @@ TEST APPLY_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -772,8 +769,7 @@ TEST APPLY_04(void) {
         insert_at_istraight_list(&test, &reverse, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_istraight_list(&test, sort, &cmp);
+    apply_istraight_list(&test, intqsort, NULL);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK - 1; ++i) {
         int a = 0;
@@ -781,7 +777,7 @@ TEST APPLY_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -794,8 +790,7 @@ TEST APPLY_05(void) {
         insert_at_istraight_list(&test, &reverse, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_istraight_list(&test, sort, &cmp);
+    apply_istraight_list(&test, intqsort, NULL);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK; ++i) {
         int a = 0;
@@ -803,7 +798,7 @@ TEST APPLY_05(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }
@@ -816,8 +811,7 @@ TEST APPLY_06(void) {
         insert_at_istraight_list(&test, &reverse, test.length);
     }
 
-    struct compare cmp = { .compare_element = compare, };
-    apply_istraight_list(&test, sort, &cmp);
+    apply_istraight_list(&test, intqsort, NULL);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK + 1; ++i) {
         int a = 0;
@@ -825,7 +819,7 @@ TEST APPLY_06(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istraight_list(&test, destroy);
+    destroy_istraight_list(&test, intdst);
 
     PASS();
 }

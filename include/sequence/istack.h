@@ -7,6 +7,8 @@
 #   define ISTACK_CHUNK CERPEC_CHUNK
 #elif ISTACK_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (ISTACK_CHUNK & (ISTACK_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
 #endif
 
 /// @brief Stack data structure.

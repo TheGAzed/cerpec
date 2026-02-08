@@ -12,6 +12,13 @@
 #   define CERPEC_CHUNK 256
 #elif CERPEC_CHUNK <= 0
 #   error "Chunk size must be greater than zero."
+#elif (CERPEC_CHUNK & (CERPEC_CHUNK - 1))
+#   error "Chunk size must be a power of 2."
+#endif
+
+#ifdef NDEBUG
+#   define NERROR
+#   define NVALID
 #endif
 
 #ifndef NVALID
