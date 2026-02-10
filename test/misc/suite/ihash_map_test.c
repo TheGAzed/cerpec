@@ -344,7 +344,7 @@ TEST SET_VALUE_01(void) {
 
     int a = -1;
     const int key = (IHASH_MAP_CHUNK - 1) / 2, value = 42;
-    set_value_ihash_map(&table, &key, &value, &a);
+    set_ihash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((IHASH_MAP_CHUNK - 1) / 2, a);
     int b = -1;
@@ -366,7 +366,7 @@ TEST SET_VALUE_02(void) {
 
     int a = -1;
     const int key = (IHASH_MAP_CHUNK) / 2, value = 42;
-    set_value_ihash_map(&table, &key, &value, &a);
+    set_ihash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((IHASH_MAP_CHUNK) / 2, a);
     int b = -1;
@@ -388,7 +388,7 @@ TEST SET_VALUE_03(void) {
 
     int a = -1;
     const int key = (IHASH_MAP_CHUNK + 1) / 2, value = 42;
-    set_value_ihash_map(&table, &key, &value, &a);
+    set_ihash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((IHASH_MAP_CHUNK + 1) / 2, a);
     int b = -1;

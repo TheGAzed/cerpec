@@ -176,7 +176,7 @@ void insert_ihash_map(ihash_map_s * const restrict map, void const * const restr
     valid(map->allocator && "Allocator can't be NULL.");
 
     // resize (expand) if map can't contain new element
-    if (map->length == map->capacity) {
+    if (!map->capacity || ((double)(map->length) / (double)(map->capacity) >= IHASH_MAP_LOAD)) {
         size_t const capacity = map->length ? map->length * CERPEC_FACTOR : IHASH_MAP_CHUNK;
         _ihash_table_resize(map, capacity);
     }
@@ -328,14 +328,13 @@ void get_value_ihash_map(ihash_map_s const * const restrict map, void const * co
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void set_value_ihash_map(ihash_map_s const * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer) {
+void set_ihash_map(ihash_map_s * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(value_buffer && "Parameter can't be NULL.");
     error(key != value_buffer && "Parameters can't be the same.");
     error(value != value_buffer && "Parameters can't be the same.");
     error(key != value && "Parameters can't be the same.");
-    error(map->length && "Structure is empty.");
 
     error(map != key && "Parameters can't be equal.");
     error(map != value && "Parameters can't be equal.");
@@ -352,22 +351,49 @@ void set_value_ihash_map(ihash_map_s const * const restrict map, void const * co
 
     // calculate hash values and index in array
     size_t const hash = map->hash_key(key);
-    size_t const index = hash % map->capacity;
+
+    if (!map->capacity) { goto INSERT; }
 
     // for each node at index check if element is contained
-    for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
+    for (size_t n = map->head[hash % map->capacity]; NIL != n; n = map->next[n]) {
         const char * current_key = map->keys + (n * map->key_size);
 
         if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
             void * current_value = map->values + (n * map->value_size);
             memcpy(value_buffer, current_value, map->value_size); // copy retrieved element into buffer
             memcpy(current_value, value, map->value_size);
-            return; // return to avoid errorion and termination at the end of function if key wasn't found
+            return; // return to avoid insertion at the end of function if key wasn't found
         }
     }
 
-    error(false && "Structure does not contain key.");
-    exit(EXIT_FAILURE); // terminate on error
+INSERT:
+    // resize (expand) if map can't contain new element
+    if (!map->capacity || ((double)(map->length) / (double)(map->capacity) >= IHASH_MAP_LOAD)) {
+        size_t const capacity = map->length ? map->length * CERPEC_FACTOR : IHASH_MAP_CHUNK;
+        _ihash_table_resize(map, capacity);
+    }
+
+    size_t const index = hash % map->capacity;
+
+    size_t const current = map->length; // index of currently inserted element
+
+    // if head has an element then redirect its prev to current
+    size_t const head = map->head[index];
+    if (NIL != head) {
+        map->prev[head] = current;
+    }
+
+    // node index redirection
+    map->prev[current] = NIL;
+    map->next[current] = head;
+    map->head[index] = current;
+
+    // copy element into elements array
+    map->hashes[current] = hash;
+    memcpy(map->keys + (current * map->key_size), key, map->key_size);
+    memcpy(map->values + (current * map->value_size), value, map->value_size);
+
+    map->length++;
 }
 
 void each_key_ihash_map(ihash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
@@ -406,6 +432,158 @@ void each_value_ihash_map(ihash_map_s const * const restrict map, handle_fn cons
             break; // return since we need to break-off of two loops
         }
     }
+}
+
+biter_s begin_ihash_map(ihash_map_s * const map) {
+    error(map && "Parameter can't be NULL.");
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    return (biter_s) {
+        .index = map->length ? 0 : INVALID_ITERATOR, .structure = map,
+    };
+}
+
+biter_s end_ihash_map(ihash_map_s * const map) {
+    error(map && "Parameter can't be NULL.");
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    return (biter_s) {
+        .index = map->length ? map->length - 1 : INVALID_ITERATOR, .structure = map,
+    };
+}
+
+biter_s find_ihash_map(ihash_map_s * const restrict map, void const * const restrict key) {
+    error(map && "Parameter can't be NULL.");
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    if (!map->capacity) { goto INVALID; }
+
+    // calculate hash values and index in array
+    size_t const hash = map->hash_key(key);
+    size_t const index = hash % map->capacity;
+
+    // for each node at index check if element is contained
+    for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
+        const char * current_key = map->keys + (n * map->key_size);
+        if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
+            return (biter_s) {
+                .index = n, .structure = map,
+            };
+        }
+    }
+
+INVALID:
+    return (biter_s) {
+        .index = INVALID_ITERATOR, .structure = map,
+    };
+}
+
+void erase_ihash_map(biter_s * const restrict iterator, void * const restrict key_buffer, void * const restrict value_buffer) {
+    error(iterator && "Parameter can't be NULL.");
+    error(key_buffer && "Parameter can't be NULL.");
+    error(value_buffer && "Parameter can't be NULL.");
+    error(key_buffer != value_buffer && "Parameters can't be equal.");
+    error(iterator->index != INVALID_ITERATOR && "Can't erase from invalid.");
+
+    ihash_map_s * map = iterator->structure;
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    const char * current_key = map->keys + (iterator->index * map->key_size);
+
+    // copy removed element into buffer
+    memcpy(key_buffer, current_key, map->key_size);
+    memcpy(value_buffer, map->values + (iterator->index * map->value_size), map->value_size);
+    map->length--;
+
+    _ihash_map_fill_hole(map, iterator->index);
+
+    // resize if map can contain a smaller capacity of elements
+    if (map->length <= map->capacity / CERPEC_FACTOR && (map->length > IHASH_MAP_CHUNK || !map->length)) {
+        _ihash_table_resize(map, map->length);
+    }
+
+    iterator->index = INVALID_ITERATOR;
+}
+
+void obtain_key_ihash_map(biter_s const * const restrict iterator, void * const restrict key_buffer) {
+    error(iterator && "Parameter can't be NULL.");
+    error(key_buffer && "Parameter can't be NULL.");
+    error(key_buffer != iterator && "Parameters can't be the same.");
+    error(iterator->index != INVALID_ITERATOR && "Can't obtain from invalid.");
+
+    ihash_map_s const * map = iterator->structure;
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    memcpy(key_buffer, map->keys + (iterator->index * map->key_size), map->key_size);
+}
+
+void obtain_value_ihash_map(biter_s const * const restrict iterator, void * const restrict value_buffer) {
+    error(iterator && "Parameter can't be NULL.");
+    error(value_buffer && "Parameter can't be NULL.");
+    error(value_buffer != iterator && "Parameters can't be the same.");
+    error(iterator->index != INVALID_ITERATOR && "Can't obtain from invalid.");
+
+    ihash_map_s const * map = iterator->structure;
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    memcpy(value_buffer, map->values + (iterator->index * map->value_size), map->value_size);
+}
+
+void following_ihash_map(biter_s * const iterator) {
+    error(iterator && "Parameter can't be NULL.");
+
+    ihash_map_s const * map = iterator->structure;
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    iterator->index = iterator->index < map->length ? iterator->index + 1 : INVALID_ITERATOR;
+}
+
+void preceding_ihash_map(biter_s * const iterator) {
+    error(iterator && "Parameter can't be NULL.");
+    ihash_map_s const * map = iterator->structure;
+
+    valid(map->hash_key && "Hash function can't be NULL.");
+    valid(map->key_size && "Key size can't be zero.");
+    valid(map->value_size && "Value size can't be zero.");
+    valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
+    valid(map->allocator && "Allocator can't be NULL.");
+
+    iterator->index = iterator->index ? iterator->index - 1 : INVALID_ITERATOR;
 }
 
 void _ihash_table_resize(ihash_map_s * const table, size_t const size) {

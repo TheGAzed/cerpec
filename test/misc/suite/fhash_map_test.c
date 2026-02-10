@@ -249,7 +249,7 @@ TEST SET_VALUE_01(void) {
 
     int a = -1;
     const int key = (FHASH_TABLE_CHUNK - 1) / 2, value = 42;
-    set_value_fhash_map(&table, &key, &value, &a);
+    set_fhash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((FHASH_TABLE_CHUNK - 1) / 2, a);
     int b = -1;
@@ -271,7 +271,7 @@ TEST SET_VALUE_02(void) {
 
     int a = -1;
     const int key = (FHASH_TABLE_CHUNK) / 2, value = 42;
-    set_value_fhash_map(&table, &key, &value, &a);
+    set_fhash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((FHASH_TABLE_CHUNK) / 2, a);
     int b = -1;

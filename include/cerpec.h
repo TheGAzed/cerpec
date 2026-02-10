@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define CERPEC_FACTOR 2
 
@@ -33,6 +34,8 @@
 #   define error(condition) (void)(0)
 #endif
 
+#define INVALID_ITERATOR (size_t)(-1)
+
 typedef void * (*alloc_fn)   (size_t const, void *);
 typedef void * (*realloc_fn) (void *, size_t const, void *);
 typedef void   (*free_fn)    (void *, void *);
@@ -46,6 +49,18 @@ typedef struct memory {
 
 extern const memory_s standard;
 
+typedef struct uni_directional_iterator {
+    void const * structure;
+    uintptr_t meta;
+    size_t index;
+} uniter_s;
+
+typedef struct bi_directional_iterator {
+    void * structure;
+    uintptr_t meta;
+    size_t index;
+} biter_s;
+
 typedef void   (*set_fn)     (void * const element);
 typedef void * (*copy_fn)    (void * const destination, void const * const source);
 typedef size_t (*hash_fn)    (void const * const element);
@@ -56,5 +71,9 @@ typedef void   (*process_fn) (void * const array, size_t const lenght, void * co
 typedef void   (*operate_fn) (void * const result, void const * const a, void const * const b);
 
 memory_s compose_memory(alloc_fn const alloc, realloc_fn const realloc, free_fn const free, void * const arguments);
+
+bool is_valid_uniter(uniter_s const * const iterator);
+
+bool is_valid_biter(biter_s const * const iterator);
 
 #endif // CERPEC_H

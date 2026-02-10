@@ -30,15 +30,23 @@ void * _standard_realloc(void * pointer, const size_t size, void * arguments) {
 }
 
 memory_s compose_memory(const alloc_fn alloc, const realloc_fn realloc, const free_fn free, void * arguments) {
-    assert(alloc && "[ERROR] Paremeter can't be NULL.");
-    assert(realloc && "[ERROR] Paremeter can't be NULL.");
-    assert(free && "[ERROR] Paremeter can't be NULL.");
+    error(alloc && "Paremeter can't be NULL.");
+    error(realloc && "Paremeter can't be NULL.");
+    error(free && "Paremeter can't be NULL.");
 
-    return (memory_s) {
-        .alloc = alloc,
-        .free = free,
-        .realloc = realloc,
+    return (memory_s) { .alloc = alloc, .free = free, .realloc = realloc, .arguments = arguments, };
+}
 
-        .arguments = arguments,
-    };
+bool is_valid_uniter(uniter_s const * const iterator) {
+    error(iterator && "Parameter can't be NULL.");
+    error(iterator->meta != INVALID_ITERATOR && "Metadata can't be invalid.");
+
+    return iterator->index != INVALID_ITERATOR;
+}
+
+bool is_valid_biter(biter_s const * const iterator) {
+    error(iterator && "Parameter can't be NULL.");
+    error(iterator->meta != INVALID_ITERATOR && "Metadata can't be invalid.");
+
+    return iterator->index != INVALID_ITERATOR;
 }

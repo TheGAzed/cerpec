@@ -91,7 +91,7 @@ void get_value_fhash_map(fhash_map_s const * const restrict map, void const * co
 /// @param key Key to value.
 /// @param value New value to insert.
 /// @param value_buffer Old value buffer to save replaced value.
-void set_value_fhash_map(fhash_map_s const * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer);
+void set_fhash_map(fhash_map_s * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer);
 
 /// @brief Iterates over each key in structure.
 /// @param map Structure to iterate over.
@@ -104,5 +104,45 @@ void each_key_fhash_map(fhash_map_s const * const restrict map, handle_fn const 
 /// @param handle Function pointer to handle each element reference using generic arguments.
 /// @param arguments Generic arguments to use in function pointer.
 void each_value_fhash_map(fhash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
+
+/// @brief Returns an iterator starting at the beginning of the structure.
+/// @param map Structure to begin from.
+/// @return Bidirectional iterator.
+biter_s begin_fhash_map(fhash_map_s * const map);
+
+/// @brief Returns an iterator starting at the end of the structure.
+/// @param map Structure to end from.
+/// @return Bidirectional iterator.
+biter_s end_fhash_map(fhash_map_s * const map);
+
+/// @brief Finds and returns searched element iterator.
+/// @param map Structure to find.
+/// @param key Key to finds value.
+/// @return Bidirectional iterator.
+biter_s find_fhash_map(fhash_map_s * const restrict map, void const * const restrict key);
+
+/// @brief Erases iterator element from structure if it's valid.
+/// @param iterator Iterator to erase.
+/// @param key_buffer Key buffer to save erased key.
+/// @param value_buffer Value buffer to save erased value.
+void erase_fhash_map(biter_s * const restrict iterator, void * const restrict key_buffer, void * const restrict value_buffer);
+
+/// @brief Obtains key element from iterator.
+/// @param iterator Iterator to obtain key.
+/// @param key_buffer Key buffer to save key.
+void obtain_key_fhash_map(biter_s const * const restrict iterator, void * const restrict key_buffer);
+
+/// @brief Obtains value element from iterator.
+/// @param iterator Iterator to obtain value.
+/// @param value_buffer Key buffer to save value.
+void obtain_value_fhash_map(biter_s const * const restrict iterator, void * const restrict value_buffer);
+
+/// @brief Goes to the following iterator.
+/// @param iterator Iterator to folow.
+void following_fhash_map(biter_s * const iterator);
+
+/// @brief Goes to the preceding iterator.
+/// @param iterator Iterator to precede.
+void preceding_fhash_map(biter_s * const iterator);
 
 #endif // FHASH_MAP_H
