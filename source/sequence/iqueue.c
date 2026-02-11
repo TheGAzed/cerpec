@@ -37,8 +37,7 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
         struct infinite_queue_node * temp = previous->next;
         previous->next = previous->next->next;
 
-        // free destroyed node and its elements array
-        queue->allocator->free(temp->elements, queue->allocator->arguments);
+        // free destroyed node
         queue->allocator->free(temp, queue->allocator->arguments);
     }
 
@@ -68,8 +67,7 @@ void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
         struct infinite_queue_node * temp = previous->next;
         previous->next = previous->next->next;
 
-        // free destroyed node and its elements array
-        queue->allocator->free(temp->elements, queue->allocator->arguments);
+        // free destroyed node
         queue->allocator->free(temp, queue->allocator->arguments);
     }
 
@@ -95,12 +93,8 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
     struct infinite_queue_node * last = NULL;
     for (size_t r = queue->length, s = queue->current; r; s = 0) {
         // allocate new node for replica
-        last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node), queue->allocator->arguments);
+        last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arguments);
         error((*current_copy) && "Memory allocation failed");
-
-        // allocate new elements array for replica
-        (*current_copy)->elements = queue->allocator->alloc(IQUEUE_CHUNK * queue->size, queue->allocator->arguments);
-        error((*current_copy)->elements && "Memory allocation failed.");
 
         // redirect current replica's node with replica's tail fopr circularity
         (*current_copy)->next = replica.tail;
@@ -157,11 +151,8 @@ void enqueue_iqueue(iqueue_s * const restrict queue, void const * const restrict
     // index where the next element will be enqueued
     size_t const next_index = (queue->current + queue->length) % IQUEUE_CHUNK;
     if (!next_index) { // if head list array is full (is divisible) adds new list element to head
-        struct infinite_queue_node * node = queue->allocator->alloc(sizeof(struct infinite_queue_node), queue->allocator->arguments);
+        struct infinite_queue_node * node = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arguments);
         error(node && "Memory allocation failed");
-
-        node->elements = queue->allocator->alloc(IQUEUE_CHUNK * queue->size, queue->allocator->arguments);
-        error(node->elements && "Memory allocation failed.");
 
         if (queue->tail == NULL) {
             node->next = node; // create initial circle
@@ -192,7 +183,6 @@ void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffe
     queue->current = (queue->current + 1) % IQUEUE_CHUNK; // set current to next index in node array
 
     if (!queue->length) { // if queue is empty after extracting element thne free memory and reset everything to zero
-        queue->allocator->free(queue->tail->elements, queue->allocator->arguments); // free empty tail/head node
         queue->allocator->free(queue->tail, queue->allocator->arguments); // free empty tail/head node
 
         queue->current = 0; // if queue is empty make current index 0 to not break enqueue_iqueue operation
@@ -201,7 +191,6 @@ void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffe
         struct infinite_queue_node * head = queue->tail->next; // get empty head node
         queue->tail->next = queue->tail->next->next; // set new head node to its next node
 
-        queue->allocator->free(head->elements, queue->allocator->arguments); // free previous head node elements
         queue->allocator->free(head, queue->allocator->arguments); // free previous head node
     }
 }
@@ -219,7 +208,7 @@ void each_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, 
     struct infinite_queue_node const * previous = queue->tail;
     // while remaining size wasn't decremented to zero
     for (size_t start = queue->current; remaining; start = 0, previous = previous->next) {
-        const struct infinite_queue_node * current = previous->next;
+        struct infinite_queue_node * current = previous->next;
 
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size

@@ -12,8 +12,8 @@
 
 /// @brief Circular linked list type node for queue structure.
 struct infinite_queue_node {
-    char * elements;                   // elements array with QUEUE_CHUNK size
     struct infinite_queue_node * next; // next sibling node
+    char elements[];                   // flexible elements array with IQUEUE_CHUNK length
 };
 
 /// @brief Queue data structure.
