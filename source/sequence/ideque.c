@@ -34,7 +34,6 @@ void destroy_ideque(ideque_s * const deque, set_fn const destroy) {
         struct infinite_deque_node * temp = current; // save current node as temporary to free later
         current = current->next; // go to next node
 
-        deque->allocator->free(temp->elements, deque->allocator->arguments); // free temporary current node elements
         deque->allocator->free(temp, deque->allocator->arguments); // free temporary current node
     }
 
@@ -61,7 +60,6 @@ void clear_ideque(ideque_s * const deque, set_fn const destroy) {
         struct infinite_deque_node * temp = current; // save current node as temporary to free later
         current = current->next; // go to next node
 
-        deque->allocator->free(temp->elements, deque->allocator->arguments); // free temporary current node elements
         deque->allocator->free(temp, deque->allocator->arguments); // free temporary current node
     }
 
@@ -84,12 +82,8 @@ ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy) {
     size_t remaining = deque->length; // save remaining size as parameter to decrement for loop
     for (size_t start = deque->current; remaining; start = 0) { // while remaining size is not zero
         // allocate node for replica
-        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node), deque->allocator->arguments);
+        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) + (IDEQUE_CHUNK * deque->size), deque->allocator->arguments);
         error(node && "Memory allocation failed.");
-
-        // allocate elements array for replica
-        node->elements = deque->allocator->alloc(IDEQUE_CHUNK * deque->size, deque->allocator->arguments);
-        error(node->elements && "Memory allocation failed.");
 
         // copy each element from old to replica
         size_t i = start;
@@ -135,12 +129,8 @@ void enqueue_front_ideque(ideque_s * const restrict deque, void const * const re
         deque->current = IDEQUE_CHUNK; // make current into list array chunk size to prevent future underflow
 
         // allocate node for replica
-        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node), deque->allocator->arguments);
+        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) + (IDEQUE_CHUNK * deque->size), deque->allocator->arguments);
         error(node && "Memory allocation failed.");
-
-        // allocate elements array for replica
-        node->elements = deque->allocator->alloc(IDEQUE_CHUNK * deque->size, deque->allocator->arguments);
-        error(node->elements && "Memory allocation failed.");
 
         if (deque->head) { // if head exists
             node->next = deque->head; // node's next is head
@@ -168,11 +158,8 @@ void enqueue_back_ideque(ideque_s * const restrict deque, void const * const res
 
     const size_t next_index = ((deque->current + deque->length) % IDEQUE_CHUNK);
     if (!next_index) { // if next index to insert into is zero
-        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node), deque->allocator->arguments);
+        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) + (IDEQUE_CHUNK * deque->size), deque->allocator->arguments);
         error(node && "Memory allocation failed.");
-
-        node->elements = deque->allocator->alloc(IDEQUE_CHUNK * deque->size, deque->allocator->arguments);
-        error(node->elements && "Memory allocation failed.");
 
         if (deque->head) { // if head exists
             node->next = deque->head; // node's next is head
@@ -244,7 +231,6 @@ void dequeue_front_ideque(ideque_s * const restrict deque, void * const restrict
         deque->head = deque->length ? deque->head->next : NULL;
         deque->current = 0; // reset current index to zero/beginning
 
-        deque->allocator->free(head->elements, deque->allocator->arguments); // free temporary head elements
         deque->allocator->free(head, deque->allocator->arguments); // free temporary head node
     }
 }
@@ -266,7 +252,6 @@ void dequeue_back_ideque(ideque_s * const restrict deque, void * const restrict 
     memcpy(buffer, deque->head->prev->elements + (back_index * deque->size), deque->size);
 
     if (!deque->length) {
-        deque->allocator->free(deque->head->elements, deque->allocator->arguments); // free head elements
         deque->allocator->free(deque->head, deque->allocator->arguments); // free head node
 
         deque->current = 0; // reset current index to 0 if deque is empty
@@ -277,7 +262,6 @@ void dequeue_back_ideque(ideque_s * const restrict deque, void * const restrict 
         deque->head->prev = tail->prev; // head's tail pointer equals tail's previous
         tail->prev->next = deque->head; // tail previous' next equals head
 
-        deque->allocator->free(tail->elements, deque->allocator->arguments); // free temporary tail elements
         deque->allocator->free(tail, deque->allocator->arguments); // free temporary tail node
     }
 }
@@ -291,7 +275,7 @@ void each_front_ideque(ideque_s const * const restrict deque, handle_fn const ha
     valid(deque->allocator && "Allocator can't be NULL.");
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
-    struct infinite_deque_node const * current = deque->head; // save head node as current pointer
+    struct infinite_deque_node * current = deque->head; // save head node as current pointer
     size_t remaining = deque->length; // save remaining size as parameter to decrement for loop
     for (size_t start = deque->current; remaining; start = 0) { // while remaining size is not zero
         size_t i = start;
@@ -316,7 +300,7 @@ void each_back_ideque(ideque_s const * const restrict deque, handle_fn const han
     valid(deque->allocator && "Allocator can't be NULL.");
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
-    struct infinite_deque_node const * current = deque->head; // save head node as current pointer
+    struct infinite_deque_node * current = deque->head; // save head node as current pointer
     for (size_t r = deque->length, l = deque->length + deque->current - 1; r;) {
         current = current->prev; // fist go to tail and other previous nodes
 
@@ -349,7 +333,7 @@ void apply_ideque(ideque_s const * const restrict deque, process_fn const proces
     // remaining count of elements is calculated
     // copying starts from head
     size_t index = 0, remaining = deque->length;
-    struct infinite_deque_node const * current = deque->head;
+    struct infinite_deque_node * current = deque->head;
     // set start to current and then begin from 0 for all the other elements in array node
     for (size_t start = deque->current; remaining; start = 0) {
         size_t i = start; // temporary save iterator outside for later subtraction
