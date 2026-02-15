@@ -569,7 +569,7 @@ void obtain_value_fhash_map(biter_s const * const restrict iterator, void * cons
     memcpy(value_buffer, map->values + (iterator->index * map->value_size), map->value_size);
 }
 
-void following_fhash_map(biter_s * const iterator) {
+void increment_fhash_map(biter_s * const iterator) {
     error(iterator && "Parameter can't be NULL.");
 
     fhash_map_s const * map = iterator->structure;
@@ -583,7 +583,7 @@ void following_fhash_map(biter_s * const iterator) {
     iterator->index = iterator->index < map->length ? iterator->index + 1 : INVALID_ITERATOR;
 }
 
-void preceding_fhash_map(biter_s * const iterator) {
+void decrement_fhash_map(biter_s * const iterator) {
     error(iterator && "Parameter can't be NULL.");
     fhash_map_s const * map = iterator->structure;
 

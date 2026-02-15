@@ -91,7 +91,8 @@ fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy) {
 
     // iterate over each element in stack and copy it into replica using function pointer
     for (size_t i = 0; i < stack->length; ++i) {
-        copy(replica.elements + (i * replica.size), stack->elements + (i * stack->size));
+        size_t const index = i * stack->size;
+        copy(replica.elements + index, stack->elements + index);
     }
 
     return replica;

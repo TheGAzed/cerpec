@@ -404,7 +404,7 @@ TEST EXTRACT_01(void) {
         insert_at_fstraight_list(&test, &i, test.length);
     }
 
-    fstraight_list_s extract = extract_fstraight_list(&test, intodd, NULL);
+    fstraight_list_s extract = extract_fstraight_list(&test, intodd);
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_fstraight_list(&test, (size_t)(i) / 2, &s);
@@ -430,7 +430,7 @@ TEST EXTRACT_02(void) {
         insert_at_fstraight_list(&test, &i, test.length);
     }
 
-    fstraight_list_s extract = extract_fstraight_list(&test, intodd, NULL);
+    fstraight_list_s extract = extract_fstraight_list(&test, intodd);
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; i += 2) {
         int s = 0;
         get_fstraight_list(&test, (size_t)(i) / 2, &s);

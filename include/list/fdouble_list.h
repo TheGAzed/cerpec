@@ -115,9 +115,8 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
 /// @brief Extracts elements into new structure based on filter function.
 /// @param list Structure to extracts from.
 /// @param filter Function pointer to check if element meets extract condition.
-/// @param arguments Generic void pointer arguments for function pointer.
 /// @return New extracted structure.
-fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter_fn const filter, void * const restrict arguments);
+fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter_fn const filter);
 
 /// @brief Iterates over each next element in structure based on their order.
 /// @param list Structure to iterate over.

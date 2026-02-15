@@ -482,10 +482,9 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
     return split;
 }
 
-icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, filter_fn const filter) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -501,9 +500,9 @@ icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, 
     size_t previous = list->tail;
     for (size_t i = 0, pos_idx = 0, neg_idx = 0; i < list->length; ++i) {
         size_t const current = list->next[previous]; // get current node
-
         char const * element = list->elements + (current * list->size); // save current element
-        if (filter(element, arguments)) { // if element is valid push into positive list
+
+        if (filter(element)) { // if element is valid push into positive list
             (*pos) = pos_idx;
 
             if (positive.length == positive.capacity) { // expand capacity if needed

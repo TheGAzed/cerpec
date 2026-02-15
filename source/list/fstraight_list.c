@@ -432,10 +432,9 @@ fstraight_list_s split_fstraight_list(fstraight_list_s * const list, size_t cons
     return split;
 }
 
-fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, filter_fn const filter) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -462,7 +461,7 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, 
     for (size_t i = list->head, pos_idx = 0, neg_idx = 0; NIL != i; i = list->next[i]) {
         char const * element = list->elements + (i * list->size);
 
-        if (filter(element, arguments)) { // if filter value is positive push it into positive
+        if (filter(element)) { // if filter value is positive push it into positive
             (*pos) = pos_idx;
             positive.next[pos_idx] = NIL;
 

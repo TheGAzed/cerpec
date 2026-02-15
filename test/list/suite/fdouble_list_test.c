@@ -484,7 +484,7 @@ TEST EXTRACT_01(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s extract = extract_fdouble_list(&test, intodd, NULL);
+    fdouble_list_s extract = extract_fdouble_list(&test, intodd);
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_fdouble_list(&test, (size_t)(i) / 2, &s);
@@ -510,7 +510,7 @@ TEST EXTRACT_02(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s extract = extract_fdouble_list(&test, intodd, NULL);
+    fdouble_list_s extract = extract_fdouble_list(&test, intodd);
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; i += 2) {
         int s = 0;
         get_fdouble_list(&test, (size_t)(i) / 2, &s);

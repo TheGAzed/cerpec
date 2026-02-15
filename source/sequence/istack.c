@@ -2,6 +2,9 @@
 
 #include <string.h>
 
+/// @brief Resizes (reallocates) stack parameter arrays based on changed capacity.
+/// @param stack Structure to resize.
+/// @param size New size.
 void _istack_resize(istack_s * const stack, size_t const size);
 
 istack_s create_istack(size_t const size) {

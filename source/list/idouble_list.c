@@ -492,10 +492,9 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     return split;
 }
 
-idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter_fn const filter, void * const restrict arguments) {
+idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter_fn const filter) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
-    error(arguments != list && "Paremeters can't be the same.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -509,7 +508,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter
     for (size_t i = 0, current = list->head; i < length; ++i) {
         char const * element = list->elements + (current * list->size);
 
-        if (!filter(element, arguments)) { // if no extraction go to next list node and continue
+        if (!filter(element)) { // if no extraction go to next list node and continue
             current = list->node[IDL_NEXT][current];
             continue;
         } // else extract and append list node into positive list

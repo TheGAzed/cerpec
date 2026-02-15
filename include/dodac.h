@@ -40,29 +40,29 @@ void charqsort(void * const array, size_t const lenght, void * const null);
 
 void charrqsort(void * const array, size_t const lenght, void * const null);
 
-bool chareven(void const * const element, void * const null);
+bool chareven(void const * const element);
 
-bool charodd(void const * const element, void * const null);
+bool charodd(void const * const element);
 
-bool charalnum(void const * const element, void * const null);
+bool charalnum(void const * const element);
 
-bool charalpha(void const * const element, void * const null);
+bool charalpha(void const * const element);
 
-bool charcntrl(void const * const element, void * const null);
+bool charcntrl(void const * const element);
 
-bool chardigit(void const * const element, void * const null);
+bool chardigit(void const * const element);
 
-bool charlower(void const * const element, void * const null);
+bool charlower(void const * const element);
 
-bool charupper(void const * const element, void * const null);
+bool charupper(void const * const element);
 
-bool charpunct(void const * const element, void * const null);
+bool charpunct(void const * const element);
 
-bool charspace(void const * const element, void * const null);
+bool charspace(void const * const element);
 
-bool charxdigit(void const * const element, void * const null);
+bool charxdigit(void const * const element);
 
-bool charprime(void const * const element, void * const null);
+bool charprime(void const * const element);
 
 void uchardst(void * const element);
 
@@ -86,29 +86,29 @@ void ucharqsort(void * const array, size_t const lenght, void * const null);
 
 void ucharrqsort(void * const array, size_t const lenght, void * const null);
 
-bool uchareven(void const * const element, void * const null);
+bool uchareven(void const * const element);
 
-bool ucharodd(void const * const element, void * const null);
+bool ucharodd(void const * const element);
 
-bool ucharalnum(void const * const element, void * const null);
+bool ucharalnum(void const * const element);
 
-bool ucharalpha(void const * const element, void * const null);
+bool ucharalpha(void const * const element);
 
-bool ucharcntrl(void const * const element, void * const null);
+bool ucharcntrl(void const * const element);
 
-bool uchardigit(void const * const element, void * const null);
+bool uchardigit(void const * const element);
 
-bool ucharlower(void const * const element, void * const null);
+bool ucharlower(void const * const element);
 
-bool ucharupper(void const * const element, void * const null);
+bool ucharupper(void const * const element);
 
-bool ucharpunct(void const * const element, void * const null);
+bool ucharpunct(void const * const element);
 
-bool ucharspace(void const * const element, void * const null);
+bool ucharspace(void const * const element);
 
-bool ucharxdigit(void const * const element, void * const null);
+bool ucharxdigit(void const * const element);
 
-bool ucharprime(void const * const element, void * const null);
+bool ucharprime(void const * const element);
 
 void intdst(void * const element);
 
@@ -134,11 +134,11 @@ void intqsort(void * const array, size_t const lenght, void * const null);
 
 void intrqsort(void * const array, size_t const lenght, void * const null);
 
-bool inteven(void const * const element, void * const null);
+bool inteven(void const * const element);
 
-bool intodd(void const * const element, void * const null);
+bool intodd(void const * const element);
 
-bool intprime(void const * const element, void * const null);
+bool intprime(void const * const element);
 
 void uintdst(void * const element);
 
@@ -158,11 +158,11 @@ void uintqsort(void * const array, size_t const lenght, void * const null);
 
 void uintrqsort(void * const array, size_t const lenght, void * const null);
 
-bool uinteven(void const * const element, void * const null);
+bool uinteven(void const * const element);
 
-bool uintodd(void const * const element, void * const null);
+bool uintodd(void const * const element);
 
-bool uintprime(void const * const element, void * const null);
+bool uintprime(void const * const element);
 
 void floatdst(void * const element);
 
@@ -218,11 +218,11 @@ void sizeqsort(void * const array, size_t const lenght, void * const null);
 
 void sizerqsort(void * const array, size_t const lenght, void * const null);
 
-bool sizeeven(void const * const element, void * const null);
+bool sizeeven(void const * const element);
 
-bool sizeodd(void const * const element, void * const null);
+bool sizeodd(void const * const element);
 
-bool sizeprime(void const * const element, void * const null);
+bool sizeprime(void const * const element);
 
 size_t stringhshmurmur(void const * const element);
 

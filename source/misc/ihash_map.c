@@ -175,8 +175,9 @@ void insert_ihash_map(ihash_map_s * const restrict map, void const * const restr
     valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
     valid(map->allocator && "Allocator can't be NULL.");
 
-    // resize (expand) if map can't contain new element
-    if (!map->capacity || ((double)(map->length) / (double)(map->capacity) >= IHASH_MAP_LOAD)) {
+    // resize (expand) if load factor was exceeded
+    double const load = (double)(map->length) / (double)(map->capacity);
+    if (!map->capacity || load >= IHASH_MAP_LOAD) {
         size_t const capacity = map->length ? map->length * CERPEC_FACTOR : IHASH_MAP_CHUNK;
         _ihash_table_resize(map, capacity);
     }
@@ -368,7 +369,8 @@ void set_ihash_map(ihash_map_s * const restrict map, void const * const restrict
 
 INSERT:
     // resize (expand) if map can't contain new element
-    if (!map->capacity || ((double)(map->length) / (double)(map->capacity) >= IHASH_MAP_LOAD)) {
+    double const load = (double)(map->length) / (double)(map->capacity);
+    if (!map->capacity || load >= IHASH_MAP_LOAD) {
         size_t const capacity = map->length ? map->length * CERPEC_FACTOR : IHASH_MAP_CHUNK;
         _ihash_table_resize(map, capacity);
     }
@@ -559,7 +561,7 @@ void obtain_value_ihash_map(biter_s const * const restrict iterator, void * cons
     memcpy(value_buffer, map->values + (iterator->index * map->value_size), map->value_size);
 }
 
-void following_ihash_map(biter_s * const iterator) {
+void increment_ihash_map(biter_s * const iterator) {
     error(iterator && "Parameter can't be NULL.");
 
     ihash_map_s const * map = iterator->structure;
@@ -573,7 +575,7 @@ void following_ihash_map(biter_s * const iterator) {
     iterator->index = iterator->index < map->length ? iterator->index + 1 : INVALID_ITERATOR;
 }
 
-void preceding_ihash_map(biter_s * const iterator) {
+void decrement_ihash_map(biter_s * const iterator) {
     error(iterator && "Parameter can't be NULL.");
     ihash_map_s const * map = iterator->structure;
 

@@ -64,64 +64,51 @@ void charrqsort(void * const array, size_t const lenght, void * const null) {
     qsort(array, lenght, sizeof(char), charrcmp);
 }
 
-bool chareven(void const * const element, void * const null) {
-    (void)(null);
+bool chareven(void const * const element) {
     return !((*(char*)element) % 2);
 }
 
-bool charodd(void const * const element, void * const null) {
-    (void)(null);
+bool charodd(void const * const element) {
     return ((*(char*)element) % 2);
 }
 
-bool charalnum(void const * const element, void * const null) {
-    (void)(null);
+bool charalnum(void const * const element) {
     return isalnum(*(char*)element);
 }
 
-bool charalpha(void const * const element, void * const null) {
-    (void)(null);
+bool charalpha(void const * const element) {
     return isalpha(*(char*)element);
 }
 
-bool charcntrl(void const * const element, void * const null) {
-    (void)(null);
+bool charcntrl(void const * const element) {
     return iscntrl(*(char*)element);
 }
 
-bool chardigit(void const * const element, void * const null) {
-    (void)(null);
+bool chardigit(void const * const element) {
     return isdigit(*(char*)element);
 }
 
-bool charlower(void const * const element, void * const null) {
-    (void)(null);
+bool charlower(void const * const element) {
     return islower(*(char*)element);
 }
 
-bool charupper(void const * const element, void * const null) {
-    (void)(null);
+bool charupper(void const * const element) {
     return isupper(*(char*)element);
 }
 
-bool charpunct(void const * const element, void * const null) {
-    (void)(null);
+bool charpunct(void const * const element) {
     return ispunct(*(char*)element);
 }
 
-bool charspace(void const * const element, void * const null) {
-    (void)(null);
+bool charspace(void const * const element) {
     return isspace(*(char*)element);
 }
 
-bool charxdigit(void const * const element, void * const null) {
-    (void)(null);
+bool charxdigit(void const * const element) {
     return isxdigit(*(char*)element);
 }
 
-bool charprime(void const * const element, void * const null) {
-    (void)(null);
-
+bool charprime(void const * const element) {
     const char number = (*(char*)element);
     for (char i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -197,64 +184,51 @@ void ucharrqsort(void * const array, size_t const lenght, void * const null) {
     qsort(array, lenght, sizeof(unsigned char), charrcmp);
 }
 
-bool uchareven(void const * const element, void * const null) {
-    (void)(null);
+bool uchareven(void const * const element) {
     return !((*(unsigned char*)element) % 2);
 }
 
-bool ucharodd(void const * const element, void * const null) {
-    (void)(null);
+bool ucharodd(void const * const element) {
     return ((*(unsigned char*)element) % 2);
 }
 
-bool ucharalnum(void const * const element, void * const null) {
-    (void)(null);
+bool ucharalnum(void const * const element) {
     return isalnum(*(unsigned char*)element);
 }
 
-bool ucharalpha(void const * const element, void * const null) {
-    (void)(null);
+bool ucharalpha(void const * const element) {
     return isalpha(*(unsigned char*)element);
 }
 
-bool ucharcntrl(void const * const element, void * const null) {
-    (void)(null);
+bool ucharcntrl(void const * const element) {
     return iscntrl(*(unsigned char*)element);
 }
 
-bool uchardigit(void const * const element, void * const null) {
-    (void)(null);
+bool uchardigit(void const * const element) {
     return isdigit(*(unsigned char*)element);
 }
 
-bool ucharlower(void const * const element, void * const null) {
-    (void)(null);
+bool ucharlower(void const * const element) {
     return islower(*(unsigned char*)element);
 }
 
-bool ucharupper(void const * const element, void * const null) {
-    (void)(null);
+bool ucharupper(void const * const element) {
     return isupper(*(unsigned char*)element);
 }
 
-bool ucharpunct(void const * const element, void * const null) {
-    (void)(null);
+bool ucharpunct(void const * const element) {
     return ispunct(*(unsigned char*)element);
 }
 
-bool ucharspace(void const * const element, void * const null) {
-    (void)(null);
+bool ucharspace(void const * const element) {
     return isspace(*(unsigned char*)element);
 }
 
-bool ucharxdigit(void const * const element, void * const null) {
-    (void)(null);
+bool ucharxdigit(void const * const element) {
     return isxdigit(*(unsigned char*)element);
 }
 
-bool ucharprime(void const * const element, void * const null) {
-    (void)(null);
-
+bool ucharprime(void const * const element) {
     const unsigned char number = (*(unsigned char*)element);
     for (unsigned char i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -330,19 +304,15 @@ void intrqsort(void * const array, size_t const lenght, void * const null) {
     qsort(array, lenght, sizeof(int), intrcmp);
 }
 
-bool inteven(void const * const element, void * const null) {
-    (void)(null);
+bool inteven(void const * const element) {
     return !((*(int*)element) % 2);
 }
 
-bool intodd(void const * const element, void * const null) {
-    (void)(null);
+bool intodd(void const * const element) {
     return (*(int*)element) % 2;
 }
 
-bool intprime(void const * const element, void * const null) {
-    (void)(null);
-
+bool intprime(void const * const element) {
     const int number = (*(int*)element);
     for (int i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -387,6 +357,7 @@ int uintrcmp(void const * const a, void const * const b) {
 
 bool uintprint(void * const element, void * const format) {
     printf(format ? format : UINT_FORMAT, (*(unsigned*)element));
+    return true;
 }
 
 void uintqsort(void * const array, size_t const lenght, void * const null) {
@@ -399,19 +370,15 @@ void uintrqsort(void * const array, size_t const lenght, void * const null) {
     qsort(array, lenght, sizeof(unsigned), uintrcmp);
 }
 
-bool uinteven(void const * const element, void * const null) {
-    (void)(null);
+bool uinteven(void const * const element) {
     return !((*(unsigned*)element) % 2);
 }
 
-bool uintodd(void const * const element, void * const null) {
-    (void)(null);
+bool uintodd(void const * const element) {
     return !((*(unsigned*)element) % 2);
 }
 
-bool uintprime(void const * const element, void * const null) {
-    (void)(null);
-
+bool uintprime(void const * const element) {
     const unsigned number = (*(unsigned*)element);
     for (unsigned i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -567,19 +534,15 @@ void sizerqsort(void * const array, size_t const lenght, void * const null) {
     qsort(array, lenght, sizeof(size_t), sizercmp);
 }
 
-bool sizeeven(void const * const element, void * const null) {
-    (void)(null);
+bool sizeeven(void const * const element) {
     return !((*(size_t*)element) % 2);
 }
 
-bool sizeodd(void const * const element, void * const null) {
-    (void)(null);
+bool sizeodd(void const * const element) {
     return ((*(size_t*)element) % 2);
 }
 
-bool sizeprime(void const * const element, void * const null) {
-    (void)(null);
-
+bool sizeprime(void const * const element) {
     const size_t number = (*(size_t*)element);
     for (size_t i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {

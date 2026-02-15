@@ -149,10 +149,10 @@ void obtain_value_ihash_map(biter_s const * const restrict iterator, void * cons
 
 /// @brief Goes to the following iterator.
 /// @param iterator Iterator to folow.
-void following_ihash_map(biter_s * const iterator);
+void increment_ihash_map(biter_s * const iterator);
 
 /// @brief Goes to the preceding iterator.
 /// @param iterator Iterator to precede.
-void preceding_ihash_map(biter_s * const iterator);
+void decrement_ihash_map(biter_s * const iterator);
 
 #endif // IHASH_MAP_H
