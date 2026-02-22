@@ -826,7 +826,7 @@ void update_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void cons
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
         if (!comparison) {
             break;
         }
@@ -1093,7 +1093,7 @@ size_t * _fbsearch_tree_predecessor(fbsearch_tree_s * const restrict tree, void 
     for (size_t * n = &(tree->root); NIL != (*n);) {
         size_t * const left = tree->node[FBST_LEFT] + (*n);
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -1140,8 +1140,8 @@ void _fbsearch_tree_fill_hole(fbsearch_tree_s * const tree, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
-        const int comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
-        const size_t node_index = comparison <= 0 ? FBST_LEFT : FBST_RIGHT;
+        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
+        size_t const node_index = comparison <= 0 ? FBST_LEFT : FBST_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }
 }

@@ -195,7 +195,7 @@ void remove_ihash_set(ihash_set_s * const set, void const * const element, void 
 
     // for each node at index check if element is contained
     for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
-        const char * current = set->elements + (n * set->size);
+        char const * current = set->elements + (n * set->size);
         if (hash != set->hashes[n] || set->compare(element, current)) { // if not equal contionue
             continue;
         } // else remove found element and return
@@ -596,7 +596,7 @@ void _ihash_set_resize(ihash_set_s * const set, size_t const size) {
 
     // reset lists by pushing hashes to their valid list
     for (size_t i = 0; i < set->length; ++i) {
-        const size_t index = set->hashes[i] % set->capacity;
+        size_t const index = set->hashes[i] % set->capacity;
 
         size_t const head = set->head[index];
         if (NIL != head) {

@@ -156,7 +156,7 @@ void enqueue_back_ideque(ideque_s * const restrict deque, void const * const res
     valid(deque->allocator && "Allocator can't be NULL.");
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
-    const size_t next_index = ((deque->current + deque->length) % IDEQUE_CHUNK);
+    size_t const next_index = ((deque->current + deque->length) % IDEQUE_CHUNK);
     if (!next_index) { // if next index to insert into is zero
         struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) + (IDEQUE_CHUNK * deque->size), deque->allocator->arguments);
         error(node && "Memory allocation failed.");

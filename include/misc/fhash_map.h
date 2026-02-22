@@ -3,7 +3,7 @@
 
 #include <cerpec.h>
 
-/// @brief Finite hash table data structure.
+/// @brief Finite hash map structure.
 typedef struct finite_hash_map {
     hash_fn hash_key;
     compare_fn compare_key;
@@ -19,7 +19,7 @@ typedef struct finite_hash_map {
 /// @param max Maximum length of structure.
 /// @param compare_key Function pointer to compare keys.
 /// @param hash_key Function pointer to hash element into value.
-/// @return Table structure.
+/// @return Map structure.
 fhash_map_s create_fhash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, compare_fn const compare_key);
 
 /// @brief Creates an empty structure.
@@ -29,16 +29,16 @@ fhash_map_s create_fhash_map(size_t const key_size, size_t const value_size, siz
 /// @param hash_key Function pointer to hash element into value.
 /// @param compare_key Function pointer to compare keys.
 /// @param allocator Custom allocator structure.
-/// @return Table structure.
+/// @return Map structure.
 fhash_map_s make_fhash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, compare_fn const compare_key, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param map Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
 /// @param destroy_value Function pointer to destroy a single value.
 void destroy_fhash_map(fhash_map_s * const map, set_fn const destroy_key, set_fn const destroy_value);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param map Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
 /// @param destroy_value Function pointer to destroy a single value.
@@ -48,7 +48,7 @@ void clear_fhash_map(fhash_map_s * map, const set_fn destroy_key, const set_fn d
 /// @param map Structure to copy.
 /// @param copy_key Function pointer to create a deep/shallow copy of a single key.
 /// @param copy_value Function pointer to create a deep/shallow copy of a single value.
-/// @return Stack structure.
+/// @return Map structure.
 fhash_map_s copy_fhash_map(fhash_map_s const * const map, copy_fn const copy_key, copy_fn const copy_value);
 
 /// @brief Checks if structure is empty.

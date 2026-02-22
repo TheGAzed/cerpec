@@ -318,7 +318,7 @@ void get_value_ihash_map(ihash_map_s const * const restrict map, void const * co
 
     // for each node at index check if element is contained
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
-        const char * current_key = map->keys + (n * map->key_size);
+        char const * current_key = map->keys + (n * map->key_size);
         if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
             memcpy(value_buffer, map->values + (n * map->value_size), map->value_size); // copy retrieved element into buffer
             return; // return to avoid error and termination at the end of function if key wasn't found
@@ -357,7 +357,7 @@ void set_ihash_map(ihash_map_s * const restrict map, void const * const restrict
 
     // for each node at index check if element is contained
     for (size_t n = map->head[hash % map->capacity]; NIL != n; n = map->next[n]) {
-        const char * current_key = map->keys + (n * map->key_size);
+        char const * current_key = map->keys + (n * map->key_size);
 
         if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
             void * current_value = map->values + (n * map->value_size);
@@ -481,7 +481,7 @@ biter_s find_ihash_map(ihash_map_s * const restrict map, void const * const rest
 
     // for each node at index check if element is contained
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
-        const char * current_key = map->keys + (n * map->key_size);
+        char const * current_key = map->keys + (n * map->key_size);
         if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
             return (biter_s) {
                 .index = n, .structure = map,
@@ -510,7 +510,7 @@ void erase_ihash_map(biter_s * const restrict iterator, void * const restrict ke
     valid(map->length <= map->capacity && "Lenght can't be larger than capacity.");
     valid(map->allocator && "Allocator can't be NULL.");
 
-    const char * current_key = map->keys + (iterator->index * map->key_size);
+    char const * current_key = map->keys + (iterator->index * map->key_size);
 
     // copy removed element into buffer
     memcpy(key_buffer, current_key, map->key_size);
@@ -614,7 +614,7 @@ void _ihash_table_resize(ihash_map_s * const table, size_t const size) {
 
     // reset lists by pushing hashes to their valid list
     for (size_t i = 0; i < table->length; ++i) {
-        const size_t index = table->hashes[i] % table->capacity;
+        size_t const index = table->hashes[i] % table->capacity;
 
         size_t const head = table->head[index];
         if (NIL != head) {

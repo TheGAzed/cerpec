@@ -25,12 +25,12 @@ fcircular_list_s create_fcircular_list(size_t const size, size_t const max);
 /// @return List structure.
 fcircular_list_s make_fcircular_list(size_t const size, size_t const max, memory_s const * const allocator);
 
-/// @brief Destroys a structure and its elements, and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy);
@@ -38,7 +38,7 @@ void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy);
 /// @brief Creates a copy of a structure and all its elements.
 /// @param list Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
-/// @return Stack structure.
+/// @return List structure.
 fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_fn const copy);
 
 /// @brief Checks if structure is empty.

@@ -221,7 +221,7 @@ void remove_first_fcircular_list(fcircular_list_s * const restrict list, void co
 
     // iterate over each element until searched element is found
     for (size_t i = 0, previous = list->tail; i < list->length; ++i, previous = list->next[previous]) {
-        const size_t current = list->next[previous]; // save current node index
+        size_t const current = list->next[previous]; // save current node index
 
         // if comparison is false (not zero) continue iterating (also avoids useless depth)
         if (0 != compare(list->elements + (current * list->size), element)) {
@@ -376,7 +376,7 @@ void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircu
     size_t src_prev = source->tail; // save previous source node
     while (NIL != destination->empty && source->length) {
         // pop empty hole index from stack
-        const size_t hole = destination->empty;
+        size_t const hole = destination->empty;
         destination->empty = destination->next[destination->empty];
 
         // redirect nodes
@@ -384,7 +384,7 @@ void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircu
         destination->next[dest_prev] = hole;
 
         // copy source element into destination and change lengths
-        const size_t src_curr = source->next[src_prev];
+        size_t const src_curr = source->next[src_prev];
         memcpy(destination->elements + (hole * destination->size), source->elements + (src_curr * source->size), source->size);
         destination->length++;
         source->length--;
@@ -396,14 +396,14 @@ void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircu
 
     // copy source elements into destination while source has elements
     while (source->length) {
-        const size_t hole = destination->length; // get rightmost array hole index
+        size_t const hole = destination->length; // get rightmost array hole index
 
         // redirect nodes
         destination->next[hole] = destination->next[dest_prev];
         destination->next[dest_prev] = hole;
 
         // copy source element into destination and change lengths
-        const size_t src_curr = source->next[src_prev];
+        size_t const src_curr = source->next[src_prev];
         memcpy(destination->elements + (hole * destination->size), source->elements + (src_curr * source->size), source->size);
         destination->length++;
         source->length--;

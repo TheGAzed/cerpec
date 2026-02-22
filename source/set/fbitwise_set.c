@@ -95,7 +95,7 @@ fbitwise_set_s copy_fbitwise_set(fbitwise_set_s const * const set) {
     size_t const size = ceil / CHAR_BIT;
 
     // create replica structure
-    const fbitwise_set_s replica = {
+    fbitwise_set_s const replica = {
         .max = set->max, .length = set->length, .allocator = set->allocator,
         .bits = set->allocator->alloc(size, set->allocator->arguments),
     };
@@ -398,9 +398,9 @@ void each_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const h
         size_t temp = i;
 
         // calculate bits' array index and bit to check
-        const size_t idx = i / BIT_COUNT;
-        const unsigned relative = ((unsigned)(i) % BIT_COUNT);
-        const unsigned bit = 1U << (BIT_COUNT - relative - 1);
+        size_t const idx = i / BIT_COUNT;
+        unsigned const relative = ((unsigned)(i) % BIT_COUNT);
+        unsigned const bit = 1U << (BIT_COUNT - relative - 1);
 
         // if bit isn't set continue, and if handle function returns false break the loop and quit main function
         if ((set->bits[idx] & bit) && !handle(&temp, arguments)) {

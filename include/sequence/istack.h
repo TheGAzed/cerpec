@@ -11,7 +11,7 @@
 #   error "Chunk size must be a power of 2."
 #endif
 
-/// @brief Stack data structure.
+/// @brief Infinite stack data structure.
 typedef struct infinite_stack {
     char * elements;               // array of elements
     size_t size, length, capacity; // size of single element, structure length and its capacity
@@ -23,18 +23,18 @@ typedef struct infinite_stack {
 /// @return Stack structure.
 istack_s create_istack(size_t const size);
 
-/// @brief Creates an empty structure.
+/// @brief Creates a custom empty structure.
 /// @param size Size of a single element.
 /// @param allocator Custom allocator structure.
 /// @return Stack structure.
 istack_s make_istack(size_t const size, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param stack Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_istack(istack_s * const stack, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param stack Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_istack(istack_s * const stack, set_fn const destroy);

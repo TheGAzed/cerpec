@@ -277,7 +277,7 @@ void insert_frb_tree(frb_tree_s * const restrict tree, void const * const restri
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
 
         previous = (*node); // change parent to child
 
@@ -323,7 +323,7 @@ void remove_frb_tree(frb_tree_s * const restrict tree, void const * const restri
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
         if (!comparison) {
             break;
         }
@@ -363,7 +363,7 @@ bool contains_frb_tree(frb_tree_s const * const restrict tree, void const * cons
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
         if (!comparison) {
             return true;
         }
@@ -524,7 +524,7 @@ void get_floor_frb_tree(frb_tree_s const * const restrict tree, void const * con
     valid(tree->node[FRBT_LEFT] && "Lefts array can't be NULL");
     valid(tree->node[FRBT_RIGHT] && "Rights array can't be NULL");
 
-    const size_t floor = _frb_tree_floor(tree, element);
+    size_t const floor = _frb_tree_floor(tree, element);
     if (NIL == floor) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -557,7 +557,7 @@ void get_ceil_frb_tree(frb_tree_s const * const restrict tree, void const * cons
     valid(tree->node[FRBT_LEFT] && "Lefts array can't be NULL");
     valid(tree->node[FRBT_RIGHT] && "Rights array can't be NULL");
 
-    const size_t ceil = _frb_tree_ceil(tree, element);
+    size_t const ceil = _frb_tree_ceil(tree, element);
     if (NIL == ceil) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -628,7 +628,7 @@ void remove_ceil_frb_tree(frb_tree_s * const restrict tree, void const * const r
     valid(tree->node[FRBT_LEFT] && "Lefts array can't be NULL");
     valid(tree->node[FRBT_RIGHT] && "Rights array can't be NULL");
 
-    const size_t ceil = _frb_tree_ceil(tree, element);
+    size_t const ceil = _frb_tree_ceil(tree, element);
     if (NIL == ceil) {
         // element was NOT found, thus return an error
         error(false && "Element not found in structure.");
@@ -812,7 +812,7 @@ void update_frb_tree(frb_tree_s const * const restrict tree, void const * const 
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
         if (!comparison) {
             break;
         }
@@ -900,14 +900,14 @@ void pre_order_frb_tree(frb_tree_s const * const restrict tree, handle_fn const 
     }
 
     while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
-        const size_t node = stack.elements[--stack.length];
+        size_t const node = stack.elements[--stack.length];
 
-        const size_t right_child = tree->node[FRBT_RIGHT][node];
+        size_t const right_child = tree->node[FRBT_RIGHT][node];
         if (NIL != right_child) {
             stack.elements[stack.length++] = right_child;
         }
 
-        const size_t left_child = tree->node[FRBT_LEFT][node];
+        size_t const left_child = tree->node[FRBT_LEFT][node];
         if (NIL != left_child) {
             stack.elements[stack.length++] = left_child;
         }
@@ -945,9 +945,9 @@ void post_order_frb_tree(frb_tree_s const * const restrict tree, handle_fn const
             stack.elements[stack.length++] = node;
             node = tree->node[FRBT_LEFT][node];
         } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
-            const size_t peek = stack.elements[stack.length - 1];
+            size_t const peek = stack.elements[stack.length - 1];
 
-            const size_t peek_right = tree->node[FRBT_RIGHT][peek];
+            size_t const peek_right = tree->node[FRBT_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
@@ -991,17 +991,17 @@ void level_order_frb_tree(frb_tree_s const * const restrict tree, handle_fn cons
     // while queue isn't empty handle on element, pop parent and push valid children
     while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
         // pop index
-        const size_t node = queue.elements[queue.current++];
+        size_t const node = queue.elements[queue.current++];
         queue.length--;
 
         // push left child of popped parent to the top of the queue
-        const size_t left_child = tree->node[FRBT_LEFT][node];
+        size_t const left_child = tree->node[FRBT_LEFT][node];
         if (NIL != left_child) {
             queue.elements[queue.current + queue.length++] = left_child;
         }
 
         // push right child of popped parent to the top of the queue
-        const size_t right_child = tree->node[FRBT_RIGHT][node];
+        size_t const right_child = tree->node[FRBT_RIGHT][node];
         if (NIL != right_child) {
             queue.elements[queue.current + queue.length++] = right_child;
         }
@@ -1011,7 +1011,7 @@ void level_order_frb_tree(frb_tree_s const * const restrict tree, handle_fn cons
 }
 
 void _frb_tree_left_rotate(frb_tree_s * const tree, size_t const node) {
-    const size_t x = node, y = tree->node[FRBT_RIGHT][x], z = tree->node[FRBT_LEFT][y];
+    size_t const x = node, y = tree->node[FRBT_RIGHT][x], z = tree->node[FRBT_LEFT][y];
 
     tree->node[FRBT_RIGHT][x] = z;
     if (NIL != z) {
@@ -1032,7 +1032,7 @@ void _frb_tree_left_rotate(frb_tree_s * const tree, size_t const node) {
 }
 
 void _frb_tree_right_rotate(frb_tree_s * const tree, size_t const node) {
-    const size_t x = node, y = tree->node[FRBT_LEFT][x], z = tree->node[FRBT_RIGHT][y];
+    size_t const x = node, y = tree->node[FRBT_LEFT][x], z = tree->node[FRBT_RIGHT][y];
 
     tree->node[FRBT_LEFT][x] = z;
     if (NIL != z) {
@@ -1076,7 +1076,7 @@ size_t _frb_tree_minimum(frb_tree_s const * const tree, size_t const node) {
 void _frb_tree_insert_fixup(frb_tree_s * const tree, size_t const node) {
     for (size_t child = node; child != tree->root && FRED_COLOR == tree->color[tree->parent[child]];) {
         if (tree->parent[child] == tree->node[FRBT_LEFT][tree->parent[tree->parent[child]]]) {
-            const size_t uncle = tree->node[FRBT_RIGHT][tree->parent[tree->parent[child]]];
+            size_t const uncle = tree->node[FRBT_RIGHT][tree->parent[tree->parent[child]]];
 
             if (NIL != uncle && FRED_COLOR == tree->color[uncle]) {
                 tree->color[tree->parent[child]] = tree->color[uncle] = FBLACK_COLOR;
@@ -1093,7 +1093,7 @@ void _frb_tree_insert_fixup(frb_tree_s * const tree, size_t const node) {
                 _frb_tree_right_rotate(tree, tree->parent[tree->parent[child]]);
             }
         } else {
-            const size_t uncle = tree->node[FRBT_LEFT][tree->parent[tree->parent[child]]];
+            size_t const uncle = tree->node[FRBT_LEFT][tree->parent[tree->parent[child]]];
 
             if (NIL != uncle && FRED_COLOR == tree->color[uncle]) {
                 tree->color[tree->parent[child]] = tree->color[uncle] = FBLACK_COLOR;
@@ -1167,8 +1167,8 @@ void _frb_tree_remove_fixup(frb_tree_s * const tree, size_t const node) {
                 sibling = tree->node[FRBT_RIGHT][tree->parent[child]];
             }
 
-            const size_t left_nibling = tree->node[FRBT_LEFT][sibling];
-            const size_t right_nibling = tree->node[FRBT_RIGHT][sibling];
+            size_t const left_nibling = tree->node[FRBT_LEFT][sibling];
+            size_t const right_nibling = tree->node[FRBT_RIGHT][sibling];
 
             if (FBLACK_COLOR == tree->color[left_nibling] && FBLACK_COLOR == tree->color[right_nibling]) {
                 tree->color[sibling] = FRED_COLOR;
@@ -1196,8 +1196,8 @@ void _frb_tree_remove_fixup(frb_tree_s * const tree, size_t const node) {
                 sibling = tree->node[FRBT_LEFT][tree->parent[child]];
             }
 
-            const size_t left_nibling = tree->node[FRBT_LEFT][sibling];
-            const size_t right_nibling = tree->node[FRBT_RIGHT][sibling];
+            size_t const left_nibling = tree->node[FRBT_LEFT][sibling];
+            size_t const right_nibling = tree->node[FRBT_RIGHT][sibling];
 
             if (FBLACK_COLOR == tree->color[left_nibling] && FBLACK_COLOR == tree->color[right_nibling]) {
                 tree->color[sibling] = FRED_COLOR;
@@ -1223,7 +1223,7 @@ void _frb_tree_remove_fixup(frb_tree_s * const tree, size_t const node) {
 }
 
 void _frb_tree_fill_hole(frb_tree_s * const tree, size_t const hole) {
-    const size_t last = tree->length + 1;
+    size_t const last = tree->length + 1;
     if (tree->length && tree->root == last) { // if head node is last array element then change index to removed one
         tree->root = hole;
     }
@@ -1239,22 +1239,22 @@ void _frb_tree_fill_hole(frb_tree_s * const tree, size_t const hole) {
     tree->color[hole] = tree->color[last];
 
     // redirect left child of rightmost array node if they don't overlap with removed index
-    const size_t left_last = tree->node[FRBT_LEFT][last];
+    size_t const left_last = tree->node[FRBT_LEFT][last];
     if (NIL != left_last) {
         tree->parent[left_last] = hole;
     }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
-    const size_t right_last = tree->node[FRBT_RIGHT][last];
+    size_t const right_last = tree->node[FRBT_RIGHT][last];
     if (NIL != right_last) {
         tree->parent[right_last] = hole;
     }
 
     // redirect parent of rightmost array node if they don't overlap with removed index
-    const size_t parent_last = tree->parent[last];
+    size_t const parent_last = tree->parent[last];
     if (NIL != parent_last) {
-        const int comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size));
-        const size_t node_index = comparison <= 0 ? FRBT_LEFT : FRBT_RIGHT;
+        int const comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size));
+        size_t const node_index = comparison <= 0 ? FRBT_LEFT : FRBT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }
 }
@@ -1263,7 +1263,7 @@ size_t _frb_tree_floor(frb_tree_s const * const restrict tree, void const * cons
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (!comparison) {
             floor = n;
             break;
@@ -1282,7 +1282,7 @@ size_t _frb_tree_ceil(frb_tree_s const * const restrict tree, void const * const
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (!comparison) {
             ceil = n;
             break;
@@ -1307,7 +1307,7 @@ size_t _frb_tree_successor(frb_tree_s const * const restrict tree, void const * 
     } else {
         for (size_t n = tree->root; NIL != n;) {
             // calculate and determine next child node, i.e. if left or right child
-            const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+            int const comparison = tree->compare(element, tree->elements + (n * tree->size));
             if (comparison < 0) {
                 successor = n;
             }
@@ -1323,7 +1323,7 @@ size_t _frb_tree_predecessor(frb_tree_s const * const restrict tree, void const 
     size_t predecessor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        const int comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {

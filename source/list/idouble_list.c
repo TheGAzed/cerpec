@@ -395,11 +395,11 @@ void splice_idouble_list(idouble_list_s * const restrict destination, idouble_li
 
     // redirect destination nodes if it and source had any
     if (destination->length && source->length) {
-        const size_t first_destination = current;
-        const size_t last_destination  = destination->node[IDL_PREV][current];
+        size_t const first_destination = current;
+        size_t const last_destination  = destination->node[IDL_PREV][current];
 
-        const size_t first_source = source->head + destination->length;
-        const size_t last_source  = source->node[IDL_PREV][source->head] + destination->length;
+        size_t const first_source = source->head + destination->length;
+        size_t const last_source  = source->node[IDL_PREV][source->head] + destination->length;
 
         destination->node[IDL_NEXT][last_destination] = first_source;
         destination->node[IDL_PREV][first_source] = last_destination;
@@ -466,7 +466,7 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
         split.length++;
         list->length--;
 
-        const size_t next = list->node[IDL_NEXT][current];
+        size_t const next = list->node[IDL_NEXT][current];
         if (list->head == current) {
             list->head = next;
         }

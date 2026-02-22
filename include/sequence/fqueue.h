@@ -23,12 +23,12 @@ fqueue_s create_fqueue(size_t const size, size_t const max);
 /// @return Queue structure.
 fqueue_s make_fqueue(size_t const size, size_t const max, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_fqueue(fqueue_s * const queue, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_fqueue(fqueue_s * const queue, set_fn const destroy);

@@ -10,13 +10,13 @@
 #   error "Chunk size must be greater than zero."
 #endif
 
-/// @brief Circular linked list type node for queue structure.
+/// @brief Circular linked list node for queue structure.
 struct infinite_queue_node {
     struct infinite_queue_node * next; // next sibling node
     char elements[];                   // flexible elements array with IQUEUE_CHUNK length
 };
 
-/// @brief Queue data structure.
+/// @brief Infinite queue data structure.
 typedef struct infinite_queue {
     struct infinite_queue_node * tail; // tail node to append next elements while enqueue-ing
     size_t size, current, length;      // current index, element size and structure length
@@ -28,18 +28,18 @@ typedef struct infinite_queue {
 /// @return Queue structure.
 iqueue_s create_iqueue(size_t const size);
 
-/// @brief Creates an empty structure.
+/// @brief Creates a custom empty structure.
 /// @param size Size of a single element.
 /// @param allocator Custom allocator structure.
-/// @return Stack structure.
+/// @return Queue structure.
 iqueue_s make_iqueue(size_t const size, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_iqueue(iqueue_s * const queue, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_iqueue(iqueue_s * const queue, set_fn const destroy);

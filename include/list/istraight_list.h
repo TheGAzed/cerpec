@@ -31,12 +31,12 @@ istraight_list_s create_istraight_list(size_t const size);
 /// @return List structure.
 istraight_list_s make_istraight_list(size_t const size, memory_s const * const allocator);
 
-/// @brief Destroys a structure and its elements, and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_istraight_list(istraight_list_s * const list, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_istraight_list(istraight_list_s * const list, set_fn const destroy);
@@ -44,7 +44,7 @@ void clear_istraight_list(istraight_list_s * const list, set_fn const destroy);
 /// @brief Creates a copy of a structure and all its elements.
 /// @param list Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
-/// @return Stack structure.
+/// @return List structure.
 istraight_list_s copy_istraight_list(istraight_list_s const * const list, copy_fn const copy);
 
 /// @brief Checks if structure is empty.

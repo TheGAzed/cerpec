@@ -72,13 +72,13 @@ iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, c
 /// @note Compare function must return 'equal' (0) if a non-edge is compared with 'none' parameter.
 iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const none, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param graph Structure to destroy.
 /// @param destroy_vertex Function pointer to destroy a single vertex element.
 /// @param destroy_edge Function pointer to destroy a single edge element.
 void destroy_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, set_fn const destroy_edge);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param graph Structure to destroy.
 /// @param destroy_vertex Function pointer to destroy a single vertex element.
 /// @param destroy_edge Function pointer to destroy a single edge element.
@@ -88,7 +88,7 @@ void clear_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, set
 /// @param graph Structure to copy.
 /// @param copy_vertex Function pointer to create a deep/shallow copy of a single vertex element.
 /// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element.
-/// @return Matrix graph structure.
+/// @return Graph structure.
 iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_vertex, copy_fn const copy_edge);
 
 /// @brief Checks if structure is empty.

@@ -1035,7 +1035,7 @@ size_t _iavl_tree_get_height(iavl_tree_s const * const tree, size_t const node) 
 }
 
 void _iavl_tree_left_rotate(iavl_tree_s * const tree, size_t const node) {
-    const size_t x = node, y = tree->node[IAVLT_RIGHT][x], z = tree->node[IAVLT_LEFT][y];
+    size_t const x = node, y = tree->node[IAVLT_RIGHT][x], z = tree->node[IAVLT_LEFT][y];
 
     tree->node[IAVLT_RIGHT][x] = z;
     if (NIL != z) {
@@ -1195,8 +1195,8 @@ void _iavl_tree_fill_hole(iavl_tree_s * const tree, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
-        const int comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
-        const size_t node_index = comparison <= 0 ? IAVLT_LEFT : IAVLT_RIGHT;
+        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
+        size_t const node_index = comparison <= 0 ? IAVLT_LEFT : IAVLT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }
 }

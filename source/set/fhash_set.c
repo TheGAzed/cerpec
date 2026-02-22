@@ -220,7 +220,7 @@ void remove_fhash_set(fhash_set_s * const set, void const * const element, void 
     size_t const index = hash % set->max;
 
     for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
-        const char * current = set->elements + (n * set->size);
+        char const * current = set->elements + (n * set->size);
         if (hash != set->hashes[n] || set->compare(element, current)) { // if not equal contionue
             continue;
         } // else remove found element and return

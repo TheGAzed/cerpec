@@ -3,7 +3,7 @@
 
 #include <cerpec.h>
 
-/// @brief Deque data structure.
+/// @brief Finite deque data structure.
 typedef struct finite_deque {
     char * elements;
     size_t length, size, current, max;
@@ -23,12 +23,12 @@ fdeque_s create_fdeque(size_t const size, size_t const max);
 /// @return Deque structure.
 fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param deque Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_fdeque(fdeque_s * const deque, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param deque Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_fdeque(fdeque_s * const deque, set_fn const destroy);

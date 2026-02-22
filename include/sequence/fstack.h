@@ -23,12 +23,12 @@ fstack_s create_fstack(size_t const size, size_t const max);
 /// @return Stack structure.
 fstack_s make_fstack(size_t const size, size_t const max, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param stack Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_fstack(fstack_s * const stack, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param stack Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_fstack(fstack_s * const stack, set_fn const destroy);

@@ -55,7 +55,7 @@ ibitwise_set_s copy_ibitwise_set(ibitwise_set_s const * const set) {
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // create replica structure
-    const ibitwise_set_s replica = {
+    ibitwise_set_s const replica = {
         .capacity = set->capacity, .length = set->length, .allocator = set->allocator,
         .bits = set->allocator->alloc(set->capacity / CHAR_BIT, set->allocator->arguments),
     };
@@ -350,9 +350,9 @@ void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const h
         size_t temp = i;
 
         // calculate bits' array index and bit to check
-        const size_t idx = i / BIT_COUNT;
-        const unsigned relative = ((unsigned)(i) % BIT_COUNT);
-        const unsigned bit = 1U << (BIT_COUNT - relative - 1);
+        size_t const idx = i / BIT_COUNT;
+        unsigned const relative = ((unsigned)(i) % BIT_COUNT);
+        unsigned const bit = 1U << (BIT_COUNT - relative - 1);
 
         // if bit isn't set continue, and if handle function returns false break the loop and quit main function
         if ((set->bits[idx] & bit) && !handle(&temp, arguments)) {

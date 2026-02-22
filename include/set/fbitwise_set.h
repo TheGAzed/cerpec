@@ -21,17 +21,17 @@ fbitwise_set_s create_fbitwise_set(size_t const max);
 /// @return Set structure.
 fbitwise_set_s make_fbitwise_set(size_t const max, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.
 void destroy_fbitwise_set(fbitwise_set_s * const set);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param set Structure to destroy.
 void clear_fbitwise_set(fbitwise_set_s * const set);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param set Structure to copy.
-/// @return Stack structure.
+/// @return Set structure.
 fbitwise_set_s copy_fbitwise_set(fbitwise_set_s const * const set);
 
 /// @brief Checks if structure is empty.

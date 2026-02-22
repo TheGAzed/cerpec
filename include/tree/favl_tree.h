@@ -32,12 +32,12 @@ favl_tree_s create_favl_tree(size_t const size, size_t const max, compare_fn con
 /// @return Tree structure.
 favl_tree_s make_favl_tree(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param tree Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_favl_tree(favl_tree_s * const tree, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param tree Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_favl_tree(favl_tree_s * const tree, set_fn const destroy);
@@ -45,7 +45,7 @@ void clear_favl_tree(favl_tree_s * const tree, set_fn const destroy);
 /// @brief Creates a copy of a structure and all its elements.
 /// @param tree Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
-/// @return Stack structure.
+/// @return Tree structure.
 favl_tree_s copy_favl_tree(favl_tree_s const * const tree, copy_fn const copy);
 
 /// @brief Checks if structure is empty.

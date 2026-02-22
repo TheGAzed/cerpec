@@ -36,12 +36,12 @@ ihash_set_s create_ihash_set(size_t const size, hash_fn const hash, compare_fn c
 /// @return Set structure.
 ihash_set_s make_ihash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_ihash_set(ihash_set_s * const set, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_ihash_set(ihash_set_s * const set, set_fn const destroy);
@@ -49,7 +49,7 @@ void clear_ihash_set(ihash_set_s * const set, set_fn const destroy);
 /// @brief Creates a copy of a structure and all its elements.
 /// @param set Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
-/// @return Stack structure.
+/// @return Set structure.
 ihash_set_s copy_ihash_set(ihash_set_s const * const set, copy_fn const copy);
 
 /// @brief Checks if structure is empty.

@@ -197,7 +197,7 @@ void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index,
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // perform heapify up or down based on comparison (ignore comparison equal to 'zero' as heap doesn't change)
-    const int comparison = heap->compare(buffer, element);
+    int const comparison = heap->compare(buffer, element);
     if (comparison > 0) {
         _ibinary_heapify_up(heap, index, temporary);
     } else if (comparison < 0) {
@@ -240,9 +240,9 @@ void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // for each element at half index call
-    const size_t start = (destination->length / 2) - 1; // value may underflow when length is less than two
+    size_t const start = (destination->length / 2) - 1; // value may underflow when length is less than two
     for (size_t i = 0; destination->length > 1 && i <= start; ++i) {
-        const size_t reverse = start - i;
+        size_t const reverse = start - i;
         _ibinary_heapify_down(destination, reverse, temporary);
     }
 
@@ -290,7 +290,7 @@ void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index, 
 
 void _ibinary_heapify_down(ibinary_heap_s const * const heap, size_t const index, void * const temporary) {
     for (size_t p = index, c = (2 * p) + 1; c < heap->length; p = c, c = (2 * p) + 1) {
-        const size_t s = c + 1;
+        size_t const s = c + 1;
         // if right child is a valid index and it is smaller than left child change left child to right one
         if (s < heap->length && heap->compare(heap->elements + (c * heap->size), heap->elements + (s * heap->size)) > 0) {
             c = s;

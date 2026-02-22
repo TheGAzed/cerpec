@@ -452,11 +452,11 @@ void splice_fdouble_list(fdouble_list_s * const restrict destination, fdouble_li
 
     // redirect destination nodes if it and source had any
     if (destination->length && source->length) {
-        const size_t first_destination = current;
-        const size_t last_destination  = destination->node[FDL_PREV][current];
+        size_t const first_destination = current;
+        size_t const last_destination  = destination->node[FDL_PREV][current];
 
-        const size_t first_source = source->head + destination->length;
-        const size_t last_source  = source->node[FDL_PREV][source->head] + destination->length;
+        size_t const first_source = source->head + destination->length;
+        size_t const last_source  = source->node[FDL_PREV][source->head] + destination->length;
 
         destination->node[FDL_NEXT][last_destination] = first_source;
         destination->node[FDL_PREV][first_source] = last_destination;
@@ -520,7 +520,7 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
         split.length++;
         list->length--;
 
-        const size_t next = list->node[FDL_NEXT][current];
+        size_t const next = list->node[FDL_NEXT][current];
         if (list->head == current) {
             list->head = next;
         }

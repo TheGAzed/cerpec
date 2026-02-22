@@ -10,14 +10,14 @@
 #   error "Chunk size must be greater than zero."
 #endif
 
-/// @brief Doubly linked list type node for deque structure.
+/// @brief Doubly linked list node for deque structure.
 struct infinite_deque_node {
     struct infinite_deque_node * next; // next sibling node
     struct infinite_deque_node * prev; // previous sibling node
     char elements[];                   // elements array with IDEQUE_CHUNK size
 };
 
-/// @brief Deque data structure.
+/// @brief Inifnite deque data structure.
 typedef struct infinite_deque {
     struct infinite_deque_node * head;
     size_t current, size, length; // current index, element size and structure length
@@ -29,18 +29,18 @@ typedef struct infinite_deque {
 /// @return Deque structure.
 ideque_s create_ideque(size_t const size);
 
-/// @brief Creates an empty structure.
+/// @brief Creates a custom empty structure.
 /// @param size Size of a single element.
 /// @param allocator Custom allocator structure.
-/// @return Stack structure.
+/// @return Deque structure.
 ideque_s make_ideque(size_t const size, memory_s const * const allocator);
 
-/// @brief Destroys a structure, and its elements and makes it unusable.
+/// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param deque Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void destroy_ideque(ideque_s * const deque, set_fn const destroy);
 
-/// @brief Clears a structure, and destroys its elements, but remains usable.
+/// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param deque Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
 void clear_ideque(ideque_s * const deque, set_fn const destroy);
