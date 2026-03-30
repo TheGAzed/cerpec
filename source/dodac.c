@@ -554,7 +554,7 @@ bool sizeprime(void const * const element) {
 }
 
 size_t stringhshmurmur(void const * const element) {
-    char const * string = element;
+    char const * string = *((char**)element);
     size_t hash = DODAC_SEED;
 
     // One-byte-at-a-time hash based on Murmur's mix
@@ -569,15 +569,15 @@ size_t stringhshmurmur(void const * const element) {
 }
 
 int stringcmp(void const * const a, void const * const b) {
-    return strcmp(a, b);
+    return strcmp(*((char**)(a)), *((char**)(b)));
 }
 
 int stringrcmp(void const * const a, void const * const b) {
-    return strcmp(b, a);
+    return strcmp(*((char**)(b)), *((char**)(a)));
 }
 
 bool stringprint(void * const element, void * const format) {
-    printf(format ? format : STRING_FORMAT, (char*)format);
+    printf(format ? format : STRING_FORMAT, *(char**)element);
     return true;
 }
 
