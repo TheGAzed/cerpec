@@ -1,4 +1,5 @@
 #include <misc/fbinary_heap.h>
+#include <dodac.h>
 
 #include <suite.h>
 

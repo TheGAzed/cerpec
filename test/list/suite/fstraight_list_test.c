@@ -1,4 +1,6 @@
 #include <list/fstraight_list.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define NIL ((size_t)(-1))

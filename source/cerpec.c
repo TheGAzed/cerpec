@@ -36,17 +36,3 @@ memory_s compose_memory(const alloc_fn alloc, const realloc_fn realloc, const fr
 
     return (memory_s) { .alloc = alloc, .free = free, .realloc = realloc, .arguments = arguments, };
 }
-
-bool is_valid_uniter(uniter_s const * const iterator) {
-    error(iterator && "Parameter can't be NULL.");
-    error(iterator->meta != INVALID_ITERATOR && "Metadata can't be invalid.");
-
-    return iterator->index != INVALID_ITERATOR;
-}
-
-bool is_valid_biter(biter_s const * const iterator) {
-    error(iterator && "Parameter can't be NULL.");
-    error(iterator->meta != INVALID_ITERATOR && "Metadata can't be invalid.");
-
-    return iterator->index != INVALID_ITERATOR;
-}

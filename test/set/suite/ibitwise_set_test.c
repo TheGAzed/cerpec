@@ -1,4 +1,6 @@
 #include <set/ibitwise_set.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 TEST CREATE_01(void) {

@@ -1,4 +1,6 @@
 #include <set/fbitwise_set.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FBITWISE_SET_CHUNK CERPEC_CHUNK

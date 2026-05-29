@@ -1,4 +1,6 @@
 #include <sequence/fdeque.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FDEQUE_CHUNK CERPEC_CHUNK

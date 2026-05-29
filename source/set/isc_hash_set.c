@@ -1,4 +1,4 @@
-#include <set/ihash_set.h>
+#include <set/isc_hash_set.h>
 
 #include <stdlib.h> // imports exit()
 #include <string.h>
@@ -8,12 +8,12 @@
 /// @brief Fills hole produced by element removal in arrays of elements.
 /// @param set Structure to remove hole from.
 /// @param hole Index of hole in arrays.
-void _ihash_set_fill_hole(ihash_set_s const * const set, size_t const hole);
+void _isc_hash_set_fill_hole(isc_hash_set_s const * const set, size_t const hole);
 
 /// @brief Resizes (reallocates) set parameter arrays based on changed capacity.
 /// @param set Structure to resize.
 /// @param size New size.
-void _ihash_set_resize(ihash_set_s * const set, size_t const size);
+void _isc_hash_set_resize(isc_hash_set_s * const set, size_t const size);
 
 /// @brief Make logic wrapper mainly to repeated assertion for specific structure operations.
 /// @param size Size of single element.
@@ -21,20 +21,20 @@ void _ihash_set_resize(ihash_set_s * const set, size_t const size);
 /// @param compare Compare function to compare elements.
 /// @param allocator Custom allocator function.
 /// @return Set structure.
-ihash_set_s _make_wrapper_ihash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
+isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
 
 /// @brief Copy logic wrapper mainly to repeated assertion for specific structure operations.
 /// @param set Structure to copy.
 /// @param copy Function pointer to create shallow/deep copy of single element
 /// @return Set structure.
-ihash_set_s _copy_wrapper_ihash_set(ihash_set_s const * const set, copy_fn const copy);
+isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy);
 
 /// @brief Insert logic wrapper mainly to remove repeated code snippeds.
 /// @param set Structure to call insert logic on.
 /// @param hash Hash of element to be inserted.
 /// @param index Head list index.
 /// @note Elements aren't added as shallow (memcpy) or deep (custom copy function) copying may occur.
-void _insert_wrapper_ihash_set(ihash_set_s const * const set, size_t const hash, size_t const index);
+void _insert_wrapper_isc_hash_set(isc_hash_set_s const * const set, size_t const hash, size_t const index);
 
 /// @brief Contains logic wrapper mainly to remove repeated code snippeds.
 /// @param set Structure to call contains logic on.
@@ -42,26 +42,26 @@ void _insert_wrapper_ihash_set(ihash_set_s const * const set, size_t const hash,
 /// @param hash Hash of element to be contained.
 /// @param index Head list index.
 /// @return 'true' if element is contained, 'false' otherwise.
-bool _contains_wrapper_ihash_set(ihash_set_s const * const set, void const * const element, size_t const hash, size_t const index);
+bool _contains_wrapper_isc_hash_set(isc_hash_set_s const * const set, void const * const element, size_t const hash, size_t const index);
 
-ihash_set_s create_ihash_set(size_t const size, hash_fn const hash, compare_fn const compare) {
+isc_hash_set_s create_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare) {
     error(hash && "Parameter can't be NULL.");
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
-    return (ihash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = &standard, };
+    return (isc_hash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = &standard, };
 }
 
-ihash_set_s make_ihash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator) {
+isc_hash_set_s make_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator) {
     error(hash && "Parameter can't be NULL.");
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
     error(allocator && "Parameter can't be NULL.");
 
-    return _make_wrapper_ihash_set(size, hash, compare, allocator);
+    return _make_wrapper_isc_hash_set(size, hash, compare, allocator);
 }
 
-void destroy_ihash_set(ihash_set_s * const set, set_fn const destroy) {
+void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy) {
     error(set && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
@@ -84,10 +84,10 @@ void destroy_ihash_set(ihash_set_s * const set, set_fn const destroy) {
     set->allocator->free(set->prev, set->allocator->arguments);
 
     // set everything to zero/false
-    memset(set, 0, sizeof(ihash_set_s));
+    memset(set, 0, sizeof(isc_hash_set_s));
 }
 
-void clear_ihash_set(ihash_set_s * const set, set_fn const destroy) {
+void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy) {
     error(set && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
@@ -120,7 +120,7 @@ void clear_ihash_set(ihash_set_s * const set, set_fn const destroy) {
     set->prev = NULL;
 }
 
-ihash_set_s copy_ihash_set(ihash_set_s const * const set, copy_fn const copy) {
+isc_hash_set_s copy_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy) {
     error(set && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -130,10 +130,10 @@ ihash_set_s copy_ihash_set(ihash_set_s const * const set, copy_fn const copy) {
     valid(set->allocator && "Allocator can't be NULL.");
     valid(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
-    return _copy_wrapper_ihash_set(set, copy);
+    return _copy_wrapper_isc_hash_set(set, copy);
 }
 
-bool is_empty_ihash_set(ihash_set_s const * const set) {
+bool is_empty_isc_hash_set(isc_hash_set_s const * const set) {
     error(set && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
@@ -145,7 +145,7 @@ bool is_empty_ihash_set(ihash_set_s const * const set) {
     return !(set->length); // if 0 return 'true'
 }
 
-void insert_ihash_set(ihash_set_s * const set, void const * const element) {
+void insert_isc_hash_set(isc_hash_set_s * const set, void const * const element) {
     error(set && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
 
@@ -157,8 +157,8 @@ void insert_ihash_set(ihash_set_s * const set, void const * const element) {
 
     // resize (expand) if set can't contain new element
     if (set->length == set->capacity) {
-        size_t const capacity = set->length ? set->length * CERPEC_FACTOR : IHASH_SET_CHUNK;
-        _ihash_set_resize(set, capacity);
+        size_t const capacity = set->length ? set->length * CERPEC_FACTOR : ISC_HASH_SET_CHUNK;
+        _isc_hash_set_resize(set, capacity);
     }
 
     // calculate hash value and index in array
@@ -173,12 +173,12 @@ void insert_ihash_set(ihash_set_s * const set, void const * const element) {
     }
 #endif
 
-    _insert_wrapper_ihash_set(set, hash, index);
+    _insert_wrapper_isc_hash_set(set, hash, index);
     memcpy(set->elements + (set->length * set->size), element, set->size);
     set->length++;
 }
 
-void remove_ihash_set(ihash_set_s * const set, void const * const element, void * const buffer) {
+void remove_isc_hash_set(isc_hash_set_s * const set, void const * const element, void * const buffer) {
     error(set && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
@@ -204,11 +204,11 @@ void remove_ihash_set(ihash_set_s * const set, void const * const element, void 
         memcpy(buffer, current, set->size);
         set->length--;
 
-        _ihash_set_fill_hole(set, n);
+        _isc_hash_set_fill_hole(set, n);
 
         // resize (expand) if set can contain a smaller capacity of elements
-        if (set->length <= set->capacity / CERPEC_FACTOR && (set->length > IHASH_SET_CHUNK || !set->length)) {
-            _ihash_set_resize(set, set->length);
+        if (set->length <= set->capacity / CERPEC_FACTOR && (set->length > ISC_HASH_SET_CHUNK || !set->length)) {
+            _isc_hash_set_resize(set, set->length);
         }
 
         return; // return to avoid errorion and termination at the end of function if element wasn't found
@@ -218,7 +218,7 @@ void remove_ihash_set(ihash_set_s * const set, void const * const element, void 
     exit(EXIT_FAILURE); // terminate on error
 }
 
-bool contains_ihash_set(ihash_set_s const * const set, void const * const element) {
+bool contains_isc_hash_set(isc_hash_set_s const * const set, void const * const element) {
     error(set && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
 
@@ -235,10 +235,10 @@ bool contains_ihash_set(ihash_set_s const * const set, void const * const elemen
     size_t const hash = set->hash(element);
     size_t const index = hash % set->capacity;
 
-    return _contains_wrapper_ihash_set(set, element, hash, index);
+    return _contains_wrapper_isc_hash_set(set, element, hash, index);
 }
 
-ihash_set_s union_ihash_set(ihash_set_s const * const set_one, ihash_set_s const * const set_two, copy_fn const copy) {
+isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -258,11 +258,11 @@ ihash_set_s union_ihash_set(ihash_set_s const * const set_one, ihash_set_s const
     valid(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements to maximum's replica
-    ihash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
-    ihash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
+    isc_hash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
+    isc_hash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
-    ihash_set_s set_union = _copy_wrapper_ihash_set(maximum, copy);
+    isc_hash_set_s set_union = _copy_wrapper_isc_hash_set(maximum, copy);
     for (size_t m = 0; m < minimum->length; ++m) {
         char const * const element = minimum->elements + (m * minimum->size);
 
@@ -270,17 +270,17 @@ ihash_set_s union_ihash_set(ihash_set_s const * const set_one, ihash_set_s const
         size_t const union_idx = min_hash % set_union.capacity;
 
         // if element is not in the set push it to set union
-        bool const contains = _contains_wrapper_ihash_set(&set_union, element, min_hash, union_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(&set_union, element, min_hash, union_idx);
         if (!contains) {
             // expand union set if necessary
             if (set_union.length == set_union.capacity) {
-                size_t const capacity = set_union.length ? set_union.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
-                _ihash_set_resize(&set_union, capacity);
+                size_t const capacity = set_union.length ? set_union.length * CERPEC_FACTOR : ISC_HASH_SET_CHUNK;
+                _isc_hash_set_resize(&set_union, capacity);
             }
 
             // index may change due to increase in capacity
             size_t const new_union_idx = min_hash % set_union.capacity;
-            _insert_wrapper_ihash_set(&set_union, min_hash, new_union_idx);
+            _insert_wrapper_isc_hash_set(&set_union, min_hash, new_union_idx);
 
             copy(set_union.elements + (set_union.length * set_union.size), element);
             set_union.length++;
@@ -290,7 +290,7 @@ ihash_set_s union_ihash_set(ihash_set_s const * const set_one, ihash_set_s const
     return set_union;
 }
 
-ihash_set_s intersect_ihash_set(ihash_set_s const * const set_one, ihash_set_s const * const set_two, copy_fn const copy) {
+isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -310,10 +310,10 @@ ihash_set_s intersect_ihash_set(ihash_set_s const * const set_one, ihash_set_s c
     valid(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements
-    ihash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
-    ihash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
+    isc_hash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
+    isc_hash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
-    ihash_set_s set_intersect = _make_wrapper_ihash_set(set_one->size, set_one->hash, set_one->compare, set_one->allocator);
+    isc_hash_set_s set_intersect = _make_wrapper_isc_hash_set(set_one->size, set_one->hash, set_one->compare, set_one->allocator);
     for (size_t min = 0; min < minimum->length; ++min) {
         char const * const element = minimum->elements + (min * minimum->size);
 
@@ -321,16 +321,16 @@ ihash_set_s intersect_ihash_set(ihash_set_s const * const set_one, ihash_set_s c
         size_t const max_idx = min_hash % maximum->capacity;
 
         // if element is in set push it into intersect
-        bool const contains = _contains_wrapper_ihash_set(maximum, element, min_hash, max_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(maximum, element, min_hash, max_idx);
         if (contains) {
             // expand intersect set if necessary
             if (set_intersect.length == set_intersect.capacity) {
-                size_t const capacity = set_intersect.length ? set_intersect.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
-                _ihash_set_resize(&set_intersect, capacity);
+                size_t const capacity = set_intersect.length ? set_intersect.length * CERPEC_FACTOR : ISC_HASH_SET_CHUNK;
+                _isc_hash_set_resize(&set_intersect, capacity);
             }
 
             size_t const intersect_index = min_hash % set_intersect.capacity;
-            _insert_wrapper_ihash_set(&set_intersect, min_hash, intersect_index);
+            _insert_wrapper_isc_hash_set(&set_intersect, min_hash, intersect_index);
 
             copy(set_intersect.elements + (set_intersect.length * set_intersect.size), element);
             set_intersect.length++;
@@ -340,7 +340,7 @@ ihash_set_s intersect_ihash_set(ihash_set_s const * const set_one, ihash_set_s c
     return set_intersect;
 }
 
-ihash_set_s subtract_ihash_set(ihash_set_s const * const minuend, ihash_set_s const * const subtrahend, copy_fn const copy) {
+isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_hash_set_s const * const subtrahend, copy_fn const copy) {
     error(minuend && "Parameter can't be NULL.");
     error(subtrahend && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -359,7 +359,7 @@ ihash_set_s subtract_ihash_set(ihash_set_s const * const minuend, ihash_set_s co
     valid(subtrahend->allocator && "Allocator can't be NULL.");
     valid(subtrahend->length <= subtrahend->capacity && "Lenght can't be larger than capacity.");
 
-    ihash_set_s set_subtract = _make_wrapper_ihash_set(minuend->size, minuend->hash, minuend->compare, minuend->allocator);
+    isc_hash_set_s set_subtract = _make_wrapper_isc_hash_set(minuend->size, minuend->hash, minuend->compare, minuend->allocator);
     for (size_t min = 0; min < minuend->length; ++min) {
         // get element and set its found flag to false
         char const * const element = minuend->elements + (min * minuend->size);
@@ -368,16 +368,16 @@ ihash_set_s subtract_ihash_set(ihash_set_s const * const minuend, ihash_set_s co
         size_t const subtrahend_idx = hash % subtrahend->capacity;
 
         // if minuend element is not in subtrahend set push it to new set
-        bool const contains = _contains_wrapper_ihash_set(subtrahend, element, hash, subtrahend_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(subtrahend, element, hash, subtrahend_idx);
         if (!contains) {
             // expand subtract set if necessary
             if (set_subtract.length == set_subtract.capacity) {
-                size_t const capacity = set_subtract.length ? set_subtract.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
-                _ihash_set_resize(&set_subtract, capacity);
+                size_t const capacity = set_subtract.length ? set_subtract.length * CERPEC_FACTOR : ISC_HASH_SET_CHUNK;
+                _isc_hash_set_resize(&set_subtract, capacity);
             }
 
             size_t const subtract_index = hash % set_subtract.capacity;
-            _insert_wrapper_ihash_set(&set_subtract, hash, subtract_index);
+            _insert_wrapper_isc_hash_set(&set_subtract, hash, subtract_index);
 
             copy(set_subtract.elements + (set_subtract.length * set_subtract.size), element);
             set_subtract.length++;
@@ -387,7 +387,7 @@ ihash_set_s subtract_ihash_set(ihash_set_s const * const minuend, ihash_set_s co
     return set_subtract;
 }
 
-ihash_set_s exclude_ihash_set(ihash_set_s const * const set_one, ihash_set_s const * const set_two, copy_fn const copy) {
+isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -406,7 +406,7 @@ ihash_set_s exclude_ihash_set(ihash_set_s const * const set_one, ihash_set_s con
     valid(set_two->allocator && "Allocator can't be NULL.");
     valid(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
-    ihash_set_s set_exclude = _make_wrapper_ihash_set(set_one->size, set_one->hash, set_one->compare, set_one->allocator);
+    isc_hash_set_s set_exclude = _make_wrapper_isc_hash_set(set_one->size, set_one->hash, set_one->compare, set_one->allocator);
 
     for (size_t one = 0; one < set_one->length; ++one) {
         // get element and set its found flag to false
@@ -415,16 +415,16 @@ ihash_set_s exclude_ihash_set(ihash_set_s const * const set_one, ihash_set_s con
         size_t const hash = set_one->hashes[one];
         size_t const two_idx = hash % set_two->capacity;
 
-        bool const contains = _contains_wrapper_ihash_set(set_two, element, hash, two_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(set_two, element, hash, two_idx);
         if (!contains) {
             // expand exclude set if necessary
             if (set_exclude.length == set_exclude.capacity) {
-                size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
-                _ihash_set_resize(&set_exclude, capacity);
+                size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : ISC_HASH_SET_CHUNK;
+                _isc_hash_set_resize(&set_exclude, capacity);
             }
 
             size_t const exclude_index = hash % set_exclude.capacity;
-            _insert_wrapper_ihash_set(&set_exclude, hash, exclude_index);
+            _insert_wrapper_isc_hash_set(&set_exclude, hash, exclude_index);
 
             copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element);
             set_exclude.length++;
@@ -438,16 +438,16 @@ ihash_set_s exclude_ihash_set(ihash_set_s const * const set_one, ihash_set_s con
         size_t const hash = set_two->hashes[two];
         size_t const one_idx = hash % set_one->capacity;
 
-        bool const contains = _contains_wrapper_ihash_set(set_one, element, hash, one_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(set_one, element, hash, one_idx);
         if (!contains) {
             // expand exclude set if necessary
             if (set_exclude.length == set_exclude.capacity) {
-                size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : IHASH_SET_CHUNK;
-                _ihash_set_resize(&set_exclude, capacity);
+                size_t const capacity = set_exclude.length ? set_exclude.length * CERPEC_FACTOR : ISC_HASH_SET_CHUNK;
+                _isc_hash_set_resize(&set_exclude, capacity);
             }
 
             size_t const exclude_index = hash % set_exclude.capacity;
-            _insert_wrapper_ihash_set(&set_exclude, hash, exclude_index);
+            _insert_wrapper_isc_hash_set(&set_exclude, hash, exclude_index);
 
             copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element);
             set_exclude.length++;
@@ -457,7 +457,7 @@ ihash_set_s exclude_ihash_set(ihash_set_s const * const set_one, ihash_set_s con
     return set_exclude;
 }
 
-bool is_subset_ihash_set(ihash_set_s const * const superset, ihash_set_s const * const subset) {
+bool is_subset_isc_hash_set(isc_hash_set_s const * const superset, isc_hash_set_s const * const subset) {
     error(superset && "Parameter can't be NULL.");
     error(subset && "Parameter can't be NULL.");
     error(superset->hash == subset->hash && "Function pointers must be the same.");
@@ -482,14 +482,14 @@ bool is_subset_ihash_set(ihash_set_s const * const superset, ihash_set_s const *
         size_t const sub_hash = subset->hashes[sub];
         size_t const super_idx = sub_hash % superset->capacity;
 
-        bool const contains = _contains_wrapper_ihash_set(superset, element, sub_hash, super_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(superset, element, sub_hash, super_idx);
         if (!contains) { return false; }
     }
 
     return true;
 }
 
-bool is_proper_subset_ihash_set(ihash_set_s const * const superset, ihash_set_s const * const subset) {
+bool is_proper_subset_isc_hash_set(isc_hash_set_s const * const superset, isc_hash_set_s const * const subset) {
     error(superset && "Parameter can't be NULL.");
     error(subset && "Parameter can't be NULL.");
     error(superset->hash == subset->hash && "Function pointers must be the same.");
@@ -514,14 +514,14 @@ bool is_proper_subset_ihash_set(ihash_set_s const * const superset, ihash_set_s 
         size_t const sub_hash = subset->hashes[sub];
         size_t const super_idx = sub_hash % superset->capacity;
 
-        bool const contains = _contains_wrapper_ihash_set(superset, element, sub_hash, super_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(superset, element, sub_hash, super_idx);
         if (!contains) { return false; }
     }
 
     return (subset->length != superset->length);
 }
 
-bool is_disjoint_ihash_set(ihash_set_s const * const set_one, ihash_set_s const * const set_two) {
+bool is_disjoint_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(set_one->hash == set_two->hash && "Function pointers must be the same.");
@@ -539,8 +539,8 @@ bool is_disjoint_ihash_set(ihash_set_s const * const set_one, ihash_set_s const 
     valid(set_two->allocator && "Allocator can't be NULL.");
     valid(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
-    ihash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
-    ihash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
+    isc_hash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
+    isc_hash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     for (size_t min = 0; min < minimum->length; ++min) {
         // get element and set its found flag to false
@@ -549,14 +549,14 @@ bool is_disjoint_ihash_set(ihash_set_s const * const set_one, ihash_set_s const 
         size_t const min_hash = minimum->hash(element);
         size_t const max_idx = min_hash % maximum->capacity;
 
-        bool const contains = _contains_wrapper_ihash_set(maximum, element, min_hash, max_idx);
+        bool const contains = _contains_wrapper_isc_hash_set(maximum, element, min_hash, max_idx);
         if (contains) { return false; }
     }
 
     return true;
 }
 
-void each_ihash_set(ihash_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const arguments) {
     error(set && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
@@ -571,7 +571,7 @@ void each_ihash_set(ihash_set_s const * const set, handle_fn const handle, void 
     }
 }
 
-void _ihash_set_resize(ihash_set_s * const set, size_t const size) {
+void _isc_hash_set_resize(isc_hash_set_s * const set, size_t const size) {
     // set table to new resized parameters
     set->capacity = size;
 
@@ -610,13 +610,13 @@ void _ihash_set_resize(ihash_set_s * const set, size_t const size) {
     }
 }
 
-ihash_set_s _make_wrapper_ihash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator) {
-    return (ihash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = allocator, };
+isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator) {
+    return (isc_hash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = allocator, };
 }
 
-ihash_set_s _copy_wrapper_ihash_set(ihash_set_s const * const set, copy_fn const copy) {
+isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy) {
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
-    ihash_set_s const replica = {
+    isc_hash_set_s const replica = {
         .capacity = set->capacity, .hash = set->hash, .length = set->length, .size = set->size,
         .allocator = set->allocator, .compare = set->compare,
 
@@ -648,7 +648,7 @@ ihash_set_s _copy_wrapper_ihash_set(ihash_set_s const * const set, copy_fn const
     return replica;
 }
 
-void _insert_wrapper_ihash_set(ihash_set_s const * const set, size_t const hash, size_t const index) {
+void _insert_wrapper_isc_hash_set(isc_hash_set_s const * const set, size_t const hash, size_t const index) {
     size_t const current = set->length;
 
     // if head has an element then redirect its prev to current
@@ -666,7 +666,7 @@ void _insert_wrapper_ihash_set(ihash_set_s const * const set, size_t const hash,
     set->hashes[current] = hash;
 }
 
-bool _contains_wrapper_ihash_set(ihash_set_s const * const set, void const * const element, size_t const hash, size_t const index) {
+bool _contains_wrapper_isc_hash_set(isc_hash_set_s const * const set, void const * const element, size_t const hash, size_t const index) {
     // for each node at index check if element is contained and return true or false
     for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
         void const * const current = set->elements + (n * set->size);
@@ -678,7 +678,7 @@ bool _contains_wrapper_ihash_set(ihash_set_s const * const set, void const * con
     return false;
 }
 
-void _ihash_set_fill_hole(ihash_set_s const * const set, size_t const hole) {
+void _isc_hash_set_fill_hole(isc_hash_set_s const * const set, size_t const hole) {
     if (NIL == set->prev[set->length]) {
         size_t const index = set->hashes[set->length] % set->capacity;
         set->head[index] = hole;

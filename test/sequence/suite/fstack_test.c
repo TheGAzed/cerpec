@@ -1,4 +1,6 @@
 #include <sequence/fstack.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FSTACK_CHUNK CERPEC_CHUNK

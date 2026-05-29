@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define CERPEC_FACTOR 2
 
@@ -16,8 +15,6 @@
 #elif (CERPEC_CHUNK & (CERPEC_CHUNK - 1))
 #   error "Chunk size must be a power of 2."
 #endif
-
-
 
 #ifdef NDEBUG
 #   define NVALID
@@ -59,23 +56,5 @@ typedef bool   (*filter_fn)  (void const * const element);
 typedef bool   (*handle_fn)  (void * const element, void * const arguments);
 typedef void   (*process_fn) (void * const array, size_t const lenght, void * const arguments);
 typedef void   (*operate_fn) (void * const result, void const * const a, void const * const b);
-
-#define INVALID_ITERATOR (size_t)(-1)
-
-typedef struct uni_directional_iterator {
-    void const * structure;
-    uintptr_t meta;
-    size_t index;
-} uniter_s;
-
-typedef struct bi_directional_iterator {
-    void * structure;
-    uintptr_t meta;
-    size_t index;
-} biter_s;
-
-bool is_valid_uniter(uniter_s const * const iterator);
-
-bool is_valid_biter(biter_s const * const iterator);
 
 #endif // CERPEC_H

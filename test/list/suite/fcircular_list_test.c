@@ -1,4 +1,6 @@
 #include <list/fcircular_list.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FCIRCULAR_LIST_CHUNK CERPEC_CHUNK

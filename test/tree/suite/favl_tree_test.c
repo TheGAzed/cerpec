@@ -1,4 +1,6 @@
 #include <tree/favl_tree.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FAVL_TREE_CHUNK CERPEC_CHUNK

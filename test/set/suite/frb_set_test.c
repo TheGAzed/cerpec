@@ -1,4 +1,6 @@
 #include <set/frb_set.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FRB_SET_CHUNK CERPEC_CHUNK

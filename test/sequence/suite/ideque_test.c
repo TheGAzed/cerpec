@@ -1,4 +1,6 @@
 #include <sequence/ideque.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 TEST CREATE_01(void) {

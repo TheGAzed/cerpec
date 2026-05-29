@@ -1,4 +1,6 @@
 #include <sequence/fqueue.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FQUEUE_CHUNK CERPEC_CHUNK

@@ -3,8 +3,6 @@
 
 #include <greatest.h>
 
-#include <dodac.h>
-
 SUITE_EXTERN(istack_test);
 SUITE_EXTERN(iqueue_test);
 SUITE_EXTERN(ideque_test);

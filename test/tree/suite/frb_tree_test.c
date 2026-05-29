@@ -1,4 +1,6 @@
 #include <tree/frb_tree.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FRB_TREE_CHUNK CERPEC_CHUNK

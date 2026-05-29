@@ -1,4 +1,6 @@
 #include <tree/fbsearch_tree.h>
+#include <dodac.h>
+
 #include <suite.h>
 
 #define FBSEARCH_TREE_CHUNK CERPEC_CHUNK

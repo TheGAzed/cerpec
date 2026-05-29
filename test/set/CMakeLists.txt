@@ -1,9 +1,9 @@
 add_executable(set_test main.c
-        suite/ihash_set_test.c
+        suite/isc_hash_set_test.c
         suite/ibitwise_set_test.c
         suite/irb_set_test.c
         suite/fbitwise_set_test.c
-        suite/fhash_set_test.c
+        suite/fsc_hash_set_test.c
         suite/frb_set_test.c
 )
 

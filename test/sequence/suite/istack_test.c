@@ -1,6 +1,7 @@
 #include <sequence/istack.h>
-#include <suite.h>
+#include <dodac.h>
 
+#include <suite.h>
 
 TEST CREATE_01(void) {
     istack_s test = create_istack(sizeof(int));

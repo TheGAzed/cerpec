@@ -1,4 +1,5 @@
 #include <misc/ibinary_heap.h>
+#include <dodac.h>
 
 #include <suite.h>
 
