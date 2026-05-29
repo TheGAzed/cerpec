@@ -486,7 +486,7 @@ TEST SPLIT_01(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s split = split_istraight_list(&test, 0, test.length / 2);
+    istraight_list_s split = slice_istraight_list(&test, 0, test.length / 2);
 
     for (int i = 0; i < (ISTRAIGHT_LIST_CHUNK - 1) / 2; ++i) {
         int s = 0;
@@ -513,7 +513,7 @@ TEST SPLIT_02(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s split = split_istraight_list(&test, 0, test.length / 2);
+    istraight_list_s split = slice_istraight_list(&test, 0, test.length / 2);
 
     for (int i = 0; i < ISTRAIGHT_LIST_CHUNK / 2; ++i) {
         int s = 0;
@@ -540,7 +540,7 @@ TEST SPLIT_03(void) {
         insert_at_istraight_list(&test, &i, test.length);
     }
 
-    istraight_list_s split = split_istraight_list(&test, 0, test.length / 2);
+    istraight_list_s split = slice_istraight_list(&test, 0, test.length / 2);
 
     for (int i = 0; i < (ISTRAIGHT_LIST_CHUNK + 1) / 2; ++i) {
         int s = 0;

@@ -86,26 +86,26 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
     // create properly initialized replica
     iqueue_s replica = { .size = queue->size, .length = queue->length, .current = queue->current };
 
-    // set originale queue's and replica's current nodes for iteration
+    // set original queue's and replica's current nodes for iteration
     struct infinite_queue_node const * current_queue = queue->tail;
     struct infinite_queue_node ** current_copy = &(replica.tail); // two pointer list to remove special .head case
 
     struct infinite_queue_node * last = NULL;
-    for (size_t r = queue->length, s = queue->current; r; s = 0) {
+    for (size_t remaining = queue->length, start = queue->current; remaining; start = 0) {
         // allocate new node for replica
         last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arguments);
         error((*current_copy) && "Memory allocation failed");
 
-        // redirect current replica's node with replica's tail fopr circularity
+        // redirect current replica's node with replica's tail for circularity
         (*current_copy)->next = replica.tail;
         current_queue = current_queue->next;
 
         // outside for loop to get copied chunk size, since it can either be 'remaining' or 'IQUEUE_CHUNK'
-        size_t i = s;
-        for (; i < r && i < IQUEUE_CHUNK; ++i) { // while i is less than both 'remaining' and 'IQUEUE_CHUNK'
+        size_t i = start;
+        for (; i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than both 'remaining' and 'IQUEUE_CHUNK'
             copy((*current_copy)->elements + (i * queue->size), current_queue->elements + (i * queue->size));
         }
-        r -= i; // subtract copied size from remaining size using i
+        remaining -= i; // subtract copied size from remaining size using i
 
         current_copy = &((*current_copy)->next);
     }

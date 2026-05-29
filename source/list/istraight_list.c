@@ -332,7 +332,7 @@ void splice_istraight_list(istraight_list_s * const restrict destination, istrai
     source->head = source->empty = NIL;
 }
 
-istraight_list_s split_istraight_list(istraight_list_s * const list, size_t const index, size_t const length) {
+istraight_list_s slice_istraight_list(istraight_list_s * const list, size_t const index, size_t const length) {
     error(list && "Paremeter can't be NULL.");
     error(index < list->length && "Index can't be more than or equal length.");
     error(length <= list->length && "Paremeter can't be greater than length.");

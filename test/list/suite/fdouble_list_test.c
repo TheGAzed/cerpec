@@ -430,7 +430,7 @@ TEST SPLIT_01(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s split = split_fdouble_list(&test, 0, test.length / 2);
+    fdouble_list_s split = slice_fdouble_list(&test, 0, test.length / 2, test.max, test.max);
 
     for (int i = 0; i < (FDOUBLE_LIST_CHUNK - 1) / 2; ++i) {
         int s = 0;
@@ -457,7 +457,7 @@ TEST SPLIT_02(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s split = split_fdouble_list(&test, 0, test.length / 2);
+    fdouble_list_s split = slice_fdouble_list(&test, 0, test.length / 2, test.max, test.max);
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK / 2; ++i) {
         int s = 0;
@@ -477,6 +477,147 @@ TEST SPLIT_02(void) {
     PASS();
 }
 
+TEST SPLIT_04(void) {
+    const int array[] = { 0, 1, 2, 3, 4 };
+    size_t const length = sizeof(array) / sizeof(int);
+    fdouble_list_s test = create_fdouble_list(sizeof(int), length);
+
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_fdouble_list(&test, array + i, test.length);
+    }
+
+    fdouble_list_s split = slice_fdouble_list(&test, 4, 1, length, length);
+
+    // test list assert
+    int got = -1;
+    get_fdouble_list(&test, 0, &got);
+    ASSERT_EQ(0, got);
+
+    get_fdouble_list(&test, 1, &got);
+    ASSERT_EQ(1, got);
+
+    get_fdouble_list(&test, 2, &got);
+    ASSERT_EQ(2, got);
+
+    get_fdouble_list(&test, 3, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_fdouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&split, intdst);
+
+    PASS();
+}
+
+TEST SPLIT_05(void) {
+    const int array[] = { 0, 1, 2, 3, 4 };
+    size_t const length = sizeof(array) / sizeof(int);
+    fdouble_list_s test = create_fdouble_list(sizeof(int), length);
+
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_fdouble_list(&test, array + i, test.length);
+    }
+
+    fdouble_list_s split = slice_fdouble_list(&test, 4, 2, length, length);
+
+    // test list assert
+    int got = -1;
+    get_fdouble_list(&test, 0, &got);
+    ASSERT_EQ(1, got);
+
+    get_fdouble_list(&test, 1, &got);
+    ASSERT_EQ(2, got);
+
+    get_fdouble_list(&test, 2, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_fdouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    get_fdouble_list(&split, 1, &got);
+    ASSERT_EQ(0, got);
+
+    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&split, intdst);
+
+    PASS();
+}
+
+TEST SPLIT_06(void) {
+    const int array[] = { 0, 1, 2, 3, 4 };
+    size_t const length = sizeof(array) / sizeof(int);
+    fdouble_list_s test = create_fdouble_list(sizeof(int), length);
+
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_fdouble_list(&test, array + i, test.length);
+    }
+
+    fdouble_list_s split = slice_fdouble_list(&test, 4, 3, length, length);
+
+    // test list assert
+    int got = -1;
+    get_fdouble_list(&test, 0, &got);
+    ASSERT_EQ(2, got);
+
+    get_fdouble_list(&test, 1, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_fdouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    get_fdouble_list(&split, 1, &got);
+    ASSERT_EQ(0, got);
+
+    get_fdouble_list(&split, 2, &got);
+    ASSERT_EQ(1, got);
+
+    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&split, intdst);
+
+    PASS();
+}
+
+TEST SPLIT_07(void) {
+    const int array[5] = { 0, 1, 2, 3, 4 };
+    size_t const length = sizeof(array) / sizeof(int);
+    fdouble_list_s test = create_fdouble_list(sizeof(int), length);
+
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_fdouble_list(&test, array + i, test.length);
+    }
+
+    fdouble_list_s split = slice_fdouble_list(&test, 4, 4, length, length);
+
+    // test list assert
+    int got = -1;
+
+    get_fdouble_list(&test, 0, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_fdouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    get_fdouble_list(&split, 1, &got);
+    ASSERT_EQ(0, got);
+
+    get_fdouble_list(&split, 2, &got);
+    ASSERT_EQ(1, got);
+
+    get_fdouble_list(&split, 3, &got);
+    ASSERT_EQ(2, got);
+
+    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&split, intdst);
+
+    PASS();
+}
+
 TEST EXTRACT_01(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
 
@@ -484,7 +625,7 @@ TEST EXTRACT_01(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s extract = extract_fdouble_list(&test, intodd);
+    fdouble_list_s extract = extract_fdouble_list(&test, intodd, test.max, test.max);
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_fdouble_list(&test, (size_t)(i) / 2, &s);
@@ -510,7 +651,7 @@ TEST EXTRACT_02(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s extract = extract_fdouble_list(&test, intodd);
+    fdouble_list_s extract = extract_fdouble_list(&test, intodd, test.max, test.max);
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; i += 2) {
         int s = 0;
         get_fdouble_list(&test, (size_t)(i) / 2, &s);
@@ -708,6 +849,8 @@ SUITE (fdouble_list_test) {
     RUN_TEST(SHIFT_PREV_01); RUN_TEST(SHIFT_PREV_02);
     RUN_TEST(SPLICE_01); RUN_TEST(SPLICE_02);
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02);
+    RUN_TEST(SPLIT_04); RUN_TEST(SPLIT_05); RUN_TEST(SPLIT_06);
+    RUN_TEST(SPLIT_07);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02);
     RUN_TEST(MAP_NEXT_01); RUN_TEST(MAP_NEXT_02);
     RUN_TEST(MAP_PREV_01); RUN_TEST(MAP_PREV_02);

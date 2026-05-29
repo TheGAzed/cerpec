@@ -364,11 +364,85 @@ void splice_fstraight_list(fstraight_list_s * const restrict destination, fstrai
     source->head = source->empty = NIL;
 }
 
-fstraight_list_s split_fstraight_list(fstraight_list_s * const list, size_t const index, size_t const length) {
+fstraight_list_s slice_fstraight_list(fstraight_list_s * const list, size_t const index, size_t const length, size_t const list_max, size_t const slice_max) {
     error(list && "Paremeter can't be NULL.");
+    error(list_max && "Paremeter can't be zero.");
+    error(slice_max && "Paremeter can't be zero.");
     error(index < list->length && "Index can't be more than or equal length.");
     error(length <= list->length && "Paremeter can't be greater than length.");
     error(index + length <= list->length && "Size can't be more than length.");
+    error(list->length - length <= list_max && "Maximum size can't be more than length.");
+    error(length <= slice_max && "Maximum size can't be more than length.");
+
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->next && "Next array can't be NULL.");
+
+    // go to node reference at index
+    size_t * node = &(list->head);
+    for (size_t i = 0; i < index; ++i) {
+        node = list->next + (*node);
+    }
+
+    // create split list structure
+    fstraight_list_s slice = {
+        .max = slice_max, .empty = NIL, .head = NIL, .size = list->size,
+        .elements = list->allocator->alloc(slice_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arguments),
+        .allocator = list->allocator,
+    };
+    error(slice.elements && "Memory allocation failed.");
+    error(slice.next && "Memory allocation failed.");
+
+    // push list elements into split list and redirect removed element in list
+    for (size_t * s = &(slice.head); slice.length < length; (*node) = list->next[(*node)], s = slice.next + (*s)) {
+        (*s) = slice.length;
+        slice.next[(*s)] = NIL;
+
+        memcpy(slice.elements + (slice.length * slice.size), list->elements + ((*node) * list->size), list->size);
+        slice.length++;
+    }
+
+    // create replica list structure for list to remove holes
+    fstraight_list_s replica = {
+        .max = list_max, .empty = NIL, .head = NIL, .size = list->size,
+        .allocator = list->allocator,
+        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arguments),
+    };
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.next && "Memory allocation failed.");
+
+    // restart node reference at list head and push its elements into replica
+    size_t const replica_length = list->length - length;
+    node = &(list->head);
+    for (size_t * r = &(replica.head); replica.length < replica_length; (*node) = list->next[(*node)], r = replica.next + (*r)) {
+        (*r) = replica.length;
+        replica.next[(*r)] = NIL;
+
+        memcpy(replica.elements + (replica.length * replica.size), list->elements + ((*node) * list->size), list->size);
+        replica.length++;
+    }
+
+    // replace list with its replica
+    list->allocator->free(list->elements, list->allocator->arguments);
+    list->allocator->free(list->next, list->allocator->arguments);
+
+    (*list) = replica;
+
+    return slice;
+}
+
+fstraight_list_s split_fstraight_list(fstraight_list_s * const list, size_t const index, size_t const list_max, size_t const split_max) {
+    error(list && "Paremeter can't be NULL.");
+    error(list_max && "Paremeter can't be zero.");
+    error(split_max && "Paremeter can't be zero.");
+    error(index < list->length && "Index can't be more than or equal length.");
+    error(index <= list_max && "Maximum size can't be more than length.");
+    error(list->length - index <= split_max && "Maximum size can't be more than length.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -385,14 +459,15 @@ fstraight_list_s split_fstraight_list(fstraight_list_s * const list, size_t cons
 
     // create split list structure
     fstraight_list_s split = {
-        .max = list->max, .empty = NIL, .head = NIL, .size = list->size,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .max = split_max, .empty = NIL, .head = NIL, .size = list->size,
+        .elements = list->allocator->alloc(split_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
     error(split.elements && "Memory allocation failed.");
     error(split.next && "Memory allocation failed.");
 
+    size_t const length = list->length - index;
     // push list elements into split list and redirect removed element in list
     for (size_t * s = &(split.head); split.length < length; (*node) = list->next[(*node)], s = split.next + (*s)) {
         (*s) = split.length;
@@ -404,10 +479,10 @@ fstraight_list_s split_fstraight_list(fstraight_list_s * const list, size_t cons
 
     // create replica list structure for list to remove holes
     fstraight_list_s replica = {
-        .max = list->max, .empty = NIL, .head = NIL, .size = list->size,
+        .max = list_max, .empty = NIL, .head = NIL, .size = list->size,
         .allocator = list->allocator,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arguments),
     };
     error(replica.elements && "Memory allocation failed.");
     error(replica.next && "Memory allocation failed.");
@@ -432,7 +507,7 @@ fstraight_list_s split_fstraight_list(fstraight_list_s * const list, size_t cons
     return split;
 }
 
-fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, filter_fn const filter) {
+fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
 
@@ -445,15 +520,15 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, 
 
     // create lists that will contain positive and negative filtered elements
     fstraight_list_s negative = {
-        .empty = NIL, .head = NIL, .size = list->size, .max = list->max, .allocator = list->allocator,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .empty = NIL, .head = NIL, .size = list->size, .max = list_max, .allocator = list->allocator,
+        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arguments),
     };
 
     fstraight_list_s positive = {
-        .empty = NIL, .head = NIL, .size = list->size, .max = list->max, .allocator = list->allocator,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .empty = NIL, .head = NIL, .size = list->size, .max = extract_max, .allocator = list->allocator,
+        .elements = list->allocator->alloc(extract_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(extract_max * sizeof(size_t), list->allocator->arguments),
     };
 
     // for each element in list check if filter returns true for current element and pushes it propper list
@@ -462,6 +537,8 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, 
         char const * element = list->elements + (i * list->size);
 
         if (filter(element)) { // if filter value is positive push it into positive
+            error(positive.length + 1 <= extract_max && "Maximum size can't be more than length.");
+
             (*pos) = pos_idx;
             positive.next[pos_idx] = NIL;
 
@@ -471,6 +548,8 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const restrict list, 
             pos = positive.next + pos_idx;
             pos_idx++;
         } else { // else push it into negative
+            error(negative.length + 1 <= extract_max && "Maximum size can't be more than length.");
+
             (*neg) = neg_idx;
             negative.next[neg_idx] = NIL;
 

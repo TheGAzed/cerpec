@@ -476,10 +476,14 @@ void splice_fdouble_list(fdouble_list_s * const restrict destination, fdouble_li
     source->length = source->head = 0;
 }
 
-fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const index, size_t const length) {
+fdouble_list_s slice_fdouble_list(fdouble_list_s * const list, size_t const index, size_t const length, size_t const list_max, size_t const slice_max) {
     error(list && "Paremeter can't be NULL.");
+    error(list_max && "Paremeter can't be zero.");
+    error(slice_max && "Paremeter can't be zero.");
     error(index < list->length && "Paremeter can't be greater than length.");
     error(length <= list->length && "Paremeter can't be greater than length.");
+    error(list->length - length <= list_max && "Maximum size can't be more than length.");
+    error(length <= slice_max && "Maximum size can't be more than length.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -499,11 +503,11 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
 
     // create split list
     fdouble_list_s split = {
-        .size = list->size, .max = list->max, .allocator = list->allocator,
+        .size = list->size, .max = slice_max, .allocator = list->allocator,
 
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .node[FDL_NEXT] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
-        .node[FDL_PREV] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(slice_max * list->size, list->allocator->arguments),
+        .node[FDL_NEXT] = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arguments),
+        .node[FDL_PREV] = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arguments),
     };
     error(split.elements && "Memory allocation failed.");
     error(split.node[FDL_NEXT] && "Memory allocation failed.");
@@ -521,10 +525,6 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
         list->length--;
 
         size_t const next = list->node[FDL_NEXT][current];
-        if (list->head == current) {
-            list->head = next;
-        }
-
         _fdouble_list_fill_hole(list, current);
 
         split_current = split.node[FDL_NEXT] + (split.length - 1);
@@ -533,16 +533,92 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
     (*split_current) = 0;
 
     // if split list contains head node change list's head to current (or last non removed) node
-    if (!index || (index >= list->length)) {
+    if (!index || (index > list->length)) {
         list->head = current;
     }
+
+    list->max = list_max;
+    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arguments);
+    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arguments);
+    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arguments);
 
     return split;
 }
 
-fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter_fn const filter) {
+fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const index, size_t const list_max, size_t const split_max) {
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+    error(index <= list_max && "Maximum size can't be more than length.");
+    error(list->length - index <= split_max && "Maximum size can't be more than length.");
+    error(list_max && "Paremeter can't be zero.");
+    error(split_max && "Paremeter can't be zero.");
+
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->max && "Maximum size can't be zero.");
+    valid(list->elements && "Elements array can't be NULL.");
+    valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
+    valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
+
+    // determine closest direction to index and go there
+    size_t current = list->head;
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? FDL_NEXT : FDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
+    }
+
+    // create split list
+    fdouble_list_s split = {
+        .size = list->size, .max = split_max, .allocator = list->allocator,
+
+        .elements = list->allocator->alloc(split_max * list->size, list->allocator->arguments),
+        .node[FDL_NEXT] = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arguments),
+        .node[FDL_PREV] = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arguments),
+    };
+    error(split.elements && "Memory allocation failed.");
+    error(split.node[FDL_NEXT] && "Memory allocation failed.");
+    error(split.node[FDL_PREV] && "Memory allocation failed.");
+
+    size_t const length = list->length - index;
+    // push list elements into split list (includes pointer magic)
+    size_t * split_current = &(split.head);
+    while (split.length < length) {
+        (*split_current) = split.length; // set head and next nodes to next index
+        split.node[FDL_PREV][split.length] = split.length - 1; // set previous node indexes to one minus current
+        split.node[FDL_PREV][0] = length - 1; // set first node's prev to last element in list
+
+        memcpy(split.elements + (split.length * split.size), list->elements + (current * list->size), list->size);
+        split.length++;
+        list->length--;
+
+        size_t const next = list->node[FDL_NEXT][current];
+        _fdouble_list_fill_hole(list, current);
+
+        split_current = split.node[FDL_NEXT] + (split.length - 1);
+        current = (next == list->length) ? current : next;
+    }
+    (*split_current) = 0;
+
+    // if split list contains head node change list's head to current (or last non removed) node
+    if (!index) {
+        list->head = current;
+    }
+
+    list->max = list_max;
+    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arguments);
+    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arguments);
+    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arguments);
+
+    return split;
+}
+
+fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
+    error(list_max && "Paremeter can't be zero.");
+    error(extract_max && "Paremeter can't be zero.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -554,10 +630,10 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter
 
     // only create positive to save true filtered values
     fdouble_list_s positive = {
-        .size = list->size, .allocator = list->allocator, .max = list->max,
-        .elements = list->allocator->alloc(list->size * list->max, list->allocator->arguments),
-        .node[FDL_PREV] = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
-        .node[FDL_NEXT] = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
+        .size = list->size, .allocator = list->allocator, .max = extract_max,
+        .elements = list->allocator->alloc(list->size * extract_max, list->allocator->arguments),
+        .node[FDL_PREV] = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arguments),
+        .node[FDL_NEXT] = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arguments),
     };
     error(positive.elements && "Memory allocation failed.");
     error(positive.node[FDL_NEXT] && "Memory allocation failed.");
@@ -572,6 +648,8 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter
             current = list->node[FDL_NEXT][current];
             continue;
         } // else extract and append list node into positive list
+
+        error(positive.length + 1 <= extract_max && "Maximum size can't be more than length.");
 
         (*pos) = positive.length; // set head and next nodes to next index
         positive.node[FDL_PREV][positive.length] = positive.length - 1; // set previous node indexes to one minus current
@@ -593,6 +671,12 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter
         current = (next == list->length) ? current : next; // nex may point to last node in array, which gets swapped
     }
     (*pos) = 0;
+
+    error(list->length <= list_max && "Maximum size can't be more than length.");
+    list->max = list_max;
+    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arguments);
+    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arguments);
+    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arguments);
 
     return positive;
 }

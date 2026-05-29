@@ -106,12 +106,18 @@ void shift_prev_idouble_list(idouble_list_s * const list, size_t const shift);
 /// @param index Start index of destination structure.
 void splice_idouble_list(idouble_list_s * const restrict destination, idouble_list_s * const restrict source, size_t const index);
 
-/// @brief Splits structure into two based on starting index and new length.
+/// @brief Slices structure into two based on starting index and new length.
+/// @param list Structure to slice.
+/// @param index Start index of slice.
+/// @param length Length to slice.
+/// @return New sliced structure.
+idouble_list_s slice_idouble_list(idouble_list_s * const list, size_t const index, size_t const length);
+
+/// @brief Splits structure into two based on starting index.
 /// @param list Structure to split.
 /// @param index Start index of split.
-/// @param length Length to split.
 /// @return New split structure.
-idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const index, size_t const length);
+idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const index);
 
 /// @brief Extracts elements into new structure based on filter function.
 /// @param list Structure to extracts from.

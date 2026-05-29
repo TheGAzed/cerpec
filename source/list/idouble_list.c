@@ -425,7 +425,7 @@ void splice_idouble_list(idouble_list_s * const restrict destination, idouble_li
     source->length = source->capacity = source->head = 0;
 }
 
-idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const index, size_t const length) {
+idouble_list_s slice_idouble_list(idouble_list_s * const list, size_t const index, size_t const length) {
     error(list && "Paremeter can't be NULL.");
     error(index < list->length && "Paremeter can't be greater than length.");
     error(length <= list->length && "Paremeter can't be greater than length.");
@@ -467,10 +467,6 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
         list->length--;
 
         size_t const next = list->node[IDL_NEXT][current];
-        if (list->head == current) {
-            list->head = next;
-        }
-
         _idouble_list_fill_hole(list, current);
 
         split_current = split.node[IDL_NEXT] + (split.length - 1);
@@ -485,7 +481,70 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     }
 
     // if split list contains head node change list's head to current (or last non removed) node
-    if (!index || (index >= list->length)) {
+    if (!index || (index > list->length)) {
+        list->head = current;
+    }
+
+    return split;
+}
+
+idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const index) {
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Paremeter can't be greater than length.");
+
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+
+    // determine closest direction to index and go there
+    size_t current = list->head;
+    size_t const closest_index = index <= (list->length / 2) ? index : list->length - index;
+    bool const closest_node = closest_index == index ? IDL_NEXT : IDL_PREV;
+    for (size_t i = 0; i < closest_index; ++i) {
+        current = list->node[closest_node][current];
+    }
+
+    size_t const length = list->length - index;
+    // create split list
+    size_t const split_capacity = _idouble_list_ceil_size(length);
+    idouble_list_s split = {
+        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
+        .node[IDL_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+        .node[IDL_PREV] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+
+        .size = list->size, .capacity = split_capacity, .allocator = list->allocator,
+    };
+    error((!split.capacity || split.elements) && "Memory allocation failed.");
+    error((!split.capacity || split.node[IDL_NEXT]) && "Memory allocation failed.");
+    error((!split.capacity || split.node[IDL_PREV]) && "Memory allocation failed.");
+
+    // push list elements into split list (includes pointer magic)
+    size_t * split_current = &(split.head);
+    while (split.length < length) {
+        (*split_current) = split.length; // set head and next nodes to next index
+        split.node[IDL_PREV][split.length] = split.length - 1; // set previous node indexes to one minus current
+        split.node[IDL_PREV][0] = length - 1; // set first node's prev to last element in list
+
+        memcpy(split.elements + (split.length * split.size), list->elements + (current * list->size), list->size);
+        split.length++;
+        list->length--;
+
+        size_t const next = list->node[IDL_NEXT][current];
+        _idouble_list_fill_hole(list, current);
+
+        split_current = split.node[IDL_NEXT] + (split.length - 1);
+        current = (next == list->length) ? current : next;
+    }
+    (*split_current) = 0;
+
+    // shrink resize original list if necessary
+    size_t const list_capacity = _idouble_list_ceil_size(list->length);
+    if (list->capacity != list_capacity) {
+        _idouble_list_resize(list, list_capacity);
+    }
+
+    // if split list contains head node change list's head to current (or last non removed) node
+    if (!index) {
         list->head = current;
     }
 

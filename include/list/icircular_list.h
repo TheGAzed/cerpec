@@ -92,12 +92,18 @@ void shift_next_icircular_list(icircular_list_s * const list, size_t const shift
 /// @param index Start index of destination structure.
 void splice_icircular_list(icircular_list_s * const restrict destination, icircular_list_s * const restrict source, size_t const index);
 
-/// @brief Splits structure into two based on starting index and new length.
+/// @brief Slices structure into two based on starting index and new length.
+/// @param list Structure to slice.
+/// @param index Start index of slice.
+/// @param length Length to slice.
+/// @return New sliced structure.
+icircular_list_s slice_icircular_list(icircular_list_s * const list, size_t const index, size_t const length);
+
+/// @brief Splits structure into two based on starting index.
 /// @param list Structure to split.
 /// @param index Start index of split.
-/// @param length Length to split.
 /// @return New split structure.
-icircular_list_s split_icircular_list(icircular_list_s * const list, size_t const index, size_t const length);
+icircular_list_s split_icircular_list(icircular_list_s * const list, size_t const index);
 
 /// @brief Extracts elements into new structure based on filter function.
 /// @param list Structure to extracts from.

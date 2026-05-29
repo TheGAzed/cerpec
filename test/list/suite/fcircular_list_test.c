@@ -390,7 +390,7 @@ TEST SPLIT_01(void) {
         insert_at_fcircular_list(&test, &i, test.length);
     }
 
-    fcircular_list_s split = split_fcircular_list(&test, 0, test.length / 2);
+    fcircular_list_s split = slice_fcircular_list(&test, 0, test.length / 2, test.max, test.max);
 
     for (int i = 0; i < (FCIRCULAR_LIST_CHUNK - 1) / 2; ++i) {
         int s = 0;
@@ -417,7 +417,7 @@ TEST SPLIT_02(void) {
         insert_at_fcircular_list(&test, &i, test.length);
     }
 
-    fcircular_list_s split = split_fcircular_list(&test, 0, test.length / 2);
+    fcircular_list_s split = slice_fcircular_list(&test, 0, test.length / 2, test.max, test.max);
 
     for (int i = 0; i < FCIRCULAR_LIST_CHUNK / 2; ++i) {
         int s = 0;
@@ -444,7 +444,7 @@ TEST EXTRACT_01(void) {
         insert_at_fcircular_list(&test, &i, test.length);
     }
 
-    fcircular_list_s extract = extract_fcircular_list(&test, intodd);
+    fcircular_list_s extract = extract_fcircular_list(&test, intodd, test.max, test.max);
     for (int i = 0; i < FCIRCULAR_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_fcircular_list(&test, (size_t)(i) / 2, &s);
@@ -470,7 +470,7 @@ TEST EXTRACT_02(void) {
         insert_at_fcircular_list(&test, &i, test.length);
     }
 
-    fcircular_list_s extract = extract_fcircular_list(&test, intodd);
+    fcircular_list_s extract = extract_fcircular_list(&test, intodd, test.max, test.max);
     for (int i = 0; i < FCIRCULAR_LIST_CHUNK; i += 2) {
         int s = 0;
         get_fcircular_list(&test, (size_t)(i) / 2, &s);

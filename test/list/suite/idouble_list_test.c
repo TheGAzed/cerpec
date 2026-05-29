@@ -607,7 +607,7 @@ TEST SPLIT_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s split = split_idouble_list(&test, 0, test.length / 2);
+    idouble_list_s split = slice_idouble_list(&test, 0, test.length / 2);
 
     for (int i = 0; i < (IDOUBLE_LIST_CHUNK - 1) / 2; ++i) {
         int s = 0;
@@ -634,7 +634,7 @@ TEST SPLIT_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s split = split_idouble_list(&test, 0, test.length / 2);
+    idouble_list_s split = slice_idouble_list(&test, 0, test.length / 2);
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK / 2; ++i) {
         int s = 0;
@@ -661,7 +661,7 @@ TEST SPLIT_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s split = split_idouble_list(&test, 0, test.length / 2);
+    idouble_list_s split = slice_idouble_list(&test, 0, test.length / 2);
 
     for (int i = 0; i < (IDOUBLE_LIST_CHUNK + 1) / 2; ++i) {
         int s = 0;
@@ -674,6 +674,143 @@ TEST SPLIT_03(void) {
         get_idouble_list(&test, (size_t)(i) - (IDOUBLE_LIST_CHUNK + 1) / 2, &t);
         ASSERT_EQ(i, t);
     }
+
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&split, intdst);
+
+    PASS();
+}
+
+TEST SPLIT_04(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    const int array[] = { 0, 1, 2, 3, 4 };
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_idouble_list(&test, array + i, test.length);
+    }
+
+    idouble_list_s split = slice_idouble_list(&test, 4, 1);
+
+    // test list assert
+    int got = -1;
+    get_idouble_list(&test, 0, &got);
+    ASSERT_EQ(0, got);
+
+    get_idouble_list(&test, 1, &got);
+    ASSERT_EQ(1, got);
+
+    get_idouble_list(&test, 2, &got);
+    ASSERT_EQ(2, got);
+
+    get_idouble_list(&test, 3, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_idouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&split, intdst);
+
+    PASS();
+}
+
+TEST SPLIT_05(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    const int array[] = { 0, 1, 2, 3, 4 };
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_idouble_list(&test, array + i, test.length);
+    }
+
+    idouble_list_s split = slice_idouble_list(&test, 4, 2);
+
+    // test list assert
+    int got = -1;
+    get_idouble_list(&test, 0, &got);
+    ASSERT_EQ(1, got);
+
+    get_idouble_list(&test, 1, &got);
+    ASSERT_EQ(2, got);
+
+    get_idouble_list(&test, 2, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_idouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    get_idouble_list(&split, 1, &got);
+    ASSERT_EQ(0, got);
+
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&split, intdst);
+
+    PASS();
+}
+
+TEST SPLIT_06(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    const int array[] = { 0, 1, 2, 3, 4 };
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_idouble_list(&test, array + i, test.length);
+    }
+
+    idouble_list_s split = slice_idouble_list(&test, 4, 3);
+
+    // test list assert
+    int got = -1;
+    get_idouble_list(&test, 0, &got);
+    ASSERT_EQ(2, got);
+
+    get_idouble_list(&test, 1, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_idouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    get_idouble_list(&split, 1, &got);
+    ASSERT_EQ(0, got);
+
+    get_idouble_list(&split, 2, &got);
+    ASSERT_EQ(1, got);
+
+    destroy_idouble_list(&test, intdst);
+    destroy_idouble_list(&split, intdst);
+
+    PASS();
+}
+
+TEST SPLIT_07(void) {
+    idouble_list_s test = create_idouble_list(sizeof(int));
+
+    const int array[] = { 0, 1, 2, 3, 4 };
+    for (size_t i = 0; i < sizeof(array) / test.size; ++i) {
+        insert_at_idouble_list(&test, array + i, test.length);
+    }
+
+    idouble_list_s split = slice_idouble_list(&test, 4, 4);
+
+    // test list assert
+    int got = -1;
+
+    get_idouble_list(&test, 0, &got);
+    ASSERT_EQ(3, got);
+
+    // sliced list assert
+    get_idouble_list(&split, 0, &got);
+    ASSERT_EQ(4, got);
+
+    get_idouble_list(&split, 1, &got);
+    ASSERT_EQ(0, got);
+
+    get_idouble_list(&split, 2, &got);
+    ASSERT_EQ(1, got);
+
+    get_idouble_list(&split, 3, &got);
+    ASSERT_EQ(2, got);
 
     destroy_idouble_list(&test, intdst);
     destroy_idouble_list(&split, intdst);
@@ -1021,6 +1158,8 @@ SUITE (idouble_list_test) {
     RUN_TEST(SHIFT_PREV_01); RUN_TEST(SHIFT_PREV_02); RUN_TEST(SHIFT_PREV_03);
     RUN_TEST(SPLICE_01); RUN_TEST(SPLICE_02); RUN_TEST(SPLICE_03);
     RUN_TEST(SPLIT_01); RUN_TEST(SPLIT_02); RUN_TEST(SPLIT_03);
+    RUN_TEST(SPLIT_04); RUN_TEST(SPLIT_05); RUN_TEST(SPLIT_06);
+    RUN_TEST(SPLIT_07);
     RUN_TEST(EXTRACT_01); RUN_TEST(EXTRACT_02); RUN_TEST(EXTRACT_03);
     RUN_TEST(MAP_NEXT_01); RUN_TEST(MAP_NEXT_02); RUN_TEST(MAP_NEXT_03);
     RUN_TEST(MAP_PREV_01); RUN_TEST(MAP_PREV_02); RUN_TEST(MAP_PREV_03);

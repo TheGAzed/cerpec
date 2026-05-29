@@ -405,7 +405,7 @@ void splice_icircular_list(icircular_list_s * const restrict destination, icircu
     source->empty = NIL;
 }
 
-icircular_list_s split_icircular_list(icircular_list_s * const list, size_t const index, size_t const length) {
+icircular_list_s slice_icircular_list(icircular_list_s * const list, size_t const index, size_t const length) {
     error(list && "Paremeter can't be NULL.");
     error(index < list->length && "Index can't be more than or equal length.");
     error(length <= list->length && "Size can't be more than length.");
@@ -448,9 +448,84 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
     }
 
     // if list's tail gets split into new list, then change tail to node after last split
-    if ((index <= list->length - 1) && (index + length >= list->length - 1)) {
+    if (index + length > list->length - 1) {
         list->tail = previous;
     }
+
+    // create replica of parameter list to remove holes in it
+    size_t const replica_length = list->length - length;
+    size_t const replica_capacity = _icircular_list_ceil_size(replica_length);
+    icircular_list_s replica = {
+        .capacity = replica_capacity, .empty = NIL, .size = list->size,
+        .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arguments),
+        .allocator = list->allocator,
+    };
+    error((!replica_capacity || replica.elements) && "Memory allocation failed.");
+    error((!replica_capacity || replica.next) && "Memory allocation failed.");
+
+    // copy remaining list element into replica
+    for (size_t * r = &(replica.tail); replica.length < replica_length; previous = list->next[previous], r = replica.next + (*r)) {
+        // append remaining list node into replica list
+        (*r) = replica.length;
+        replica.next[(*r)] = replica.tail;
+
+        // copy list's removed node into replica list
+        memcpy(replica.elements + ((*r) * replica.size), list->elements + (previous * list->size), list->size);
+        replica.length++;
+    }
+    list->allocator->free(list->elements, list->allocator->arguments);
+    list->allocator->free(list->next, list->allocator->arguments);
+
+    (*list) = replica; // change list into hole-less replica
+
+    return split;
+}
+
+icircular_list_s split_icircular_list(icircular_list_s * const list, size_t const index) {
+    error(list && "Paremeter can't be NULL.");
+    error(index < list->length && "Index can't be more than or equal length.");
+
+    valid(list->size && "Size can't be zero.");
+    valid(list->length <= list->capacity && "Length exceeds capacity.");
+    valid(list->allocator && "Allocator can't be NULL.");
+    valid(list->tail != NIL && "Tail can't be NIL.");
+
+    size_t previous = list->tail;
+    // iterate to previous node from index
+    for (size_t i = 0; i < index; ++i) {
+        previous = list->next[previous];
+    }
+
+    size_t const length = list->length - index;
+    // create split list
+    size_t const split_capacity = _icircular_list_ceil_size(length);
+    icircular_list_s split = {
+        .capacity = split_capacity, .empty = NIL, .size = list->size,
+        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+        .allocator = list->allocator,
+    };
+    error((!split_capacity || split.elements) && "Memory allocation failed.");
+    error((!split_capacity || split.next) && "Memory allocation failed.");
+
+    // copy list elements into split list starting from index node (also redirect list's removed nodes)
+    for (size_t * s = &(split.tail); split.length < length; s = split.next + (*s)) {
+        size_t const current = list->next[previous]; // save current node index
+
+        list->next[previous] = list->next[current]; // redirect removed node
+
+        // append removed node into split list
+        (*s) = split.tail = split.length;
+        split.next[(*s)] = 0;
+
+        // copy list's removed node into split list
+        memcpy(split.elements + ((*s) * split.size), list->elements + (current * list->size), list->size);
+        split.length++;
+    }
+
+    // list's tail gets split into new list, change tail to node after last split
+    list->tail = previous;
 
     // create replica of parameter list to remove holes in it
     size_t const replica_length = list->length - length;

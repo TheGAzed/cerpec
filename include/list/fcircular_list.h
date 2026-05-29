@@ -91,18 +91,30 @@ void shift_next_fcircular_list(fcircular_list_s * const list, size_t const shift
 /// @param index Start index of destination structure.
 void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircular_list_s * const restrict source, size_t const index);
 
-/// @brief Splits structure into two based on starting index and new length.
+/// @brief Slices structure into two based on starting index and new length.
+/// @param list Structure to slice.
+/// @param index Start index of slice.
+/// @param length Length to slice.
+/// @param list_max Maximum length of original structure.
+/// @param slice_max Maximum length of sliced structure.
+/// @return New sliced structure.
+fcircular_list_s slice_fcircular_list(fcircular_list_s * const list, size_t const index, size_t const length, size_t const list_max, size_t const slice_max);
+
+/// @brief Splits structure into two based on starting index.
 /// @param list Structure to split.
 /// @param index Start index of split.
-/// @param length Length to split.
-/// @return New split structure.
-fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t const index, size_t const length);
+/// @param list_max Maximum length of original structure.
+/// @param split_max Maximum length of split structure.
+/// @return New split structure (right part).
+fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t const index, size_t const list_max, size_t const split_max);
 
 /// @brief Extracts elements into new structure based on filter function.
 /// @param list Structure to extracts from.
 /// @param filter Function pointer to check if element meets extract condition.
+/// @param list_max Maximum length of original structure.
+/// @param extract_max Maximum length of extracted structure.
 /// @return New extracted structure.
-fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, filter_fn const filter);
+fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, filter_fn const filter, size_t const list_max, size_t const extract_max);
 
 /// @brief Iterates over each element in structure based on their order.
 /// @param list Structure to iterate over.

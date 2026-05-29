@@ -423,10 +423,92 @@ void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircu
     source->empty = NIL;
 }
 
-fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t const index, size_t const length) {
+fcircular_list_s slice_fcircular_list(fcircular_list_s * const list, size_t const index, size_t const length, size_t const list_max, size_t const slice_max) {
     error(list && "Paremeter can't be NULL.");
+    error(list_max && "Paremeter can't be zero.");
+    error(slice_max && "Paremeter can't be zero.");
     error(index < list->length && "Index can't be more than or equal length.");
     error(length <= list->length && "Size can't be more than length.");
+    error(list->length - length <= list_max && "Maximum size can't be more than length.");
+    error(length <= slice_max && "Maximum size can't be more than length.");
+
+    valid(list->size && "Size can't be zero.");
+    valid(list->max && "Maximum can't be zero.");
+    valid(list->length <= list->max && "Length exceeds maximum.");
+    valid(list->allocator && "Allocator can't be NULL.");
+
+    size_t previous = list->tail;
+    // iterate to previous node from index
+    for (size_t i = 0; i < index; ++i) {
+        previous = list->next[previous];
+    }
+
+    // create split list
+    fcircular_list_s slice = {
+        .max = slice_max, .empty = NIL, .tail = 0, .length = 0, .size = list->size,
+        .elements = list->allocator->alloc(slice_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arguments),
+        .allocator = list->allocator,
+    };
+    error(slice.elements && "Memory allocation failed.");
+    error(slice.next && "Memory allocation failed.");
+
+    // copy list elements into split list starting from index node (also redirect list's removed nodes)
+    for (size_t * s = &(slice.tail); slice.length < length; s = slice.next + (*s)) {
+        size_t const current = list->next[previous]; // save current node index
+
+        list->next[previous] = list->next[current]; // redirect removed node
+
+        // append removed node into split list
+        (*s) = slice.tail = slice.length;
+        slice.next[(*s)] = 0;
+
+        // copy list's removed node into split list
+        memcpy(slice.elements + ((*s) * slice.size), list->elements + (current * list->size), list->size);
+        slice.length++;
+    }
+
+    // if list's tail gets split into new list, then change tail to node before index node
+    if (index + length > list->length - 1) {
+        list->tail = previous;
+    }
+
+    // create replica of parameter list to remove holes in it
+    size_t const replica_length = list->length - length;
+    fcircular_list_s replica = {
+        .max = list_max, .empty = NIL, .size = list->size,
+        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arguments),
+        .allocator = list->allocator,
+    };
+    error(replica.elements && "Memory allocation failed.");
+    error(replica.next && "Memory allocation failed.");
+
+    // copy remaining list element into replica
+    for (size_t * r = &(replica.tail); replica.length < replica_length; previous = list->next[previous], r = replica.next + (*r)) {
+        // append remaining list node into replica list
+        (*r) = replica.length;
+        replica.next[(*r)] = replica.tail;
+
+        // copy list's removed node into replica list
+        memcpy(replica.elements + ((*r) * replica.size), list->elements + (previous * list->size), list->size);
+        replica.length++;
+    }
+    list->allocator->free(list->elements, list->allocator->arguments);
+    list->allocator->free(list->next, list->allocator->arguments);
+
+    (*list) = replica; // change list into hole-less replica
+
+    return slice;
+}
+
+fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t const index, size_t const list_max, size_t const split_max) {
+    error(list && "Paremeter can't be NULL.");
+    error(list_max && "Paremeter can't be zero.");
+    error(split_max && "Paremeter can't be zero.");
+    error(index < list->length && "Index can't be more than or equal length.");
+    error(index <= list_max && "Maximum size can't be more than length.");
+    error(list->length - index <= split_max && "Maximum size can't be more than length.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -441,14 +523,15 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
 
     // create split list
     fcircular_list_s split = {
-        .max = list->max, .empty = NIL, .tail = 0, .length = 0, .size = list->size,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .max = split_max, .empty = NIL, .tail = 0, .length = 0, .size = list->size,
+        .elements = list->allocator->alloc(split_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
     error(split.elements && "Memory allocation failed.");
     error(split.next && "Memory allocation failed.");
 
+    size_t const length = list->length - index;
     // copy list elements into split list starting from index node (also redirect list's removed nodes)
     for (size_t * s = &(split.tail); split.length < length; s = split.next + (*s)) {
         size_t const current = list->next[previous]; // save current node index
@@ -464,17 +547,15 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
         split.length++;
     }
 
-    // if list's tail gets split into new list, then change tail to node after last split
-    if ((index <= list->length - 1) && (index + length >= list->length - 1)) {
-        list->tail = previous;
-    }
+    // list's tail gets split into new list, change tail to node before index node
+    list->tail = previous;
 
     // create replica of parameter list to remove holes in it
     size_t const replica_length = list->length - length;
     fcircular_list_s replica = {
-        .max = list->max, .empty = NIL, .size = list->size,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .max = list_max, .empty = NIL, .size = list->size,
+        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arguments),
+        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arguments),
         .allocator = list->allocator,
     };
     error(replica.elements && "Memory allocation failed.");
@@ -498,9 +579,11 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
     return split;
 }
 
-fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, filter_fn const filter) {
+fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
+    error(list_max && "Paremeter can't be zero.");
+    error(extract_max && "Paremeter can't be zero.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -511,14 +594,14 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, 
 
     // create temporary lists to save filtered elements
     fcircular_list_s negative = {
-        .empty = NIL, .size = list->size, .allocator = list->allocator, .max = list->max,
-        .elements = list->allocator->alloc(list->size * list->max, list->allocator->arguments),
-        .next = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
+        .empty = NIL, .size = list->size, .allocator = list->allocator, .max = list_max,
+        .elements = list->allocator->alloc(list->size * list_max, list->allocator->arguments),
+        .next = list->allocator->alloc(sizeof(size_t) * list_max, list->allocator->arguments),
     };
     fcircular_list_s positive = {
-        .empty = NIL, .size = list->size, .allocator = list->allocator, .max = list->max,
-        .elements = list->allocator->alloc(list->size * list->max, list->allocator->arguments),
-        .next = list->allocator->alloc(sizeof(size_t) * list->max, list->allocator->arguments),
+        .empty = NIL, .size = list->size, .allocator = list->allocator, .max = extract_max,
+        .elements = list->allocator->alloc(list->size * extract_max, list->allocator->arguments),
+        .next = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arguments),
     };
 
     // iterate over each element in list while calling filter function
@@ -529,6 +612,8 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, 
 
         char const * element = list->elements + (current * list->size); // save current element
         if (filter(element)) { // if element is valid push into positive list
+            error(positive.length + 1 <= extract_max && "Extracted list exceeds maximum length.");
+
             (*pos) = pos_idx;
             positive.next[pos_idx] = 0; // make list circular
             // copy element into list
@@ -538,6 +623,8 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, 
             pos = positive.next + pos_idx; // go to positive next node
             pos_idx++;
         } else { // else push into negative list
+            error(negative.length + 1 <= list_max && "Extracted list exceeds maximum length.");
+
             (*neg) = neg_idx;
             negative.next[neg_idx] = 0; // make list circular
             // copy element into list
