@@ -105,8 +105,8 @@ bool is_disjoint_ibitwise_set(ibitwise_set_s const * const set_one, ibitwise_set
 /// @brief Iterates over each element in structure.
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
+/// @param argh Generic arguments to use in function pointer.
 /// @note Function does not change the set indexes.
-void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const handle, void * const arguments);
+void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const handle, void * const argh);
 
 #endif // IBITWISE_SET_H

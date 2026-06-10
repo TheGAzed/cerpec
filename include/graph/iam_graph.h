@@ -75,14 +75,18 @@ iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, com
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param graph Structure to destroy.
 /// @param destroy_vertex Function pointer to destroy a single vertex element.
+/// @param argdv Arguments for destroy function pointer.
 /// @param destroy_edge Function pointer to destroy a single edge element.
-void destroy_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, set_fn const destroy_edge);
+/// @param argde Arguments for destroy function pointer.
+void destroy_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, void * const argdv, set_fn const destroy_edge, void * const argde);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param graph Structure to destroy.
 /// @param destroy_vertex Function pointer to destroy a single vertex element.
+/// @param argdv Arguments for destroy function pointer.
 /// @param destroy_edge Function pointer to destroy a single edge element.
-void clear_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, set_fn const destroy_edge);
+/// @param argde Arguments for destroy function pointer.
+void clear_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, void * const argdv, set_fn const destroy_edge, void * const argde);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param graph Structure to copy.
@@ -124,9 +128,10 @@ size_t insert_vertex_iam_graph(iam_graph_s * const graph, void const * const ver
 /// @param index Index location of vertex.
 /// @param buffer Element buffer to save vertex.
 /// @param destroy_edge Function pointer to destroy single edge element associated wtih removed vertex.
+/// @param argde Arguments for destroy function pointer.
 /// @return Index of last swapped element in vertex array.
 /// @note The last vertex in elements array (including its edges) gets swapped with the removed index vertex.
-size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, void * const buffer, set_fn const destroy_edge);
+size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, void * const buffer, set_fn const destroy_edge, void * const argde);
 
 /// @brief Gets the vertex element at index in structure.
 /// @param graph Structure to get from.
@@ -214,10 +219,11 @@ iam_table_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * co
 /// @param graph Structure to generate from.
 /// @param sort Function pointer to sort special array of edge-vertices - 'iam_edge_s', for Kruskal's algorithm.
 /// @param cost Cost structure that defines the distance properties in table.
-/// @param arguments Arguments for sorting function.
-/// @param increment Function pointer to increment rank cost by one.
+/// @param args Arguments for sorting function.
+/// @param inc Function pointer to increment rank cost by one.
+/// @param argi Arguments for increment function pointer.
 /// @return Kruskal lookup table with subgraph of minimum spanning tree from start node to all other nodes.
-iam_table_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, process_fn const sort, void * const arguments, set_fn const increment);
+iam_table_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, process_fn const sort, void * const args, set_fn const inc, void * const argi);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param table Structure to destroy.
@@ -235,36 +241,36 @@ iam_graph_s subgraph_iam_list(iam_table_s const * const table, copy_fn const cop
 /// @brief Iterates over each vertex element in structure starting from the beginning.
 /// @param graph Structure to iterate.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Arguments for handle function pointer.
-void each_vertex_iam_graph(iam_graph_s const * const graph, handle_fn const handle, void * const arguments);
+/// @param argh Arguments for handle function pointer.
+void each_vertex_iam_graph(iam_graph_s const * const graph, handle_fn const handle, void * const argh);
 
 /// @brief Iterates over each neighbor of a vertex index.
 /// @param graph Structure to iterate.
 /// @param index Index of vertex to iterate neighbors.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Arguments for handle function pointer.
-void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index, handle_fn const handle, void * const arguments);
+/// @param argh Arguments for handle function pointer.
+void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index, handle_fn const handle, void * const argh);
 
 /// @brief Iterates over each edge element in structure starting from the beginning.
 /// @param graph Structure to iterate.
 /// @param handle Function pointer to handle each edge-vertices (iam_edge_s) element reference using generic arguments.
-/// @param arguments Arguments for operate function pointer.
-void each_edge_iam_graph(iam_graph_s const * const graph, handle_fn const handle, void * const arguments);
+/// @param argh Arguments for operate function pointer.
+void each_edge_iam_graph(iam_graph_s const * const graph, handle_fn const handle, void * const argh);
 
 /// @brief Iterates over each cost element in structure starting from the beginning.
 /// @param table Structure to iterate.
 /// @param handle Operate function pointer to operate on each vertex.
-/// @param arguments Arguments for operate function pointer.
-void each_cost_iam_list(iam_table_s const * const table, handle_fn const handle, void * const arguments);
+/// @param argh Arguments for operate function pointer.
+void each_cost_iam_list(iam_table_s const * const table, handle_fn const handle, void * const argh);
 
 /// @brief Traverses the costs paths of the specified structure using a generated table.
 /// @param table Structure to traverse.
 /// @param end End vertex index to recursively travel to from starting vertex.
 /// @param handle Operate function pointer to operate on each vertex.
-/// @param arguments Arguments for operate function pointer.
+/// @param argh Arguments for operate function pointer.
 /// @return 'true' if path exists, 'false' otherwise.
-/// @note The algorithm shoul be used with shortest path find implementations, i.e. Dijkstra and A*,
+/// @note The algorithm should be used with shortest path find implementations, i.e. Dijkstra and A*,
 /// to traverse the path from 'end' vertex to the start one, but one can also traverse MSP tables with it.
-bool each_path_iam_list(iam_table_s const * const table, size_t const end, handle_fn const handle, void * const arguments);
+bool each_path_iam_list(iam_table_s const * const table, size_t const end, handle_fn const handle, void * const argh);
 
 #endif // IAM_GRAPH_H

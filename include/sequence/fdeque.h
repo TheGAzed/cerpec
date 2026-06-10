@@ -26,12 +26,14 @@ fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * alloc
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param deque Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_fdeque(fdeque_s * const deque, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void destroy_fdeque(fdeque_s * const deque, set_fn const destroy, void * const argd);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param deque Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_fdeque(fdeque_s * const deque, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void clear_fdeque(fdeque_s * const deque, set_fn const destroy, void * const argd);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param deque Structure to copy.
@@ -52,49 +54,49 @@ bool is_full_fdeque(fdeque_s const * const deque);
 /// @brief Enqueues a single element to the front of the structure.
 /// @param deque Structure to enqueue into.
 /// @param element Element buffer to enqueue.
-void enqueue_front_fdeque(fdeque_s * const restrict deque, void const * const restrict element);
+void enqueue_front_fdeque(fdeque_s * const deque, void const * const element);
 
 /// @brief Enqueues a single element to the back of the structure.
 /// @param deque Structure to enqueue into.
 /// @param element Element buffer to enqueue.
-void enqueue_back_fdeque(fdeque_s * const restrict deque, void const * const restrict element);
+void enqueue_back_fdeque(fdeque_s * const deque, void const * const element);
 
 /// @brief Dequeues a single element from the front of the structure.
 /// @param deque Structure to dequeue from.
 /// @param buffer Element buffer to save dequeue.
-void dequeue_front_fdeque(fdeque_s * const restrict deque, void * const restrict buffer);
+void dequeue_front_fdeque(fdeque_s * const deque, void * const buffer);
 
 /// @brief Dequeues a single element from the back of the structure.
 /// @param deque Structure to dequeue from.
 /// @param buffer Element buffer to save dequeue.
-void dequeue_back_fdeque(fdeque_s * const restrict deque, void * const restrict buffer);
+void dequeue_back_fdeque(fdeque_s * const deque, void * const buffer);
 
 /// @brief Peeks a single element from the front of the structure.
 /// @param deque Structure to peek.
 /// @param buffer Element buffer to save peek.
-void peek_front_fdeque(fdeque_s const * const restrict deque, void * const restrict buffer);
+void peek_front_fdeque(fdeque_s const * const deque, void * const buffer);
 
 /// @brief Peeks a single element from the back of the structure.
 /// @param deque Structure to peek.
 /// @param buffer Element buffer to save peek.
-void peek_back_fdeque(fdeque_s const * const restrict deque, void * const restrict buffer);
+void peek_back_fdeque(fdeque_s const * const deque, void * const buffer);
 
 /// @brief Iterates over each element in structure starting from the front.
 /// @param deque Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_front_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_front_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const argh);
 
 /// @brief Iterates over each element in structure starting from the back.
 /// @param deque Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_back_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const argh);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param deque Structure to map.
 /// @param process Function pointer to manage array of elements using strucuter length, element size and arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void apply_fdeque(fdeque_s const * const restrict deque, process_fn const process, void * const restrict arguments);
+/// @param argp Generic arguments to use in function pointer.
+void apply_fdeque(fdeque_s const * const deque, process_fn const process, void * const argp);
 
 #endif // FDEQUE_H

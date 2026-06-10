@@ -12,7 +12,7 @@ TEST CREATE_01(void) {
     ASSERT_NEQ(0, test.size);
     ASSERT_EQ(NULL, test.elements);
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -20,7 +20,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     istack_s test = create_istack(sizeof(int));
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     ASSERT_EQ(0, test.capacity);
     ASSERT_EQ(0, test.length);
@@ -34,14 +34,14 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     istack_s test = create_istack(sizeof(int));
 
-    clear_istack(&test, intdst);
+    clear_istack(&test, intdst, NULL);
 
     ASSERT_EQ(0, test.capacity);
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(0, test.size);
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -53,7 +53,7 @@ TEST PUSH_01(void) {
         push_istack(&test, &i);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -65,7 +65,7 @@ TEST PUSH_02(void) {
         push_istack(&test, &i);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -77,7 +77,7 @@ TEST PUSH_03(void) {
         push_istack(&test, &i);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -93,7 +93,7 @@ TEST PEEP_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -109,7 +109,7 @@ TEST PEEP_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -125,7 +125,7 @@ TEST PEEP_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -143,7 +143,7 @@ TEST POP_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -161,7 +161,7 @@ TEST POP_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -179,7 +179,7 @@ TEST POP_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -200,7 +200,7 @@ TEST MAP_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -221,7 +221,7 @@ TEST MAP_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -242,7 +242,7 @@ TEST MAP_03(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -262,7 +262,7 @@ TEST APPLY_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -282,7 +282,7 @@ TEST APPLY_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -302,7 +302,7 @@ TEST APPLY_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -322,7 +322,7 @@ TEST APPLY_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -342,7 +342,7 @@ TEST APPLY_05(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }
@@ -362,7 +362,7 @@ TEST APPLY_06(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_istack(&test, intdst);
+    destroy_istack(&test, intdst, NULL);
 
     PASS();
 }

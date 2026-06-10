@@ -11,7 +11,7 @@ TEST CREATE_01(void) {
     ASSERT_NEQ(0, test.size);
     ASSERT_EQ(NULL, test.tail);
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -19,7 +19,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     ASSERT_EQ(0, test.length);
     ASSERT_NEQ(sizeof(int), test.size);
@@ -32,13 +32,13 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
-    clear_iqueue(&test, intdst);
+    clear_iqueue(&test, intdst, NULL);
 
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(0, test.size);
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -50,7 +50,7 @@ TEST ENQUEUE_01(void) {
         enqueue_iqueue(&test, &i);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -62,7 +62,7 @@ TEST ENQUEUE_02(void) {
         enqueue_iqueue(&test, &i);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -74,7 +74,7 @@ TEST ENQUEUE_03(void) {
         enqueue_iqueue(&test, &i);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -90,7 +90,7 @@ TEST PEEK_01(void) {
         ASSERT_EQ(0, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -106,7 +106,7 @@ TEST PEEK_02(void) {
         ASSERT_EQ(0, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -122,7 +122,7 @@ TEST PEEK_03(void) {
         ASSERT_EQ(0, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -140,7 +140,7 @@ TEST DEQUEUE_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -158,7 +158,7 @@ TEST DEQUEUE_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -176,7 +176,7 @@ TEST DEQUEUE_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -197,7 +197,7 @@ TEST MAP_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -218,7 +218,7 @@ TEST MAP_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -239,7 +239,7 @@ TEST MAP_03(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -259,7 +259,7 @@ TEST APPLY_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -279,7 +279,7 @@ TEST APPLY_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -299,7 +299,7 @@ TEST APPLY_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -319,7 +319,7 @@ TEST APPLY_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -339,7 +339,7 @@ TEST APPLY_05(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }
@@ -359,7 +359,7 @@ TEST APPLY_06(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_iqueue(&test, intdst);
+    destroy_iqueue(&test, intdst, NULL);
 
     PASS();
 }

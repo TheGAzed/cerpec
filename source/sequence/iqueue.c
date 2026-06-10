@@ -15,7 +15,7 @@ iqueue_s make_iqueue(size_t const size, memory_s const * const allocator) {
     return (iqueue_s) { .size = size, .allocator = allocator };
 }
 
-void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
+void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const argd) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -29,7 +29,7 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
         // destroy elements in previous' next (so head and next)
         size_t i = start;
         for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
-            destroy(previous->next->elements + (i * queue->size));
+            destroy(previous->next->elements + (i * queue->size), argd);
         }
         queue->length -= (i - start);
 
@@ -38,14 +38,14 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy) {
         previous->next = previous->next->next;
 
         // free destroyed node
-        queue->allocator->free(temp, queue->allocator->arguments);
+        queue->allocator->free(temp, queue->allocator->arg);
     }
 
     // set everything to zero
     memset(queue, 0, sizeof(iqueue_s));
 }
 
-void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
+void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const argd) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -59,7 +59,7 @@ void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
         // destroy elements in previous' next (so head and next)
         size_t i = start;
         for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
-            destroy(previous->next->elements + (i * queue->size));
+            destroy(previous->next->elements + (i * queue->size), argd);
         }
         queue->length -= (i - start);
 
@@ -68,7 +68,7 @@ void clear_iqueue(iqueue_s * const queue, set_fn const destroy) {
         previous->next = previous->next->next;
 
         // free destroyed node
-        queue->allocator->free(temp, queue->allocator->arguments);
+        queue->allocator->free(temp, queue->allocator->arg);
     }
 
     queue->current = queue->length = 0;
@@ -93,7 +93,7 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
     struct infinite_queue_node * last = NULL;
     for (size_t remaining = queue->length, start = queue->current; remaining; start = 0) {
         // allocate new node for replica
-        last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arguments);
+        last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arg);
         error((*current_copy) && "Memory allocation failed");
 
         // redirect current replica's node with replica's tail for circularity
@@ -124,7 +124,7 @@ bool is_empty_iqueue(iqueue_s const * const queue) {
     return (queue->length == 0);
 }
 
-void peek_iqueue(iqueue_s const * const restrict queue, void * const restrict buffer) {
+void peek_iqueue(iqueue_s const * const queue, void * const buffer) {
     error(queue && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(queue->length && "Can't peek empty structure.");
@@ -138,7 +138,7 @@ void peek_iqueue(iqueue_s const * const restrict queue, void * const restrict bu
     memcpy(buffer, queue->tail->next->elements + (queue->current * queue->size), queue->size);
 }
 
-void enqueue_iqueue(iqueue_s * const restrict queue, void const * const restrict buffer) {
+void enqueue_iqueue(iqueue_s * const queue, void const * const buffer) {
     error(queue && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(~(queue->length) && "Queue's size will overflow.");
@@ -151,7 +151,7 @@ void enqueue_iqueue(iqueue_s * const restrict queue, void const * const restrict
     // index where the next element will be enqueued
     size_t const next_index = (queue->current + queue->length) % IQUEUE_CHUNK;
     if (!next_index) { // if head list array is full (is divisible) adds new list element to head
-        struct infinite_queue_node * node = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arguments);
+        struct infinite_queue_node * node = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arg);
         error(node && "Memory allocation failed");
 
         if (queue->tail == NULL) {
@@ -167,7 +167,7 @@ void enqueue_iqueue(iqueue_s * const restrict queue, void const * const restrict
     queue->length++;
 }
 
-void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffer) {
+void dequeue_iqueue(iqueue_s * const queue, void * const buffer) {
     error(queue && "Parameter can't be NULL.");
     error(queue->length && "Strucutre can't be empty.");
     error(queue->tail && "Tail can't be NULL");
@@ -183,7 +183,7 @@ void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffe
     queue->current = (queue->current + 1) % IQUEUE_CHUNK; // set current to next index in node array
 
     if (!queue->length) { // if queue is empty after extracting element thne free memory and reset everything to zero
-        queue->allocator->free(queue->tail, queue->allocator->arguments); // free empty tail/head node
+        queue->allocator->free(queue->tail, queue->allocator->arg); // free empty tail/head node
 
         queue->current = 0; // if queue is empty make current index 0 to not break enqueue_iqueue operation
         queue->tail = NULL; // set tail to NULL
@@ -191,14 +191,14 @@ void dequeue_iqueue(iqueue_s * const restrict queue, void * const restrict buffe
         struct infinite_queue_node * head = queue->tail->next; // get empty head node
         queue->tail->next = queue->tail->next->next; // set new head node to its next node
 
-        queue->allocator->free(head, queue->allocator->arguments); // free previous head node
+        queue->allocator->free(head, queue->allocator->arg); // free previous head node
     }
 }
 
-void each_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
+void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const argh) {
     error(queue && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL");
-    error(queue != arguments && "Parameters can't be the same.");
+    error(queue != argh && "Parameters can't be the same.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->allocator && "Allocator can't be NULL.");
@@ -213,7 +213,7 @@ void each_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, 
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size
             // handle on element and if zero is returned then end main function
-            if (!handle(current->elements + (i * queue->size), arguments)) {
+            if (!handle(current->elements + (i * queue->size), argh)) {
                 return;
             }
         }
@@ -221,17 +221,17 @@ void each_iqueue(iqueue_s const * const restrict queue, handle_fn const handle, 
     }
 }
 
-void apply_iqueue(iqueue_s const * const restrict queue, process_fn const process, void * const restrict arguments) {
+void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const argp) {
     error(queue && "Parameter can't be NULL.");
     error(process && "Parameter can't be NULL");
-    error(queue != arguments && "Parameters can't be the same.");
+    error(queue != argp && "Parameters can't be the same.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->allocator && "Allocator can't be NULL.");
     valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     // create elements array to temporary save element from circular linked list nodes
-    char * elements_array = queue->allocator->alloc(queue->length * queue->size, queue->allocator->arguments);
+    char * elements_array = queue->allocator->alloc(queue->length * queue->size, queue->allocator->arg);
     error((!queue->length || elements_array) && "Memory allocation failed.");
 
     size_t index = 0, remaining = queue->length; // temporary variable to save queue's size
@@ -246,7 +246,7 @@ void apply_iqueue(iqueue_s const * const restrict queue, process_fn const proces
         remaining -= (i - start); // subtract absolute value of i and start from remaining size
     }
 
-    process(elements_array, queue->length, arguments); // process initialized elements array
+    process(elements_array, queue->length, argp); // process initialized elements array
 
     index = 0, remaining = queue->length, previous = queue->tail;
     for (size_t start = queue->current; remaining; start = 0, previous = previous->next) { // save elements array back into queue
@@ -258,5 +258,5 @@ void apply_iqueue(iqueue_s const * const restrict queue, process_fn const proces
         remaining -= (i - start); // subtract absolute value of i and start from remaining size
     }
 
-    queue->allocator->free(elements_array, queue->allocator->arguments);
+    queue->allocator->free(elements_array, queue->allocator->arg);
 }

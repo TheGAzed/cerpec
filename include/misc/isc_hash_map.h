@@ -49,14 +49,18 @@ isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size,
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param map Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
+/// @param argdk Arguments for key destroy function pointer.
 /// @param destroy_value Function pointer to destroy a single value.
-void destroy_isc_hash_map(isc_hash_map_s * const map, set_fn const destroy_key, set_fn const destroy_value);
+/// @param argdv Arguments for value destroy function pointer.
+void destroy_isc_hash_map(isc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param map Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
+/// @param argdk Arguments for key destroy function pointer.
 /// @param destroy_value Function pointer to destroy a single value.
-void clear_isc_hash_map(isc_hash_map_s * map, const set_fn destroy_key, const set_fn destroy_value);
+/// @param argdv Arguments for value destroy function pointer.
+void clear_isc_hash_map(isc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param map Structure to copy.
@@ -74,26 +78,26 @@ bool is_empty_isc_hash_map(isc_hash_map_s const * const map);
 /// @param map Structure to insert element into.
 /// @param key Key to insert.
 /// @param value Value to insert.
-void insert_isc_hash_map(isc_hash_map_s * const restrict map, void const * const restrict key, void const * const restrict value);
+void insert_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value);
 
 /// @brief Removes unique key/value pair from structure.
 /// @param map Structure to remove element into.
 /// @param key Key to remove.
 /// @param key_buffer Key buffer to save removed key.
 /// @param value_buffer Value buffer to save removed value.
-void remove_isc_hash_map(isc_hash_map_s * const restrict map, void const * const restrict key, void * const restrict key_buffer, void * const restrict value_buffer);
+void remove_isc_hash_map(isc_hash_map_s * const map, void const * const key, void * const key_buffer, void * const value_buffer);
 
 /// @brief Checks if structure contains key.
 /// @param map Structure to check.
 /// @param key Key to check.
 /// @return 'true' if contained, 'false' otherwise.
-bool contains_key_isc_hash_map(isc_hash_map_s const * const restrict map, void const * const restrict key);
+bool contains_key_isc_hash_map(isc_hash_map_s const * const map, void const * const key);
 
 /// @brief Gets value based on key.
 /// @param map Structure to set value.
 /// @param key Key to value.
 /// @param value_buffer Value buffer to save retrieved value.
-void get_value_isc_hash_map(isc_hash_map_s const * const restrict map, void const * const restrict key, void * const restrict value_buffer);
+void get_value_isc_hash_map(isc_hash_map_s const * const map, void const * const key, void * const value_buffer);
 
 /// @brief Sets value based on key.
 /// @param map Structure to get value.
@@ -101,18 +105,18 @@ void get_value_isc_hash_map(isc_hash_map_s const * const restrict map, void cons
 /// @param value New value to insert.
 /// @param value_buffer Old value buffer to save replaced value.
 /// @note When key doesn't exist it performs an insert, otherwise the old value is replace with the new one.
-void set_isc_hash_map(isc_hash_map_s * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer);
+void set_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value, void * const value_buffer);
 
 /// @brief Iterates over each key in structure.
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_key_isc_hash_map(isc_hash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_key_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const argh);
 
 /// @brief Iterates over each value in structure.
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_value_isc_hash_map(isc_hash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_value_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const argh);
 
 #endif // ISC_HASH_MAP_H

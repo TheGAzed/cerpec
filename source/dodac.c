@@ -5,8 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void chardst(void * const element) {
-    *(char*)element = '\0';
+void chardst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
 }
 
 void * charcpy(void * const destination, void const * const source) {
@@ -119,8 +120,9 @@ bool charprime(void const * const element) {
     return number > 1;
 }
 
-void uchardst(void * const element) {
-    *(unsigned char*)element = '\0';
+void uchardst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
 }
 
 void * ucharcpy(void * const destination, void const * const source) {
@@ -239,8 +241,9 @@ bool ucharprime(void const * const element) {
     return number > 1;
 }
 
-void intdst(void * const element) {
-    (*(int*)element) = 0;
+void intdst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
 }
 
 void * intcpy(void * const destination, void const * const source) {
@@ -323,8 +326,9 @@ bool intprime(void const * const element) {
     return number > 1;
 }
 
-void uintdst(void * const element) {
-    (*(unsigned*)element) = 0U;
+void uintdst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
 }
 
 void * uintcpy(void * const destination, void const * const source) {
@@ -389,8 +393,9 @@ bool uintprime(void const * const element) {
     return number > 1;
 }
 
-void floatdst(void * const element) {
-    (*(float*)element) = 0.0f;
+void floatdst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
 }
 
 void * floatcpy(void * const destination, void const * const source) {
@@ -438,8 +443,9 @@ void floatrqsort(void * const array, size_t const lenght, void * const null) {
     qsort(array, lenght, sizeof(float), floatrcmp);
 }
 
-void doubledst(void * const element) {
-    (*(double*)element) = 0.0;
+void doubledst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
 }
 
 void * doublecpy(void * const destination, void const * const source) {
@@ -487,8 +493,9 @@ void doublerqsort(void * const array, size_t const lenght, void * const null) {
     qsort(array, lenght, sizeof(double), doublercmp);
 }
 
-void sizedst(void * const element) {
-    (*(size_t*)element) = 0;
+void sizedst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
 }
 
 void * sizecpy(void * const destination, void const * const source) {

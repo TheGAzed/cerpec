@@ -15,14 +15,14 @@ TEST CREATE_01(void) {
     ASSERT_NEQ(NULL, test.node[FDL_NEXT]);
     ASSERT_NEQ(NULL, test.node[FDL_PREV]);
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
 
 TEST DESTROY_01(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     ASSERT_EQ(0, test.size);
 
@@ -32,14 +32,14 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     fdouble_list_s test = create_fdouble_list(sizeof(int), FDOUBLE_LIST_CHUNK);
 
-    clear_fdouble_list(&test, intdst);
+    clear_fdouble_list(&test, intdst, NULL);
 
     ASSERT_EQ(sizeof(int), test.size);
     ASSERT_NEQ(NULL, test.elements);
     ASSERT_NEQ(NULL, test.node[FDL_NEXT]);
     ASSERT_NEQ(NULL, test.node[FDL_PREV]);
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -63,8 +63,8 @@ TEST COPY_01(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&replica, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&replica, intdst, NULL);
 
     PASS();
 }
@@ -88,8 +88,8 @@ TEST COPY_02(void) {
         ASSERT_EQ(t, r);
     }
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&replica, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&replica, intdst, NULL);
 
     PASS();
 }
@@ -99,7 +99,7 @@ TEST IS_EMPTY_01(void) {
 
     ASSERT(is_empty_fdouble_list(&test));
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -112,7 +112,7 @@ TEST IS_EMPTY_02(void) {
 
     ASSERT_FALSE(is_empty_fdouble_list(&test));
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -124,7 +124,7 @@ TEST INSERT_AT_01(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -136,7 +136,7 @@ TEST INSERT_AT_02(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -154,7 +154,7 @@ TEST GET_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -172,7 +172,7 @@ TEST GET_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -190,7 +190,7 @@ TEST REMOVE_FIRST_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -208,7 +208,7 @@ TEST REMOVE_FIRST_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -226,7 +226,7 @@ TEST REMOVE_AT_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -244,7 +244,7 @@ TEST REMOVE_AT_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -264,7 +264,7 @@ TEST REVERSE_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -284,7 +284,7 @@ TEST REVERSE_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -305,7 +305,7 @@ TEST SHIFT_NEXT_01(void) {
         shift_next_fdouble_list(&test, 1);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -326,7 +326,7 @@ TEST SHIFT_NEXT_02(void) {
         shift_next_fdouble_list(&test, 1);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -347,7 +347,7 @@ TEST SHIFT_PREV_01(void) {
         ASSERT_EQ(FDOUBLE_LIST_CHUNK - 1 - 1 - i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -368,7 +368,7 @@ TEST SHIFT_PREV_02(void) {
         ASSERT_EQ(FDOUBLE_LIST_CHUNK - 1 - i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -393,8 +393,8 @@ TEST SPLICE_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&one, intdst);
-    destroy_fdouble_list(&two, intdst);
+    destroy_fdouble_list(&one, intdst, NULL);
+    destroy_fdouble_list(&two, intdst, NULL);
 
     PASS();
 }
@@ -419,8 +419,8 @@ TEST SPLICE_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&one, intdst);
-    destroy_fdouble_list(&two, intdst);
+    destroy_fdouble_list(&one, intdst, NULL);
+    destroy_fdouble_list(&two, intdst, NULL);
 
     PASS();
 }
@@ -446,8 +446,8 @@ TEST SPLIT_01(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&split, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&split, intdst, NULL);
 
     PASS();
 }
@@ -473,8 +473,8 @@ TEST SPLIT_02(void) {
         ASSERT_EQ(i, t);
     }
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&split, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&split, intdst, NULL);
 
     PASS();
 }
@@ -508,8 +508,8 @@ TEST SPLIT_04(void) {
     get_fdouble_list(&split, 0, &got);
     ASSERT_EQ(4, got);
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&split, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&split, intdst, NULL);
 
     PASS();
 }
@@ -543,8 +543,8 @@ TEST SPLIT_05(void) {
     get_fdouble_list(&split, 1, &got);
     ASSERT_EQ(0, got);
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&split, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&split, intdst, NULL);
 
     PASS();
 }
@@ -578,8 +578,8 @@ TEST SPLIT_06(void) {
     get_fdouble_list(&split, 2, &got);
     ASSERT_EQ(1, got);
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&split, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&split, intdst, NULL);
 
     PASS();
 }
@@ -614,8 +614,8 @@ TEST SPLIT_07(void) {
     get_fdouble_list(&split, 3, &got);
     ASSERT_EQ(2, got);
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&split, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&split, intdst, NULL);
 
     PASS();
 }
@@ -640,8 +640,8 @@ TEST EXTRACT_01(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&extract, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&extract, intdst, NULL);
 
     PASS();
 }
@@ -666,8 +666,8 @@ TEST EXTRACT_02(void) {
         ASSERT_EQ(i, e);
     }
 
-    destroy_fdouble_list(&test, intdst);
-    destroy_fdouble_list(&extract, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
+    destroy_fdouble_list(&extract, intdst, NULL);
 
     PASS();
 }
@@ -688,7 +688,7 @@ TEST MAP_NEXT_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -709,7 +709,7 @@ TEST MAP_NEXT_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -730,7 +730,7 @@ TEST MAP_PREV_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -751,7 +751,7 @@ TEST MAP_PREV_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -771,7 +771,7 @@ TEST APPLY_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -791,7 +791,7 @@ TEST APPLY_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -812,7 +812,7 @@ TEST APPLY_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }
@@ -833,7 +833,7 @@ TEST APPLY_04(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fdouble_list(&test, intdst);
+    destroy_fdouble_list(&test, intdst, NULL);
 
     PASS();
 }

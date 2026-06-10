@@ -21,7 +21,7 @@ TEST CREATE_01(void) {
     ASSERT_EQ(NULL, graph.vertices);
     ASSERT_NEQ(NULL, graph.none);
 
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -30,7 +30,7 @@ TEST DESTROY_01(void) {
     int none = 0;
     iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
 
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     ASSERT_EQ(NULL, graph.allocator);
     ASSERT_EQ(NULL, graph.compare);
@@ -48,7 +48,7 @@ TEST CLEAR_01(void) {
     int none = 0;
     iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
 
-    clear_iam_graph(&graph, intdst, intdst);
+    clear_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     ASSERT_NEQ(NULL, graph.allocator);
     ASSERT_NEQ(NULL, graph.compare);
@@ -59,7 +59,7 @@ TEST CLEAR_01(void) {
     ASSERT_EQ(NULL, graph.vertices);
     ASSERT_NEQ(NULL, graph.none);
 
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -79,7 +79,7 @@ TEST COPY_01(void) {
         }
     }
 
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -99,7 +99,7 @@ TEST COPY_02(void) {
         }
     }
 
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -119,7 +119,7 @@ TEST COPY_03(void) {
         }
     }
 
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -163,7 +163,7 @@ TEST DIJKSTRA_01(void) {
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_01_SIZE * sizeof(size_t));
 
     destroy_iam_list(&table);
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -212,7 +212,7 @@ TEST DIJKSTRA_02(void) {
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_02_SIZE * sizeof(size_t));
 
     destroy_iam_list(&table);
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -262,7 +262,7 @@ TEST DIJKSTRA_03(void) {
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_03_SIZE * sizeof(size_t));
 
     destroy_iam_list(&table);
-    destroy_iam_graph(&graph, intdst, intdst);
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
 }

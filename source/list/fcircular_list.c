@@ -11,8 +11,8 @@ fcircular_list_s create_fcircular_list(size_t const size, size_t const max) {
 
     fcircular_list_s const list =  {
         .empty = NIL, .size = size, .max = max, .allocator = &standard,
-        .elements = standard.alloc(size * max, standard.arguments),
-        .next = standard.alloc(sizeof(size_t) * max, standard.arguments),
+        .elements = standard.alloc(size * max, standard.arg),
+        .next = standard.alloc(sizeof(size_t) * max, standard.arg),
     };
     error(list.elements && "Memory allocation failed.");
     error(list.next && "Memory allocation failed.");
@@ -27,8 +27,8 @@ fcircular_list_s make_fcircular_list(size_t const size, size_t const max, memory
 
     fcircular_list_s const list =  {
         .empty = NIL, .size = size, .max = max, .allocator = allocator,
-        .elements = allocator->alloc(size * max, allocator->arguments),
-        .next = allocator->alloc(sizeof(size_t) * max, allocator->arguments),
+        .elements = allocator->alloc(size * max, allocator->arg),
+        .next = allocator->alloc(sizeof(size_t) * max, allocator->arg),
     };
     error(list.elements && "Memory allocation failed.");
     error(list.next && "Memory allocation failed.");
@@ -36,7 +36,7 @@ fcircular_list_s make_fcircular_list(size_t const size, size_t const max, memory
     return list;
 }
 
-void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
+void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -50,16 +50,16 @@ void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy)
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
 
     // set everything to zero
     memset(list, 0, sizeof(fcircular_list_s));
 }
 
-void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
+void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -73,7 +73,7 @@ void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy) {
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
     }
 
     // set only non important parameters to zero/nil
@@ -95,8 +95,8 @@ fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_f
     // create a replica/copy structure
     fcircular_list_s replica = {
         .empty = NIL, .size = list->size, .max = list->max,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error(replica.elements && "Memory allocation failed.");
@@ -139,7 +139,7 @@ bool is_full_fcircular_list(fcircular_list_s const * const list) {
     return (list->max == list->length);
 }
 
-void insert_at_fcircular_list(fcircular_list_s * const restrict list, void const * const restrict element, size_t const index) {
+void insert_at_fcircular_list(fcircular_list_s * const list, void const * const element, size_t const index) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(index <= list->length && "Paremeter can't be greater than length.");
@@ -179,7 +179,7 @@ void insert_at_fcircular_list(fcircular_list_s * const restrict list, void const
     list->length++;
 }
 
-void get_fcircular_list(fcircular_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+void get_fcircular_list(fcircular_list_s const * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(list->length && "Can't get element from empty list->");
@@ -202,7 +202,7 @@ void get_fcircular_list(fcircular_list_s const * const restrict list, size_t con
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_fcircular_list(fcircular_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_first_fcircular_list(fcircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -259,7 +259,7 @@ void remove_first_fcircular_list(fcircular_list_s * const restrict list, void co
     exit(EXIT_FAILURE);
 }
 
-void remove_at_fcircular_list(fcircular_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+void remove_at_fcircular_list(fcircular_list_s * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(list->length && "Can't get element from empty list.");
@@ -342,7 +342,7 @@ void shift_next_fcircular_list(fcircular_list_s * const list, size_t const shift
     }
 }
 
-void splice_fcircular_list(fcircular_list_s * const restrict destination, fcircular_list_s * const restrict source, size_t const index) {
+void splice_fcircular_list(fcircular_list_s * const destination, fcircular_list_s * const source, size_t const index) {
     error(destination && "Paremeter can't be NULL.");
     error(source && "Paremeter can't be NULL.");
     error(index <= destination->length && "Paremeter can't be greater than length.");
@@ -446,8 +446,8 @@ fcircular_list_s slice_fcircular_list(fcircular_list_s * const list, size_t cons
     // create split list
     fcircular_list_s slice = {
         .max = slice_max, .empty = NIL, .tail = 0, .length = 0, .size = list->size,
-        .elements = list->allocator->alloc(slice_max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(slice_max * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error(slice.elements && "Memory allocation failed.");
@@ -477,8 +477,8 @@ fcircular_list_s slice_fcircular_list(fcircular_list_s * const list, size_t cons
     size_t const replica_length = list->length - length;
     fcircular_list_s replica = {
         .max = list_max, .empty = NIL, .size = list->size,
-        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error(replica.elements && "Memory allocation failed.");
@@ -494,8 +494,8 @@ fcircular_list_s slice_fcircular_list(fcircular_list_s * const list, size_t cons
         memcpy(replica.elements + ((*r) * replica.size), list->elements + (previous * list->size), list->size);
         replica.length++;
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
 
     (*list) = replica; // change list into hole-less replica
 
@@ -524,8 +524,8 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
     // create split list
     fcircular_list_s split = {
         .max = split_max, .empty = NIL, .tail = 0, .length = 0, .size = list->size,
-        .elements = list->allocator->alloc(split_max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(split_max * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error(split.elements && "Memory allocation failed.");
@@ -554,8 +554,8 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
     size_t const replica_length = list->length - length;
     fcircular_list_s replica = {
         .max = list_max, .empty = NIL, .size = list->size,
-        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(list_max * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(list_max * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error(replica.elements && "Memory allocation failed.");
@@ -571,15 +571,15 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
         memcpy(replica.elements + ((*r) * replica.size), list->elements + (previous * list->size), list->size);
         replica.length++;
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
 
     (*list) = replica; // change list into hole-less replica
 
     return split;
 }
 
-fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
+fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
     error(list_max && "Paremeter can't be zero.");
@@ -595,13 +595,13 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, 
     // create temporary lists to save filtered elements
     fcircular_list_s negative = {
         .empty = NIL, .size = list->size, .allocator = list->allocator, .max = list_max,
-        .elements = list->allocator->alloc(list->size * list_max, list->allocator->arguments),
-        .next = list->allocator->alloc(sizeof(size_t) * list_max, list->allocator->arguments),
+        .elements = list->allocator->alloc(list->size * list_max, list->allocator->arg),
+        .next = list->allocator->alloc(sizeof(size_t) * list_max, list->allocator->arg),
     };
     fcircular_list_s positive = {
         .empty = NIL, .size = list->size, .allocator = list->allocator, .max = extract_max,
-        .elements = list->allocator->alloc(list->size * extract_max, list->allocator->arguments),
-        .next = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arguments),
+        .elements = list->allocator->alloc(list->size * extract_max, list->allocator->arg),
+        .next = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arg),
     };
 
     // iterate over each element in list while calling filter function
@@ -642,17 +642,17 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const restrict list, 
     negative.tail = negative.length ? negative.length - 1 : 0;
 
     // change list into negative and return positive one
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
     (*list) = negative;
 
     return positive;
 }
 
-void each_fcircular_list(fcircular_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+void each_fcircular_list(fcircular_list_s const * const list, handle_fn const handle, void * const argh) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
+    error(list != argh && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -664,16 +664,16 @@ void each_fcircular_list(fcircular_list_s const * const restrict list, handle_fn
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current]; // go to next node to avoid initial tail handle
-        if (!handle(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), argh)) {
             return;
         }
     }
 }
 
-void apply_fcircular_list(fcircular_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+void apply_fcircular_list(fcircular_list_s const * const list, process_fn const process, void * const argh) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
+    error(list != argh && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -683,7 +683,7 @@ void apply_fcircular_list(fcircular_list_s const * const restrict list, process_
     valid(list->next && "Next array can't be NULL.");
 
     // create temporary continuous array for list element
-    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
+    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arg);
     error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
@@ -693,7 +693,7 @@ void apply_fcircular_list(fcircular_list_s const * const restrict list, process_
     }
 
     // process elements
-    process(elements_array, list->length, arguments);
+    process(elements_array, list->length, argh);
 
     // copy elements back into list
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -701,5 +701,5 @@ void apply_fcircular_list(fcircular_list_s const * const restrict list, process_
         memcpy(list->elements + (current * list->size), elements_array + (i * list->size), list->size);
     }
 
-    list->allocator->free(elements_array, list->allocator->arguments);
+    list->allocator->free(elements_array, list->allocator->arg);
 }

@@ -30,12 +30,14 @@ fdouble_list_s make_fdouble_list(size_t const size, size_t const max, memory_s c
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const argd);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const argd);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param list Structure to copy.
@@ -57,33 +59,33 @@ bool is_full_fdouble_list(fdouble_list_s const * const list);
 /// @param list Structure to insert into.
 /// @param element Element buffer to insert.
 /// @param index Index to insert at.
-void insert_at_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, size_t const index);
+void insert_at_fdouble_list(fdouble_list_s * const list, void const * const element, size_t const index);
 
 /// @brief Gets the element at index without removing it from the structure.
 /// @param list Structure to get element from.
 /// @param index Index to get element at.
 /// @param buffer Element buffer to save gotten element.
-void get_fdouble_list(fdouble_list_s const * const restrict list, size_t const index, void * const restrict buffer);
+void get_fdouble_list(fdouble_list_s const * const list, size_t const index, void * const buffer);
 
 /// @brief Removes first element equal to parameter one, based on compare function pointer.
 /// @param list Structure to remove element from.
 /// @param element Element to search for.
 /// @param buffer Element buffer to save removed element.
 /// @param compare Function pointer to compare parameter element with list's.
-void remove_first_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare);
+void remove_first_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare);
 
 /// @brief Removes last element equal to parameter one, based on compare function pointer.
 /// @param list Structure to remove element from.
 /// @param element Element to search for.
 /// @param buffer Element buffer to save removed element.
 /// @param compare Function pointer to compare parameter element with list's.
-void remove_last_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare);
+void remove_last_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare);
 
 /// @brief Removes element at index in structure.
 /// @param list Structure to remove element from.
 /// @param index Index to remove element at.
 /// @param buffer Element buffer to save removed element.
-void remove_at_fdouble_list(fdouble_list_s * const restrict list, size_t const index, void * const restrict buffer);
+void remove_at_fdouble_list(fdouble_list_s * const list, size_t const index, void * const buffer);
 
 /// @brief Reverses element list order.
 /// @param list Structure to reverse.
@@ -103,7 +105,7 @@ void shift_prev_fdouble_list(fdouble_list_s * const list, size_t const shift);
 /// @param destination Structure to splice into.
 /// @param source Structure to splice with.
 /// @param index Start index of destination structure.
-void splice_fdouble_list(fdouble_list_s * const restrict destination, fdouble_list_s * const restrict source, size_t const index);
+void splice_fdouble_list(fdouble_list_s * const destination, fdouble_list_s * const source, size_t const index);
 
 /// @brief Slices structure into two based on starting index and new length.
 /// @param list Structure to slice.
@@ -128,24 +130,24 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
 /// @param list_max Maximum length of original structure.
 /// @param extract_max Maximum length of extracted structure.
 /// @return New extracted structure.
-fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter_fn const filter, size_t const list_max, size_t const extract_max);
+fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const filter, size_t const list_max, size_t const extract_max);
 
 /// @brief Iterates over each next element in structure based on their order.
 /// @param list Structure to iterate over.
-/// @param operate Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic void pointer arguments for function pointer.
-void each_next_fdouble_list(fdouble_list_s const * const restrict list, handle_fn const operate, void * const restrict arguments);
+/// @param handle Function pointer to handle each element reference using generic arguments.
+/// @param argh Generic void pointer arguments for function pointer.
+void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const argh);
 
 /// @brief Iterates over each previous element in structure based on their order.
 /// @param list Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic void pointer arguments for function pointer.
-void each_prev_fdouble_list(fdouble_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments);
+/// @param argh Generic void pointer arguments for function pointer.
+void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const argh);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param list Structure to manage.
 /// @param process Function pointer process elements array of structure length.
-/// @param arguments Generic void pointer arguments for function pointer.
-void apply_fdouble_list(fdouble_list_s const * const restrict list, process_fn const process, void * const restrict arguments);
+/// @param argp Generic void pointer arguments for function pointer.
+void apply_fdouble_list(fdouble_list_s const * const list, process_fn const process, void * const argp);
 
 #endif // FDOUBLE_LIST_H

@@ -26,12 +26,14 @@ fqueue_s make_fqueue(size_t const size, size_t const max, memory_s const * const
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_fqueue(fqueue_s * const queue, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void destroy_fqueue(fqueue_s * const queue, set_fn const destroy, void * const argd);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_fqueue(fqueue_s * const queue, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void clear_fqueue(fqueue_s * const queue, set_fn const destroy, void * const argd);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param queue Structure to copy.
@@ -52,28 +54,28 @@ bool is_full_fqueue(fqueue_s const * const queue);
 /// @brief Enqueues a single element to the end of the structure.
 /// @param queue Structure to enqueue into.
 /// @param buffer Element buffer to enqueue.
-void enqueue_fqueue(fqueue_s * const restrict queue, void const * const restrict buffer);
+void enqueue_fqueue(fqueue_s * const queue, void const * const buffer);
 
 /// @brief Dequeues a single element from the start of the structure.
 /// @param queue Structure to dequeue from.
 /// @param buffer Element buffer to save dequeue.
-void dequeue_fqueue(fqueue_s * const restrict queue, void * const restrict buffer);
+void dequeue_fqueue(fqueue_s * const queue, void * const buffer);
 
 /// @brief Peeks a single element from the start of the structure.
 /// @param queue Structure to peek.
 /// @param buffer Element buffer to save peek.
-void peek_fqueue(fqueue_s const * const restrict queue, void * const restrict buffer);
+void peek_fqueue(fqueue_s const * const queue, void * const buffer);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param queue Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_fqueue(fqueue_s const * const queue, handle_fn const handle, void * const argh);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param queue Structure to map.
 /// @param process Function pointer to manage array of elements using strucuter length, element size and arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void apply_fqueue(fqueue_s const * const restrict queue, process_fn const process, void * const restrict arguments);
+/// @param argp Generic arguments to use in function pointer.
+void apply_fqueue(fqueue_s const * const queue, process_fn const process, void * const argp);
 
 #endif // FQUEUE_H

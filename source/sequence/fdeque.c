@@ -8,7 +8,7 @@ fdeque_s create_fdeque(size_t const size, size_t const max) {
 
     // create finite queue with allocated memory and check if allocation succeded
     fdeque_s const deque = {
-        .elements = standard.alloc(size * max, standard.arguments),
+        .elements = standard.alloc(size * max, standard.arg),
         .size = size, .max = max,
         .allocator = &standard,
     };
@@ -24,7 +24,7 @@ fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * alloc
 
     // create finite queue with custom allocated memory and check if allocation succeded
     fdeque_s const deque = {
-        .elements = allocator->alloc(size * max, allocator->arguments),
+        .elements = allocator->alloc(size * max, allocator->arg),
         .size = size, .max = max,
         .allocator = allocator,
     };
@@ -33,7 +33,7 @@ fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * alloc
     return deque;
 }
 
-void destroy_fdeque(fdeque_s * const deque, set_fn const destroy) {
+void destroy_fdeque(fdeque_s * const deque, set_fn const destroy, void * const argd) {
     error(deque && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -51,20 +51,20 @@ void destroy_fdeque(fdeque_s * const deque, set_fn const destroy) {
 
     // iterate over elements on the right, if they exist with current offset
     for (size_t i = deque->current; i < right_length + deque->current; ++i) {
-        destroy(deque->elements + (i * deque->size));
+        destroy(deque->elements + (i * deque->size), argd);
     }
     // iterate over elements on the left size starting from zero, if they exist
     for (size_t i = 0; i < left_length; ++i) {
-        destroy(deque->elements + (i * deque->size));
+        destroy(deque->elements + (i * deque->size), argd);
     }
 
     // free elements array and set all values to zero/NULL
-    deque->allocator->free(deque->elements, deque->allocator->arguments);
+    deque->allocator->free(deque->elements, deque->allocator->arg);
 
     memset(deque, 0, sizeof(fdeque_s));
 }
 
-void clear_fdeque(fdeque_s * const deque, set_fn const destroy) {
+void clear_fdeque(fdeque_s * const deque, set_fn const destroy, void * const argd) {
     error(deque && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -82,11 +82,11 @@ void clear_fdeque(fdeque_s * const deque, set_fn const destroy) {
 
     // iterate over elements on the right, if they exist with current offset
     for (size_t i = deque->current; i < right_length + deque->current; ++i) {
-        destroy(deque->elements + (i * deque->size));
+        destroy(deque->elements + (i * deque->size), argd);
     }
     // iterate over elements on the left size starting from zero, if they exist
     for (size_t i = 0; i < left_length; ++i) {
-        destroy(deque->elements + (i * deque->size));
+        destroy(deque->elements + (i * deque->size), argd);
     }
 
     // only set parameters than will only clear the structure (it must remain usable)
@@ -106,7 +106,7 @@ fdeque_s copy_fdeque(fdeque_s const * const deque, copy_fn const copy) {
 
     // create initial replica structure with allocated memory (current remains 0)
     fdeque_s const replica = {
-        .elements = deque->allocator->alloc(deque->max * deque->size, deque->allocator->arguments),
+        .elements = deque->allocator->alloc(deque->max * deque->size, deque->allocator->arg),
         .max = deque->max, .size = deque->size, .length = deque->length,
         .allocator = deque->allocator,
     };
@@ -157,7 +157,7 @@ bool is_full_fdeque(fdeque_s const * const deque) {
     return (deque->length == deque->max); // compare if length is max
 }
 
-void enqueue_front_fdeque(fdeque_s * const restrict deque, void const * const restrict element) {
+void enqueue_front_fdeque(fdeque_s * const deque, void const * const element) {
     error(deque && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(deque->length != deque->max && "Structure is full.");
@@ -180,7 +180,7 @@ void enqueue_front_fdeque(fdeque_s * const restrict deque, void const * const re
     deque->length++;
 }
 
-void enqueue_back_fdeque(fdeque_s * const restrict deque, void const * const restrict element) {
+void enqueue_back_fdeque(fdeque_s * const deque, void const * const element) {
     error(deque && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(deque->length != deque->max && "Structure is full.");
@@ -201,7 +201,7 @@ void enqueue_back_fdeque(fdeque_s * const restrict deque, void const * const res
     deque->length++;
 }
 
-void dequeue_front_fdeque(fdeque_s * const restrict deque, void * const restrict buffer) {
+void dequeue_front_fdeque(fdeque_s * const deque, void * const buffer) {
     error(deque && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(deque->length && "Structure is empty.");
@@ -220,7 +220,7 @@ void dequeue_front_fdeque(fdeque_s * const restrict deque, void * const restrict
     deque->length--;
 }
 
-void dequeue_back_fdeque(fdeque_s * const restrict deque, void * const restrict buffer) {
+void dequeue_back_fdeque(fdeque_s * const deque, void * const buffer) {
     error(deque && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(deque->length && "Structure is empty.");
@@ -240,7 +240,7 @@ void dequeue_back_fdeque(fdeque_s * const restrict deque, void * const restrict 
     memcpy(buffer, deque->elements + (position * deque->size), deque->size);
 }
 
-void peek_front_fdeque(fdeque_s const * const restrict deque, void * const restrict buffer) {
+void peek_front_fdeque(fdeque_s const * const deque, void * const buffer) {
     error(deque && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(deque->length && "Structure is empty.");
@@ -257,7 +257,7 @@ void peek_front_fdeque(fdeque_s const * const restrict deque, void * const restr
     memcpy(buffer, deque->elements + (deque->current * deque->size), deque->size);
 }
 
-void peek_back_fdeque(fdeque_s const * const restrict deque, void * const restrict buffer) {
+void peek_back_fdeque(fdeque_s const * const deque, void * const buffer) {
     error(deque && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(deque->length && "Structure is empty.");
@@ -275,10 +275,10 @@ void peek_back_fdeque(fdeque_s const * const restrict deque, void * const restri
     memcpy(buffer, deque->elements + (position * deque->size), deque->size);
 }
 
-void each_front_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+void each_front_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const argh) {
     error(deque && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(deque != arguments && "Parameters can't be equal.");
+    error(deque != argh && "Parameters can't be equal.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->max && "Maximum can't be zero.");
@@ -295,17 +295,17 @@ void each_front_fdeque(fdeque_s const * const restrict deque, handle_fn const ha
     // create flag to save handle return value when handling is terminated
     bool is_handle = true;
     for (size_t i = deque->current; i < (right_length + deque->current) && is_handle; ++i) {
-        is_handle = handle(deque->elements + (i * deque->size), arguments);
+        is_handle = handle(deque->elements + (i * deque->size), argh);
     }
     for (size_t i = 0; i < left_length && is_handle; ++i) {
-        is_handle = handle(deque->elements + (i * deque->size), arguments);
+        is_handle = handle(deque->elements + (i * deque->size), argh);
     }
 }
 
-void each_back_fdeque(fdeque_s const * const restrict deque, handle_fn const handle, void * const restrict arguments) {
+void each_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const argh) {
     error(deque && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(deque != arguments && "Parameters can't be equal.");
+    error(deque != argh && "Parameters can't be equal.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->max && "Maximum can't be zero.");
@@ -324,18 +324,18 @@ void each_back_fdeque(fdeque_s const * const restrict deque, handle_fn const han
     bool is_handle = true;
     for (size_t i = 0; i < left_length && is_handle; ++i) {
         const size_t reverse = left_length - i - 1;
-        is_handle = handle(deque->elements + (reverse * deque->size), arguments);
+        is_handle = handle(deque->elements + (reverse * deque->size), argh);
     }
     for (size_t i = 0; i < right_length && is_handle; ++i) {
         const size_t reverse = right_length - i - 1;
-        is_handle = handle(deque->elements + ((reverse + deque->current) * deque->size), arguments);
+        is_handle = handle(deque->elements + ((reverse + deque->current) * deque->size), argh);
     }
 }
 
-void apply_fdeque(fdeque_s const * const restrict deque, process_fn const process, void * const restrict arguments) {
+void apply_fdeque(fdeque_s const * const deque, process_fn const process, void * const argp) {
     error(deque && "Parameter can't be NULL.");
     error(process && "Parameter can't be NULL.");
-    error(deque != arguments && "Parameters can't be equal.");
+    error(deque != argp && "Parameters can't be equal.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->max && "Maximum can't be zero.");
@@ -345,7 +345,7 @@ void apply_fdeque(fdeque_s const * const restrict deque, process_fn const proces
     valid(deque->current < deque->max && "Current exceeds maximum.");
 
     // initialize temporary elements array to save elements from circular field into straight
-    char * elements_array = deque->allocator->alloc(deque->length * deque->size, deque->allocator->arguments);
+    char * elements_array = deque->allocator->alloc(deque->length * deque->size, deque->allocator->arg);
     error((!deque->length || elements_array) && "Memory allocation failed.");
 
     // divide circular elements array into right and left part
@@ -358,12 +358,12 @@ void apply_fdeque(fdeque_s const * const restrict deque, process_fn const proces
     memcpy(elements_array + (right_length * deque->size), deque->elements, left_length * deque->size);
 
     // process temporary array
-    process(elements_array, deque->length, arguments);
+    process(elements_array, deque->length, argp);
 
     // save elements from temporary array back into structure while keeping its order
     memcpy(deque->elements + (deque->current * deque->size), elements_array, right_length * deque->size);
     memcpy(deque->elements, elements_array + (right_length * deque->size), left_length * deque->size);
 
     // free temporary array
-    deque->allocator->free(elements_array, deque->allocator->arguments);
+    deque->allocator->free(elements_array, deque->allocator->arg);
 }

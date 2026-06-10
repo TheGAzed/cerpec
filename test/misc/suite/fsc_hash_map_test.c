@@ -15,7 +15,7 @@ TEST CREATE_01(void) {
     ASSERT_NEQ(NULL, table.keys);
     ASSERT_NEQ(NULL, table.values);
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -23,7 +23,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     ASSERT_EQ(0, table.length);
     ASSERT_EQ(0, table.key_size);
@@ -38,7 +38,7 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
 
-    clear_fsc_hash_map(&table, intdst, intdst);
+    clear_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     ASSERT_EQ(0, table.length);
     ASSERT_NEQ(0, table.key_size);
@@ -47,7 +47,7 @@ TEST CLEAR_01(void) {
     ASSERT_NEQ(NULL, table.keys);
     ASSERT_NEQ(NULL, table.values);
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -70,8 +70,8 @@ TEST COPY_01(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_fsc_hash_map(&replica, intdst, intdst);
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&replica, intdst, NULL, intdst, NULL);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -94,8 +94,8 @@ TEST COPY_02(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_fsc_hash_map(&replica, intdst, intdst);
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&replica, intdst, NULL, intdst, NULL);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -108,7 +108,7 @@ TEST INSERT_01(void) {
         insert_fsc_hash_map(&table, &i, &j);
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -121,7 +121,7 @@ TEST INSERT_02(void) {
         insert_fsc_hash_map(&table, &i, &j);
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -142,7 +142,7 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -163,7 +163,7 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -180,7 +180,7 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_key_fsc_hash_map(&table, &i));
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -197,7 +197,7 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_key_fsc_hash_map(&table, &i));
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -216,7 +216,7 @@ TEST GET_VALUE_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -235,7 +235,7 @@ TEST GET_VALUE_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -257,7 +257,7 @@ TEST SET_VALUE_01(void) {
     get_value_fsc_hash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -279,7 +279,7 @@ TEST SET_VALUE_02(void) {
     get_value_fsc_hash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_fsc_hash_map(&table, intdst, intdst);
+    destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }

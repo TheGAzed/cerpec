@@ -11,7 +11,7 @@ TEST CREATE_01(void) {
     ASSERT_EQ(0, set.length);
     ASSERT_NEQ(0, set.size);
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -19,7 +19,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     ASSERT_EQ(0, set.length);
     ASSERT_EQ(0, set.size);
@@ -30,12 +30,12 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
 
-    clear_frb_set(&set, intdst);
+    clear_frb_set(&set, intdst, NULL);
 
     ASSERT_EQ(0, set.length);
     ASSERT_NEQ(0, set.size);
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -47,7 +47,7 @@ TEST INSERT_01(void) {
         insert_frb_set(&set, &i);
     }
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -59,7 +59,7 @@ TEST INSERT_02(void) {
         insert_frb_set(&set, &i);
     }
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -77,7 +77,7 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, buf);
     }
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -95,7 +95,7 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, buf);
     }
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -111,7 +111,7 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_frb_set(&set, &i));
     }
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -127,7 +127,7 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_frb_set(&set, &i));
     }
 
-    destroy_frb_set(&set, intdst);
+    destroy_frb_set(&set, intdst, NULL);
 
     PASS();
 }
@@ -147,9 +147,9 @@ TEST UNION_01(void) {
         ASSERT(contains_frb_set(&set_union, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_union, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_union, intdst, NULL);
 
     PASS();
 }
@@ -169,9 +169,9 @@ TEST UNION_02(void) {
         ASSERT(contains_frb_set(&set_union, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_union, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_union, intdst, NULL);
 
     PASS();
 }
@@ -194,9 +194,9 @@ TEST UNION_03(void) {
         ASSERT(contains_frb_set(&set_union, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_union, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_union, intdst, NULL);
 
     PASS();
 }
@@ -219,9 +219,9 @@ TEST UNION_04(void) {
         ASSERT(contains_frb_set(&set_union, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_union, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_union, intdst, NULL);
 
     PASS();
 }
@@ -244,9 +244,9 @@ TEST UNION_05(void) {
         ASSERT(contains_frb_set(&set_union, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_union, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_union, intdst, NULL);
 
     PASS();
 }
@@ -269,9 +269,9 @@ TEST UNION_06(void) {
         ASSERT(contains_frb_set(&set_union, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_union, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_union, intdst, NULL);
 
     PASS();
 }
@@ -291,9 +291,9 @@ TEST INTERSECT_01(void) {
         ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_intersect, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_intersect, intdst, NULL);
 
     PASS();
 }
@@ -313,9 +313,9 @@ TEST INTERSECT_02(void) {
         ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_intersect, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_intersect, intdst, NULL);
 
     PASS();
 }
@@ -338,9 +338,9 @@ TEST INTERSECT_03(void) {
         ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_intersect, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_intersect, intdst, NULL);
 
     PASS();
 }
@@ -363,9 +363,9 @@ TEST INTERSECT_04(void) {
         ASSERT_FALSE(contains_frb_set(&set_intersect, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_intersect, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_intersect, intdst, NULL);
 
     PASS();
 }
@@ -396,9 +396,9 @@ TEST INTERSECT_05(void) {
         ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_intersect, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_intersect, intdst, NULL);
 
     PASS();
 }
@@ -429,9 +429,9 @@ TEST INTERSECT_06(void) {
         ASSERT(contains_frb_set(&set_intersect, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_intersect, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_intersect, intdst, NULL);
 
     PASS();
 }
@@ -451,9 +451,9 @@ TEST SUBTRACT_01(void) {
         ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_subtract, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_subtract, intdst, NULL);
 
     PASS();
 }
@@ -473,9 +473,9 @@ TEST SUBTRACT_02(void) {
         ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_subtract, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_subtract, intdst, NULL);
 
     PASS();
 }
@@ -502,9 +502,9 @@ TEST SUBTRACT_03(void) {
         ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_subtract, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_subtract, intdst, NULL);
 
     PASS();
 }
@@ -531,9 +531,9 @@ TEST SUBTRACT_04(void) {
         ASSERT_FALSE(contains_frb_set(&set_subtract, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_subtract, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_subtract, intdst, NULL);
 
     PASS();
 }
@@ -556,9 +556,9 @@ TEST SUBTRACT_05(void) {
         ASSERT(contains_frb_set(&set_subtract, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_subtract, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_subtract, intdst, NULL);
 
     PASS();
 }
@@ -581,9 +581,9 @@ TEST SUBTRACT_06(void) {
         ASSERT(contains_frb_set(&set_subtract, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_subtract, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_subtract, intdst, NULL);
 
     PASS();
 }
@@ -603,9 +603,9 @@ TEST EXCLUDE_01(void) {
         ASSERT_FALSE(contains_frb_set(&set_exclude, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_exclude, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_exclude, intdst, NULL);
 
     PASS();
 }
@@ -625,9 +625,9 @@ TEST EXCLUDE_02(void) {
         ASSERT_FALSE(contains_frb_set(&set_exclude, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_exclude, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_exclude, intdst, NULL);
 
     PASS();
 }
@@ -650,9 +650,9 @@ TEST EXCLUDE_03(void) {
         ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_exclude, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_exclude, intdst, NULL);
 
     PASS();
 }
@@ -675,9 +675,9 @@ TEST EXCLUDE_04(void) {
         ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_exclude, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_exclude, intdst, NULL);
 
     PASS();
 }
@@ -704,9 +704,9 @@ TEST EXCLUDE_05(void) {
         ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_exclude, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_exclude, intdst, NULL);
 
     PASS();
 }
@@ -733,9 +733,9 @@ TEST EXCLUDE_06(void) {
         ASSERT(contains_frb_set(&set_exclude, &i));
     }
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
-    destroy_frb_set(&set_exclude, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
+    destroy_frb_set(&set_exclude, intdst, NULL);
 
     PASS();
 }
@@ -750,8 +750,8 @@ TEST IS_SUBSET_01(void) {
 
     ASSERT(is_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -766,8 +766,8 @@ TEST IS_SUBSET_02(void) {
 
     ASSERT(is_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -783,8 +783,8 @@ TEST IS_SUBSET_03(void) {
 
     ASSERT(is_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -800,8 +800,8 @@ TEST IS_SUBSET_04(void) {
 
     ASSERT(is_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -820,8 +820,8 @@ TEST IS_SUBSET_05(void) {
 
     ASSERT_FALSE(is_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -840,8 +840,8 @@ TEST IS_SUBSET_06(void) {
 
     ASSERT_FALSE(is_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -856,8 +856,8 @@ TEST IS_PROPER_SUBSET_01(void) {
 
     ASSERT(is_proper_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -872,8 +872,8 @@ TEST IS_PROPER_SUBSET_02(void) {
 
     ASSERT(is_proper_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -889,8 +889,8 @@ TEST IS_PROPER_SUBSET_03(void) {
 
     ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -906,8 +906,8 @@ TEST IS_PROPER_SUBSET_04(void) {
 
     ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -926,8 +926,8 @@ TEST IS_PROPER_SUBSET_05(void) {
 
     ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -946,8 +946,8 @@ TEST IS_PROPER_SUBSET_06(void) {
 
     ASSERT_FALSE(is_proper_subset_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -963,8 +963,8 @@ TEST IS_DISJOINT_01(void) {
 
     ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -980,8 +980,8 @@ TEST IS_DISJOINT_02(void) {
 
     ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -1000,8 +1000,8 @@ TEST IS_DISJOINT_03(void) {
 
     ASSERT(is_disjoint_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -1020,8 +1020,8 @@ TEST IS_DISJOINT_04(void) {
 
     ASSERT(is_disjoint_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -1040,8 +1040,8 @@ TEST IS_DISJOINT_05(void) {
 
     ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }
@@ -1060,8 +1060,8 @@ TEST IS_DISJOINT_06(void) {
 
     ASSERT_FALSE(is_disjoint_frb_set(&set_one, &set_two));
 
-    destroy_frb_set(&set_one, intdst);
-    destroy_frb_set(&set_two, intdst);
+    destroy_frb_set(&set_one, intdst, NULL);
+    destroy_frb_set(&set_two, intdst, NULL);
 
     PASS();
 }

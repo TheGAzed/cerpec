@@ -55,11 +55,11 @@ irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
     // initialize structure
     irb_set_s const set = {
         .root = NIL, .compare = compare, .size = size,
-        .elements = standard.alloc(size, standard.arguments),
-        .color = standard.alloc(sizeof(bool), standard.arguments),
-        .parent = standard.alloc(sizeof(size_t), standard.arguments),
-        .node[IRB_SET_LEFT] = standard.alloc(sizeof(size_t), standard.arguments),
-        .node[IRB_SET_RIGHT] = standard.alloc(sizeof(size_t), standard.arguments),
+        .elements = standard.alloc(size, standard.arg),
+        .color = standard.alloc(sizeof(bool), standard.arg),
+        .parent = standard.alloc(sizeof(size_t), standard.arg),
+        .node[IRB_SET_LEFT] = standard.alloc(sizeof(size_t), standard.arg),
+        .node[IRB_SET_RIGHT] = standard.alloc(sizeof(size_t), standard.arg),
         .allocator = &standard,
     };
     assert(set.elements && "[ERROR] Memory allocation failed.");
@@ -83,11 +83,11 @@ irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s con
     // initialize structure
     irb_set_s const set = {
         .root = NIL, .compare = compare, .size = size,
-        .elements = allocator->alloc(size, allocator->arguments),
-        .color = allocator->alloc(sizeof(bool), allocator->arguments),
-        .parent = allocator->alloc(sizeof(size_t), allocator->arguments),
-        .node[IRB_SET_LEFT] = allocator->alloc(sizeof(size_t), allocator->arguments),
-        .node[IRB_SET_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arguments),
+        .elements = allocator->alloc(size, allocator->arg),
+        .color = allocator->alloc(sizeof(bool), allocator->arg),
+        .parent = allocator->alloc(sizeof(size_t), allocator->arg),
+        .node[IRB_SET_LEFT] = allocator->alloc(sizeof(size_t), allocator->arg),
+        .node[IRB_SET_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arg),
         .allocator = allocator,
     };
     assert(set.elements && "[ERROR] Memory allocation failed.");
@@ -103,7 +103,7 @@ irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s con
     return set;
 }
 
-void destroy_irb_set(irb_set_s * const set, set_fn const destroy) {
+void destroy_irb_set(irb_set_s * const set, set_fn const destroy, void * const argd) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -113,21 +113,21 @@ void destroy_irb_set(irb_set_s * const set, set_fn const destroy) {
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     // free arrays
-    set->allocator->free(set->elements, set->allocator->arguments);
-    set->allocator->free(set->color, set->allocator->arguments);
-    set->allocator->free(set->parent, set->allocator->arguments);
-    set->allocator->free(set->node[IRB_SET_LEFT], set->allocator->arguments);
-    set->allocator->free(set->node[IRB_SET_RIGHT], set->allocator->arguments);
+    set->allocator->free(set->elements, set->allocator->arg);
+    set->allocator->free(set->color, set->allocator->arg);
+    set->allocator->free(set->parent, set->allocator->arg);
+    set->allocator->free(set->node[IRB_SET_LEFT], set->allocator->arg);
+    set->allocator->free(set->node[IRB_SET_RIGHT], set->allocator->arg);
 
     // make strucutre invalid/set to zero
     memset(set, 0, sizeof(irb_set_s));
 }
 
-void clear_irb_set(irb_set_s * const set, set_fn const destroy) {
+void clear_irb_set(irb_set_s * const set, set_fn const destroy, void * const argd) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -137,15 +137,15 @@ void clear_irb_set(irb_set_s * const set, set_fn const destroy) {
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     // shrink arrays to hold only one node
-    set->elements = set->allocator->realloc(set->elements, set->size, set->allocator->arguments);
-    set->color = set->allocator->realloc(set->color, sizeof(bool), set->allocator->arguments);
-    set->parent = set->allocator->realloc(set->parent, sizeof(size_t), set->allocator->arguments);
-    set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], sizeof(size_t), set->allocator->arguments);
-    set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], sizeof(size_t), set->allocator->arguments);
+    set->elements = set->allocator->realloc(set->elements, set->size, set->allocator->arg);
+    set->color = set->allocator->realloc(set->color, sizeof(bool), set->allocator->arg);
+    set->parent = set->allocator->realloc(set->parent, sizeof(size_t), set->allocator->arg);
+    set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], sizeof(size_t), set->allocator->arg);
+    set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], sizeof(size_t), set->allocator->arg);
 
     assert(set->elements && "[ERROR] Memory allocation failed.");
     assert(set->color && "[ERROR] Memory allocation failed.");
@@ -168,11 +168,11 @@ irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy) {
 
     // initialize replica
     irb_set_s const replica = {
-        .elements = set->allocator->alloc((set->capacity + 1) * set->size, set->allocator->arguments),
-        .color = set->allocator->alloc((set->capacity + 1) * sizeof(bool), set->allocator->arguments),
-        .parent = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arguments),
-        .node[IRB_SET_LEFT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arguments),
-        .node[IRB_SET_RIGHT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arguments),
+        .elements = set->allocator->alloc((set->capacity + 1) * set->size, set->allocator->arg),
+        .color = set->allocator->alloc((set->capacity + 1) * sizeof(bool), set->allocator->arg),
+        .parent = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arg),
+        .node[IRB_SET_LEFT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arg),
+        .node[IRB_SET_RIGHT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arg),
         .allocator = set->allocator,
 
         .capacity = set->capacity, .root = set->root, .length = set->length, .compare = set->compare, .size = set->size,
@@ -805,7 +805,7 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
     return true;
 }
 
-void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * const argh) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
@@ -824,7 +824,7 @@ void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * co
             node = left;
         }
 
-        if (!handle(set->elements + (node * set->size), arguments)) { break; }
+        if (!handle(set->elements + (node * set->size), argh)) { break; }
 
         left_done = true;
         if (NIL != right) {
@@ -1057,18 +1057,18 @@ void _irb_set_resize(irb_set_s * const set, size_t const size) {
     set->capacity = size;
     size_t const resize = set->capacity + 1; // +1 to account for special NIL node
 
-    set->elements = set->allocator->realloc(set->elements, resize * set->size, set->allocator->arguments);
+    set->elements = set->allocator->realloc(set->elements, resize * set->size, set->allocator->arg);
     assert(set->elements && "[ERROR] Memory allocation failed.");
 
-    set->color = set->allocator->realloc(set->color, resize * sizeof(bool), set->allocator->arguments);
+    set->color = set->allocator->realloc(set->color, resize * sizeof(bool), set->allocator->arg);
     assert(set->color && "[ERROR] Memory allocation failed.");
 
-    set->parent = set->allocator->realloc(set->parent, resize * sizeof(size_t), set->allocator->arguments);
+    set->parent = set->allocator->realloc(set->parent, resize * sizeof(size_t), set->allocator->arg);
     assert(set->parent && "[ERROR] Memory allocation failed.");
 
-    set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], resize * sizeof(size_t), set->allocator->arguments);
+    set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], resize * sizeof(size_t), set->allocator->arg);
     assert(set->node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
 
-    set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], resize * sizeof(size_t), set->allocator->arguments);
+    set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], resize * sizeof(size_t), set->allocator->arg);
     assert(set->node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
 }

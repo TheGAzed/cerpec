@@ -35,12 +35,14 @@ ibinary_heap_s make_ibinary_heap(size_t const size, compare_fn const compare, me
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param heap Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const argd);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param heap Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const argd);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param heap Structure to copy.
@@ -78,12 +80,12 @@ void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index,
 /// @brief Melds (combines) second structure into first while keeping properties.
 /// @param destination First structure to meld elements into.
 /// @param source Second structure to meld elements from.
-void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap_s * const restrict source);
+void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * const source);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param heap Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const argh);
 
 #endif // IBINARY_HEAP_H

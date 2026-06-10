@@ -33,12 +33,14 @@ fsc_hash_set_s make_fsc_hash_set(size_t const size, size_t const max, hash_fn co
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const argd);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const argd);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param set Structure to copy.
@@ -122,7 +124,7 @@ bool is_disjoint_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set
 /// @brief Iterates over each element in structure.
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle, void * const arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle, void * const argh);
 
 #endif // FSC_HASH_SET_H

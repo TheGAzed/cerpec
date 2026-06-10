@@ -14,7 +14,7 @@ TEST CREATE_01(void) {
     ASSERT_EQ(NULL, table.keys);
     ASSERT_EQ(NULL, table.values);
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -22,7 +22,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     ASSERT_EQ(0, table.capacity);
     ASSERT_EQ(0, table.length);
@@ -38,7 +38,7 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
 
-    clear_isc_hash_map(&table, intdst, intdst);
+    clear_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     ASSERT_EQ(0, table.capacity);
     ASSERT_EQ(0, table.length);
@@ -48,7 +48,7 @@ TEST CLEAR_01(void) {
     ASSERT_EQ(NULL, table.keys);
     ASSERT_EQ(NULL, table.values);
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -71,8 +71,8 @@ TEST COPY_01(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_isc_hash_map(&replica, intdst, intdst);
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&replica, intdst, NULL, intdst, NULL);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -95,8 +95,8 @@ TEST COPY_02(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_isc_hash_map(&replica, intdst, intdst);
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&replica, intdst, NULL, intdst, NULL);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -119,8 +119,8 @@ TEST COPY_03(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_isc_hash_map(&replica, intdst, intdst);
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&replica, intdst, NULL, intdst, NULL);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -133,7 +133,7 @@ TEST INSERT_01(void) {
         insert_isc_hash_map(&table, &i, &j);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -146,7 +146,7 @@ TEST INSERT_02(void) {
         insert_isc_hash_map(&table, &i, &j);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -159,7 +159,7 @@ TEST INSERT_03(void) {
         insert_isc_hash_map(&table, &i, &j);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -180,7 +180,7 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -201,7 +201,7 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -222,7 +222,7 @@ TEST REMOVE_03(void) {
         ASSERT_EQ(i, value);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -239,7 +239,7 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_key_isc_hash_map(&table, &i));
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -256,7 +256,7 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_key_isc_hash_map(&table, &i));
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -273,7 +273,7 @@ TEST CONTAINS_03(void) {
         ASSERT(contains_key_isc_hash_map(&table, &i));
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -292,7 +292,7 @@ TEST GET_VALUE_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -311,7 +311,7 @@ TEST GET_VALUE_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -330,7 +330,7 @@ TEST GET_VALUE_03(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -352,7 +352,7 @@ TEST SET_VALUE_01(void) {
     get_value_isc_hash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -374,7 +374,7 @@ TEST SET_VALUE_02(void) {
     get_value_isc_hash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }
@@ -396,7 +396,7 @@ TEST SET_VALUE_03(void) {
     get_value_isc_hash_map(&table, &key, &b);
     ASSERT_EQ(value, b);
 
-    destroy_isc_hash_map(&table, intdst, intdst);
+    destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
     PASS();
 }

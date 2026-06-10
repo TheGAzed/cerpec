@@ -12,7 +12,7 @@ TEST CREATE_01(void) {
     ASSERT_EQ(0, heap.length);
     ASSERT_NEQ(0, heap.size);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -20,7 +20,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     ibinary_heap_s heap = create_ibinary_heap(sizeof(int), intcmp);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     ASSERT_EQ(0, heap.capacity);
     ASSERT_EQ(NULL, heap.compare);
@@ -34,7 +34,7 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     ibinary_heap_s heap = create_ibinary_heap(sizeof(int), intcmp);
 
-    clear_ibinary_heap(&heap, intdst);
+    clear_ibinary_heap(&heap, intdst, NULL);
 
     ASSERT_EQ(0, heap.capacity);
     ASSERT_NEQ(NULL, heap.compare);
@@ -42,7 +42,7 @@ TEST CLEAR_01(void) {
     ASSERT_EQ(0, heap.length);
     ASSERT_NEQ(0, heap.size);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -64,8 +64,8 @@ TEST COPY_01(void) {
         ASSERT_EQ(a, b);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
-    destroy_ibinary_heap(&replica, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
+    destroy_ibinary_heap(&replica, intdst, NULL);
 
     PASS();
 }
@@ -87,8 +87,8 @@ TEST COPY_02(void) {
         ASSERT_EQ(a, b);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
-    destroy_ibinary_heap(&replica, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
+    destroy_ibinary_heap(&replica, intdst, NULL);
 
     PASS();
 }
@@ -110,8 +110,8 @@ TEST COPY_03(void) {
         ASSERT_EQ(a, b);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
-    destroy_ibinary_heap(&replica, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
+    destroy_ibinary_heap(&replica, intdst, NULL);
 
     PASS();
 }
@@ -123,7 +123,7 @@ TEST PUSH_01(void) {
         push_ibinary_heap(&heap, &i);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -135,7 +135,7 @@ TEST PUSH_02(void) {
         push_ibinary_heap(&heap, &i);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -147,7 +147,7 @@ TEST PUSH_03(void) {
         push_ibinary_heap(&heap, &i);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -166,7 +166,7 @@ TEST POP_01(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -185,7 +185,7 @@ TEST POP_02(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -204,7 +204,7 @@ TEST POP_03(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -220,7 +220,7 @@ TEST PEEP_01(void) {
     peep_ibinary_heap(&heap, &a);
     ASSERT_EQ(0, a);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -236,7 +236,7 @@ TEST PEEP_02(void) {
     peep_ibinary_heap(&heap, &a);
     ASSERT_EQ(0, a);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -252,7 +252,7 @@ TEST PEEP_03(void) {
     peep_ibinary_heap(&heap, &a);
     ASSERT_EQ(0, a);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -273,7 +273,7 @@ TEST REPLACE_01(void) {
     peep_ibinary_heap(&heap, &c);
     ASSERT_EQ(1, c);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -294,7 +294,7 @@ TEST REPLACE_02(void) {
     peep_ibinary_heap(&heap, &c);
     ASSERT_EQ(1, c);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -315,7 +315,7 @@ TEST REPLACE_03(void) {
     peep_ibinary_heap(&heap, &c);
     ASSERT_EQ(1, c);
 
-    destroy_ibinary_heap(&heap, intdst);
+    destroy_ibinary_heap(&heap, intdst, NULL);
 
     PASS();
 }
@@ -341,8 +341,8 @@ TEST MELD_01(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_ibinary_heap(&one, intdst);
-    destroy_ibinary_heap(&two, intdst);
+    destroy_ibinary_heap(&one, intdst, NULL);
+    destroy_ibinary_heap(&two, intdst, NULL);
 
     PASS();
 }
@@ -368,8 +368,8 @@ TEST MELD_02(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_ibinary_heap(&one, intdst);
-    destroy_ibinary_heap(&two, intdst);
+    destroy_ibinary_heap(&one, intdst, NULL);
+    destroy_ibinary_heap(&two, intdst, NULL);
 
     PASS();
 }
@@ -395,8 +395,8 @@ TEST MELD_03(void) {
         ASSERT_EQ(a, i);
     }
 
-    destroy_ibinary_heap(&one, intdst);
-    destroy_ibinary_heap(&two, intdst);
+    destroy_ibinary_heap(&one, intdst, NULL);
+    destroy_ibinary_heap(&two, intdst, NULL);
 
     PASS();
 }
@@ -417,7 +417,7 @@ TEST MAP_01(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_ibinary_heap(&test, intdst);
+    destroy_ibinary_heap(&test, intdst, NULL);
 
     PASS();
 }
@@ -438,7 +438,7 @@ TEST MAP_02(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_ibinary_heap(&test, intdst);
+    destroy_ibinary_heap(&test, intdst, NULL);
 
     PASS();
 }
@@ -459,7 +459,7 @@ TEST MAP_03(void) {
         ASSERT_EQ(i + value, a);
     }
 
-    destroy_ibinary_heap(&test, intdst);
+    destroy_ibinary_heap(&test, intdst, NULL);
 
     PASS();
 }

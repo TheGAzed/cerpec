@@ -19,31 +19,31 @@ struct fbsearch_tree_queue {
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search floor of.
 /// @return Pointer to index of floor element or NULL.
-size_t * _fbsearch_tree_floor(fbsearch_tree_s * const restrict tree, void const * const restrict element);
+size_t * _fbsearch_tree_floor(fbsearch_tree_s * const tree, void const * const element);
 
 /// @brief Helper function to get pointer index to ceil of element.
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search ceil of.
 /// @return Pointer to index of ceil element or NULL.
-size_t * _fbsearch_tree_ceil(fbsearch_tree_s * const restrict tree, void const * const restrict element);
+size_t * _fbsearch_tree_ceil(fbsearch_tree_s * const tree, void const * const element);
 
 /// @brief Helper function to get pointer index to successor of element.
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search successor of.
 /// @return Pointer to index of successor element or NULL.
-size_t * _fbsearch_tree_successor(fbsearch_tree_s * const restrict tree, void const * const restrict element);
+size_t * _fbsearch_tree_successor(fbsearch_tree_s * const tree, void const * const element);
 
 /// @brief Helper function to get pointer index to predecessor of element.
 /// @param tree Structure to get pointer index from.
 /// @param element Element to search predecessor of.
 /// @return Pointer to index of predecessor element or NULL.
-size_t * _fbsearch_tree_predecessor(fbsearch_tree_s * const restrict tree, void const * const restrict element);
+size_t * _fbsearch_tree_predecessor(fbsearch_tree_s * const tree, void const * const element);
 
 /// Binary search tree node removal fixup.
 /// @param tree Structure to fix.
 /// @param node Index reference to removed node.
 /// @return Index of hole left behind by fixup.
-size_t _fbsearch_tree_remove_fixup(fbsearch_tree_s const * const restrict tree, size_t * const restrict node);
+size_t _fbsearch_tree_remove_fixup(fbsearch_tree_s const * const tree, size_t * const node);
 
 /// Fills the hole left after removing an element in the tree's arrays, puts rightmost element into hole.
 /// @param tree Structure to fill.
@@ -57,10 +57,10 @@ fbsearch_tree_s create_fbsearch_tree(size_t const size, size_t const max, compar
 
     fbsearch_tree_s const tree = {
         .compare = compare, .allocator = &standard, .max = max, .root = NIL, .size = size,
-        .elements = standard.alloc(max * size, standard.arguments),
-        .parent = standard.alloc(max * sizeof(size_t), standard.arguments),
-        .node[FBST_RIGHT] = standard.alloc(max * sizeof(size_t), standard.arguments),
-        .node[FBST_LEFT] = standard.alloc(max * sizeof(size_t), standard.arguments),
+        .elements = standard.alloc(max * size, standard.arg),
+        .parent = standard.alloc(max * sizeof(size_t), standard.arg),
+        .node[FBST_RIGHT] = standard.alloc(max * sizeof(size_t), standard.arg),
+        .node[FBST_LEFT] = standard.alloc(max * sizeof(size_t), standard.arg),
     };
     error(tree.elements && "Memory allocation failed.");
     error(tree.parent && "Memory allocation failed.");
@@ -78,10 +78,10 @@ fbsearch_tree_s make_fbsearch_tree(size_t const size, size_t const max, compare_
 
     fbsearch_tree_s const tree = {
         .compare = compare, .allocator = allocator, .max = max, .root = NIL, .size = size,
-        .elements = allocator->alloc(max * size, allocator->arguments),
-        .parent = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-        .node[FBST_RIGHT] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-        .node[FBST_LEFT] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .elements = allocator->alloc(max * size, allocator->arg),
+        .parent = allocator->alloc(max * sizeof(size_t), allocator->arg),
+        .node[FBST_RIGHT] = allocator->alloc(max * sizeof(size_t), allocator->arg),
+        .node[FBST_LEFT] = allocator->alloc(max * sizeof(size_t), allocator->arg),
     };
     error(tree.elements && "Memory allocation failed.");
     error(tree.parent && "Memory allocation failed.");
@@ -91,7 +91,7 @@ fbsearch_tree_s make_fbsearch_tree(size_t const size, size_t const max, compare_
     return tree;
 }
 
-void destroy_fbsearch_tree(fbsearch_tree_s * const tree, set_fn const destroy) {
+void destroy_fbsearch_tree(fbsearch_tree_s * const tree, set_fn const destroy, void * const argd) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -106,17 +106,17 @@ void destroy_fbsearch_tree(fbsearch_tree_s * const tree, set_fn const destroy) {
     valid(tree->node[FBST_RIGHT] && "Rights array can't be NULL");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size));
+        destroy(tree->elements + (i * tree->size), argd);
     }
-    tree->allocator->free(tree->elements, tree->allocator->arguments);
-    tree->allocator->free(tree->parent, tree->allocator->arguments);
-    tree->allocator->free(tree->node[FBST_LEFT], tree->allocator->arguments);
-    tree->allocator->free(tree->node[FBST_RIGHT], tree->allocator->arguments);
+    tree->allocator->free(tree->elements, tree->allocator->arg);
+    tree->allocator->free(tree->parent, tree->allocator->arg);
+    tree->allocator->free(tree->node[FBST_LEFT], tree->allocator->arg);
+    tree->allocator->free(tree->node[FBST_RIGHT], tree->allocator->arg);
 
     memset(tree, 0, sizeof(fbsearch_tree_s));
 }
 
-void clear_fbsearch_tree(fbsearch_tree_s * const tree, set_fn const destroy) {
+void clear_fbsearch_tree(fbsearch_tree_s * const tree, set_fn const destroy, void * const argd) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -131,7 +131,7 @@ void clear_fbsearch_tree(fbsearch_tree_s * const tree, set_fn const destroy) {
     valid(tree->node[FBST_RIGHT] && "Rights array can't be NULL");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size));
+        destroy(tree->elements + (i * tree->size), argd);
     }
 
     tree->length = 0;
@@ -153,10 +153,10 @@ fbsearch_tree_s copy_fbsearch_tree(fbsearch_tree_s const * const tree, copy_fn c
     valid(tree->node[FBST_RIGHT] && "Rights array can't be NULL");
 
     fbsearch_tree_s const replica = {
-        .elements = tree->allocator->alloc(tree->max * tree->size, tree->allocator->arguments),
-        .parent = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arguments),
-        .node[FBST_LEFT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arguments),
-        .node[FBST_RIGHT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arguments),
+        .elements = tree->allocator->alloc(tree->max * tree->size, tree->allocator->arg),
+        .parent = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arg),
+        .node[FBST_LEFT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arg),
+        .node[FBST_RIGHT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arg),
 
         .max = tree->max, .root = tree->root, .length = tree->length, .compare = tree->compare,
         .size = tree->size, .allocator = tree->allocator,
@@ -208,7 +208,7 @@ bool is_full_fbsearch_tree(fbsearch_tree_s const * const tree) {
     return (tree->length == tree->max);
 }
 
-void insert_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * const restrict element) {
+void insert_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element) {
     error(tree && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(tree != element && "Parameters can't be equal.");
@@ -241,7 +241,7 @@ void insert_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * co
     tree->length++;
 }
 
-void remove_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -289,7 +289,7 @@ void remove_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * co
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-bool contains_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void const * const restrict element) {
+bool contains_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element) {
     error(tree && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(tree != element && "Parameters can't be equal.");
@@ -317,7 +317,7 @@ bool contains_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void co
     return false;
 }
 
-void get_max_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void * const restrict buffer) {
+void get_max_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -346,7 +346,7 @@ void get_max_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void * c
     memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
 }
 
-void get_min_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void * const restrict buffer) {
+void get_min_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -375,7 +375,7 @@ void get_min_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void * c
     memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
 }
 
-void remove_max_fbsearch_tree(fbsearch_tree_s * const restrict tree, void * const restrict buffer) {
+void remove_max_fbsearch_tree(fbsearch_tree_s * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -415,7 +415,7 @@ void remove_max_fbsearch_tree(fbsearch_tree_s * const restrict tree, void * cons
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void remove_min_fbsearch_tree(fbsearch_tree_s * const restrict tree, void * const restrict buffer) {
+void remove_min_fbsearch_tree(fbsearch_tree_s * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -455,7 +455,7 @@ void remove_min_fbsearch_tree(fbsearch_tree_s * const restrict tree, void * cons
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void get_floor_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_floor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -502,7 +502,7 @@ void get_floor_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void c
     memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
 }
 
-void get_ceil_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_ceil_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -549,7 +549,7 @@ void get_ceil_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void co
     memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
 }
 
-void remove_floor_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_floor_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -586,7 +586,7 @@ void remove_floor_fbsearch_tree(fbsearch_tree_s * const restrict tree, void cons
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void remove_ceil_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_ceil_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -623,7 +623,7 @@ void remove_ceil_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void get_successor_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_successor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -674,7 +674,7 @@ void get_successor_fbsearch_tree(fbsearch_tree_s const * const restrict tree, vo
     memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
 }
 
-void get_predecessor_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void get_predecessor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -725,7 +725,7 @@ void get_predecessor_fbsearch_tree(fbsearch_tree_s const * const restrict tree, 
     memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
 }
 
-void remove_successor_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_successor_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -762,7 +762,7 @@ void remove_successor_fbsearch_tree(fbsearch_tree_s * const restrict tree, void 
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void remove_predecessor_fbsearch_tree(fbsearch_tree_s * const restrict tree, void const * const restrict element, void * const restrict buffer) {
+void remove_predecessor_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -799,7 +799,7 @@ void remove_predecessor_fbsearch_tree(fbsearch_tree_s * const restrict tree, voi
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void update_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void const * const restrict latter, void * const restrict former) {
+void update_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const latter, void * const former) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(latter && "Parameter can't be NULL.");
@@ -845,10 +845,10 @@ void update_fbsearch_tree(fbsearch_tree_s const * const restrict tree, void cons
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void in_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void in_order_fbsearch_tree(fbsearch_tree_s const * const tree, handle_fn const handle, void * const argh) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != arguments && "Parameters can't be equal.");
+    error(tree != argh && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -867,7 +867,7 @@ void in_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle_
             node = tree->node[FBST_LEFT][node];
         }
 
-        if (!handle(tree->elements + (node * tree->size), arguments)) {
+        if (!handle(tree->elements + (node * tree->size), argh)) {
             break;
         }
 
@@ -891,10 +891,10 @@ void in_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle_
     }
 }
 
-void pre_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void pre_order_fbsearch_tree(fbsearch_tree_s const * const tree, handle_fn const handle, void * const argh) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != arguments && "Parameters can't be equal.");
+    error(tree != argh && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -908,7 +908,7 @@ void pre_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle
 
     // create simple stack to manage depth first in-order traversal of node indexes
     struct fbsearch_tree_stack stack = {
-        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
+        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arg),
     };
     error(!tree->length || stack.elements && "Memory allocation failed.");
 
@@ -916,7 +916,7 @@ void pre_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), arguments)) {
+    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), argh)) {
         size_t const node = stack.elements[--stack.length];
 
         size_t const right_child = tree->node[FBST_RIGHT][node];
@@ -930,13 +930,13 @@ void pre_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle
         }
     }
 
-    tree->allocator->free(stack.elements, tree->allocator->arguments);
+    tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void post_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void post_order_fbsearch_tree(fbsearch_tree_s const * const tree, handle_fn const handle, void * const argh) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != arguments && "Parameters can't be equal.");
+    error(tree != argh && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -950,7 +950,7 @@ void post_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handl
 
     // create simple stack to manage depth first in-order traversal of node indexes
     struct fbsearch_tree_stack stack = {
-        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
+        .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arg),
     };
     error(!tree->length || stack.elements && "Memory allocation failed.");
 
@@ -968,7 +968,7 @@ void post_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handl
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!handle(tree->elements + (node * tree->size), arguments)) {
+                if (!handle(tree->elements + (node * tree->size), argh)) {
                     break;
                 }
 
@@ -977,13 +977,13 @@ void post_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handl
         }
     }
 
-    tree->allocator->free(stack.elements, tree->allocator->arguments);
+    tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void level_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, handle_fn const handle, void * const restrict arguments) {
+void level_order_fbsearch_tree(fbsearch_tree_s const * const tree, handle_fn const handle, void * const argh) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != arguments && "Parameters can't be equal.");
+    error(tree != argh && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -997,7 +997,7 @@ void level_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, hand
 
     // create simple queue to manage breath first level order traversal of node indexes
     struct fbsearch_tree_queue queue = {
-        .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arguments),
+        .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arg),
     };
     error(!tree->length || queue.elements && "Memory allocation failed.");
 
@@ -1006,7 +1006,7 @@ void level_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, hand
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), arguments)) {
+    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), argh)) {
         // pop index
         size_t const node = queue.elements[queue.current++];
         queue.length--;
@@ -1024,10 +1024,10 @@ void level_order_fbsearch_tree(fbsearch_tree_s const * const restrict tree, hand
         }
     }
 
-    tree->allocator->free(queue.elements, tree->allocator->arguments);
+    tree->allocator->free(queue.elements, tree->allocator->arg);
 }
 
-size_t * _fbsearch_tree_floor(fbsearch_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _fbsearch_tree_floor(fbsearch_tree_s * const tree, void const * const element) {
     size_t * floor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
@@ -1046,7 +1046,7 @@ size_t * _fbsearch_tree_floor(fbsearch_tree_s * const restrict tree, void const 
     return floor;
 }
 
-size_t * _fbsearch_tree_ceil(fbsearch_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _fbsearch_tree_ceil(fbsearch_tree_s * const tree, void const * const element) {
     size_t * ceil = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
@@ -1065,7 +1065,7 @@ size_t * _fbsearch_tree_ceil(fbsearch_tree_s * const restrict tree, void const *
     return ceil;
 }
 
-size_t * _fbsearch_tree_successor(fbsearch_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _fbsearch_tree_successor(fbsearch_tree_s * const tree, void const * const element) {
     size_t * successor = NULL;
 
     size_t * const right = tree->node[FBST_RIGHT] + tree->root;
@@ -1088,7 +1088,7 @@ size_t * _fbsearch_tree_successor(fbsearch_tree_s * const restrict tree, void co
     return successor;
 }
 
-size_t * _fbsearch_tree_predecessor(fbsearch_tree_s * const restrict tree, void const * const restrict element) {
+size_t * _fbsearch_tree_predecessor(fbsearch_tree_s * const tree, void const * const element) {
     size_t * predecessor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         size_t * const left = tree->node[FBST_LEFT] + (*n);
@@ -1146,7 +1146,7 @@ void _fbsearch_tree_fill_hole(fbsearch_tree_s * const tree, size_t const hole) {
     }
 }
 
-size_t _fbsearch_tree_remove_fixup(fbsearch_tree_s const * const restrict tree, size_t * const restrict node) {
+size_t _fbsearch_tree_remove_fixup(fbsearch_tree_s const * const tree, size_t * const node) {
     // calculate the rightmost depth of the left child
     size_t left_depth = 0, * left_node = node;
     for (size_t * l = tree->node[FBST_LEFT] + (*left_node); NIL != (*l); l = tree->node[FBST_RIGHT] + (*l)) {

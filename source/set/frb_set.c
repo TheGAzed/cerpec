@@ -51,11 +51,11 @@ frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const c
     // initialize structure
     frb_set_s const set = {
         .root = NIL, .compare = compare, .size = size, .max = max,
-        .elements = standard.alloc((max + 1) * size, standard.arguments),
-        .color = standard.alloc((max + 1) * sizeof(bool), standard.arguments),
-        .parent = standard.alloc((max + 1) * sizeof(size_t), standard.arguments),
-        .node[IRB_SET_LEFT] = standard.alloc((max + 1) * sizeof(size_t), standard.arguments),
-        .node[IRB_SET_RIGHT] = standard.alloc((max + 1) * sizeof(size_t), standard.arguments),
+        .elements = standard.alloc((max + 1) * size, standard.arg),
+        .color = standard.alloc((max + 1) * sizeof(bool), standard.arg),
+        .parent = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
+        .node[IRB_SET_LEFT] = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
+        .node[IRB_SET_RIGHT] = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
         .allocator = &standard,
     };
     assert(set.elements && "[ERROR] Memory allocation failed.");
@@ -80,11 +80,11 @@ frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const com
     // initialize structure
     frb_set_s const set = {
         .root = NIL, .compare = compare, .size = size, .max = max,
-        .elements = allocator->alloc((max + 1) *size, allocator->arguments),
-        .color = allocator->alloc((max + 1) *sizeof(bool), allocator->arguments),
-        .parent = allocator->alloc((max + 1) *sizeof(size_t), allocator->arguments),
-        .node[IRB_SET_LEFT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arguments),
-        .node[IRB_SET_RIGHT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arguments),
+        .elements = allocator->alloc((max + 1) *size, allocator->arg),
+        .color = allocator->alloc((max + 1) *sizeof(bool), allocator->arg),
+        .parent = allocator->alloc((max + 1) *sizeof(size_t), allocator->arg),
+        .node[IRB_SET_LEFT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arg),
+        .node[IRB_SET_RIGHT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arg),
         .allocator = allocator,
     };
     assert(set.elements && "[ERROR] Memory allocation failed.");
@@ -100,7 +100,7 @@ frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const com
     return set;
 }
 
-void destroy_frb_set(frb_set_s * const set, set_fn const destroy) {
+void destroy_frb_set(frb_set_s * const set, set_fn const destroy, void * const argd) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -110,21 +110,21 @@ void destroy_frb_set(frb_set_s * const set, set_fn const destroy) {
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     // free arrays
-    set->allocator->free(set->elements, set->allocator->arguments);
-    set->allocator->free(set->color, set->allocator->arguments);
-    set->allocator->free(set->parent, set->allocator->arguments);
-    set->allocator->free(set->node[IRB_SET_LEFT], set->allocator->arguments);
-    set->allocator->free(set->node[IRB_SET_RIGHT], set->allocator->arguments);
+    set->allocator->free(set->elements, set->allocator->arg);
+    set->allocator->free(set->color, set->allocator->arg);
+    set->allocator->free(set->parent, set->allocator->arg);
+    set->allocator->free(set->node[IRB_SET_LEFT], set->allocator->arg);
+    set->allocator->free(set->node[IRB_SET_RIGHT], set->allocator->arg);
 
     // make strucutre invalid/set to zero
     memset(set, 0, sizeof(frb_set_s));
 }
 
-void clear_frb_set(frb_set_s * const set, set_fn const destroy) {
+void clear_frb_set(frb_set_s * const set, set_fn const destroy, void * const argd) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -134,7 +134,7 @@ void clear_frb_set(frb_set_s * const set, set_fn const destroy) {
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     // clear (NOT destroy) structure
@@ -152,11 +152,11 @@ frb_set_s copy_frb_set(frb_set_s const * const set, copy_fn const copy) {
 
     // initialize replica
     frb_set_s const replica = {
-        .elements = set->allocator->alloc((set->max + 1) * set->size, set->allocator->arguments),
-        .color = set->allocator->alloc((set->max + 1) * sizeof(bool), set->allocator->arguments),
-        .parent = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arguments),
-        .node[IRB_SET_LEFT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arguments),
-        .node[IRB_SET_RIGHT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arguments),
+        .elements = set->allocator->alloc((set->max + 1) * set->size, set->allocator->arg),
+        .color = set->allocator->alloc((set->max + 1) * sizeof(bool), set->allocator->arg),
+        .parent = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arg),
+        .node[IRB_SET_LEFT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arg),
+        .node[IRB_SET_RIGHT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arg),
         .allocator = set->allocator,
 
         .max = set->max, .root = set->root, .length = set->length, .compare = set->compare, .size = set->size,
@@ -770,7 +770,7 @@ bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * cons
     return true;
 }
 
-void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const argh) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
@@ -778,7 +778,7 @@ void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * co
     assert(set->size && "[INVALID] Parameter can't be zero.");
     assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
 
-    for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), arguments); ++i) {}
+    for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), argh); ++i) {}
 }
 
 void _frb_set_left_rotate(frb_set_s * const set, size_t const node) {

@@ -61,7 +61,7 @@ isc_hash_set_s make_isc_hash_set(size_t const size, hash_fn const hash, compare_
     return _make_wrapper_isc_hash_set(size, hash, compare, allocator);
 }
 
-void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy) {
+void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const argd) {
     error(set && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
@@ -72,22 +72,22 @@ void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy) {
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     // free arrays
-    set->allocator->free(set->elements, set->allocator->arguments);
-    set->allocator->free(set->hashes, set->allocator->arguments);
+    set->allocator->free(set->elements, set->allocator->arg);
+    set->allocator->free(set->hashes, set->allocator->arg);
 
-    set->allocator->free(set->head, set->allocator->arguments);
-    set->allocator->free(set->next, set->allocator->arguments);
-    set->allocator->free(set->prev, set->allocator->arguments);
+    set->allocator->free(set->head, set->allocator->arg);
+    set->allocator->free(set->next, set->allocator->arg);
+    set->allocator->free(set->prev, set->allocator->arg);
 
     // set everything to zero/false
     memset(set, 0, sizeof(isc_hash_set_s));
 }
 
-void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy) {
+void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const argd) {
     error(set && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
@@ -98,16 +98,16 @@ void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy) {
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     // free arrays
-    set->allocator->free(set->elements, set->allocator->arguments);
-    set->allocator->free(set->hashes, set->allocator->arguments);
+    set->allocator->free(set->elements, set->allocator->arg);
+    set->allocator->free(set->hashes, set->allocator->arg);
 
-    set->allocator->free(set->head, set->allocator->arguments);
-    set->allocator->free(set->next, set->allocator->arguments);
-    set->allocator->free(set->prev, set->allocator->arguments);
+    set->allocator->free(set->head, set->allocator->arg);
+    set->allocator->free(set->next, set->allocator->arg);
+    set->allocator->free(set->prev, set->allocator->arg);
 
     // only clear set (keep the set usable)
     set->capacity = set->length = 0;
@@ -556,7 +556,7 @@ bool is_disjoint_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set
     return true;
 }
 
-void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const argh) {
     error(set && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
@@ -567,7 +567,7 @@ void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle,
     valid(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     for (size_t i = 0; i < set->length; ++i) {
-        if (!handle(set->elements + (i * set->size), arguments)) { break; }
+        if (!handle(set->elements + (i * set->size), argh)) { break; }
     }
 }
 
@@ -575,19 +575,19 @@ void _isc_hash_set_resize(isc_hash_set_s * const set, size_t const size) {
     // set table to new resized parameters
     set->capacity = size;
 
-    set->head = set->allocator->realloc(set->head, size * sizeof(size_t), set->allocator->arguments);
+    set->head = set->allocator->realloc(set->head, size * sizeof(size_t), set->allocator->arg);
     error((!set->capacity || set->head) && "Memory allocation failed.");
 
-    set->next = set->allocator->realloc(set->next, size * sizeof(size_t), set->allocator->arguments);
+    set->next = set->allocator->realloc(set->next, size * sizeof(size_t), set->allocator->arg);
     error((!set->capacity || set->next) && "Memory allocation failed.");
 
-    set->prev = set->allocator->realloc(set->prev, size * sizeof(size_t), set->allocator->arguments);
+    set->prev = set->allocator->realloc(set->prev, size * sizeof(size_t), set->allocator->arg);
     error((!set->capacity || set->prev) && "Memory allocation failed.");
 
-    set->elements = set->allocator->realloc(set->elements, size * set->size, set->allocator->arguments);
+    set->elements = set->allocator->realloc(set->elements, size * set->size, set->allocator->arg);
     error((!set->capacity || set->elements) && "Memory allocation failed.");
 
-    set->hashes = set->allocator->realloc(set->hashes, size * sizeof(size_t), set->allocator->arguments);
+    set->hashes = set->allocator->realloc(set->hashes, size * sizeof(size_t), set->allocator->arg);
     error((!set->capacity || set->hashes) && "Memory allocation failed.");
 
     for (size_t i = 0; i < set->capacity; ++i) {
@@ -620,12 +620,12 @@ isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy
         .capacity = set->capacity, .hash = set->hash, .length = set->length, .size = set->size,
         .allocator = set->allocator, .compare = set->compare,
 
-        .elements = set->allocator->alloc(set->capacity * set->size, set->allocator->arguments),
-        .hashes = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arguments),
+        .elements = set->allocator->alloc(set->capacity * set->size, set->allocator->arg),
+        .hashes = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arg),
 
-        .head = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arguments),
-        .next = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arguments),
-        .prev = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arguments),
+        .head = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arg),
+        .next = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arg),
+        .prev = set->allocator->alloc(set->capacity * sizeof(size_t), set->allocator->arg),
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");
     error((!replica.capacity || replica.hashes) && "Memory allocation failed.");

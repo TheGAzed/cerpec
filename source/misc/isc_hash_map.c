@@ -40,7 +40,7 @@ isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size,
     };
 }
 
-void destroy_isc_hash_map(isc_hash_map_s * const map, set_fn const destroy_key, set_fn const destroy_value) {
+void destroy_isc_hash_map(isc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv) {
     error(map && "Parameter can't be NULL.");
     error(destroy_key && "Parameter can't be NULL.");
     error(destroy_value && "Parameter can't be NULL.");
@@ -53,23 +53,23 @@ void destroy_isc_hash_map(isc_hash_map_s * const map, set_fn const destroy_key, 
 
     // for each element since they are all layered continuosly in array
     for (size_t i = 0; i < map->length; ++i) {
-        destroy_key(map->keys + (i * map->key_size));
-        destroy_value(map->values + (i * map->value_size));
+        destroy_key(map->keys + (i * map->key_size), argdk);
+        destroy_value(map->values + (i * map->value_size), argdv);
     }
 
     // free arrays
-    map->allocator->free(map->head, map->allocator->arguments);
-    map->allocator->free(map->next, map->allocator->arguments);
-    map->allocator->free(map->prev, map->allocator->arguments);
-    map->allocator->free(map->hashes, map->allocator->arguments);
-    map->allocator->free(map->keys, map->allocator->arguments);
-    map->allocator->free(map->values, map->allocator->arguments);
+    map->allocator->free(map->head, map->allocator->arg);
+    map->allocator->free(map->next, map->allocator->arg);
+    map->allocator->free(map->prev, map->allocator->arg);
+    map->allocator->free(map->hashes, map->allocator->arg);
+    map->allocator->free(map->keys, map->allocator->arg);
+    map->allocator->free(map->values, map->allocator->arg);
 
     // map everything to zero/false
     memset(map, 0, sizeof(isc_hash_map_s));
 }
 
-void clear_isc_hash_map(isc_hash_map_s * map, const set_fn destroy_key, const set_fn destroy_value) {
+void clear_isc_hash_map(isc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv) {
     error(map && "Parameter can't be NULL.");
     error(destroy_key && "Parameter can't be NULL.");
     error(destroy_value && "Parameter can't be NULL.");
@@ -83,18 +83,18 @@ void clear_isc_hash_map(isc_hash_map_s * map, const set_fn destroy_key, const se
     // for each element since they are all layered continuosly in array
     for (size_t i = 0; i < map->capacity; ++i) {
         for (size_t n = map->head[i]; NIL != n; n = map->next[n]) {
-            destroy_key(map->keys + (n * map->key_size));
-            destroy_value(map->values + (n * map->value_size));
+            destroy_key(map->keys + (n * map->key_size), argdk);
+            destroy_value(map->values + (n * map->value_size), argdv);
         }
     }
 
     // free arrays
-    map->allocator->free(map->keys, map->allocator->arguments);
-    map->allocator->free(map->values, map->allocator->arguments);
-    map->allocator->free(map->hashes, map->allocator->arguments);
-    map->allocator->free(map->head, map->allocator->arguments);
-    map->allocator->free(map->next, map->allocator->arguments);
-    map->allocator->free(map->prev, map->allocator->arguments);
+    map->allocator->free(map->keys, map->allocator->arg);
+    map->allocator->free(map->values, map->allocator->arg);
+    map->allocator->free(map->hashes, map->allocator->arg);
+    map->allocator->free(map->head, map->allocator->arg);
+    map->allocator->free(map->next, map->allocator->arg);
+    map->allocator->free(map->prev, map->allocator->arg);
 
     // only clear map (keep the map usable)
     map->capacity = map->length = 0;
@@ -118,13 +118,13 @@ isc_hash_map_s copy_isc_hash_map(isc_hash_map_s const * const map, copy_fn const
         .capacity = map->capacity, .hash_key = map->hash_key, .length = map->length,
         .key_size = map->key_size, .value_size = map->value_size, .compare_key = map->compare_key,
 
-        .keys = map->allocator->alloc(map->capacity * map->key_size, map->allocator->arguments),
-        .values = map->allocator->alloc(map->capacity * map->value_size, map->allocator->arguments),
-        .hashes = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arguments),
+        .keys = map->allocator->alloc(map->capacity * map->key_size, map->allocator->arg),
+        .values = map->allocator->alloc(map->capacity * map->value_size, map->allocator->arg),
+        .hashes = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arg),
 
-        .head = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arguments),
-        .next = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arguments),
-        .prev = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arguments),
+        .head = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arg),
+        .next = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arg),
+        .prev = map->allocator->alloc(map->capacity * sizeof(size_t), map->allocator->arg),
 
         .allocator = map->allocator,
     };
@@ -161,7 +161,7 @@ bool is_empty_isc_hash_map(isc_hash_map_s const * const map) {
     return !(map->length); // if 0 return 'true'
 }
 
-void insert_isc_hash_map(isc_hash_map_s * const restrict map, void const * const restrict key, void const * const restrict value) {
+void insert_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(value && "Parameter can't be NULL.");
@@ -215,7 +215,7 @@ void insert_isc_hash_map(isc_hash_map_s * const restrict map, void const * const
     map->length++;
 }
 
-void remove_isc_hash_map(isc_hash_map_s * const restrict map, void const * const restrict key, void * const restrict key_buffer, void * const restrict value_buffer) {
+void remove_isc_hash_map(isc_hash_map_s * const map, void const * const key, void * const key_buffer, void * const value_buffer) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(key_buffer && "Parameter can't be NULL.");
@@ -267,7 +267,7 @@ void remove_isc_hash_map(isc_hash_map_s * const restrict map, void const * const
     exit(EXIT_FAILURE); // terminate on error
 }
 
-bool contains_key_isc_hash_map(isc_hash_map_s const * const restrict map, void const * const restrict key) {
+bool contains_key_isc_hash_map(isc_hash_map_s const * const map, void const * const key) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(map != key && "Parameters can't be equal.");
@@ -296,7 +296,7 @@ bool contains_key_isc_hash_map(isc_hash_map_s const * const restrict map, void c
     return false;
 }
 
-void get_value_isc_hash_map(isc_hash_map_s const * const restrict map, void const * const restrict key, void * const restrict value_buffer) {
+void get_value_isc_hash_map(isc_hash_map_s const * const map, void const * const key, void * const value_buffer) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(value_buffer && "Parameter can't be NULL.");
@@ -329,7 +329,7 @@ void get_value_isc_hash_map(isc_hash_map_s const * const restrict map, void cons
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void set_isc_hash_map(isc_hash_map_s * const restrict map, void const * const restrict key, void const * const restrict value, void * const restrict value_buffer) {
+void set_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value, void * const value_buffer) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(value_buffer && "Parameter can't be NULL.");
@@ -398,10 +398,10 @@ INSERT:
     map->length++;
 }
 
-void each_key_isc_hash_map(isc_hash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
+void each_key_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const argh) {
     error(map && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(map != arguments && "Parameters can't be equal.");
+    error(map != argh && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -411,16 +411,16 @@ void each_key_isc_hash_map(isc_hash_map_s const * const restrict map, handle_fn 
 
     // iterate over each valid key in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
-        if (!handle(map->keys + (i * map->key_size), arguments)) {
+        if (!handle(map->keys + (i * map->key_size), argh)) {
             break; // return since we need to break-off of two loops
         }
     }
 }
 
-void each_value_isc_hash_map(isc_hash_map_s const * const restrict map, handle_fn const handle, void * const restrict arguments) {
+void each_value_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const argh) {
     error(map && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(map != arguments && "Parameters can't be equal.");
+    error(map != argh && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -430,7 +430,7 @@ void each_value_isc_hash_map(isc_hash_map_s const * const restrict map, handle_f
 
     // iterate over each valid value in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
-        if (!handle(map->values + (i * map->value_size), arguments)) {
+        if (!handle(map->values + (i * map->value_size), argh)) {
             break; // return since we need to break-off of two loops
         }
     }
@@ -440,22 +440,22 @@ void _isc_hash_table_resize(isc_hash_map_s * const table, size_t const size) {
     // set table to new resized parameters
     table->capacity = size;
 
-    table->head = table->allocator->realloc(table->head, size * sizeof(size_t), table->allocator->arguments);
+    table->head = table->allocator->realloc(table->head, size * sizeof(size_t), table->allocator->arg);
     error((!table->capacity || table->head) && "Memory allocation failed.");
 
-    table->next = table->allocator->realloc(table->next, size * sizeof(size_t), table->allocator->arguments);
+    table->next = table->allocator->realloc(table->next, size * sizeof(size_t), table->allocator->arg);
     error((!table->capacity || table->next) && "Memory allocation failed.");
 
-    table->prev = table->allocator->realloc(table->prev, size * sizeof(size_t), table->allocator->arguments);
+    table->prev = table->allocator->realloc(table->prev, size * sizeof(size_t), table->allocator->arg);
     error((!table->capacity || table->prev) && "Memory allocation failed.");
 
-    table->keys = table->allocator->realloc(table->keys, size * table->key_size, table->allocator->arguments);
+    table->keys = table->allocator->realloc(table->keys, size * table->key_size, table->allocator->arg);
     error((!table->capacity || table->keys) && "Memory allocation failed.");
 
-    table->values = table->allocator->realloc(table->values, size * table->value_size, table->allocator->arguments);
+    table->values = table->allocator->realloc(table->values, size * table->value_size, table->allocator->arg);
     error((!table->capacity || table->values) && "Memory allocation failed.");
 
-    table->hashes = table->allocator->realloc(table->hashes, size * sizeof(size_t), table->allocator->arguments);
+    table->hashes = table->allocator->realloc(table->hashes, size * sizeof(size_t), table->allocator->arg);
     error((!table->capacity || table->hashes) && "Memory allocation failed.");
 
     for (size_t i = 0; i < table->capacity; ++i) { table->head[i] = NIL; }

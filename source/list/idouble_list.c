@@ -32,7 +32,7 @@ idouble_list_s make_idouble_list(size_t const size, memory_s const * const alloc
     return (idouble_list_s) { .size = size, .allocator = allocator, };
 }
 
-void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy) {
+void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -42,19 +42,19 @@ void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy) {
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
         current = list->node[IDL_NEXT][current];
     }
 
     // free list's node arrays
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->node[IDL_NEXT], list->allocator->arguments);
-    list->allocator->free(list->node[IDL_PREV], list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->node[IDL_NEXT], list->allocator->arg);
+    list->allocator->free(list->node[IDL_PREV], list->allocator->arg);
 
     memset(list, 0, sizeof(idouble_list_s));
 }
 
-void clear_idouble_list(idouble_list_s * const list, set_fn const destroy) {
+void clear_idouble_list(idouble_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -64,14 +64,14 @@ void clear_idouble_list(idouble_list_s * const list, set_fn const destroy) {
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
         current = list->node[IDL_NEXT][current];
     }
 
     // free list's node arrays
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->node[IDL_NEXT], list->allocator->arguments);
-    list->allocator->free(list->node[IDL_PREV], list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->node[IDL_NEXT], list->allocator->arg);
+    list->allocator->free(list->node[IDL_PREV], list->allocator->arg);
 
     // make list clear, but still usable
     list->node[IDL_NEXT] = list->node[IDL_PREV] = NULL;
@@ -90,9 +90,9 @@ idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn cons
     // allocate and set replica of list
     idouble_list_s const replica = {
         .capacity = list->capacity, .head = list->head, .length = list->length, .size = list->size,
-        .node[IDL_NEXT] = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
-        .node[IDL_PREV] = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
-        .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments),
+        .node[IDL_NEXT] = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arg),
+        .node[IDL_PREV] = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arg),
+        .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arg),
         .allocator = list->allocator,
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");
@@ -119,7 +119,7 @@ bool is_empty_idouble_list(idouble_list_s const * const list) {
     return !(list->length);
 }
 
-void insert_at_idouble_list(idouble_list_s * const restrict list, void const * const restrict element, size_t const index) {
+void insert_at_idouble_list(idouble_list_s * const list, void const * const element, size_t const index) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(index <= list->length && "Paremeter can't be greater than length.");
@@ -162,7 +162,7 @@ void insert_at_idouble_list(idouble_list_s * const restrict list, void const * c
     list->length++;
 }
 
-void get_idouble_list(idouble_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+void get_idouble_list(idouble_list_s const * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(index < list->length && "Paremeter can't be greater than length.");
@@ -184,7 +184,7 @@ void get_idouble_list(idouble_list_s const * const restrict list, size_t const i
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_idouble_list(idouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_first_idouble_list(idouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -229,7 +229,7 @@ void remove_first_idouble_list(idouble_list_s * const restrict list, void const 
     exit(EXIT_FAILURE);
 }
 
-void remove_last_idouble_list(idouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_last_idouble_list(idouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -276,7 +276,7 @@ void remove_last_idouble_list(idouble_list_s * const restrict list, void const *
     exit(EXIT_FAILURE);
 }
 
-void remove_at_idouble_list(idouble_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+void remove_at_idouble_list(idouble_list_s * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(index < list->length && "Paremeter can't be greater than length.");
@@ -357,7 +357,7 @@ void shift_prev_idouble_list(idouble_list_s * const list, size_t const shift) {
     }
 }
 
-void splice_idouble_list(idouble_list_s * const restrict destination, idouble_list_s * const restrict source, size_t const index) {
+void splice_idouble_list(idouble_list_s * const destination, idouble_list_s * const source, size_t const index) {
     error(destination && "Paremeter can't be NULL.");
     error(source && "Paremeter can't be NULL.");
     error(index <= destination->length && "Paremeter can't be greater than length.");
@@ -416,9 +416,9 @@ void splice_idouble_list(idouble_list_s * const restrict destination, idouble_li
     destination->length += source->length;
 
     // clear (NOT DESTROY) source list
-    source->allocator->free(source->elements, source->allocator->arguments);
-    source->allocator->free(source->node[IDL_NEXT], source->allocator->arguments);
-    source->allocator->free(source->node[IDL_PREV], source->allocator->arguments);
+    source->allocator->free(source->elements, source->allocator->arg);
+    source->allocator->free(source->node[IDL_NEXT], source->allocator->arg);
+    source->allocator->free(source->node[IDL_PREV], source->allocator->arg);
 
     source->node[IDL_NEXT] = source->node[IDL_PREV] = NULL;
     source->elements = NULL;
@@ -445,9 +445,9 @@ idouble_list_s slice_idouble_list(idouble_list_s * const list, size_t const inde
     // create split list
     size_t const split_capacity = _idouble_list_ceil_size(length);
     idouble_list_s split = {
-        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
-        .node[IDL_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
-        .node[IDL_PREV] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arg),
+        .node[IDL_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arg),
+        .node[IDL_PREV] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arg),
 
         .size = list->size, .capacity = split_capacity, .allocator = list->allocator,
     };
@@ -508,9 +508,9 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     // create split list
     size_t const split_capacity = _idouble_list_ceil_size(length);
     idouble_list_s split = {
-        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
-        .node[IDL_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
-        .node[IDL_PREV] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arg),
+        .node[IDL_NEXT] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arg),
+        .node[IDL_PREV] = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arg),
 
         .size = list->size, .capacity = split_capacity, .allocator = list->allocator,
     };
@@ -551,7 +551,7 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     return split;
 }
 
-idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter_fn const filter) {
+idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const filter) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
 
@@ -606,27 +606,27 @@ idouble_list_s extract_idouble_list(idouble_list_s * const restrict list, filter
     return positive;
 }
 
-void each_next_idouble_list(idouble_list_s const * const restrict list, handle_fn const operate, void * const restrict arguments) {
+void each_next_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const argh) {
     error(list && "Paremeter can't be NULL.");
-    error(operate && "Paremeter can't be NULL.");
-    error(arguments != list && "Paremeters can't be the same.");
+    error(handle && "Paremeter can't be NULL.");
+    error(argh != list && "Paremeters can't be the same.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
     valid(list->allocator && "Allocator can't be NULL.");
 
-    // for each forward element in list call operate function and break if it returns false
+    // for each forward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDL_NEXT][current]) {
-        if (!operate(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), argh)) {
             break;
         }
     }
 }
 
-void each_prev_idouble_list(idouble_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+void each_prev_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const argh) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(arguments != list && "Paremeters can't be the same.");
+    error(argh != list && "Paremeters can't be the same.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -635,22 +635,22 @@ void each_prev_idouble_list(idouble_list_s const * const restrict list, handle_f
     // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
         current = list->node[IDL_PREV][current];
-        if (!handle(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), argh)) {
             break;
         }
     }
 }
 
-void apply_idouble_list(idouble_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+void apply_idouble_list(idouble_list_s const * const list, process_fn const process, void * const argp) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(arguments != list && "Paremeters can't be the same.");
+    error(argp != list && "Paremeters can't be the same.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
     valid(list->allocator && "Allocator can't be NULL.");
 
-    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
+    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arg);
     error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
@@ -659,26 +659,26 @@ void apply_idouble_list(idouble_list_s const * const restrict list, process_fn c
     }
 
     // process elements
-    process(elements_array, list->length, arguments);
+    process(elements_array, list->length, argp);
 
     // copy elements back into list
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDL_NEXT][current]) {
         memcpy(list->elements + (current * list->size), elements_array + (i * list->size), list->size);
     }
 
-    list->allocator->free(elements_array, list->allocator->arguments);
+    list->allocator->free(elements_array, list->allocator->arg);
 }
 
 void _idouble_list_resize(idouble_list_s * const list, size_t const size) {
     list->capacity = size;
 
-    list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arguments);
+    list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arg);
     error((!list->capacity || list->elements) && "Memory allocation failed.");
 
-    list->node[IDL_NEXT] = list->allocator->realloc(list->node[IDL_NEXT], list->capacity * sizeof(size_t), list->allocator->arguments);
+    list->node[IDL_NEXT] = list->allocator->realloc(list->node[IDL_NEXT], list->capacity * sizeof(size_t), list->allocator->arg);
     error((!list->capacity || list->node[IDL_NEXT]) && "Memory allocation failed.");
 
-    list->node[IDL_PREV] = list->allocator->realloc(list->node[IDL_PREV], list->capacity * sizeof(size_t), list->allocator->arguments);
+    list->node[IDL_PREV] = list->allocator->realloc(list->node[IDL_PREV], list->capacity * sizeof(size_t), list->allocator->arg);
     error((!list->capacity || list->node[IDL_PREV]) && "Memory allocation failed.");
 }
 

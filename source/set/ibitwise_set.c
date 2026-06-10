@@ -32,7 +32,7 @@ void destroy_ibitwise_set(ibitwise_set_s * const set) {
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // free bits array since it only stores indexes
-    set->allocator->free(set->bits, set->allocator->arguments);
+    set->allocator->free(set->bits, set->allocator->arg);
 
     memset(set, 0, sizeof(ibitwise_set_s));
 }
@@ -43,7 +43,7 @@ void clear_ibitwise_set(ibitwise_set_s * const set) {
     assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
 
     // free bits array since it only stores indexes
-    set->allocator->free(set->bits, set->allocator->arguments);
+    set->allocator->free(set->bits, set->allocator->arg);
 
     set->capacity = set->length = 0;
     set->bits = NULL;
@@ -57,7 +57,7 @@ ibitwise_set_s copy_ibitwise_set(ibitwise_set_s const * const set) {
     // create replica structure
     ibitwise_set_s const replica = {
         .capacity = set->capacity, .length = set->length, .allocator = set->allocator,
-        .bits = set->allocator->alloc(set->capacity / CHAR_BIT, set->allocator->arguments),
+        .bits = set->allocator->alloc(set->capacity / CHAR_BIT, set->allocator->arg),
     };
     assert((!replica.capacity || replica.bits) && "[ERROR] Memory allocation failed.");
 
@@ -340,7 +340,7 @@ bool is_disjoint_ibitwise_set(ibitwise_set_s const * const set_one, ibitwise_set
     return true;
 }
 
-void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const handle, void * const argh) {
     assert(set && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
@@ -355,7 +355,7 @@ void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const h
         unsigned const bit = 1U << (BIT_COUNT - relative - 1);
 
         // if bit isn't set continue, and if handle function returns false break the loop and quit main function
-        if ((set->bits[idx] & bit) && !handle(&temp, arguments)) {
+        if ((set->bits[idx] & bit) && !handle(&temp, argh)) {
             break;
         }
     }
@@ -377,7 +377,7 @@ int _ibitwise_set_popcount(unsigned const bits) {
 }
 
 void _ibitwise_set_resize(ibitwise_set_s * const set, size_t const size) {
-    set->bits = set->allocator->realloc(set->bits, size / CHAR_BIT, set->allocator->arguments);
+    set->bits = set->allocator->realloc(set->bits, size / CHAR_BIT, set->allocator->arg);
     for (size_t i = set->capacity / BIT_COUNT; i < size / BIT_COUNT; ++i) {
         set->bits[i] = 0;
     }

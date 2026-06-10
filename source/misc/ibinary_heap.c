@@ -39,7 +39,7 @@ ibinary_heap_s make_ibinary_heap(size_t const size, compare_fn const compare, me
     };
 }
 
-void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy) {
+void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const argd) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -49,15 +49,15 @@ void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy) {
 
     // for each element in heap array call destroy function
     for (size_t i = 0; i < heap->length; ++i) {
-        destroy(heap->elements + (i * heap->size));
+        destroy(heap->elements + (i * heap->size), argd);
     }
-    heap->allocator->free(heap->elements, heap->allocator->arguments);
+    heap->allocator->free(heap->elements, heap->allocator->arg);
 
     // make structure invalid
     memset(heap, 0, sizeof(ibinary_heap_s));
 }
 
-void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy) {
+void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const argd) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -67,9 +67,9 @@ void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy) {
 
     // for each element in heap array call destroy function
     for (size_t i = 0; i < heap->length; ++i) {
-        destroy(heap->elements + (i * heap->size));
+        destroy(heap->elements + (i * heap->size), argd);
     }
-    heap->allocator->free(heap->elements, heap->allocator->arguments);
+    heap->allocator->free(heap->elements, heap->allocator->arg);
 
     // only clear structure
     heap->length = heap->capacity = 0;
@@ -87,7 +87,7 @@ ibinary_heap_s copy_ibinary_heap(ibinary_heap_s const * const heap, copy_fn cons
     // initialize replica structure
     ibinary_heap_s const replica = {
         .capacity = heap->capacity, .compare = heap->compare, .size = heap->size, .length = heap->length,
-        .elements = heap->allocator->alloc(heap->capacity * heap->size, heap->allocator->arguments),
+        .elements = heap->allocator->alloc(heap->capacity * heap->size, heap->allocator->arg),
         .allocator = heap->allocator,
     };
     assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
@@ -126,12 +126,12 @@ void push_ibinary_heap(ibinary_heap_s * const heap, void const * const element) 
     memcpy(heap->elements + (heap->length * heap->size), element, heap->size);
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arguments);
+    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     _ibinary_heapify_up(heap, heap->length, temporary);
 
-    heap->allocator->free(temporary, heap->allocator->arguments);
+    heap->allocator->free(temporary, heap->allocator->arg);
 
     heap->length++;
 }
@@ -153,7 +153,7 @@ void pop_ibinary_heap(ibinary_heap_s * const heap, void * const buffer) {
     memmove(heap->elements, heap->elements + (heap->length * heap->size), heap->size);
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arguments);
+    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     _ibinary_heapify_down(heap, 0, temporary);
@@ -162,7 +162,7 @@ void pop_ibinary_heap(ibinary_heap_s * const heap, void * const buffer) {
         _ibinary_heap_resize(heap, heap->length);
     }
 
-    heap->allocator->free(temporary, heap->allocator->arguments);
+    heap->allocator->free(temporary, heap->allocator->arg);
 }
 
 void peep_ibinary_heap(ibinary_heap_s const * const heap, void * const buffer) {
@@ -193,7 +193,7 @@ void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index,
     memcpy(heap->elements + (index * heap->size), element, heap->size);
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arguments);
+    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // perform heapify up or down based on comparison (ignore comparison equal to 'zero' as heap doesn't change)
@@ -204,10 +204,10 @@ void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index,
         _ibinary_heapify_down(heap, index, temporary);
     }
 
-    heap->allocator->free(temporary, heap->allocator->arguments);
+    heap->allocator->free(temporary, heap->allocator->arg);
 }
 
-void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap_s * const restrict source) {
+void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * const source) {
     assert(destination && "[ERROR] Parameter can't be NULL.");
     assert(source && "[ERROR] Parameter can't be NULL.");
     assert(source != destination && "[ERROR] Parameter can't be equal.");
@@ -231,12 +231,12 @@ void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap
     destination->length += source->length;
 
     // clear (NOT DESTROY) source elements array
-    source->allocator->free(source->elements, source->allocator->arguments);
+    source->allocator->free(source->elements, source->allocator->arg);
     source->length = source->capacity = 0;
     source->elements = NULL;
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = destination->allocator->alloc(destination->size, destination->allocator->arguments);
+    void * temporary = destination->allocator->alloc(destination->size, destination->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // for each element at half index call
@@ -246,10 +246,10 @@ void meld_ibinary_heap(ibinary_heap_s * const restrict destination, ibinary_heap
         _ibinary_heapify_down(destination, reverse, temporary);
     }
 
-    destination->allocator->free(temporary, destination->allocator->arguments);
+    destination->allocator->free(temporary, destination->allocator->arg);
 }
 
-void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const arguments) {
+void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const argh) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
@@ -257,13 +257,13 @@ void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle
     assert(heap->size && "[INVALID] Parameter can't be zero.");
     assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
 
-    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), arguments); ++i) {}
+    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), argh); ++i) {}
 }
 
 void _ibinary_heap_resize(ibinary_heap_s * const heap, size_t const size) {
     heap->capacity = size;
 
-    heap->elements = heap->allocator->realloc(heap->elements, size * heap->size, heap->allocator->arguments);
+    heap->elements = heap->allocator->realloc(heap->elements, size * heap->size, heap->allocator->arg);
     assert((!size || heap->elements) && "[ERROR] Memory allocation failed.");
 }
 

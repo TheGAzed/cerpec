@@ -18,7 +18,7 @@
 #define SIZE_FORMAT "%zu "
 #define STRING_FORMAT "%s "
 
-void chardst(void * const element);
+void chardst(void * const element, void * arg);
 
 void * charcpy(void * const destination, void const * const source);
 
@@ -64,7 +64,7 @@ bool charxdigit(void const * const element);
 
 bool charprime(void const * const element);
 
-void uchardst(void * const element);
+void uchardst(void * const element, void * arg);
 
 void * ucharcpy(void * const destination, void const * const source);
 
@@ -110,7 +110,7 @@ bool ucharxdigit(void const * const element);
 
 bool ucharprime(void const * const element);
 
-void intdst(void * const element);
+void intdst(void * const element, void * arg);
 
 void * intcpy(void * const destination, void const * const source);
 
@@ -140,7 +140,7 @@ bool intodd(void const * const element);
 
 bool intprime(void const * const element);
 
-void uintdst(void * const element);
+void uintdst(void * const element, void * arg);
 
 void * uintcpy(void * const destination, void const * const source);
 
@@ -164,7 +164,7 @@ bool uintodd(void const * const element);
 
 bool uintprime(void const * const element);
 
-void floatdst(void * const element);
+void floatdst(void * const element, void * arg);
 
 void * floatcpy(void * const destination, void const * const source);
 
@@ -182,7 +182,7 @@ void floatqsort(void * const array, size_t const lenght, void * const null);
 
 void floatrqsort(void * const array, size_t const lenght, void * const null);
 
-void doubledst(void * const element);
+void doubledst(void * const element, void * arg);
 
 void * doublecpy(void * const destination, void const * const source);
 
@@ -200,7 +200,7 @@ void doubleqsort(void * const array, size_t const lenght, void * const null);
 
 void doublerqsort(void * const array, size_t const lenght, void * const null);
 
-void sizedst(void * const element);
+void sizedst(void * const element, void * arg);
 
 void * sizecpy(void * const destination, void const * const source);
 

@@ -8,7 +8,7 @@ fstack_s create_fstack(size_t const size, size_t const max) {
 
     // create constant initialized structure with checked allocated memory
     fstack_s const stack = {
-        .elements = standard.alloc(max * size, standard.arguments),
+        .elements = standard.alloc(max * size, standard.arg),
         .max = max, .size = size, .allocator = &standard,
     };
     error(stack.elements && "Memory allocation failed.");
@@ -23,7 +23,7 @@ fstack_s make_fstack(size_t const size, size_t const max, memory_s const * const
 
     // create constant initialized structure with custom checked allocated memory
     fstack_s const stack = {
-        .elements = allocator->alloc(max * size, allocator->arguments),
+        .elements = allocator->alloc(max * size, allocator->arg),
         .max = max, .size = size, .allocator = allocator,
     };
     error(stack.elements && "Memory allocation failed.");
@@ -31,7 +31,7 @@ fstack_s make_fstack(size_t const size, size_t const max, memory_s const * const
     return stack;
 }
 
-void destroy_fstack(fstack_s * const stack, set_fn const destroy) {
+void destroy_fstack(fstack_s * const stack, set_fn const destroy, void * const argd) {
     error(stack && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -43,16 +43,16 @@ void destroy_fstack(fstack_s * const stack, set_fn const destroy) {
 
     // iterate over each element and call destroy function on it
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
-        destroy(e);
+        destroy(e, argd);
     }
 
     // free elements array and set everything to zero/NULL
-    stack->allocator->free(stack->elements, stack->allocator->arguments);
+    stack->allocator->free(stack->elements, stack->allocator->arg);
 
     memset(stack, 0, sizeof(fstack_s));
 }
 
-void clear_fstack(fstack_s * const stack, set_fn const destroy) {
+void clear_fstack(fstack_s * const stack, set_fn const destroy, void * const argd) {
     error(stack && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -64,7 +64,7 @@ void clear_fstack(fstack_s * const stack, set_fn const destroy) {
 
     // iterate over each element and call destroy function on it
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
-        destroy(e);
+        destroy(e, argd);
     }
 
     // just clear length
@@ -83,7 +83,7 @@ fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy) {
 
     // create initialized constant copy of structure with checked allocated memory
     fstack_s const replica = {
-        .elements = stack->allocator->alloc(stack->max * stack->size, stack->allocator->arguments),
+        .elements = stack->allocator->alloc(stack->max * stack->size, stack->allocator->arg),
         .length = stack->length, .max = stack->max, .size = stack->size,
         .allocator = stack->allocator,
     };
@@ -122,7 +122,7 @@ bool is_full_fstack(fstack_s const * const stack) {
     return (stack->length == stack->max); // return comparison of length and max
 }
 
-void push_fstack(fstack_s * const restrict stack, void const * const restrict element) {
+void push_fstack(fstack_s * const stack, void const * const element) {
     error(stack && "Parameter can't be NULL.");
     error(element && "Parameter can't be NULL.");
     error(stack->length != stack->max && "Structure is full.");
@@ -139,7 +139,7 @@ void push_fstack(fstack_s * const restrict stack, void const * const restrict el
     stack->length++;
 }
 
-void pop_fstack(fstack_s * const restrict stack, void * const restrict buffer) {
+void pop_fstack(fstack_s * const stack, void * const buffer) {
     error(stack && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(stack->length && "Structure is empty.");
@@ -156,7 +156,7 @@ void pop_fstack(fstack_s * const restrict stack, void * const restrict buffer) {
     memcpy(buffer, stack->elements + (stack->length * stack->size), stack->size);
 }
 
-void peep_fstack(fstack_s const * const restrict stack, void * const restrict buffer) {
+void peep_fstack(fstack_s const * const stack, void * const buffer) {
     error(stack && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(stack->length && "Structure is empty.");
@@ -172,10 +172,10 @@ void peep_fstack(fstack_s const * const restrict stack, void * const restrict bu
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void each_fstack(fstack_s const * const restrict stack, handle_fn const handle, void * const restrict arguments) {
+void each_fstack(fstack_s const * const stack, handle_fn const handle, void * const argh) {
     error(stack && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(stack != arguments && "Parameters can't be equal.");
+    error(stack != argh && "Parameters can't be equal.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->max && "Maximum can't be zero.");
@@ -184,13 +184,13 @@ void each_fstack(fstack_s const * const restrict stack, handle_fn const handle, 
     valid(stack->length <= stack->max && "Length exceeds maximum.");
 
     // empty for loop since all the logic can just fit into its expressions
-    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, arguments); e += stack->size) {}
+    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, argh); e += stack->size) {}
 }
 
-void apply_fstack(fstack_s const * const restrict stack, process_fn const process, void * const restrict arguments) {
+void apply_fstack(fstack_s const * const stack, process_fn const process, void * const argp) {
     error(stack && "Parameter can't be NULL.");
     error(process && "Parameter can't be NULL.");
-    error(stack != arguments && "Parameters can't be equal.");
+    error(stack != argp && "Parameters can't be equal.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->max && "Maximum can't be zero.");
@@ -199,5 +199,5 @@ void apply_fstack(fstack_s const * const restrict stack, process_fn const proces
     valid(stack->length <= stack->max && "Length exceeds maximum.");
 
     // simply call the function on the stack as everyting is continuous
-    process(stack->elements, stack->length, arguments);
+    process(stack->elements, stack->length, argp);
 }

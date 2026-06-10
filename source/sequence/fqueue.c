@@ -8,7 +8,7 @@ fqueue_s create_fqueue(size_t const size, size_t const max) {
 
     // initializer constant queue structure with allocated memory and check if it was successful
     fqueue_s const queue = {
-        .elements = standard.alloc(max * size, standard.arguments),
+        .elements = standard.alloc(max * size, standard.arg),
         .max = max, .size = size, .allocator = &standard,
     };
     error(queue.elements && "Memory allocation failed.");
@@ -23,7 +23,7 @@ fqueue_s make_fqueue(size_t const size, size_t const max, memory_s const * const
 
     // initializer constant queue structure with allocated memory and check if it was successful
     fqueue_s const queue = {
-        .elements = allocator->alloc(max * size, allocator->arguments),
+        .elements = allocator->alloc(max * size, allocator->arg),
         .max = max, .size = size, .allocator = allocator,
     };
     error(queue.elements && "Memory allocation failed.");
@@ -31,7 +31,7 @@ fqueue_s make_fqueue(size_t const size, size_t const max, memory_s const * const
     return queue;
 }
 
-void destroy_fqueue(fqueue_s * const queue, set_fn const destroy) {
+void destroy_fqueue(fqueue_s * const queue, set_fn const destroy, void * const argd) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -49,19 +49,19 @@ void destroy_fqueue(fqueue_s * const queue, set_fn const destroy) {
 
     // iterate over rith and left elements and call destroy function on them
     for (size_t i = queue->current; i < right_length + queue->current; ++i) {
-        destroy(queue->elements + (i * queue->size));
+        destroy(queue->elements + (i * queue->size), argd);
     }
     for (size_t i = 0; i < left_length; ++i) {
-        destroy(queue->elements + (i * queue->size));
+        destroy(queue->elements + (i * queue->size), argd);
     }
 
     // free memory array and set everything manually to zero/NULL
-    queue->allocator->free(queue->elements, queue->allocator->arguments);
+    queue->allocator->free(queue->elements, queue->allocator->arg);
 
     memset(queue, 0, sizeof(fqueue_s));
 }
 
-void clear_fqueue(fqueue_s * const queue, set_fn const destroy) {
+void clear_fqueue(fqueue_s * const queue, set_fn const destroy, void * const argd) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -79,10 +79,10 @@ void clear_fqueue(fqueue_s * const queue, set_fn const destroy) {
 
     // iterate over rith and left elements and call destroy function on them
     for (size_t i = queue->current; i < right_length + queue->current; ++i) {
-        destroy(queue->elements + (i * queue->size));
+        destroy(queue->elements + (i * queue->size), argd);
     }
     for (size_t i = 0; i < left_length; ++i) {
-        destroy(queue->elements + (i * queue->size));
+        destroy(queue->elements + (i * queue->size), argd);
     }
 
     // just clear size and set current to start (zero)
@@ -102,7 +102,7 @@ fqueue_s copy_fqueue(fqueue_s const * const queue, copy_fn const copy) {
 
     // initialize constant replica copy of queue
     fqueue_s const replica = {
-        .elements = queue->allocator->alloc(queue->max * queue->size, queue->allocator->arguments),
+        .elements = queue->allocator->alloc(queue->max * queue->size, queue->allocator->arg),
         .max = queue->max, .size = queue->size, .length = queue->length,
         .allocator = queue->allocator,
     };
@@ -151,7 +151,7 @@ bool is_full_fqueue(fqueue_s const * const queue) {
     return (queue->length == queue->max); // return comparison of length and max
 }
 
-void enqueue_fqueue(fqueue_s * const restrict queue, void const * const restrict buffer) {
+void enqueue_fqueue(fqueue_s * const queue, void const * const buffer) {
     error(queue && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(queue->length != queue->max && "Structure is full.");
@@ -172,7 +172,7 @@ void enqueue_fqueue(fqueue_s * const restrict queue, void const * const restrict
     queue->length++;
 }
 
-void dequeue_fqueue(fqueue_s * const restrict queue, void * const restrict buffer) {
+void dequeue_fqueue(fqueue_s * const queue, void * const buffer) {
     error(queue && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(queue->length && "Structure is empty.");
@@ -191,7 +191,7 @@ void dequeue_fqueue(fqueue_s * const restrict queue, void * const restrict buffe
     queue->length--;
 }
 
-void peek_fqueue(fqueue_s const * const restrict queue, void * const restrict buffer) {
+void peek_fqueue(fqueue_s const * const queue, void * const buffer) {
     error(queue && "Parameter can't be NULL.");
     error(buffer && "Parameter can't be NULL.");
     error(queue->length && "Structure is empty.");
@@ -208,10 +208,10 @@ void peek_fqueue(fqueue_s const * const restrict queue, void * const restrict bu
     memcpy(buffer, queue->elements + (queue->current * queue->size), queue->size);
 }
 
-void each_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, void * const restrict arguments) {
+void each_fqueue(fqueue_s const * const queue, handle_fn const handle, void * const argh) {
     error(queue && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(queue != arguments && "Parameters can't be equal.");
+    error(queue != argh && "Parameters can't be equal.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->max && "Maximum can't be zero.");
@@ -228,17 +228,17 @@ void each_fqueue(fqueue_s const * const restrict queue, handle_fn const handle, 
     // save temporary handle flag to check if handler hasn't terminated during iteration
     bool is_handle = true;
     for (size_t i = queue->current; i < (right_length + queue->current) && is_handle; ++i) {
-        is_handle = handle(queue->elements + (i * queue->size), arguments);
+        is_handle = handle(queue->elements + (i * queue->size), argh);
     }
     for (size_t i = 0; i < left_length && is_handle; ++i) {
-        is_handle = handle(queue->elements + (i * queue->size), arguments);
+        is_handle = handle(queue->elements + (i * queue->size), argh);
     }
 }
 
-void apply_fqueue(fqueue_s const * const restrict queue, process_fn const process, void * const restrict arguments) {
+void apply_fqueue(fqueue_s const * const queue, process_fn const process, void * const argp) {
     error(queue && "Parameter can't be NULL.");
     error(process && "Parameter can't be NULL.");
-    error(queue != arguments && "Parameters can't be equal.");
+    error(queue != argp && "Parameters can't be equal.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->max && "Maximum can't be zero.");
@@ -248,7 +248,7 @@ void apply_fqueue(fqueue_s const * const restrict queue, process_fn const proces
     valid(queue->current < queue->max && "Current exceeds maximum.");
 
     // create temporary straight elements array to save elements from queue's circular one
-    char * elements_array = queue->allocator->alloc(queue->length * queue->size, queue->allocator->arguments);
+    char * elements_array = queue->allocator->alloc(queue->length * queue->size, queue->allocator->arg);
     error((!queue->length || elements_array) && "Memory allocation failed.");
 
     // divide circular elements array into right and left part
@@ -261,12 +261,12 @@ void apply_fqueue(fqueue_s const * const restrict queue, process_fn const proces
     memcpy(elements_array + (right_length * queue->size), queue->elements, left_length * queue->size);
 
     // process elements array
-    process(elements_array, queue->length, arguments);
+    process(elements_array, queue->length, argp);
 
     // copy back elements from temporary array into queue
     memcpy(queue->elements + (queue->current * queue->size), elements_array, right_length * queue->size);
     memcpy(queue->elements, elements_array + (right_length * queue->size), left_length * queue->size);
 
     // free temporary elements array
-    queue->allocator->free(elements_array, queue->allocator->arguments);
+    queue->allocator->free(elements_array, queue->allocator->arg);
 }

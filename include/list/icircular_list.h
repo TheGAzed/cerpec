@@ -34,12 +34,14 @@ icircular_list_s make_icircular_list(size_t const size, memory_s const * const a
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const argd);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_icircular_list(icircular_list_s * const list, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void clear_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const argd);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param list Structure to copy.
@@ -56,26 +58,26 @@ bool is_empty_icircular_list(icircular_list_s const * const list);
 /// @param list Structure to insert into.
 /// @param element Element buffer to insert.
 /// @param index Index to insert at.
-void insert_at_icircular_list(icircular_list_s * const restrict list, void const * const restrict element, size_t const index);
+void insert_at_icircular_list(icircular_list_s * const list, void const * const element, size_t const index);
 
 /// @brief Gets the element at index without removing it from the structure.
 /// @param list Structure to get element from.
 /// @param index Index to get element at.
 /// @param buffer Element buffer to save gotten element.
-void get_icircular_list(icircular_list_s const * const restrict list, size_t const index, void * const restrict buffer);
+void get_icircular_list(icircular_list_s const * const list, size_t const index, void * const buffer);
 
 /// @brief Removes first element equal to parameter one, based on compare function pointer.
 /// @param list Structure to remove element from.
 /// @param element Element to search for.
 /// @param buffer Element buffer to save removed element.
 /// @param compare Function pointer to compare parameter element with list's.
-void remove_first_icircular_list(icircular_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare);
+void remove_first_icircular_list(icircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare);
 
 /// @brief Removes element at index in structure.
 /// @param list Structure to remove element from.
 /// @param index Index to remove element at.
 /// @param buffer Element buffer to save removed element.
-void remove_at_icircular_list(icircular_list_s * const restrict list, size_t const index, void * const restrict buffer);
+void remove_at_icircular_list(icircular_list_s * const list, size_t const index, void * const buffer);
 
 /// @brief Reverses element list order.
 /// @param list Structure to reverse.
@@ -90,7 +92,7 @@ void shift_next_icircular_list(icircular_list_s * const list, size_t const shift
 /// @param destination Structure to splice into.
 /// @param source Structure to splice with.
 /// @param index Start index of destination structure.
-void splice_icircular_list(icircular_list_s * const restrict destination, icircular_list_s * const restrict source, size_t const index);
+void splice_icircular_list(icircular_list_s * const destination, icircular_list_s * const source, size_t const index);
 
 /// @brief Slices structure into two based on starting index and new length.
 /// @param list Structure to slice.
@@ -109,18 +111,18 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
 /// @param list Structure to extracts from.
 /// @param filter Function pointer to check if element meets extract condition.
 /// @return New extracted structure.
-icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, filter_fn const filter);
+icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn const filter);
 
 /// @brief Iterates over each element in structure based on their order.
 /// @param list Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic void pointer arguments for function pointer.
-void each_icircular_list(icircular_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments);
+/// @param argh Generic void pointer arguments for function pointer.
+void each_icircular_list(icircular_list_s const * const list, handle_fn const handle, void * const argh);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param list Structure to manage.
 /// @param process Function pointer to process elements array of structure length.
-/// @param arguments Generic void pointer arguments for function pointer.
-void apply_icircular_list(icircular_list_s const * const restrict list, process_fn const process, void * const restrict arguments);
+/// @param argp Generic void pointer arguments for function pointer.
+void apply_icircular_list(icircular_list_s const * const list, process_fn const process, void * const argp);
 
 #endif // ICIRCULAR_LIST_H

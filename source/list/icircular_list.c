@@ -29,7 +29,7 @@ icircular_list_s make_icircular_list(size_t const size, memory_s const * const a
     return (icircular_list_s) { .empty = NIL, .size = size, .allocator = allocator };
 }
 
-void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy) {
+void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -41,16 +41,16 @@ void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy)
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
 
     // set everything to zero
     memset(list, 0, sizeof(icircular_list_s));
 }
 
-void clear_icircular_list(icircular_list_s * const list, set_fn const destroy) {
+void clear_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -62,10 +62,10 @@ void clear_icircular_list(icircular_list_s * const list, set_fn const destroy) {
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
 
     // set only non important parameters to zero/nil
     list->length = list->capacity = list->tail = 0;
@@ -87,8 +87,8 @@ icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_f
     // create a replica/copy structure
     icircular_list_s replica = {
         .empty = NIL, .size = list->size, .capacity = list->capacity, .allocator = list->allocator,
-        .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(list->capacity * sizeof(size_t), list->allocator->arg),
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");
     error((!replica.capacity || replica.next) && "Memory allocation failed.");
@@ -115,7 +115,7 @@ bool is_empty_icircular_list(icircular_list_s const * const list) {
     return !(list->length);
 }
 
-void insert_at_icircular_list(icircular_list_s * const restrict list, void const * const restrict element, size_t const index) {
+void insert_at_icircular_list(icircular_list_s * const list, void const * const element, size_t const index) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(index <= list->length && "Paremeter can't be greater than length.");
@@ -159,7 +159,7 @@ void insert_at_icircular_list(icircular_list_s * const restrict list, void const
     list->length++;
 }
 
-void get_icircular_list(icircular_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+void get_icircular_list(icircular_list_s const * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(list->length && "Can't get element from empty list->");
@@ -180,7 +180,7 @@ void get_icircular_list(icircular_list_s const * const restrict list, size_t con
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_icircular_list(icircular_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_first_icircular_list(icircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -236,7 +236,7 @@ void remove_first_icircular_list(icircular_list_s * const restrict list, void co
     exit(EXIT_FAILURE);
 }
 
-void remove_at_icircular_list(icircular_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+void remove_at_icircular_list(icircular_list_s * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(list->length && "Can't get element from empty list.");
@@ -318,7 +318,7 @@ void shift_next_icircular_list(icircular_list_s * const list, size_t const shift
     }
 }
 
-void splice_icircular_list(icircular_list_s * const restrict destination, icircular_list_s * const restrict source, size_t const index) {
+void splice_icircular_list(icircular_list_s * const destination, icircular_list_s * const source, size_t const index) {
     error(destination && "Paremeter can't be NULL.");
     error(source && "Paremeter can't be NULL.");
     error(index <= destination->length && "Paremeter can't be greater than length.");
@@ -395,8 +395,8 @@ void splice_icircular_list(icircular_list_s * const restrict destination, icircu
     }
 
     // clear (NOT DESTROY) source list
-    source->allocator->free(source->elements, source->allocator->arguments);
-    source->allocator->free(source->next, source->allocator->arguments);
+    source->allocator->free(source->elements, source->allocator->arg);
+    source->allocator->free(source->next, source->allocator->arg);
 
     source->elements = NULL;
     source->next = NULL;
@@ -425,8 +425,8 @@ icircular_list_s slice_icircular_list(icircular_list_s * const list, size_t cons
     size_t const split_capacity = _icircular_list_ceil_size(length);
     icircular_list_s split = {
         .capacity = split_capacity, .empty = NIL, .size = list->size,
-        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error((!split_capacity || split.elements) && "Memory allocation failed.");
@@ -457,8 +457,8 @@ icircular_list_s slice_icircular_list(icircular_list_s * const list, size_t cons
     size_t const replica_capacity = _icircular_list_ceil_size(replica_length);
     icircular_list_s replica = {
         .capacity = replica_capacity, .empty = NIL, .size = list->size,
-        .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error((!replica_capacity || replica.elements) && "Memory allocation failed.");
@@ -474,8 +474,8 @@ icircular_list_s slice_icircular_list(icircular_list_s * const list, size_t cons
         memcpy(replica.elements + ((*r) * replica.size), list->elements + (previous * list->size), list->size);
         replica.length++;
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
 
     (*list) = replica; // change list into hole-less replica
 
@@ -502,8 +502,8 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
     size_t const split_capacity = _icircular_list_ceil_size(length);
     icircular_list_s split = {
         .capacity = split_capacity, .empty = NIL, .size = list->size,
-        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(split_capacity * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(split_capacity * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error((!split_capacity || split.elements) && "Memory allocation failed.");
@@ -532,8 +532,8 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
     size_t const replica_capacity = _icircular_list_ceil_size(replica_length);
     icircular_list_s replica = {
         .capacity = replica_capacity, .empty = NIL, .size = list->size,
-        .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arguments),
-        .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(replica_capacity * list->size, list->allocator->arg),
+        .next = list->allocator->alloc(replica_capacity * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error((!replica_capacity || replica.elements) && "Memory allocation failed.");
@@ -549,15 +549,15 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
         memcpy(replica.elements + ((*r) * replica.size), list->elements + (previous * list->size), list->size);
         replica.length++;
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
 
     (*list) = replica; // change list into hole-less replica
 
     return split;
 }
 
-icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, filter_fn const filter) {
+icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn const filter) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
 
@@ -616,17 +616,17 @@ icircular_list_s extract_icircular_list(icircular_list_s * const restrict list, 
     negative.tail = negative.length ? negative.length - 1 : 0;
 
     // change list into negative and return positive one
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->next, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->next, list->allocator->arg);
     (*list) = negative;
 
     return positive;
 }
 
-void each_icircular_list(icircular_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+void each_icircular_list(icircular_list_s const * const list, handle_fn const handle, void * const argh) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
+    error(list != argh && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -636,23 +636,23 @@ void each_icircular_list(icircular_list_s const * const restrict list, handle_fn
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        if (!handle(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), argh)) {
             break;
         }
     }
 }
 
-void apply_icircular_list(icircular_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+void apply_icircular_list(icircular_list_s const * const list, process_fn const process, void * const argp) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
+    error(list != argp && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
     valid(list->allocator && "Allocator can't be NULL.");
     valid(list->tail != NIL && "Tail can't be NIL.");
 
-    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
+    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arg);
     error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
@@ -662,7 +662,7 @@ void apply_icircular_list(icircular_list_s const * const restrict list, process_
     }
 
     // process elements
-    process(elements_array, list->length, arguments);
+    process(elements_array, list->length, argp);
 
     // copy elements back into list
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
@@ -670,7 +670,7 @@ void apply_icircular_list(icircular_list_s const * const restrict list, process_
         memcpy(list->elements + (current * list->size), elements_array + (i * list->size), list->size);
     }
 
-    list->allocator->free(elements_array, list->allocator->arguments);
+    list->allocator->free(elements_array, list->allocator->arg);
 }
 
 void _icircular_list_resize(icircular_list_s * const list, size_t const size) {
@@ -678,28 +678,28 @@ void _icircular_list_resize(icircular_list_s * const list, size_t const size) {
 
     // if list expands or hole stack is empty then just expand/shrink the list and return
     if (list->capacity != list->length || NIL == list->empty) {
-        list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arguments);
+        list->elements = list->allocator->realloc(list->elements, list->capacity * list->size, list->allocator->arg);
         error((!list->capacity || list->elements) && "Memory allocation failed.");
 
-        list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arguments);
+        list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arg);
         error((!list->capacity || list->next) && "Memory allocation failed.");
 
         return;
     } // else copy elements into new array in order, and clear hole stack
 
     // allocate new array to save alements linearly without holes
-    char * elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arguments);
+    char * elements = list->allocator->alloc(list->capacity * list->size, list->allocator->arg);
     error((!list->capacity || elements) && "Memory allocation failed.");
 
     // copy each element inside new array and set it to elements list starting from tail
     for (size_t i = 0, current = list->tail; i < list->length; ++i, current = list->next[current]) {
         memcpy(elements + (i * list->size), list->elements + (current * list->size), list->size);
     }
-    list->allocator->free(list->elements, list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
     list->elements = elements;
 
     // reallocate next indexes and set them from
-    list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arguments);
+    list->next = list->allocator->realloc(list->next, list->capacity * sizeof(size_t), list->allocator->arg);
     error((!list->capacity || list->next) && "Memory allocation failed.");
 
     for (size_t i = 0, * current = &(list->tail); i < list->length; current = list->next + i, i++) {

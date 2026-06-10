@@ -13,7 +13,7 @@ TEST CREATE_01(void) {
     ASSERT_NEQ( 0, test.size);
     ASSERT_NEQ(NULL, test.elements);
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -21,7 +21,7 @@ TEST CREATE_01(void) {
 TEST DESTROY_01(void) {
     fbsearch_tree_s test = create_fbsearch_tree(sizeof(int), CERPEC_CHUNK, intcmp);
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     ASSERT_EQ(0, test.length);
     ASSERT_EQ(0, test.size);
@@ -33,12 +33,12 @@ TEST DESTROY_01(void) {
 TEST CLEAR_01(void) {
     fbsearch_tree_s test = create_fbsearch_tree(sizeof(int), CERPEC_CHUNK, intcmp);
 
-    clear_fbsearch_tree(&test, intdst);
+    clear_fbsearch_tree(&test, intdst, NULL);
 
     ASSERT_EQ(0, test.length);
     ASSERT_NEQ(0, test.size);
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -50,7 +50,7 @@ TEST INSERT_01(void) {
         insert_fbsearch_tree(&test, &i);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -62,7 +62,7 @@ TEST INSERT_02(void) {
         insert_fbsearch_tree(&test, &i);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -80,7 +80,7 @@ TEST REMOVE_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -98,7 +98,7 @@ TEST REMOVE_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -114,7 +114,7 @@ TEST CONTAINS_01(void) {
         ASSERT(contains_fbsearch_tree(&test, &i));
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -130,7 +130,7 @@ TEST CONTAINS_02(void) {
         ASSERT(contains_fbsearch_tree(&test, &i));
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -151,7 +151,7 @@ TEST GET_MAX_01(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -172,7 +172,7 @@ TEST GET_MAX_02(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -193,7 +193,7 @@ TEST GET_MIN_01(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -214,7 +214,7 @@ TEST GET_MIN_02(void) {
         ASSERT_EQ(b, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -232,7 +232,7 @@ TEST REMOVE_MAX_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -250,7 +250,7 @@ TEST REMOVE_MAX_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -268,7 +268,7 @@ TEST REMOVE_MIN_01(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -286,7 +286,7 @@ TEST REMOVE_MIN_02(void) {
         ASSERT_EQ(i, a);
     }
 
-    destroy_fbsearch_tree(&test, intdst);
+    destroy_fbsearch_tree(&test, intdst, NULL);
 
     PASS();
 }
@@ -306,7 +306,7 @@ TEST GET_FLOOR_01(void) {
 
     ASSERT_EQ(a - 1, floor);
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -326,7 +326,7 @@ TEST GET_FLOOR_02(void) {
 
     ASSERT_EQ(a - 1, floor);
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -346,7 +346,7 @@ TEST GET_CEIL_01(void) {
 
     ASSERT_EQ(a + 1, ceil);
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -366,7 +366,7 @@ TEST GET_CEIL_02(void) {
 
     ASSERT_EQ(a + 1, ceil);
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -388,7 +388,7 @@ TEST REMOVE_FLOOR_01(void) {
         a = b;
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -410,7 +410,7 @@ TEST REMOVE_FLOOR_02(void) {
         a = b;
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -432,7 +432,7 @@ TEST REMOVE_CEIL_01(void) {
         a = b;
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -454,7 +454,7 @@ TEST REMOVE_CEIL_02(void) {
         a = b;
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -472,7 +472,7 @@ TEST GET_SUCCESSOR_01(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -490,7 +490,7 @@ TEST GET_SUCCESSOR_02(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -508,7 +508,7 @@ TEST GET_PREDECESSOR_01(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -526,7 +526,7 @@ TEST GET_PREDECESSOR_02(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -544,7 +544,7 @@ TEST REMOVE_SUCCESSOR_01(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -562,7 +562,7 @@ TEST REMOVE_SUCCESSOR_02(void) {
         ASSERT_EQ(i, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -580,7 +580,7 @@ TEST REMOVE_PREDECESSOR_01(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }
@@ -598,7 +598,7 @@ TEST REMOVE_PREDECESSOR_02(void) {
         ASSERT_EQ(a - 1, b);
     }
 
-    destroy_fbsearch_tree(&tree, intdst);
+    destroy_fbsearch_tree(&tree, intdst, NULL);
 
     PASS();
 }

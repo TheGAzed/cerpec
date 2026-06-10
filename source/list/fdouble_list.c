@@ -14,9 +14,9 @@ fdouble_list_s create_fdouble_list(size_t const size, size_t const max) {
 
     fdouble_list_s const list = {
         .max = max, .size = size, .allocator = &standard,
-        .elements = standard.alloc(max * size, standard.arguments),
-        .node[FDL_PREV] = standard.alloc(max * sizeof(size_t), standard.arguments),
-        .node[FDL_NEXT] = standard.alloc(max * sizeof(size_t), standard.arguments),
+        .elements = standard.alloc(max * size, standard.arg),
+        .node[FDL_PREV] = standard.alloc(max * sizeof(size_t), standard.arg),
+        .node[FDL_NEXT] = standard.alloc(max * sizeof(size_t), standard.arg),
     };
     error(list.elements && "Memory allocation failed.");
     error(list.node[FDL_PREV] && "Memory allocation failed.");
@@ -32,9 +32,9 @@ fdouble_list_s make_fdouble_list(size_t const size, size_t const max, memory_s c
 
     fdouble_list_s const list = {
         .max = max, .size = size, .allocator = allocator,
-        .elements = allocator->alloc(max * size, allocator->arguments),
-        .node[FDL_PREV] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-        .node[FDL_NEXT] = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .elements = allocator->alloc(max * size, allocator->arg),
+        .node[FDL_PREV] = allocator->alloc(max * sizeof(size_t), allocator->arg),
+        .node[FDL_NEXT] = allocator->alloc(max * sizeof(size_t), allocator->arg),
     };
     error(list.elements && "Memory allocation failed.");
     error(list.node[FDL_PREV] && "Memory allocation failed.");
@@ -43,7 +43,7 @@ fdouble_list_s make_fdouble_list(size_t const size, size_t const max, memory_s c
     return list;
 }
 
-void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
+void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -57,19 +57,19 @@ void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
         current = list->node[FDL_NEXT][current];
     }
 
     // free list's node arrays
-    list->allocator->free(list->elements, list->allocator->arguments);
-    list->allocator->free(list->node[FDL_NEXT], list->allocator->arguments);
-    list->allocator->free(list->node[FDL_PREV], list->allocator->arguments);
+    list->allocator->free(list->elements, list->allocator->arg);
+    list->allocator->free(list->node[FDL_NEXT], list->allocator->arg);
+    list->allocator->free(list->node[FDL_PREV], list->allocator->arg);
 
     memset(list, 0, sizeof(fdouble_list_s));
 }
 
-void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
+void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const argd) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -83,7 +83,7 @@ void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy) {
 
     // call destroy function for each element in list
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
-        destroy(list->elements + (current * list->size));
+        destroy(list->elements + (current * list->size), argd);
         current = list->node[FDL_NEXT][current];
     }
 
@@ -106,9 +106,9 @@ fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn cons
     // allocate and set replica of list
     fdouble_list_s const replica = {
         .max = list->max, .head = list->head, .length = list->length, .size = list->size,
-        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arguments),
-        .node[FDL_NEXT] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
-        .node[FDL_PREV] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(list->max * list->size, list->allocator->arg),
+        .node[FDL_NEXT] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arg),
+        .node[FDL_PREV] = list->allocator->alloc(list->max * sizeof(size_t), list->allocator->arg),
         .allocator = list->allocator,
     };
     error(replica.elements && "Memory allocation failed.");
@@ -153,7 +153,7 @@ bool is_full_fdouble_list(fdouble_list_s const * const list) {
     return (list->length == list->max);
 }
 
-void insert_at_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, size_t const index) {
+void insert_at_fdouble_list(fdouble_list_s * const list, void const * const element, size_t const index) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(index <= list->length && "Paremeter can't be greater than length.");
@@ -195,7 +195,7 @@ void insert_at_fdouble_list(fdouble_list_s * const restrict list, void const * c
     list->length++;
 }
 
-void get_fdouble_list(fdouble_list_s const * const restrict list, size_t const index, void * const restrict buffer) {
+void get_fdouble_list(fdouble_list_s const * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(index < list->length && "Paremeter can't be greater than length.");
@@ -221,7 +221,7 @@ void get_fdouble_list(fdouble_list_s const * const restrict list, size_t const i
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_first_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -269,7 +269,7 @@ void remove_first_fdouble_list(fdouble_list_s * const restrict list, void const 
     exit(EXIT_FAILURE);
 }
 
-void remove_last_fdouble_list(fdouble_list_s * const restrict list, void const * const restrict element, void * const restrict buffer, compare_fn const compare) {
+void remove_last_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -319,7 +319,7 @@ void remove_last_fdouble_list(fdouble_list_s * const restrict list, void const *
     exit(EXIT_FAILURE);
 }
 
-void remove_at_fdouble_list(fdouble_list_s * const restrict list, size_t const index, void * const restrict buffer) {
+void remove_at_fdouble_list(fdouble_list_s * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(index < list->length && "Paremeter can't be greater than length.");
@@ -411,7 +411,7 @@ void shift_prev_fdouble_list(fdouble_list_s * const list, size_t const shift) {
     }
 }
 
-void splice_fdouble_list(fdouble_list_s * const restrict destination, fdouble_list_s * const restrict source, size_t const index) {
+void splice_fdouble_list(fdouble_list_s * const destination, fdouble_list_s * const source, size_t const index) {
     error(destination && "Paremeter can't be NULL.");
     error(source && "Paremeter can't be NULL.");
     error(index <= destination->length && "Paremeter can't be greater than length.");
@@ -505,9 +505,9 @@ fdouble_list_s slice_fdouble_list(fdouble_list_s * const list, size_t const inde
     fdouble_list_s split = {
         .size = list->size, .max = slice_max, .allocator = list->allocator,
 
-        .elements = list->allocator->alloc(slice_max * list->size, list->allocator->arguments),
-        .node[FDL_NEXT] = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arguments),
-        .node[FDL_PREV] = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(slice_max * list->size, list->allocator->arg),
+        .node[FDL_NEXT] = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arg),
+        .node[FDL_PREV] = list->allocator->alloc(slice_max * sizeof(size_t), list->allocator->arg),
     };
     error(split.elements && "Memory allocation failed.");
     error(split.node[FDL_NEXT] && "Memory allocation failed.");
@@ -538,9 +538,9 @@ fdouble_list_s slice_fdouble_list(fdouble_list_s * const list, size_t const inde
     }
 
     list->max = list_max;
-    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arguments);
-    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arguments);
-    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arguments);
+    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arg);
+    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arg);
+    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arg);
 
     return split;
 }
@@ -573,9 +573,9 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
     fdouble_list_s split = {
         .size = list->size, .max = split_max, .allocator = list->allocator,
 
-        .elements = list->allocator->alloc(split_max * list->size, list->allocator->arguments),
-        .node[FDL_NEXT] = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arguments),
-        .node[FDL_PREV] = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arguments),
+        .elements = list->allocator->alloc(split_max * list->size, list->allocator->arg),
+        .node[FDL_NEXT] = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arg),
+        .node[FDL_PREV] = list->allocator->alloc(split_max * sizeof(size_t), list->allocator->arg),
     };
     error(split.elements && "Memory allocation failed.");
     error(split.node[FDL_NEXT] && "Memory allocation failed.");
@@ -607,14 +607,14 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
     }
 
     list->max = list_max;
-    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arguments);
-    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arguments);
-    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arguments);
+    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arg);
+    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arg);
+    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arg);
 
     return split;
 }
 
-fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
+fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
     error(list_max && "Paremeter can't be zero.");
@@ -631,9 +631,9 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter
     // only create positive to save true filtered values
     fdouble_list_s positive = {
         .size = list->size, .allocator = list->allocator, .max = extract_max,
-        .elements = list->allocator->alloc(list->size * extract_max, list->allocator->arguments),
-        .node[FDL_PREV] = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arguments),
-        .node[FDL_NEXT] = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arguments),
+        .elements = list->allocator->alloc(list->size * extract_max, list->allocator->arg),
+        .node[FDL_PREV] = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arg),
+        .node[FDL_NEXT] = list->allocator->alloc(sizeof(size_t) * extract_max, list->allocator->arg),
     };
     error(positive.elements && "Memory allocation failed.");
     error(positive.node[FDL_NEXT] && "Memory allocation failed.");
@@ -674,17 +674,17 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const restrict list, filter
 
     error(list->length <= list_max && "Maximum size can't be more than length.");
     list->max = list_max;
-    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arguments);
-    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arguments);
-    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arguments);
+    list->elements = list->allocator->realloc(list->elements, list_max * list->size, list->allocator->arg);
+    list->node[FDL_NEXT] = list->allocator->realloc(list->node[FDL_NEXT], list_max * sizeof(size_t), list->allocator->arg);
+    list->node[FDL_PREV] = list->allocator->realloc(list->node[FDL_PREV], list_max * sizeof(size_t), list->allocator->arg);
 
     return positive;
 }
 
-void each_next_fdouble_list(fdouble_list_s const * const restrict list, handle_fn const operate, void * const restrict arguments) {
+void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const argh) {
     error(list && "Paremeter can't be NULL.");
-    error(operate && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
+    error(handle && "Paremeter can't be NULL.");
+    error(list != argh && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -694,18 +694,18 @@ void each_next_fdouble_list(fdouble_list_s const * const restrict list, handle_f
     valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
-    // for each forward element in list call operate function and break if it returns false
+    // for each forward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
-        if (!operate(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), argh)) {
             break;
         }
     }
 }
 
-void each_prev_fdouble_list(fdouble_list_s const * const restrict list, handle_fn const handle, void * const restrict arguments) {
+void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const argh) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
+    error(list != argh && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -718,16 +718,16 @@ void each_prev_fdouble_list(fdouble_list_s const * const restrict list, handle_f
     // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
         current = list->node[FDL_PREV][current];
-        if (!handle(list->elements + (current * list->size), arguments)) {
+        if (!handle(list->elements + (current * list->size), argh)) {
             break;
         }
     }
 }
 
-void apply_fdouble_list(fdouble_list_s const * const restrict list, process_fn const process, void * const restrict arguments) {
+void apply_fdouble_list(fdouble_list_s const * const list, process_fn const process, void * const argp) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(list != arguments && "Parameters can't be equal.");
+    error(list != argp && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -738,7 +738,7 @@ void apply_fdouble_list(fdouble_list_s const * const restrict list, process_fn c
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
     // create temporary continuous array for list element
-    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arguments);
+    char * elements_array = list->allocator->alloc(list->length * list->size, list->allocator->arg);
     error((!list->length || elements_array) && "Memory allocation failed.");
 
     // push list elements into elements array inorder
@@ -747,14 +747,14 @@ void apply_fdouble_list(fdouble_list_s const * const restrict list, process_fn c
     }
 
     // process elements
-    process(elements_array, list->length, arguments);
+    process(elements_array, list->length, argp);
 
     // copy elements back into list
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
         memcpy(list->elements + (current * list->size), elements_array + (i * list->size), list->size);
     }
 
-    list->allocator->free(elements_array, list->allocator->arguments);
+    list->allocator->free(elements_array, list->allocator->arg);
 }
 
 void _fdouble_list_fill_hole(fdouble_list_s * list, const size_t hole) {

@@ -38,12 +38,14 @@ frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const com
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void destroy_frb_set(frb_set_s * const set, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void destroy_frb_set(frb_set_s * const set, set_fn const destroy, void * const argd);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-void clear_frb_set(frb_set_s * const set, set_fn const destroy);
+/// @param argd Arguments for destroy function pointer.
+void clear_frb_set(frb_set_s * const set, set_fn const destroy, void * const argd);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param set Structure to copy.
@@ -127,7 +129,7 @@ bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * cons
 /// @brief Iterates over each element in structure.
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const arguments);
+/// @param argh Generic arguments to use in function pointer.
+void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const argh);
 
 #endif // FRB_SET_H

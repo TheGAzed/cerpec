@@ -22,7 +22,7 @@ fbinary_heap_s create_fbinary_heap(size_t const size, size_t const max, compare_
 
     fbinary_heap_s const heap = {
         .size = size, .compare = compare, .allocator = &standard, .max = max,
-        .elements = standard.alloc(max * size, standard.arguments),
+        .elements = standard.alloc(max * size, standard.arg),
     };
     assert(heap.elements && "[ERROR] Memory allocation failed.");
 
@@ -37,14 +37,14 @@ fbinary_heap_s make_fbinary_heap(size_t const size, size_t const max, compare_fn
 
     fbinary_heap_s const heap = {
         .size = size, .compare = compare, .allocator = allocator, .max = max,
-        .elements = allocator->alloc(max * size, allocator->arguments),
+        .elements = allocator->alloc(max * size, allocator->arg),
     };
     assert(heap.elements && "[ERROR] Memory allocation failed.");
 
     return heap;
 }
 
-void destroy_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy) {
+void destroy_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy, void * const argd) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -55,15 +55,15 @@ void destroy_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy) {
 
     // for each element in heap array call destroy function
     for (size_t i = 0; i < heap->length; ++i) {
-        destroy(heap->elements + (i * heap->size));
+        destroy(heap->elements + (i * heap->size), argd);
     }
-    heap->allocator->free(heap->elements, heap->allocator->arguments);
+    heap->allocator->free(heap->elements, heap->allocator->arg);
 
     // make structure invalid
     memset(heap, 0, sizeof(fbinary_heap_s));
 }
 
-void clear_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy) {
+void clear_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy, void * const argd) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(destroy && "[ERROR] Parameter can't be NULL.");
 
@@ -74,7 +74,7 @@ void clear_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy) {
 
     // for each element in heap array call destroy function
     for (size_t i = 0; i < heap->length; ++i) {
-        destroy(heap->elements + (i * heap->size));
+        destroy(heap->elements + (i * heap->size), argd);
     }
 
     // only clear structure
@@ -93,7 +93,7 @@ fbinary_heap_s copy_fbinary_heap(fbinary_heap_s const * const heap, copy_fn cons
     // initialize replica structure
     fbinary_heap_s const replica = {
         .max = heap->max, .compare = heap->compare, .size = heap->size, .length = heap->length,
-        .elements = heap->allocator->alloc(heap->max * heap->size, heap->allocator->arguments),
+        .elements = heap->allocator->alloc(heap->max * heap->size, heap->allocator->arg),
         .allocator = heap->allocator,
     };
     assert(replica.elements && "[ERROR] Memory allocation failed.");
@@ -141,12 +141,12 @@ void push_fbinary_heap(fbinary_heap_s * const heap, void const * const element) 
     memcpy(heap->elements + (heap->length * heap->size), element, heap->size);
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arguments);
+    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     _fbinary_heapify_up(heap, heap->length, temporary);
 
-    heap->allocator->free(temporary, heap->allocator->arguments);
+    heap->allocator->free(temporary, heap->allocator->arg);
 
     heap->length++;
 }
@@ -169,12 +169,12 @@ void pop_fbinary_heap(fbinary_heap_s * const heap, void * const buffer) {
     memmove(heap->elements, heap->elements + (heap->length * heap->size), heap->size);
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arguments);
+    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     _fbinary_heapify_down(heap, 0, temporary);
 
-    heap->allocator->free(temporary, heap->allocator->arguments);
+    heap->allocator->free(temporary, heap->allocator->arg);
 }
 
 void peep_fbinary_heap(fbinary_heap_s const * const heap, void * const buffer) {
@@ -190,7 +190,7 @@ void peep_fbinary_heap(fbinary_heap_s const * const heap, void * const buffer) {
     memcpy(buffer, heap->elements, heap->size);
 }
 
-void replace_fbinary_heap(fbinary_heap_s const * const heap, size_t const index, void const * const restrict element, void * const restrict buffer) {
+void replace_fbinary_heap(fbinary_heap_s const * const heap, size_t const index, void const * const element, void * const buffer) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(buffer && "[ERROR] Parameter can't be NULL.");
     assert(element && "[ERROR] Parameter can't be NULL.");
@@ -207,7 +207,7 @@ void replace_fbinary_heap(fbinary_heap_s const * const heap, size_t const index,
     memcpy(heap->elements + (index * heap->size), element, heap->size);
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arguments);
+    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // perform heapify up or down based on comparison (ignore comparison equal to 'zero' as heap doesn't change)
@@ -218,10 +218,10 @@ void replace_fbinary_heap(fbinary_heap_s const * const heap, size_t const index,
         _fbinary_heapify_down(heap, index, temporary);
     }
 
-    heap->allocator->free(temporary, heap->allocator->arguments);
+    heap->allocator->free(temporary, heap->allocator->arg);
 }
 
-void meld_fbinary_heap(fbinary_heap_s * const restrict destination, fbinary_heap_s * const restrict source) {
+void meld_fbinary_heap(fbinary_heap_s * const destination, fbinary_heap_s * const source) {
     assert(destination && "[ERROR] Parameter can't be NULL.");
     assert(source && "[ERROR] Parameter can't be NULL.");
     assert(source != destination && "[ERROR] Parameter can't be equal.");
@@ -245,7 +245,7 @@ void meld_fbinary_heap(fbinary_heap_s * const restrict destination, fbinary_heap
     source->length = 0;
 
     // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = destination->allocator->alloc(destination->size, destination->allocator->arguments);
+    void * temporary = destination->allocator->alloc(destination->size, destination->allocator->arg);
     assert(temporary && "[ERROR] Memory allocation failed.");
 
     // for each element at half index call
@@ -255,10 +255,10 @@ void meld_fbinary_heap(fbinary_heap_s * const restrict destination, fbinary_heap
         _fbinary_heapify_down(destination, reverse, temporary);
     }
 
-    destination->allocator->free(temporary, destination->allocator->arguments);
+    destination->allocator->free(temporary, destination->allocator->arg);
 }
 
-void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const arguments) {
+void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const argh) {
     assert(heap && "[ERROR] Parameter can't be NULL.");
     assert(handle && "[ERROR] Parameter can't be NULL.");
 
@@ -267,7 +267,7 @@ void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle
     assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
     assert(heap->max && "[INVALID] Paremeter can't be zero.");
 
-    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), arguments); ++i) {}
+    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), argh); ++i) {}
 }
 
 void _fbinary_heapify_up(fbinary_heap_s const * const heap, size_t const index, void * const temporary) {

@@ -48,12 +48,12 @@ fsc_hash_set_s create_fsc_hash_set(size_t const size, size_t const max, hash_fn 
     fsc_hash_set_s const set = {
         .size = size, .hash = hash, .allocator = &standard, .max = max, .compare = compare,
 
-        .elements = standard.alloc(max * size, standard.arguments),
-        .hashes = standard.alloc(max * sizeof(size_t), standard.arguments),
+        .elements = standard.alloc(max * size, standard.arg),
+        .hashes = standard.alloc(max * sizeof(size_t), standard.arg),
 
-        .head = standard.alloc(max * sizeof(size_t), standard.arguments),
-        .next = standard.alloc(max * sizeof(size_t), standard.arguments),
-        .prev = standard.alloc(max * sizeof(size_t), standard.arguments),
+        .head = standard.alloc(max * sizeof(size_t), standard.arg),
+        .next = standard.alloc(max * sizeof(size_t), standard.arg),
+        .prev = standard.alloc(max * sizeof(size_t), standard.arg),
     };
     error(set.elements && "Memory allocation failed.");
     error(set.hashes && "Memory allocation failed.");
@@ -78,7 +78,7 @@ fsc_hash_set_s make_fsc_hash_set(size_t const size, size_t const max, hash_fn co
     return _make_wrapper_fsc_hash_set(size, max, hash, compare, allocator);
 }
 
-void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy) {
+void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const argd) {
     error(set && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -92,22 +92,22 @@ void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy) {
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     // free arrays
-    set->allocator->free(set->elements, set->allocator->arguments);
-    set->allocator->free(set->hashes, set->allocator->arguments);
+    set->allocator->free(set->elements, set->allocator->arg);
+    set->allocator->free(set->hashes, set->allocator->arg);
 
-    set->allocator->free(set->head, set->allocator->arguments);
-    set->allocator->free(set->next, set->allocator->arguments);
-    set->allocator->free(set->prev, set->allocator->arguments);
+    set->allocator->free(set->head, set->allocator->arg);
+    set->allocator->free(set->next, set->allocator->arg);
+    set->allocator->free(set->prev, set->allocator->arg);
 
     // set everything to zero/false
     memset(set, 0, sizeof(fsc_hash_set_s));
 }
 
-void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy) {
+void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const argd) {
     error(set && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -121,7 +121,7 @@ void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy) {
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size));
+        destroy(set->elements + (i * set->size), argd);
     }
 
     for (size_t i = 0; i < set->max; ++i) {
@@ -581,7 +581,7 @@ bool is_disjoint_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set
     return true;
 }
 
-void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle, void * const arguments) {
+void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle, void * const argh) {
     error(set && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
@@ -594,7 +594,7 @@ void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle,
     valid(set->allocator && "Allocator can't be NULL.");
 
     for (size_t i = 0; i < set->length; ++i) {
-        if (!handle(set->elements + (i * set->size), arguments)) { break; }
+        if (!handle(set->elements + (i * set->size), argh)) { break; }
     }
 }
 
@@ -631,12 +631,12 @@ fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, h
     fsc_hash_set_s const set = {
         .size = size, .hash = hash, .allocator = allocator, .max = max, .compare = compare,
 
-        .elements = allocator->alloc(max * size, allocator->arguments),
-        .hashes = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .elements = allocator->alloc(max * size, allocator->arg),
+        .hashes = allocator->alloc(max * sizeof(size_t), allocator->arg),
 
-        .head = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-        .next = allocator->alloc(max * sizeof(size_t), allocator->arguments),
-        .prev = allocator->alloc(max * sizeof(size_t), allocator->arguments),
+        .head = allocator->alloc(max * sizeof(size_t), allocator->arg),
+        .next = allocator->alloc(max * sizeof(size_t), allocator->arg),
+        .prev = allocator->alloc(max * sizeof(size_t), allocator->arg),
     };
     error(set.elements && "Memory allocation failed.");
     error(set.hashes && "Memory allocation failed.");
@@ -657,12 +657,12 @@ fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy
         .max = set->max, .hash = set->hash, .length = set->length, .size = set->size,
         .allocator = set->allocator, .compare = set->compare,
 
-        .elements = set->allocator->alloc(set->max * set->size, set->allocator->arguments),
-        .hashes = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
+        .elements = set->allocator->alloc(set->max * set->size, set->allocator->arg),
+        .hashes = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arg),
 
-        .head = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
-        .next = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
-        .prev = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arguments),
+        .head = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arg),
+        .next = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arg),
+        .prev = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arg),
     };
     error(replica.elements && "Memory allocation failed.");
     error(replica.hashes && "Memory allocation failed.");
