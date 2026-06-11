@@ -77,7 +77,7 @@ fsc_hash_map_s make_fsc_hash_map(size_t const key_size, size_t const value_size,
     return table;
 }
 
-void destroy_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv) {
+void destroy_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const adk, set_fn const destroy_value, void * const adv) {
     error(map && "Parameter can't be NULL.");
     error(destroy_key && "Parameter can't be NULL.");
     error(destroy_value && "Parameter can't be NULL.");
@@ -90,8 +90,8 @@ void destroy_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, 
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < map->length; ++i) {
-        destroy_key(map->keys + (i * map->key_size), argdk);
-        destroy_value(map->values + (i * map->value_size), argdv);
+        destroy_key(map->keys + (i * map->key_size), adk);
+        destroy_value(map->values + (i * map->value_size), adv);
     }
 
     // free arrays
@@ -107,7 +107,7 @@ void destroy_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, 
     memset(map, 0, sizeof(fsc_hash_map_s));
 }
 
-void clear_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv) {
+void clear_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const adk, set_fn const destroy_value, void * const adv) {
     error(map && "Parameter can't be NULL.");
     error(destroy_key && "Parameter can't be NULL.");
     error(destroy_value && "Parameter can't be NULL.");
@@ -120,8 +120,8 @@ void clear_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, vo
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < map->length; ++i) {
-        destroy_key(map->keys + (i * map->key_size), argdk);
-        destroy_value(map->values + (i * map->value_size), argdv);
+        destroy_key(map->keys + (i * map->key_size), adk);
+        destroy_value(map->values + (i * map->value_size), adv);
     }
 
     for (size_t i = 0; i < map->max; ++i) {
@@ -132,7 +132,7 @@ void clear_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, vo
     map->length = 0;
 }
 
-fsc_hash_map_s copy_fsc_hash_map(fsc_hash_map_s const * const map, copy_fn const copy_key, copy_fn const copy_value) {
+fsc_hash_map_s copy_fsc_hash_map(fsc_hash_map_s const * const map, copy_fn const copy_key, void * const ack, copy_fn const copy_value, void * const acv) {
     error(map && "Parameter can't be NULL.");
     error(copy_key && "Parameter can't be NULL.");
     error(copy_value && "Parameter can't be NULL.");
@@ -172,8 +172,8 @@ fsc_hash_map_s copy_fsc_hash_map(fsc_hash_map_s const * const map, copy_fn const
     memcpy(replica.hashes, map->hashes, map->length * sizeof(size_t));
 
     for (size_t i = 0; i < map->length; ++i) {
-        copy_key(replica.keys + (i * replica.key_size), map->keys + (i * map->key_size));
-        copy_value(replica.values + (i * replica.value_size), map->values + (i * map->value_size));
+        copy_key(replica.keys + (i * replica.key_size), map->keys + (i * map->key_size), ack);
+        copy_value(replica.values + (i * replica.value_size), map->values + (i * map->value_size), acv);
     }
 
     return replica;
@@ -418,10 +418,10 @@ void set_fsc_hash_map(fsc_hash_map_s * const map, void const * const key, void c
     map->length++;
 }
 
-void each_key_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const argh) {
+void each_key_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const ah) {
     error(map && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(map != argh && "Parameters can't be equal.");
+    error(map != ah && "Parameters can't be equal.");
 
     valid(map->hash_key && "Parameter can't be NULL.");
     valid(map->key_size && "Parameter can't be zero.");
@@ -431,16 +431,16 @@ void each_key_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const han
 
     // iterate over each valid key in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
-        if (!handle(map->keys + (i * map->key_size), argh)) {
+        if (!handle(map->keys + (i * map->key_size), ah)) {
             break; // return since we need to break-off of two loops
         }
     }
 }
 
-void each_value_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const argh) {
+void each_value_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const ah) {
     error(map && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(map != argh && "Parameters can't be equal.");
+    error(map != ah && "Parameters can't be equal.");
 
     valid(map->hash_key && "Parameter can't be NULL.");
     valid(map->key_size && "Parameter can't be zero.");
@@ -450,7 +450,7 @@ void each_value_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const h
 
     // iterate over each valid value in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
-        if (!handle(map->values + (i * map->value_size), argh)) {
+        if (!handle(map->values + (i * map->value_size), ah)) {
             break; // return since we need to break-off of two loops
         }
     }

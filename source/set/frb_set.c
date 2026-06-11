@@ -44,9 +44,9 @@ void _frb_set_remove_fixup(frb_set_s * const set, size_t const node);
 void _frb_set_fill_hole(frb_set_s * const set, size_t const hole);
 
 frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const compare) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
-    assert(max && "[ERROR] Parameter can't be zero.");
+    assert(compare && "Parameter can't be NULL.");
+    assert(size && "Parameter can't be zero.");
+    assert(max && "Parameter can't be zero.");
 
     // initialize structure
     frb_set_s const set = {
@@ -58,11 +58,11 @@ frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const c
         .node[IRB_SET_RIGHT] = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
         .allocator = &standard,
     };
-    assert(set.elements && "[ERROR] Memory allocation failed.");
-    assert(set.color && "[ERROR] Memory allocation failed.");
-    assert(set.parent && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(set.elements && "Memory allocation failed.");
+    assert(set.color && "Memory allocation failed.");
+    assert(set.parent && "Memory allocation failed.");
+    assert(set.node[IRB_SET_LEFT] && "Memory allocation failed.");
+    assert(set.node[IRB_SET_RIGHT] && "Memory allocation failed.");
 
     // set NIL node since the set uses special NIL nodes
     set.color[NIL] = IBLACK_SET_COLOR;
@@ -72,10 +72,10 @@ frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const c
 }
 
 frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
-    assert(max && "[ERROR] Parameter can't be zero.");
-    assert(allocator && "[ERROR] Parameter can't be NULL.");
+    assert(compare && "Parameter can't be NULL.");
+    assert(size && "Parameter can't be zero.");
+    assert(max && "Parameter can't be zero.");
+    assert(allocator && "Parameter can't be NULL.");
 
     // initialize structure
     frb_set_s const set = {
@@ -87,11 +87,11 @@ frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const com
         .node[IRB_SET_RIGHT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arg),
         .allocator = allocator,
     };
-    assert(set.elements && "[ERROR] Memory allocation failed.");
-    assert(set.color && "[ERROR] Memory allocation failed.");
-    assert(set.parent && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(set.elements && "Memory allocation failed.");
+    assert(set.color && "Memory allocation failed.");
+    assert(set.parent && "Memory allocation failed.");
+    assert(set.node[IRB_SET_LEFT] && "Memory allocation failed.");
+    assert(set.node[IRB_SET_RIGHT] && "Memory allocation failed.");
 
     // set NIL node since the set uses special NIL nodes
     set.color[NIL] = IBLACK_SET_COLOR;
@@ -100,17 +100,17 @@ frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const com
     return set;
 }
 
-void destroy_frb_set(frb_set_s * const set, set_fn const destroy, void * const argd) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+void destroy_frb_set(frb_set_s * const set, set_fn const destroy, void * const ad) {
+    assert(set && "Parameter can't be NULL.");
+    assert(destroy && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     // free arrays
@@ -124,17 +124,17 @@ void destroy_frb_set(frb_set_s * const set, set_fn const destroy, void * const a
     memset(set, 0, sizeof(frb_set_s));
 }
 
-void clear_frb_set(frb_set_s * const set, set_fn const destroy, void * const argd) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+void clear_frb_set(frb_set_s * const set, set_fn const destroy, void * const ad) {
+    assert(set && "Parameter can't be NULL.");
+    assert(destroy && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     // clear (NOT destroy) structure
@@ -142,13 +142,13 @@ void clear_frb_set(frb_set_s * const set, set_fn const destroy, void * const arg
     set->length = 0;
 }
 
-frb_set_s copy_frb_set(frb_set_s const * const set, copy_fn const copy) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
+frb_set_s copy_frb_set(frb_set_s const * const set, copy_fn const copy, void * const ac) {
+    assert(set && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
     // initialize replica
     frb_set_s const replica = {
@@ -163,16 +163,16 @@ frb_set_s copy_frb_set(frb_set_s const * const set, copy_fn const copy) {
     };
 
     // since the structure always has one additional NIL node malloc must be checked even if capacity is zero
-    assert(replica.elements && "[ERROR] Memory allocation failed.");
-    assert(replica.color && "[ERROR] Memory allocation failed.");
-    assert(replica.parent && "[ERROR] Memory allocation failed.");
-    assert(replica.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(replica.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(replica.elements && "Memory allocation failed.");
+    assert(replica.color && "Memory allocation failed.");
+    assert(replica.parent && "Memory allocation failed.");
+    assert(replica.node[IRB_SET_LEFT] && "Memory allocation failed.");
+    assert(replica.node[IRB_SET_RIGHT] && "Memory allocation failed.");
 
     // copy elements and indexes straight to replica
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < set->length + 1; ++i) {
-        copy(replica.elements + (i * set->size), set->elements + (i * set->size));
+        copy(replica.elements + (i * set->size), set->elements + (i * set->size), ac);
     }
     memcpy(replica.color, set->color, (set->length + 1) * sizeof(bool));
     memcpy(replica.parent, set->parent, (set->length + 1) * sizeof(size_t));
@@ -183,32 +183,32 @@ frb_set_s copy_frb_set(frb_set_s const * const set, copy_fn const copy) {
 }
 
 bool is_empty_frb_set(frb_set_s const * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
     return !(set->length);
 }
 
 bool is_full_frb_set(frb_set_s const * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
     return (set->length == set->max);
 }
 
 void insert_frb_set(frb_set_s * const set, void const * const element) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
+    assert(element && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
     size_t previous = NIL; // initially invalid for the head case when set is empty
     size_t * node = &(set->root); // pointer to later change actual index of the empty child
@@ -235,18 +235,18 @@ void insert_frb_set(frb_set_s * const set, void const * const element) {
 }
 
 void remove_frb_set(frb_set_s * const set, void const * const element, void * const buffer) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(set->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
+    assert(set->length && "Can't get element from empty structure.");
+    assert(buffer && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(set->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != set->root && "[INVALID] Paremeter can't be NIL.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
+    assert(set->elements && "Paremeter can't be NULL.");
+    assert(set->parent && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_LEFT] && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_RIGHT] && "Paremeter can't be NULL.");
+    assert(NIL != set->root && "Paremeter can't be NIL.");
 
     size_t node = set->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
@@ -264,7 +264,7 @@ void remove_frb_set(frb_set_s * const set, void const * const element, void * co
 
     if (NIL == node) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in set.");
+        assert(false && "Element not found in set.");
         exit(EXIT_FAILURE);
     }
 
@@ -310,16 +310,16 @@ void remove_frb_set(frb_set_s * const set, void const * const element, void * co
 }
 
 bool contains_frb_set(frb_set_s const * const set, void const * const element) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
+    assert(element && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
-    assert(set->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(set->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
+    assert(set->elements && "Paremeter can't be NULL.");
+    assert(set->parent && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_LEFT] && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_RIGHT] && "Paremeter can't be NULL.");
 
     for (size_t node = set->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -335,27 +335,27 @@ bool contains_frb_set(frb_set_s const * const set, void const * const element) {
     return false;
 }
 
-frb_set_s union_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+frb_set_s union_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy, void * const ac) {
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements to maximum's replica
     frb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
     frb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
-    frb_set_s set_union = copy_frb_set(maximum, copy);
+    frb_set_s set_union = copy_frb_set(maximum, copy, ac);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -396,7 +396,7 @@ frb_set_s union_frb_set(frb_set_s const * const set_one, frb_set_s const * const
         set_union.node[IRB_SET_LEFT][(*node)] = set_union.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_union.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_union.elements + ((*node) * set_union.size), element);
+        copy(set_union.elements + ((*node) * set_union.size), element, ac);
         set_union.length++;
 
         _frb_set_insert_fixup(&set_union, (*node));
@@ -405,20 +405,20 @@ frb_set_s union_frb_set(frb_set_s const * const set_one, frb_set_s const * const
     return set_union;
 }
 
-frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy, void * const ac) {
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements
     frb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
@@ -467,7 +467,7 @@ frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * c
         set_intersect.node[IRB_SET_LEFT][(*node)] = set_intersect.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_intersect.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_intersect.elements + ((*node) * set_intersect.size), element);
+        copy(set_intersect.elements + ((*node) * set_intersect.size), element, ac);
         set_intersect.length++;
 
         _frb_set_insert_fixup(&set_intersect, (*node));
@@ -476,20 +476,20 @@ frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * c
     return set_intersect;
 }
 
-frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * const subtrahend, copy_fn const copy) {
-    assert(minuend && "[ERROR] Parameter can't be NULL.");
-    assert(subtrahend && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(minuend->compare == subtrahend->compare && "[ERROR] Function pointers must be the same.");
-    assert(minuend->size == subtrahend->size && "[ERROR] Sizes must be the same.");
+frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * const subtrahend, copy_fn const copy, void * const ac) {
+    assert(minuend && "Parameter can't be NULL.");
+    assert(subtrahend && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(minuend->compare == subtrahend->compare && "Function pointers must be the same.");
+    assert(minuend->size == subtrahend->size && "Sizes must be the same.");
 
-    assert(minuend->compare && "[INVALID] Parameter can't be NULL.");
-    assert(minuend->size && "[INVALID] Parameter can't be zero.");
-    assert(minuend->length <= minuend->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(minuend->compare && "Parameter can't be NULL.");
+    assert(minuend->size && "Parameter can't be zero.");
+    assert(minuend->length <= minuend->max && "Lenght can't be larger than maximum.");
 
-    assert(subtrahend->compare && "[INVALID] Parameter can't be NULL.");
-    assert(subtrahend->size && "[INVALID] Parameter can't be zero.");
-    assert(subtrahend->length <= subtrahend->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(subtrahend->compare && "Parameter can't be NULL.");
+    assert(subtrahend->size && "Parameter can't be zero.");
+    assert(subtrahend->length <= subtrahend->max && "Lenght can't be larger than maximum.");
 
     frb_set_s set_subtract = make_frb_set(minuend->size, minuend->max, minuend->compare, minuend->allocator);
 
@@ -532,7 +532,7 @@ frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * co
         set_subtract.node[IRB_SET_LEFT][(*node)] = set_subtract.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_subtract.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_subtract.elements + ((*node) * set_subtract.size), element);
+        copy(set_subtract.elements + ((*node) * set_subtract.size), element, ac);
         set_subtract.length++;
 
         _frb_set_insert_fixup(&set_subtract, (*node));
@@ -541,20 +541,20 @@ frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * co
     return set_subtract;
 }
 
-frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two, copy_fn const copy, void * const ac) {
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
 
     frb_set_s const * const biggest = set_one->max >= set_two->max ? set_one : set_two;
 
@@ -599,7 +599,7 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
         set_exclude.node[IRB_SET_LEFT][(*node)] = set_exclude.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_exclude.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_exclude.elements + ((*node) * set_exclude.size), element);
+        copy(set_exclude.elements + ((*node) * set_exclude.size), element, ac);
         set_exclude.length++;
 
         _frb_set_insert_fixup(&set_exclude, (*node));
@@ -644,7 +644,7 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
         set_exclude.node[IRB_SET_LEFT][(*node)] = set_exclude.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_exclude.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_exclude.elements + ((*node) * set_exclude.size), element);
+        copy(set_exclude.elements + ((*node) * set_exclude.size), element, ac);
         set_exclude.length++;
 
         _frb_set_insert_fixup(&set_exclude, (*node));
@@ -654,18 +654,18 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
 }
 
 bool is_subset_frb_set(frb_set_s const * const superset, frb_set_s const * const subset) {
-    assert(superset && "[ERROR] Parameter can't be NULL.");
-    assert(subset && "[ERROR] Parameter can't be NULL.");
-    assert(superset->compare == subset->compare && "[ERROR] Function pointers must be the same.");
-    assert(superset->size == subset->size && "[ERROR] Sizes must be the same.");
+    assert(superset && "Parameter can't be NULL.");
+    assert(subset && "Parameter can't be NULL.");
+    assert(superset->compare == subset->compare && "Function pointers must be the same.");
+    assert(superset->size == subset->size && "Sizes must be the same.");
 
-    assert(superset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(superset->size && "[INVALID] Parameter can't be zero.");
-    assert(superset->length <= superset->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(superset->compare && "Parameter can't be NULL.");
+    assert(superset->size && "Parameter can't be zero.");
+    assert(superset->length <= superset->max && "Lenght can't be larger than maximum.");
 
-    assert(subset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(subset->size && "[INVALID] Parameter can't be zero.");
-    assert(subset->length <= subset->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(subset->compare && "Parameter can't be NULL.");
+    assert(subset->size && "Parameter can't be zero.");
+    assert(subset->length <= subset->max && "Lenght can't be larger than maximum.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < subset->length + 1; ++i) {
@@ -692,18 +692,18 @@ bool is_subset_frb_set(frb_set_s const * const superset, frb_set_s const * const
 }
 
 bool is_proper_subset_frb_set(frb_set_s const * const superset, frb_set_s const * const subset) {
-    assert(superset && "[ERROR] Parameter can't be NULL.");
-    assert(subset && "[ERROR] Parameter can't be NULL.");
-    assert(superset->compare == subset->compare && "[ERROR] Function pointers must be the same.");
-    assert(superset->size == subset->size && "[ERROR] Sizes must be the same.");
+    assert(superset && "Parameter can't be NULL.");
+    assert(subset && "Parameter can't be NULL.");
+    assert(superset->compare == subset->compare && "Function pointers must be the same.");
+    assert(superset->size == subset->size && "Sizes must be the same.");
 
-    assert(superset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(superset->size && "[INVALID] Parameter can't be zero.");
-    assert(superset->length <= superset->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(superset->compare && "Parameter can't be NULL.");
+    assert(superset->size && "Parameter can't be zero.");
+    assert(superset->length <= superset->max && "Lenght can't be larger than maximum.");
 
-    assert(subset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(subset->size && "[INVALID] Parameter can't be zero.");
-    assert(subset->length <= subset->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(subset->compare && "Parameter can't be NULL.");
+    assert(subset->size && "Parameter can't be zero.");
+    assert(subset->length <= subset->max && "Lenght can't be larger than maximum.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < subset->length + 1; ++i) {
@@ -730,18 +730,18 @@ bool is_proper_subset_frb_set(frb_set_s const * const superset, frb_set_s const 
 }
 
 bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * const set_two) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->max && "Lenght can't be larger than maximum.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->max && "Lenght can't be larger than maximum.");
 
     frb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
     frb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
@@ -770,15 +770,15 @@ bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * cons
     return true;
 }
 
-void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const argh) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
+void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const ah) {
+    assert(set && "Parameter can't be NULL.");
+    assert(handle && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->max && "[INVALID] Lenght can't be larger than maximum.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
-    for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), argh); ++i) {}
+    for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), ah); ++i) {}
 }
 
 void _frb_set_left_rotate(frb_set_s * const set, size_t const node) {

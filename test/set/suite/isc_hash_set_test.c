@@ -191,7 +191,7 @@ TEST UNION_01(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -213,7 +213,7 @@ TEST UNION_02(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -235,7 +235,7 @@ TEST UNION_03(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -260,7 +260,7 @@ TEST UNION_04(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -285,7 +285,7 @@ TEST UNION_05(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -310,7 +310,7 @@ TEST UNION_06(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -335,7 +335,7 @@ TEST UNION_07(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -360,7 +360,7 @@ TEST UNION_08(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -385,7 +385,7 @@ TEST UNION_09(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_union = union_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_union, &i));
@@ -407,7 +407,7 @@ TEST INTERSECT_01(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_intersect, &i));
@@ -429,7 +429,7 @@ TEST INTERSECT_02(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT(contains_isc_hash_set(&set_intersect, &i));
@@ -451,7 +451,7 @@ TEST INTERSECT_03(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_intersect, &i));
@@ -476,7 +476,7 @@ TEST INTERSECT_04(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_intersect, &i));
@@ -501,7 +501,7 @@ TEST INTERSECT_05(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_intersect, &i));
@@ -526,7 +526,7 @@ TEST INTERSECT_06(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_intersect, &i));
@@ -551,7 +551,7 @@ TEST INTERSECT_07(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK - 1) / 3; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_intersect, &i));
@@ -584,7 +584,7 @@ TEST INTERSECT_08(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK) / 3; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_intersect, &i));
@@ -617,7 +617,7 @@ TEST INTERSECT_09(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_intersect = intersect_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK + 1) / 3; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_intersect, &i));
@@ -647,7 +647,7 @@ TEST SUBTRACT_01(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_subtract, &i));
@@ -669,7 +669,7 @@ TEST SUBTRACT_02(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_subtract, &i));
@@ -691,7 +691,7 @@ TEST SUBTRACT_03(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_subtract, &i));
@@ -716,7 +716,7 @@ TEST SUBTRACT_04(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK - 1) / 2; ++i) {
         ASSERT(contains_isc_hash_set(&set_subtract, &i));
@@ -745,7 +745,7 @@ TEST SUBTRACT_05(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK) / 2; ++i) {
         ASSERT(contains_isc_hash_set(&set_subtract, &i));
@@ -774,7 +774,7 @@ TEST SUBTRACT_06(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK + 1) / 2; ++i) {
         ASSERT(contains_isc_hash_set(&set_subtract, &i));
@@ -804,7 +804,7 @@ TEST SUBTRACT_07(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK - 1) / 3; ++i) {
         ASSERT(contains_isc_hash_set(&set_subtract, &i));
@@ -829,7 +829,7 @@ TEST SUBTRACT_08(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK) / 3; ++i) {
         ASSERT(contains_isc_hash_set(&set_subtract, &i));
@@ -854,7 +854,7 @@ TEST SUBTRACT_09(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_subtract = subtract_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK + 1) / 3; ++i) {
         ASSERT(contains_isc_hash_set(&set_subtract, &i));
@@ -876,7 +876,7 @@ TEST EXCLUDE_01(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_exclude, &i));
@@ -898,7 +898,7 @@ TEST EXCLUDE_02(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_exclude, &i));
@@ -920,7 +920,7 @@ TEST EXCLUDE_03(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT_FALSE(contains_isc_hash_set(&set_exclude, &i));
@@ -945,7 +945,7 @@ TEST EXCLUDE_04(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK - 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_exclude, &i));
@@ -970,7 +970,7 @@ TEST EXCLUDE_05(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK; ++i) {
         ASSERT(contains_isc_hash_set(&set_exclude, &i));
@@ -995,7 +995,7 @@ TEST EXCLUDE_06(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_SET_CHUNK + 1; ++i) {
         ASSERT(contains_isc_hash_set(&set_exclude, &i));
@@ -1020,7 +1020,7 @@ TEST EXCLUDE_07(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK - 1) / 3; ++i) {
         ASSERT(contains_isc_hash_set(&set_exclude, &i));
@@ -1049,7 +1049,7 @@ TEST EXCLUDE_08(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK) / 3; ++i) {
         ASSERT(contains_isc_hash_set(&set_exclude, &i));
@@ -1078,7 +1078,7 @@ TEST EXCLUDE_09(void) {
         insert_isc_hash_set(&set_two, &i);
     }
 
-    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy);
+    isc_hash_set_s set_exclude = exclude_isc_hash_set(&set_one, &set_two, intcpy, NULL);
 
     for (int i = 0; i < (ISC_HASH_SET_CHUNK + 1) / 3; ++i) {
         ASSERT(contains_isc_hash_set(&set_exclude, &i));

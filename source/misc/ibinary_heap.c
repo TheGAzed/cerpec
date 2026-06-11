@@ -21,8 +21,8 @@ void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index, 
 void _ibinary_heapify_down(ibinary_heap_s const * const heap, size_t const index, void * const temporary);
 
 ibinary_heap_s create_ibinary_heap(size_t const size, compare_fn const compare) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
+    assert(compare && "Parameter can't be NULL.");
+    assert(size && "Parameter can't be zero.");
 
     return (ibinary_heap_s) {
         .size = size, .compare = compare, .allocator = &standard,
@@ -30,26 +30,26 @@ ibinary_heap_s create_ibinary_heap(size_t const size, compare_fn const compare) 
 }
 
 ibinary_heap_s make_ibinary_heap(size_t const size, compare_fn const compare, memory_s const * const allocator) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
-    assert(allocator && "[ERROR] Parameter can't be NULL.");
+    assert(compare && "Parameter can't be NULL.");
+    assert(size && "Parameter can't be zero.");
+    assert(allocator && "Parameter can't be NULL.");
 
     return (ibinary_heap_s) {
         .size = size, .compare = compare, .allocator = allocator,
     };
 }
 
-void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const argd) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const ad) {
+    assert(heap && "Parameter can't be NULL.");
+    assert(destroy && "Parameter can't be NULL.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     // for each element in heap array call destroy function
     for (size_t i = 0; i < heap->length; ++i) {
-        destroy(heap->elements + (i * heap->size), argd);
+        destroy(heap->elements + (i * heap->size), ad);
     }
     heap->allocator->free(heap->elements, heap->allocator->arg);
 
@@ -57,17 +57,17 @@ void destroy_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, voi
     memset(heap, 0, sizeof(ibinary_heap_s));
 }
 
-void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const argd) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void * const ad) {
+    assert(heap && "Parameter can't be NULL.");
+    assert(destroy && "Parameter can't be NULL.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     // for each element in heap array call destroy function
     for (size_t i = 0; i < heap->length; ++i) {
-        destroy(heap->elements + (i * heap->size), argd);
+        destroy(heap->elements + (i * heap->size), ad);
     }
     heap->allocator->free(heap->elements, heap->allocator->arg);
 
@@ -76,13 +76,13 @@ void clear_ibinary_heap(ibinary_heap_s * const heap, set_fn const destroy, void 
     heap->elements = NULL;
 }
 
-ibinary_heap_s copy_ibinary_heap(ibinary_heap_s const * const heap, copy_fn const copy) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
+ibinary_heap_s copy_ibinary_heap(ibinary_heap_s const * const heap, copy_fn const copy, void * const ac) {
+    assert(heap && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     // initialize replica structure
     ibinary_heap_s const replica = {
@@ -90,32 +90,32 @@ ibinary_heap_s copy_ibinary_heap(ibinary_heap_s const * const heap, copy_fn cons
         .elements = heap->allocator->alloc(heap->capacity * heap->size, heap->allocator->arg),
         .allocator = heap->allocator,
     };
-    assert((!replica.capacity || replica.elements) && "[ERROR] Memory allocation failed.");
+    assert((!replica.capacity || replica.elements) && "Memory allocation failed.");
 
     // copy each array element into replica
     for (size_t i = 0; i < heap->length; ++i) {
-        copy(replica.elements + (i * replica.size), heap->elements + (i * heap->size));
+        copy(replica.elements + (i * replica.size), heap->elements + (i * heap->size), ac);
     }
 
     return replica;
 }
 
 bool is_empty_ibinary_heap(ibinary_heap_s const * const heap) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap && "Parameter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     return !(heap->length);
 }
 
 void push_ibinary_heap(ibinary_heap_s * const heap, void const * const element) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(heap && "Parameter can't be NULL.");
+    assert(element && "Parameter can't be NULL.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     if (heap->length == heap->capacity) {
         size_t const capacity = heap->length ? heap->length * CERPEC_FACTOR : IBINARY_HEAP_CHUNK;
@@ -127,7 +127,7 @@ void push_ibinary_heap(ibinary_heap_s * const heap, void const * const element) 
 
     // create temporary element holder outside of loop for swaps in heap fixup
     void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
-    assert(temporary && "[ERROR] Memory allocation failed.");
+    assert(temporary && "Memory allocation failed.");
 
     _ibinary_heapify_up(heap, heap->length, temporary);
 
@@ -137,13 +137,13 @@ void push_ibinary_heap(ibinary_heap_s * const heap, void const * const element) 
 }
 
 void pop_ibinary_heap(ibinary_heap_s * const heap, void * const buffer) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(heap->length && "[ERROR] Length can't be zero.");
+    assert(heap && "Parameter can't be NULL.");
+    assert(buffer && "Parameter can't be NULL.");
+    assert(heap->length && "Length can't be zero.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     // save root element
     memcpy(buffer, heap->elements, heap->size);
@@ -154,7 +154,7 @@ void pop_ibinary_heap(ibinary_heap_s * const heap, void * const buffer) {
 
     // create temporary element holder outside of loop for swaps in heap fixup
     void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
-    assert(temporary && "[ERROR] Memory allocation failed.");
+    assert(temporary && "Memory allocation failed.");
 
     _ibinary_heapify_down(heap, 0, temporary);
 
@@ -166,26 +166,26 @@ void pop_ibinary_heap(ibinary_heap_s * const heap, void * const buffer) {
 }
 
 void peep_ibinary_heap(ibinary_heap_s const * const heap, void * const buffer) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(heap->length && "[ERROR] Length can't be zero.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(heap && "Parameter can't be NULL.");
+    assert(heap->length && "Length can't be zero.");
+    assert(buffer && "Parameter can't be NULL.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     memcpy(buffer, heap->elements, heap->size);
 }
 
 void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index, void const * const element, void * const buffer) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
-    assert(index < heap->length && "[ERROR] Parameter can't be more than length.");
+    assert(heap && "Parameter can't be NULL.");
+    assert(buffer && "Parameter can't be NULL.");
+    assert(element && "Parameter can't be NULL.");
+    assert(index < heap->length && "Parameter can't be more than length.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
     // copy element to replace into buffer
     memcpy(buffer, heap->elements + (index * heap->size), heap->size);
@@ -194,7 +194,7 @@ void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index,
 
     // create temporary element holder outside of loop for swaps in heap fixup
     void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
-    assert(temporary && "[ERROR] Memory allocation failed.");
+    assert(temporary && "Memory allocation failed.");
 
     // perform heapify up or down based on comparison (ignore comparison equal to 'zero' as heap doesn't change)
     int const comparison = heap->compare(buffer, element);
@@ -208,17 +208,17 @@ void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index,
 }
 
 void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * const source) {
-    assert(destination && "[ERROR] Parameter can't be NULL.");
-    assert(source && "[ERROR] Parameter can't be NULL.");
-    assert(source != destination && "[ERROR] Parameter can't be equal.");
+    assert(destination && "Parameter can't be NULL.");
+    assert(source && "Parameter can't be NULL.");
+    assert(source != destination && "Parameter can't be equal.");
 
-    assert(destination->compare && "[INVALID] Parameter can't be NULL.");
-    assert(destination->size && "[INVALID] Parameter can't be zero.");
-    assert(destination->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(destination->compare && "Parameter can't be NULL.");
+    assert(destination->size && "Parameter can't be zero.");
+    assert(destination->allocator && "Paremeter can't be NULL.");
 
-    assert(source->compare && "[INVALID] Parameter can't be NULL.");
-    assert(source->size && "[INVALID] Parameter can't be zero.");
-    assert(source->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(source->compare && "Parameter can't be NULL.");
+    assert(source->size && "Parameter can't be zero.");
+    assert(source->allocator && "Paremeter can't be NULL.");
 
     // calculate new destination length
     size_t const sum = destination->length + source->length;
@@ -237,7 +237,7 @@ void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * cons
 
     // create temporary element holder outside of loop for swaps in heap fixup
     void * temporary = destination->allocator->alloc(destination->size, destination->allocator->arg);
-    assert(temporary && "[ERROR] Memory allocation failed.");
+    assert(temporary && "Memory allocation failed.");
 
     // for each element at half index call
     size_t const start = (destination->length / 2) - 1; // value may underflow when length is less than two
@@ -249,22 +249,22 @@ void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * cons
     destination->allocator->free(temporary, destination->allocator->arg);
 }
 
-void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const argh) {
-    assert(heap && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
+void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const ah) {
+    assert(heap && "Parameter can't be NULL.");
+    assert(handle && "Parameter can't be NULL.");
 
-    assert(heap->compare && "[INVALID] Parameter can't be NULL.");
-    assert(heap->size && "[INVALID] Parameter can't be zero.");
-    assert(heap->allocator && "[INVALID] Paremeter can't be NULL.");
+    assert(heap->compare && "Parameter can't be NULL.");
+    assert(heap->size && "Parameter can't be zero.");
+    assert(heap->allocator && "Paremeter can't be NULL.");
 
-    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), argh); ++i) {}
+    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), ah); ++i) {}
 }
 
 void _ibinary_heap_resize(ibinary_heap_s * const heap, size_t const size) {
     heap->capacity = size;
 
     heap->elements = heap->allocator->realloc(heap->elements, size * heap->size, heap->allocator->arg);
-    assert((!size || heap->elements) && "[ERROR] Memory allocation failed.");
+    assert((!size || heap->elements) && "Memory allocation failed.");
 }
 
 void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index, void * const temporary) {

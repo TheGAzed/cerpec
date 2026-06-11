@@ -385,7 +385,7 @@ bool is_disjoint_fbitwise_set(fbitwise_set_s const * const set_one, fbitwise_set
     return true;
 }
 
-void each_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const handle, void * const argh) {
+void each_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const handle, void * const ah) {
     error(set && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
@@ -403,7 +403,7 @@ void each_index_fbitwise_set(fbitwise_set_s const * const set, handle_fn const h
         unsigned const bit = 1U << (BIT_COUNT - relative - 1);
 
         // if bit isn't set continue, and if handle function returns false break the loop and quit main function
-        if ((set->bits[idx] & bit) && !handle(&temp, argh)) {
+        if ((set->bits[idx] & bit) && !handle(&temp, ah)) {
             break;
         }
     }

@@ -36,7 +36,7 @@ fcircular_list_s make_fcircular_list(size_t const size, size_t const max, memory
     return list;
 }
 
-void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy, void * const argd) {
+void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -50,7 +50,7 @@ void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy,
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
     }
     list->allocator->free(list->elements, list->allocator->arg);
     list->allocator->free(list->next, list->allocator->arg);
@@ -59,7 +59,7 @@ void destroy_fcircular_list(fcircular_list_s * const list, set_fn const destroy,
     memset(list, 0, sizeof(fcircular_list_s));
 }
 
-void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy, void * const argd) {
+void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -73,7 +73,7 @@ void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy, v
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
     }
 
     // set only non important parameters to zero/nil
@@ -81,7 +81,7 @@ void clear_fcircular_list(fcircular_list_s * const list, set_fn const destroy, v
     list->empty = NIL;
 }
 
-fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_fn const copy) {
+fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_fn const copy, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(copy && "Paremeter can't be NULL.");
 
@@ -107,7 +107,7 @@ fcircular_list_s copy_fcircular_list(fcircular_list_s const * const list, copy_f
         (*r) = replica.length++;
         replica.next[(*r)] = replica.tail;
 
-        copy(replica.elements + ((*r) * replica.size), list->elements + (l * list->size));
+        copy(replica.elements + ((*r) * replica.size), list->elements + (l * list->size), ac);
     }
 
     return replica;
@@ -649,10 +649,10 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn
     return positive;
 }
 
-void each_fcircular_list(fcircular_list_s const * const list, handle_fn const handle, void * const argh) {
+void each_fcircular_list(fcircular_list_s const * const list, handle_fn const handle, void * const ah) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != argh && "Parameters can't be equal.");
+    error(list != ah && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -664,16 +664,16 @@ void each_fcircular_list(fcircular_list_s const * const list, handle_fn const ha
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current]; // go to next node to avoid initial tail handle
-        if (!handle(list->elements + (current * list->size), argh)) {
+        if (!handle(list->elements + (current * list->size), ah)) {
             return;
         }
     }
 }
 
-void apply_fcircular_list(fcircular_list_s const * const list, process_fn const process, void * const argh) {
+void apply_fcircular_list(fcircular_list_s const * const list, process_fn const process, void * const ap) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(list != argh && "Parameters can't be equal.");
+    error(list != ap && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -693,7 +693,7 @@ void apply_fcircular_list(fcircular_list_s const * const list, process_fn const 
     }
 
     // process elements
-    process(elements_array, list->length, argh);
+    process(elements_array, list->length, ap);
 
     // copy elements back into list
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {

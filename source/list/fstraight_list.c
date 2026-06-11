@@ -38,7 +38,7 @@ fstraight_list_s make_fstraight_list(size_t const size, size_t const max, memory
     return list;
 }
 
-void destroy_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const argd) {
+void destroy_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -51,7 +51,7 @@ void destroy_fstraight_list(fstraight_list_s * const list, set_fn const destroy,
 
     // iterate over each node and destroy its element
     for (size_t i = list->head; i != NIL; i = list->next[i]) {
-        destroy(list->elements + (i * list->size), argd);
+        destroy(list->elements + (i * list->size), ad);
     }
     list->allocator->free(list->elements, list->allocator->arg);
     list->allocator->free(list->next, list->allocator->arg);
@@ -59,7 +59,7 @@ void destroy_fstraight_list(fstraight_list_s * const list, set_fn const destroy,
     memset(list, 0, sizeof(fstraight_list_s));
 }
 
-void clear_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const argd) {
+void clear_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -72,7 +72,7 @@ void clear_fstraight_list(fstraight_list_s * const list, set_fn const destroy, v
 
     // iterate over each node and destroy its element
     for (size_t i = list->head; NIL != i; i = list->next[i]) {
-        destroy(list->elements + (i * list->size), argd);
+        destroy(list->elements + (i * list->size), ad);
     }
 
     // clear (NOT destroy) list
@@ -80,7 +80,7 @@ void clear_fstraight_list(fstraight_list_s * const list, set_fn const destroy, v
     list->head = list->empty = NIL;
 }
 
-fstraight_list_s copy_fstraight_list(fstraight_list_s const * const list, copy_fn const copy) {
+fstraight_list_s copy_fstraight_list(fstraight_list_s const * const list, copy_fn const copy, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(copy && "Paremeter can't be NULL.");
 
@@ -106,7 +106,7 @@ fstraight_list_s copy_fstraight_list(fstraight_list_s const * const list, copy_f
         (*r) = index;
         replica.next[index] = NIL;
 
-        copy(replica.elements + (index * replica.size), list->elements + (i * list->size));
+        copy(replica.elements + (index * replica.size), list->elements + (i * list->size), ac);
     }
 
     return replica;
@@ -570,10 +570,10 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const list, filter_fn
     return positive;
 }
 
-void each_fstraight_list(fstraight_list_s const * const list, handle_fn const handle, void * const argh) {
+void each_fstraight_list(fstraight_list_s const * const list, handle_fn const handle, void * const ah) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != argh && "Parameters can't be equal.");
+    error(list != ah && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -582,13 +582,13 @@ void each_fstraight_list(fstraight_list_s const * const list, handle_fn const ha
     valid(list->elements && "Elements array can't be NULL.");
     valid(list->next && "Next array can't be NULL.");
 
-    for (size_t i = list->head; NIL != i && handle(list->elements + (i * list->size), argh); i = list->next[i]) {}
+    for (size_t i = list->head; NIL != i && handle(list->elements + (i * list->size), ah); i = list->next[i]) {}
 }
 
-void apply_fstraight_list(fstraight_list_s const * const list, process_fn const process, void * const argp) {
+void apply_fstraight_list(fstraight_list_s const * const list, process_fn const process, void * const ap) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(list != argp && "Parameters can't be equal.");
+    error(list != ap && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -607,7 +607,7 @@ void apply_fstraight_list(fstraight_list_s const * const list, process_fn const 
         index++;
     }
 
-    process(elements_array, list->length, argp);
+    process(elements_array, list->length, ap);
 
     for (size_t i = list->head, index = 0; NIL != i; i = list->next[i]) {
         memcpy(list->elements + (i * list->size), elements_array + (index * list->size), list->size);

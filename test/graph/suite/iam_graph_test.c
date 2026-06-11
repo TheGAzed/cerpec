@@ -152,7 +152,7 @@ TEST DIJKSTRA_01(void) {
     insert_edge_iam_graph(&graph, 4, 6, edges + 10);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, intsum, &zero, &inf);
+    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, NULL, intsum, NULL, &zero, &inf);
 
     iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
 
@@ -201,7 +201,7 @@ TEST DIJKSTRA_02(void) {
     insert_edge_iam_graph(&graph, 6, 7, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, intsum, &zero, &inf);
+    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, NULL, intsum, NULL, &zero, &inf);
 
     iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
 
@@ -251,7 +251,7 @@ TEST DIJKSTRA_03(void) {
     insert_edge_iam_graph(&graph, 7, 8, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, intsum, &zero, &inf);
+    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, NULL, intsum, NULL, &zero, &inf);
 
     iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
 

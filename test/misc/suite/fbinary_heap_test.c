@@ -53,7 +53,7 @@ TEST COPY_01(void) {
         push_fbinary_heap(&heap, &i);
     }
 
-    fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy);
+    fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         int a = 0, b = 0;
@@ -76,7 +76,7 @@ TEST COPY_02(void) {
         push_fbinary_heap(&heap, &i);
     }
 
-    fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy);
+    fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         int a = 0, b = 0;

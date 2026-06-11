@@ -91,7 +91,7 @@ iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, memory_s
     return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, };
 }
 
-void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * const argd) {
+void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * const ad) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -101,7 +101,7 @@ void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * co
     valid(tree->allocator && "Allocator can't be NULL.");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size), argd);
+        destroy(tree->elements + (i * tree->size), ad);
     }
     tree->allocator->free(tree->elements, tree->allocator->arg);
     tree->allocator->free(tree->height, tree->allocator->arg);
@@ -112,7 +112,7 @@ void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * co
     memset(tree, 0, sizeof(iavl_tree_s));
 }
 
-void clear_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * const argd) {
+void clear_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * const ad) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -122,7 +122,7 @@ void clear_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * cons
     valid(tree->allocator && "Allocator can't be NULL.");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size), argd);
+        destroy(tree->elements + (i * tree->size), ad);
     }
     tree->allocator->free(tree->elements, tree->allocator->arg);
     tree->allocator->free(tree->height, tree->allocator->arg);
@@ -137,7 +137,7 @@ void clear_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * cons
     tree->length = tree->capacity = 0;
 }
 
-iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy) {
+iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy, void * const ac) {
     error(tree && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -163,7 +163,7 @@ iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy) {
     error((!replica.capacity || replica.node[IAVLT_RIGHT]) && "Memory allocation failed.");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
+        copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size), ac);
     }
     memcpy(replica.height, tree->height, tree->length * sizeof(size_t));
     memcpy(replica.parent, tree->parent, tree->length * sizeof(size_t));
@@ -784,10 +784,10 @@ void update_iavl_tree(iavl_tree_s const * const tree, void const * const latter,
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void in_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void in_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
@@ -801,7 +801,7 @@ void in_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, 
             node = tree->node[IAVLT_LEFT][node];
         }
 
-        if (!handle(tree->elements + (node * tree->size), argh)) {
+        if (!handle(tree->elements + (node * tree->size), ah)) {
             break;
         }
 
@@ -825,10 +825,10 @@ void in_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, 
     }
 }
 
-void pre_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void pre_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
@@ -845,7 +845,7 @@ void pre_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle,
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), argh)) {
+    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), ah)) {
         size_t const node = stack.elements[--stack.length];
 
         size_t const right_child = tree->node[IAVLT_RIGHT][node];
@@ -862,10 +862,10 @@ void pre_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle,
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void post_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void post_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
@@ -892,7 +892,7 @@ void post_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!handle(tree->elements + (node * tree->size), argh)) {
+                if (!handle(tree->elements + (node * tree->size), ah)) {
                     break;
                 }
 
@@ -904,10 +904,10 @@ void post_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void level_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void level_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
@@ -925,7 +925,7 @@ void level_order_iavl_tree(iavl_tree_s const * const tree, handle_fn const handl
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), argh)) {
+    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), ah)) {
         // pop index
         size_t const node = queue.elements[queue.current++];
         queue.length--;

@@ -20,9 +20,9 @@
 
 void chardst(void * const element, void * arg);
 
-void * charcpy(void * const destination, void const * const source);
+void * charcpy(void * const destination, void const * const source, void * arg);
 
-void * charsum(void * const sum, void const * const addent);
+void * charsum(void * const sum, void const * const addent, void * arg);
 
 size_t charhshsame(void const * const element);
 
@@ -66,9 +66,9 @@ bool charprime(void const * const element);
 
 void uchardst(void * const element, void * arg);
 
-void * ucharcpy(void * const destination, void const * const source);
+void * ucharcpy(void * const destination, void const * const source, void * arg);
 
-void * ucharsum(void * const sum, void const * const addent);
+void * ucharsum(void * const sum, void const * const addent, void * arg);
 
 size_t ucharhshsame(void const * const element);
 
@@ -112,9 +112,9 @@ bool ucharprime(void const * const element);
 
 void intdst(void * const element, void * arg);
 
-void * intcpy(void * const destination, void const * const source);
+void * intcpy(void * const destination, void const * const source, void * arg);
 
-void * intsum(void * const sum, void const * const addent);
+void * intsum(void * const sum, void const * const addent, void * arg);
 
 size_t inthshsame(void const * const element);
 
@@ -142,9 +142,9 @@ bool intprime(void const * const element);
 
 void uintdst(void * const element, void * arg);
 
-void * uintcpy(void * const destination, void const * const source);
+void * uintcpy(void * const destination, void const * const source, void * arg);
 
-void * uintsum(void * const sum, void const * const addent);
+void * uintsum(void * const sum, void const * const addent, void * arg);
 
 size_t uinthshsame(void const * const element);
 
@@ -166,9 +166,9 @@ bool uintprime(void const * const element);
 
 void floatdst(void * const element, void * arg);
 
-void * floatcpy(void * const destination, void const * const source);
+void * floatcpy(void * const destination, void const * const source, void * arg);
 
-void * floatsum(void * const sum, void const * const addent);
+void * floatsum(void * const sum, void const * const addent, void * arg);
 
 size_t floathshsame(void const * const element);
 
@@ -184,9 +184,9 @@ void floatrqsort(void * const array, size_t const lenght, void * const null);
 
 void doubledst(void * const element, void * arg);
 
-void * doublecpy(void * const destination, void const * const source);
+void * doublecpy(void * const destination, void const * const source, void * arg);
 
-void * doublesum(void * const sum, void const * const addent);
+void * doublesum(void * const sum, void const * const addent, void * arg);
 
 size_t doublehshsame(void const * const element);
 
@@ -202,9 +202,9 @@ void doublerqsort(void * const array, size_t const lenght, void * const null);
 
 void sizedst(void * const element, void * arg);
 
-void * sizecpy(void * const destination, void const * const source);
+void * sizecpy(void * const destination, void const * const source, void * arg);
 
-void * sizesum(void * const sum, void const * const addent);
+void * sizesum(void * const sum, void const * const addent, void * arg);
 
 size_t sizehshsame(void const * const element);
 

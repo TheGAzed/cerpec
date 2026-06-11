@@ -51,7 +51,7 @@ TEST COPY_01(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s replica = copy_fdouble_list(&test, intcpy);
+    fdouble_list_s replica = copy_fdouble_list(&test, intcpy, NULL);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -76,7 +76,7 @@ TEST COPY_02(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s replica = copy_fdouble_list(&test, intcpy);
+    fdouble_list_s replica = copy_fdouble_list(&test, intcpy, NULL);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);

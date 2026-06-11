@@ -20,7 +20,7 @@ istack_s make_istack(size_t const size, memory_s const * const allocator) {
     return (istack_s) { .size = size, .allocator = allocator };
 }
 
-void destroy_istack(istack_s * const stack, set_fn const destroy, void * const argd) {
+void destroy_istack(istack_s * const stack, set_fn const destroy, void * const ad) {
     error(stack && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -30,14 +30,14 @@ void destroy_istack(istack_s * const stack, set_fn const destroy, void * const a
 
     // for each element in elements array call destroy
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
-        destroy(e, argd);
+        destroy(e, ad);
     }
     stack->allocator->free(stack->elements, stack->allocator->arg); // free elements array
 
     memset(stack, 0, sizeof(istack_s));
 }
 
-void clear_istack(istack_s * const stack, set_fn const destroy, void * const argd) {
+void clear_istack(istack_s * const stack, set_fn const destroy, void * const ad) {
     error(stack && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -47,7 +47,7 @@ void clear_istack(istack_s * const stack, set_fn const destroy, void * const arg
 
     // for each element in elements array call destroy
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
-        destroy(e, argd);
+        destroy(e, ad);
     }
     stack->allocator->free(stack->elements, stack->allocator->arg); // free elements array
 
@@ -56,7 +56,7 @@ void clear_istack(istack_s * const stack, set_fn const destroy, void * const arg
     stack->elements = NULL;
 }
 
-istack_s copy_istack(istack_s const * const stack, copy_fn const copy) {
+istack_s copy_istack(istack_s const * const stack, copy_fn const copy, void * const ac) {
     error(stack && "Paremeter can't be NULL.");
     error(copy && "Paremeter can't be NULL.");
 
@@ -74,7 +74,7 @@ istack_s copy_istack(istack_s const * const stack, copy_fn const copy) {
     // initialize replica's elements array with stack's elements
     for (size_t i = 0; i < stack->length; ++i) {
         size_t const offset = i * stack->size;
-        copy(replica.elements + offset, stack->elements + offset);
+        copy(replica.elements + offset, stack->elements + offset, ac);
     }
 
     return replica;
@@ -144,30 +144,30 @@ void peep_istack(istack_s const * const stack, void * const buffer) {
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void each_istack(istack_s const * const stack, handle_fn const handle, void * const argh) {
+void each_istack(istack_s const * const stack, handle_fn const handle, void * const ah) {
     error(stack && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(stack != argh && "Parameters can't be the same.");
+    error(stack != ah && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
     valid(stack->allocator && "Allocator can't be NULL.");
 
     // iterate over each element from bottom to the top of stack
-    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, argh); e += stack->size) {}
+    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, ah); e += stack->size) {}
 }
 
-void apply_istack(istack_s const * const stack, process_fn const process, void * const argp) {
+void apply_istack(istack_s const * const stack, process_fn const process, void * const ap) {
     error(stack && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(stack != argp && "Parameters can't be the same.");
+    error(stack != ap && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
     valid(stack->allocator && "Allocator can't be NULL.");
 
     // process stack elements as an array (as a whole)
-    process(stack->elements, stack->length, argp);
+    process(stack->elements, stack->length, ap);
 }
 
 void _istack_resize(istack_s * const stack, size_t const size) {

@@ -60,7 +60,7 @@ TEST COPY_01(void) {
         insert_fsc_hash_map(&table, &i, &j);
     }
 
-    fsc_hash_map_s replica = copy_fsc_hash_map(&table, intcpy, intcpy);
+    fsc_hash_map_s replica = copy_fsc_hash_map(&table, intcpy, NULL, intcpy, NULL);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
         ASSERT(contains_key_fsc_hash_map(&replica, &i));
@@ -84,7 +84,7 @@ TEST COPY_02(void) {
         insert_fsc_hash_map(&table, &i, &j);
     }
 
-    fsc_hash_map_s replica = copy_fsc_hash_map(&table, intcpy, intcpy);
+    fsc_hash_map_s replica = copy_fsc_hash_map(&table, intcpy, NULL, intcpy, NULL);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
         ASSERT(contains_key_fsc_hash_map(&replica, &i));

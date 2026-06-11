@@ -28,20 +28,21 @@ fstraight_list_s make_fstraight_list(size_t const size, size_t const max, memory
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void destroy_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void destroy_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const ad);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param list Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void clear_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void clear_fstraight_list(fstraight_list_s * const list, set_fn const destroy, void * const ad);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param list Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return List structure.
-fstraight_list_s copy_fstraight_list(fstraight_list_s const * const list, copy_fn const copy);
+fstraight_list_s copy_fstraight_list(fstraight_list_s const * const list, copy_fn const copy, void * const ac);
 
 /// @brief Checks if structure is empty.
 /// @param list Structure to check.
@@ -116,13 +117,13 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const list, filter_fn
 /// @brief Iterates over each element in structure based on their order.
 /// @param list Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param argh Generic void pointer arguments for function pointer.
-void each_fstraight_list(fstraight_list_s const * const list, handle_fn const handle, void * const argh);
+/// @param ah Generic void pointer arguments for function pointer.
+void each_fstraight_list(fstraight_list_s const * const list, handle_fn const handle, void * const ah);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param list Structure to manage.
 /// @param process Function pointer process elements array of structure length.
-/// @param argp Generic void pointer arguments for function pointer.
-void apply_fstraight_list(fstraight_list_s const * const list, process_fn const process, void * const argp);
+/// @param ap Generic void pointer arguments for function pointer.
+void apply_fstraight_list(fstraight_list_s const * const list, process_fn const process, void * const ap);
 
 #endif // FSTRAIGHT_LIST_H

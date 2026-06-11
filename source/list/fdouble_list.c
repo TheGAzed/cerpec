@@ -43,7 +43,7 @@ fdouble_list_s make_fdouble_list(size_t const size, size_t const max, memory_s c
     return list;
 }
 
-void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const argd) {
+void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -57,7 +57,7 @@ void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy, voi
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
         current = list->node[FDL_NEXT][current];
     }
 
@@ -69,7 +69,7 @@ void destroy_fdouble_list(fdouble_list_s * const list, set_fn const destroy, voi
     memset(list, 0, sizeof(fdouble_list_s));
 }
 
-void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const argd) {
+void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -83,7 +83,7 @@ void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void 
 
     // call destroy function for each element in list
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
         current = list->node[FDL_NEXT][current];
     }
 
@@ -91,7 +91,7 @@ void clear_fdouble_list(fdouble_list_s * const list, set_fn const destroy, void 
     list->head = list->length = 0;
 }
 
-fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn const copy) {
+fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn const copy, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(copy && "Paremeter can't be NULL.");
 
@@ -117,7 +117,7 @@ fdouble_list_s copy_fdouble_list(fdouble_list_s const * const list, copy_fn cons
 
     // copy nodes (elements and indexes) into list
     for (size_t i = 0; i < list->length; ++i) {
-        copy(replica.elements + (i * replica.size), list->elements + (i * list->size));
+        copy(replica.elements + (i * replica.size), list->elements + (i * list->size), ac);
     }
     memcpy(replica.node[FDL_NEXT], list->node[FDL_NEXT], list->length * sizeof(size_t));
     memcpy(replica.node[FDL_PREV], list->node[FDL_PREV], list->length * sizeof(size_t));
@@ -681,10 +681,10 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const
     return positive;
 }
 
-void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const argh) {
+void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const ah) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != argh && "Parameters can't be equal.");
+    error(list != ah && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -696,16 +696,16 @@ void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const h
 
     // for each forward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
-        if (!handle(list->elements + (current * list->size), argh)) {
+        if (!handle(list->elements + (current * list->size), ah)) {
             break;
         }
     }
 }
 
-void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const argh) {
+void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const ah) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != argh && "Parameters can't be equal.");
+    error(list != ah && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -718,16 +718,16 @@ void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const h
     // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
         current = list->node[FDL_PREV][current];
-        if (!handle(list->elements + (current * list->size), argh)) {
+        if (!handle(list->elements + (current * list->size), ah)) {
             break;
         }
     }
 }
 
-void apply_fdouble_list(fdouble_list_s const * const list, process_fn const process, void * const argp) {
+void apply_fdouble_list(fdouble_list_s const * const list, process_fn const process, void * const ap) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(list != argp && "Parameters can't be equal.");
+    error(list != ap && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -747,7 +747,7 @@ void apply_fdouble_list(fdouble_list_s const * const list, process_fn const proc
     }
 
     // process elements
-    process(elements_array, list->length, argp);
+    process(elements_array, list->length, ap);
 
     // copy elements back into list
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {

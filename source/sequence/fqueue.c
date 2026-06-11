@@ -31,7 +31,7 @@ fqueue_s make_fqueue(size_t const size, size_t const max, memory_s const * const
     return queue;
 }
 
-void destroy_fqueue(fqueue_s * const queue, set_fn const destroy, void * const argd) {
+void destroy_fqueue(fqueue_s * const queue, set_fn const destroy, void * const ad) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -49,10 +49,10 @@ void destroy_fqueue(fqueue_s * const queue, set_fn const destroy, void * const a
 
     // iterate over rith and left elements and call destroy function on them
     for (size_t i = queue->current; i < right_length + queue->current; ++i) {
-        destroy(queue->elements + (i * queue->size), argd);
+        destroy(queue->elements + (i * queue->size), ad);
     }
     for (size_t i = 0; i < left_length; ++i) {
-        destroy(queue->elements + (i * queue->size), argd);
+        destroy(queue->elements + (i * queue->size), ad);
     }
 
     // free memory array and set everything manually to zero/NULL
@@ -61,7 +61,7 @@ void destroy_fqueue(fqueue_s * const queue, set_fn const destroy, void * const a
     memset(queue, 0, sizeof(fqueue_s));
 }
 
-void clear_fqueue(fqueue_s * const queue, set_fn const destroy, void * const argd) {
+void clear_fqueue(fqueue_s * const queue, set_fn const destroy, void * const ad) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -79,17 +79,17 @@ void clear_fqueue(fqueue_s * const queue, set_fn const destroy, void * const arg
 
     // iterate over rith and left elements and call destroy function on them
     for (size_t i = queue->current; i < right_length + queue->current; ++i) {
-        destroy(queue->elements + (i * queue->size), argd);
+        destroy(queue->elements + (i * queue->size), ad);
     }
     for (size_t i = 0; i < left_length; ++i) {
-        destroy(queue->elements + (i * queue->size), argd);
+        destroy(queue->elements + (i * queue->size), ad);
     }
 
     // just clear size and set current to start (zero)
     queue->length = queue->current = 0;
 }
 
-fqueue_s copy_fqueue(fqueue_s const * const queue, copy_fn const copy) {
+fqueue_s copy_fqueue(fqueue_s const * const queue, copy_fn const copy, void * const ac) {
     error(queue && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -116,10 +116,10 @@ fqueue_s copy_fqueue(fqueue_s const * const queue, copy_fn const copy) {
     // set a current index for replica elements to start at index zero and copy elements
     size_t current = 0;
     for (size_t i = queue->current; i < right_length + queue->current; ++i, ++current) {
-        copy(replica.elements + (current * replica.size), queue->elements + (i * queue->size));
+        copy(replica.elements + (current * replica.size), queue->elements + (i * queue->size), ac);
     }
     for (size_t i = 0; i < left_length; ++i, ++current) {
-        copy(replica.elements + (current * replica.size), queue->elements + (i * queue->size));
+        copy(replica.elements + (current * replica.size), queue->elements + (i * queue->size), ac);
     }
 
     return replica;
@@ -208,10 +208,10 @@ void peek_fqueue(fqueue_s const * const queue, void * const buffer) {
     memcpy(buffer, queue->elements + (queue->current * queue->size), queue->size);
 }
 
-void each_fqueue(fqueue_s const * const queue, handle_fn const handle, void * const argh) {
+void each_fqueue(fqueue_s const * const queue, handle_fn const handle, void * const ah) {
     error(queue && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(queue != argh && "Parameters can't be equal.");
+    error(queue != ah && "Parameters can't be equal.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->max && "Maximum can't be zero.");
@@ -228,17 +228,17 @@ void each_fqueue(fqueue_s const * const queue, handle_fn const handle, void * co
     // save temporary handle flag to check if handler hasn't terminated during iteration
     bool is_handle = true;
     for (size_t i = queue->current; i < (right_length + queue->current) && is_handle; ++i) {
-        is_handle = handle(queue->elements + (i * queue->size), argh);
+        is_handle = handle(queue->elements + (i * queue->size), ah);
     }
     for (size_t i = 0; i < left_length && is_handle; ++i) {
-        is_handle = handle(queue->elements + (i * queue->size), argh);
+        is_handle = handle(queue->elements + (i * queue->size), ah);
     }
 }
 
-void apply_fqueue(fqueue_s const * const queue, process_fn const process, void * const argp) {
+void apply_fqueue(fqueue_s const * const queue, process_fn const process, void * const ap) {
     error(queue && "Parameter can't be NULL.");
     error(process && "Parameter can't be NULL.");
-    error(queue != argp && "Parameters can't be equal.");
+    error(queue != ap && "Parameters can't be equal.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->max && "Maximum can't be zero.");
@@ -261,7 +261,7 @@ void apply_fqueue(fqueue_s const * const queue, process_fn const process, void *
     memcpy(elements_array + (right_length * queue->size), queue->elements, left_length * queue->size);
 
     // process elements array
-    process(elements_array, queue->length, argp);
+    process(elements_array, queue->length, ap);
 
     // copy back elements from temporary array into queue
     memcpy(queue->elements + (queue->current * queue->size), elements_array, right_length * queue->size);

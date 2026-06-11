@@ -23,7 +23,7 @@ fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, h
 /// @param set Structure to copy.
 /// @param copy Function pointer to create shallow/deep copy of single element
 /// @return Set structure.
-fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy);
+fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy, void * const argc);
 
 /// @brief Insert logic wrapper mainly to remove repeated code snippeds.
 /// @param set Structure to call insert logic on.
@@ -78,7 +78,7 @@ fsc_hash_set_s make_fsc_hash_set(size_t const size, size_t const max, hash_fn co
     return _make_wrapper_fsc_hash_set(size, max, hash, compare, allocator);
 }
 
-void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const argd) {
+void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const ad) {
     error(set && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -92,7 +92,7 @@ void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     // free arrays
@@ -107,7 +107,7 @@ void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void
     memset(set, 0, sizeof(fsc_hash_set_s));
 }
 
-void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const argd) {
+void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const ad) {
     error(set && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -121,7 +121,7 @@ void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void *
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     for (size_t i = 0; i < set->max; ++i) {
@@ -132,7 +132,7 @@ void clear_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void *
     set->length = 0;
 }
 
-fsc_hash_set_s copy_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy) {
+fsc_hash_set_s copy_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy, void * const ac) {
     error(set && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -144,7 +144,7 @@ fsc_hash_set_s copy_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const
     valid(set->next && "Nexts array can't be NULL.");
     valid(set->allocator && "Allocator can't be NULL.");
 
-    return _copy_wrapper_fsc_hash_set(set, copy);
+    return _copy_wrapper_fsc_hash_set(set, copy, ac);
 }
 
 bool is_empty_fsc_hash_set(fsc_hash_set_s const * const set) {
@@ -257,7 +257,7 @@ bool contains_fsc_hash_set(fsc_hash_set_s const * const set, void const * const 
     return _contains_wrapper_fsc_hash_set(set, element, hash, index);
 }
 
-fsc_hash_set_s union_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set_s const * const set_two, copy_fn const copy) {
+fsc_hash_set_s union_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set_s const * const set_two, copy_fn const copy, void * const ac) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -285,7 +285,7 @@ fsc_hash_set_s union_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash
     fsc_hash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
-    fsc_hash_set_s set_union = _copy_wrapper_fsc_hash_set(maximum, copy);
+    fsc_hash_set_s set_union = _copy_wrapper_fsc_hash_set(maximum, copy, ac);
     for (size_t m = 0; m < minimum->length; ++m) {
         char const * const element = minimum->elements + (m * minimum->size);
 
@@ -299,7 +299,7 @@ fsc_hash_set_s union_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash
             error(set_union.length <= set_union.max && "Length can't exceeds maximum.");
             _insert_wrapper_fsc_hash_set(&set_union, min_hash, union_idx);
 
-            copy(set_union.elements + (set_union.length * set_union.size), element);
+            copy(set_union.elements + (set_union.length * set_union.size), element, ac);
             set_union.length++;
         }
     }
@@ -307,7 +307,7 @@ fsc_hash_set_s union_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash
     return set_union;
 }
 
-fsc_hash_set_s intersect_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set_s const * const set_two, copy_fn const copy) {
+fsc_hash_set_s intersect_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set_s const * const set_two, copy_fn const copy, void * const ac) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -349,7 +349,7 @@ fsc_hash_set_s intersect_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_
             size_t const intersect_index = min_hash % set_intersect.max;
             _insert_wrapper_fsc_hash_set(&set_intersect, min_hash, intersect_index);
 
-            copy(set_intersect.elements + (set_intersect.length * set_intersect.size), element);
+            copy(set_intersect.elements + (set_intersect.length * set_intersect.size), element, ac);
             set_intersect.length++;
         }
     }
@@ -357,7 +357,7 @@ fsc_hash_set_s intersect_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_
     return set_intersect;
 }
 
-fsc_hash_set_s subtract_fsc_hash_set(fsc_hash_set_s const * const minuend, fsc_hash_set_s const * const subtrahend, copy_fn const copy) {
+fsc_hash_set_s subtract_fsc_hash_set(fsc_hash_set_s const * const minuend, fsc_hash_set_s const * const subtrahend, copy_fn const copy, void * const ac) {
     error(minuend && "Parameter can't be NULL.");
     error(subtrahend && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -394,7 +394,7 @@ fsc_hash_set_s subtract_fsc_hash_set(fsc_hash_set_s const * const minuend, fsc_h
             size_t const subtract_index = hash % set_subtract.max;
             _insert_wrapper_fsc_hash_set(&set_subtract, hash, subtract_index);
 
-            copy(set_subtract.elements + (set_subtract.length * set_subtract.size), element);
+            copy(set_subtract.elements + (set_subtract.length * set_subtract.size), element, ac);
             set_subtract.length++;
         }
     }
@@ -402,7 +402,7 @@ fsc_hash_set_s subtract_fsc_hash_set(fsc_hash_set_s const * const minuend, fsc_h
     return set_subtract;
 }
 
-fsc_hash_set_s exclude_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set_s const * const set_two, copy_fn const copy) {
+fsc_hash_set_s exclude_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set_s const * const set_two, copy_fn const copy, void * const ac) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -443,7 +443,7 @@ fsc_hash_set_s exclude_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_ha
             size_t const exclude_index = hash % set_exclude.max;
             _insert_wrapper_fsc_hash_set(&set_exclude, hash, exclude_index);
 
-            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element);
+            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element, ac);
             set_exclude.length++;
         }
     }
@@ -462,7 +462,7 @@ fsc_hash_set_s exclude_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_ha
             size_t const exclude_index = hash % set_exclude.max;
             _insert_wrapper_fsc_hash_set(&set_exclude, hash, exclude_index);
 
-            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element);
+            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element, ac);
             set_exclude.length++;
         }
     }
@@ -581,7 +581,7 @@ bool is_disjoint_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set
     return true;
 }
 
-void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle, void * const argh) {
+void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle, void * const ah) {
     error(set && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
@@ -594,7 +594,7 @@ void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle,
     valid(set->allocator && "Allocator can't be NULL.");
 
     for (size_t i = 0; i < set->length; ++i) {
-        if (!handle(set->elements + (i * set->size), argh)) { break; }
+        if (!handle(set->elements + (i * set->size), ah)) { break; }
     }
 }
 
@@ -651,7 +651,7 @@ fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, h
     return set;
 }
 
-fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy) {
+fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy, void * const argc) {
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
     fsc_hash_set_s const replica = {
         .max = set->max, .hash = set->hash, .length = set->length, .size = set->size,
@@ -679,7 +679,7 @@ fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy
 
     // for each element continuusly in array call copy function
     for (size_t i = 0; i < set->length; ++i) {
-        copy(replica.elements + (i * replica.size), set->elements + (i * set->size));
+        copy(replica.elements + (i * replica.size), set->elements + (i * set->size), argc);
     }
 
     return replica;

@@ -35,25 +35,27 @@ fsc_hash_map_s make_fsc_hash_map(size_t const key_size, size_t const value_size,
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param map Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
-/// @param argdk Arguments for key destroy function pointer.
+/// @param adk Arguments for key destroy function pointer.
 /// @param destroy_value Function pointer to destroy a single value.
-/// @param argdv Arguments for value destroy function pointer.
-void destroy_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv);
+/// @param adv Arguments for value destroy function pointer.
+void destroy_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const adk, set_fn const destroy_value, void * const adv);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param map Structure to destroy.
 /// @param destroy_key Function pointer to destroy a single key.
-/// @param argdk Arguments for key destroy function pointer.
+/// @param adk Arguments for key destroy function pointer.
 /// @param destroy_value Function pointer to destroy a single value.
-/// @param argdv Arguments for value destroy function pointer.
-void clear_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const argdk, set_fn const destroy_value, void * const argdv);
+/// @param adv Arguments for value destroy function pointer.
+void clear_fsc_hash_map(fsc_hash_map_s * const map, set_fn const destroy_key, void * const adk, set_fn const destroy_value, void * const adv);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param map Structure to copy.
 /// @param copy_key Function pointer to create a deep/shallow copy of a single key.
+/// @param ack Arguments for copy key function pointer.
 /// @param copy_value Function pointer to create a deep/shallow copy of a single value.
+/// @param acv Arguments for copy value function pointer.
 /// @return Map structure.
-fsc_hash_map_s copy_fsc_hash_map(fsc_hash_map_s const * const map, copy_fn const copy_key, copy_fn const copy_value);
+fsc_hash_map_s copy_fsc_hash_map(fsc_hash_map_s const * const map, copy_fn const copy_key, void * const ack, copy_fn const copy_value, void * const acv);
 
 /// @brief Checks if structure is empty.
 /// @param map Structure to check.
@@ -100,13 +102,13 @@ void set_fsc_hash_map(fsc_hash_map_s * const map, void const * const key, void c
 /// @brief Iterates over each key in structure.
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param argh Generic arguments to use in function pointer.
-void each_key_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const argh);
+/// @param ah Generic arguments to use in function pointer.
+void each_key_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const ah);
 
 /// @brief Iterates over each value in structure.
 /// @param map Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param argh Generic arguments to use in function pointer.
-void each_value_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const argh);
+/// @param ah Generic arguments to use in function pointer.
+void each_value_fsc_hash_map(fsc_hash_map_s const * const map, handle_fn const handle, void * const ah);
 
 #endif // FSC_HASH_MAP_H

@@ -39,20 +39,21 @@ isc_hash_set_s make_isc_hash_set(size_t const size, hash_fn const hash, compare_
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const ad);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param set Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const ad);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param set Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Set structure.
-isc_hash_set_s copy_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy);
+isc_hash_set_s copy_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy, void * const ac);
 
 /// @brief Checks if structure is empty.
 /// @param set Structure to check.
@@ -80,29 +81,33 @@ bool contains_isc_hash_set(isc_hash_set_s const * const set, void const * const 
 /// @param set_one First structure to union.
 /// @param set_two Second structure to union.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Union structure.
-isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy);
+isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy, void * const ac);
 
 /// @brief Performs intersection of two structures and returns a new copy.
 /// @param set_one First structure to intersect.
 /// @param set_two Second structure to intersect.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Intersect structure.
-isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy);
+isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy, void * const ac);
 
 /// @brief Performs subtraction of two structures and returns a new copy.
 /// @param minuend Structure to subtract from.
 /// @param subtrahend Structure to subtract with.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Subtract structure.
-isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_hash_set_s const * const subtrahend, copy_fn const copy);
+isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_hash_set_s const * const subtrahend, copy_fn const copy, void * const ac);
 
 /// @brief Performs exclusion (symmetric difference) of two structures and returns a new copy.
 /// @param set_one First structure to exclude.
 /// @param set_two Second structure to exclude.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Exclude structure.
-isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy);
+isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy, void * const ac);
 
 /// @brief Checks if structure is subset of another structure.
 /// @param superset Superset structure to check with.
@@ -125,7 +130,7 @@ bool is_disjoint_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set
 /// @brief Iterates over each element in structure.
 /// @param set Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param argh Generic arguments to use in function pointer.
-void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const argh);
+/// @param ah Generic arguments to use in function pointer.
+void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const ah);
 
 #endif // ISC_HASH_SET_H

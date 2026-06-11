@@ -15,7 +15,7 @@ ideque_s make_ideque(size_t const size, memory_s const * const allocator) {
     return (ideque_s) { .size = size, .allocator = allocator, };
 }
 
-void destroy_ideque(ideque_s * const deque, set_fn const destroy, void * const argd) {
+void destroy_ideque(ideque_s * const deque, set_fn const destroy, void * const ad) {
     error(deque && "Parameter is NULL.");
     error(destroy && "Parameter is NULL.");
 
@@ -27,7 +27,7 @@ void destroy_ideque(ideque_s * const deque, set_fn const destroy, void * const a
     for (size_t start = deque->current; deque->length; start = 0) { // for every node in deque list until size is not zero
         size_t i = start; // set i outside of nested for loop to save its value
         for (; i < (deque->length + start) && i < IDEQUE_CHUNK; ++i) { // destroy each element in node
-            destroy(current->elements + (i * deque->size), argd);
+            destroy(current->elements + (i * deque->size), ad);
         }
         deque->length -= (i - start); // subtract absolute value of i and start from deque's size
 
@@ -41,7 +41,7 @@ void destroy_ideque(ideque_s * const deque, set_fn const destroy, void * const a
     memset(deque, 0, sizeof(ideque_s));
 }
 
-void clear_ideque(ideque_s * const deque, set_fn const destroy, void * const argd) {
+void clear_ideque(ideque_s * const deque, set_fn const destroy, void * const ad) {
     error(deque && "Parameter is NULL.");
     error(destroy && "Parameter is NULL.");
 
@@ -53,7 +53,7 @@ void clear_ideque(ideque_s * const deque, set_fn const destroy, void * const arg
     for (size_t start = deque->current; deque->length; start = 0) { // for every node in deque list until size is not zero
         size_t i = start; // set i outside of nested for loop to save its value
         for (; i < (deque->length + start) && i < IDEQUE_CHUNK; ++i) { // destroy each element in node
-            destroy(current->elements + (i * deque->size), argd);
+            destroy(current->elements + (i * deque->size), ad);
         }
         deque->length -= (i - start); // subtract absolute value of i and start from deque's size
 
@@ -67,7 +67,7 @@ void clear_ideque(ideque_s * const deque, set_fn const destroy, void * const arg
     deque->head = NULL;
 }
 
-ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy) {
+ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy, void * const ac) {
     error(deque && "Parameter is NULL.");
     error(copy && "Parameter is NULL.");
 
@@ -88,7 +88,7 @@ ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy) {
         // copy each element from old to replica
         size_t i = start;
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
-            copy(node->elements + (i * deque->size), current_deque->elements + (i * deque->size));
+            copy(node->elements + (i * deque->size), current_deque->elements + (i * deque->size), ac);
         }
 
         (*current_replika) = node->prev = node; // *current_copy and node's prev will point to node
@@ -266,10 +266,10 @@ void dequeue_back_ideque(ideque_s * const deque, void * const buffer) {
     }
 }
 
-void each_front_ideque(ideque_s const * const deque, handle_fn const handle, void * const argh) {
+void each_front_ideque(ideque_s const * const deque, handle_fn const handle, void * const ah) {
     error(deque && "Parameter is NULL.");
     error(handle && "Parameter is NULL.");
-    error(deque != argh && "Parameters can't be the same.");
+    error(deque != ah && "Parameters can't be the same.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->allocator && "Allocator can't be NULL.");
@@ -281,7 +281,7 @@ void each_front_ideque(ideque_s const * const deque, handle_fn const handle, voi
         size_t i = start;
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
             // if operate returns false then terminate main function
-            if (!handle(current->elements + (i * deque->size), argh)) {
+            if (!handle(current->elements + (i * deque->size), ah)) {
                 return;
             }
         }
@@ -291,10 +291,10 @@ void each_front_ideque(ideque_s const * const deque, handle_fn const handle, voi
     }
 }
 
-void each_back_ideque(ideque_s const * const deque, handle_fn const handle, void * const argh) {
+void each_back_ideque(ideque_s const * const deque, handle_fn const handle, void * const ah) {
     error(deque && "Parameter is NULL.");
     error(handle && "Parameter is NULL.");
-    error(deque != argh && "Parameters can't be the same.");
+    error(deque != ah && "Parameters can't be the same.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->allocator && "Allocator can't be NULL.");
@@ -308,7 +308,7 @@ void each_back_ideque(ideque_s const * const deque, handle_fn const handle, void
         size_t i = 0; // save number of operated elements in node
         for (; i <= node_index && r; ++i, r--) { // until node index is reached and elements remain
             // handle on reversed i to start from last element in node
-            if (!handle(current->elements + ((node_index - i) * deque->size), argh)) {
+            if (!handle(current->elements + ((node_index - i) * deque->size), ah)) {
                 return;
             }
         }
@@ -316,10 +316,10 @@ void each_back_ideque(ideque_s const * const deque, handle_fn const handle, void
     }
 }
 
-void apply_ideque(ideque_s const * const deque, process_fn const process, void * const argp) {
+void apply_ideque(ideque_s const * const deque, process_fn const process, void * const ap) {
     error(deque && "Parameter is NULL.");
     error(process && "Parameter is NULL.");
-    error(deque != argp && "Parameters can't be the same.");
+    error(deque != ap && "Parameters can't be the same.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->allocator && "Allocator can't be NULL.");
@@ -348,7 +348,7 @@ void apply_ideque(ideque_s const * const deque, process_fn const process, void *
         current = current->next; // go to next node
     }
 
-    process(elements_array, deque->length, argp);
+    process(elements_array, deque->length, ap);
 
     // reset index and remaining and copy back elements from array into each node array
     index = 0, remaining = deque->length, current = deque->head;

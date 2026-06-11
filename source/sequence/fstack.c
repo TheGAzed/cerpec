@@ -31,7 +31,7 @@ fstack_s make_fstack(size_t const size, size_t const max, memory_s const * const
     return stack;
 }
 
-void destroy_fstack(fstack_s * const stack, set_fn const destroy, void * const argd) {
+void destroy_fstack(fstack_s * const stack, set_fn const destroy, void * const ad) {
     error(stack && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -43,7 +43,7 @@ void destroy_fstack(fstack_s * const stack, set_fn const destroy, void * const a
 
     // iterate over each element and call destroy function on it
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
-        destroy(e, argd);
+        destroy(e, ad);
     }
 
     // free elements array and set everything to zero/NULL
@@ -52,7 +52,7 @@ void destroy_fstack(fstack_s * const stack, set_fn const destroy, void * const a
     memset(stack, 0, sizeof(fstack_s));
 }
 
-void clear_fstack(fstack_s * const stack, set_fn const destroy, void * const argd) {
+void clear_fstack(fstack_s * const stack, set_fn const destroy, void * const ad) {
     error(stack && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -64,14 +64,14 @@ void clear_fstack(fstack_s * const stack, set_fn const destroy, void * const arg
 
     // iterate over each element and call destroy function on it
     for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size); e += stack->size) {
-        destroy(e, argd);
+        destroy(e, ad);
     }
 
     // just clear length
     stack->length = 0;
 }
 
-fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy) {
+fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy, void * const ac) {
     error(stack && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -92,7 +92,7 @@ fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy) {
     // iterate over each element in stack and copy it into replica using function pointer
     for (size_t i = 0; i < stack->length; ++i) {
         size_t const index = i * stack->size;
-        copy(replica.elements + index, stack->elements + index);
+        copy(replica.elements + index, stack->elements + index, ac);
     }
 
     return replica;
@@ -172,10 +172,10 @@ void peep_fstack(fstack_s const * const stack, void * const buffer) {
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void each_fstack(fstack_s const * const stack, handle_fn const handle, void * const argh) {
+void each_fstack(fstack_s const * const stack, handle_fn const handle, void * const ah) {
     error(stack && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(stack != argh && "Parameters can't be equal.");
+    error(stack != ah && "Parameters can't be equal.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->max && "Maximum can't be zero.");
@@ -184,13 +184,13 @@ void each_fstack(fstack_s const * const stack, handle_fn const handle, void * co
     valid(stack->length <= stack->max && "Length exceeds maximum.");
 
     // empty for loop since all the logic can just fit into its expressions
-    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, argh); e += stack->size) {}
+    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, ah); e += stack->size) {}
 }
 
-void apply_fstack(fstack_s const * const stack, process_fn const process, void * const argp) {
+void apply_fstack(fstack_s const * const stack, process_fn const process, void * const ap) {
     error(stack && "Parameter can't be NULL.");
     error(process && "Parameter can't be NULL.");
-    error(stack != argp && "Parameters can't be equal.");
+    error(stack != ap && "Parameters can't be equal.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->max && "Maximum can't be zero.");
@@ -199,5 +199,5 @@ void apply_fstack(fstack_s const * const stack, process_fn const process, void *
     valid(stack->length <= stack->max && "Length exceeds maximum.");
 
     // simply call the function on the stack as everyting is continuous
-    process(stack->elements, stack->length, argp);
+    process(stack->elements, stack->length, ap);
 }

@@ -29,7 +29,7 @@ icircular_list_s make_icircular_list(size_t const size, memory_s const * const a
     return (icircular_list_s) { .empty = NIL, .size = size, .allocator = allocator };
 }
 
-void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const argd) {
+void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -41,7 +41,7 @@ void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy,
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
     }
     list->allocator->free(list->elements, list->allocator->arg);
     list->allocator->free(list->next, list->allocator->arg);
@@ -50,7 +50,7 @@ void destroy_icircular_list(icircular_list_s * const list, set_fn const destroy,
     memset(list, 0, sizeof(icircular_list_s));
 }
 
-void clear_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const argd) {
+void clear_icircular_list(icircular_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -62,7 +62,7 @@ void clear_icircular_list(icircular_list_s * const list, set_fn const destroy, v
     // iterate over each element in list and call destroy function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
     }
     list->allocator->free(list->elements, list->allocator->arg);
     list->allocator->free(list->next, list->allocator->arg);
@@ -75,7 +75,7 @@ void clear_icircular_list(icircular_list_s * const list, set_fn const destroy, v
     list->empty = NIL;
 }
 
-icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_fn const copy) {
+icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_fn const copy, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(copy && "Paremeter can't be NULL.");
 
@@ -98,7 +98,7 @@ icircular_list_s copy_icircular_list(icircular_list_s const * const list, copy_f
         (*r) = replica.length++;
         replica.next[(*r)] = replica.tail;
 
-        copy(replica.elements + ((*r) * replica.size), list->elements + (l * list->size));
+        copy(replica.elements + ((*r) * replica.size), list->elements + (l * list->size), ac);
     }
 
     return replica;
@@ -623,10 +623,10 @@ icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn
     return positive;
 }
 
-void each_icircular_list(icircular_list_s const * const list, handle_fn const handle, void * const argh) {
+void each_icircular_list(icircular_list_s const * const list, handle_fn const handle, void * const ah) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(list != argh && "Parameters can't be equal.");
+    error(list != ah && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -636,16 +636,16 @@ void each_icircular_list(icircular_list_s const * const list, handle_fn const ha
     // iterate over each element calling handle function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
         current = list->next[current];
-        if (!handle(list->elements + (current * list->size), argh)) {
+        if (!handle(list->elements + (current * list->size), ah)) {
             break;
         }
     }
 }
 
-void apply_icircular_list(icircular_list_s const * const list, process_fn const process, void * const argp) {
+void apply_icircular_list(icircular_list_s const * const list, process_fn const process, void * const ap) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(list != argp && "Parameters can't be equal.");
+    error(list != ap && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -662,7 +662,7 @@ void apply_icircular_list(icircular_list_s const * const list, process_fn const 
     }
 
     // process elements
-    process(elements_array, list->length, argp);
+    process(elements_array, list->length, ap);
 
     // copy elements back into list
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {

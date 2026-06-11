@@ -115,7 +115,7 @@ favl_tree_s make_favl_tree(size_t const size, size_t const max, compare_fn const
     return tree;
 }
 
-void destroy_favl_tree(favl_tree_s * const tree, set_fn const destroy, void * const argd) {
+void destroy_favl_tree(favl_tree_s * const tree, set_fn const destroy, void * const ad) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -131,7 +131,7 @@ void destroy_favl_tree(favl_tree_s * const tree, set_fn const destroy, void * co
     valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size), argd);
+        destroy(tree->elements + (i * tree->size), ad);
     }
     tree->allocator->free(tree->elements, tree->allocator->arg);
     tree->allocator->free(tree->height, tree->allocator->arg);
@@ -142,7 +142,7 @@ void destroy_favl_tree(favl_tree_s * const tree, set_fn const destroy, void * co
     memset(tree, 0, sizeof(favl_tree_s));
 }
 
-void clear_favl_tree(favl_tree_s * const tree, set_fn const destroy, void * const argd) {
+void clear_favl_tree(favl_tree_s * const tree, set_fn const destroy, void * const ad) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -158,14 +158,14 @@ void clear_favl_tree(favl_tree_s * const tree, set_fn const destroy, void * cons
     valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size), argd);
+        destroy(tree->elements + (i * tree->size), ad);
     }
 
     tree->root = NIL;
     tree->length = 0;
 }
 
-favl_tree_s copy_favl_tree(favl_tree_s const * const tree, copy_fn const copy) {
+favl_tree_s copy_favl_tree(favl_tree_s const * const tree, copy_fn const copy, void * const ac) {
     error(tree && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -197,7 +197,7 @@ favl_tree_s copy_favl_tree(favl_tree_s const * const tree, copy_fn const copy) {
     error(replica.node[FAVLT_RIGHT] && "Memory allocation failed.");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
+        copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size), ac);
     }
     memcpy(replica.height, tree->height, tree->length * sizeof(size_t));
     memcpy(replica.parent, tree->parent, tree->length * sizeof(size_t));
@@ -903,10 +903,10 @@ void update_favl_tree(favl_tree_s const * const tree, void const * const latter,
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void in_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void in_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -926,7 +926,7 @@ void in_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, 
             node = tree->node[FAVLT_LEFT][node];
         }
 
-        if (!handle(tree->elements + (node * tree->size), argh)) {
+        if (!handle(tree->elements + (node * tree->size), ah)) {
             break;
         }
 
@@ -950,10 +950,10 @@ void in_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, 
     }
 }
 
-void pre_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void pre_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -976,7 +976,7 @@ void pre_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle,
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), argh)) {
+    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), ah)) {
         size_t const node = stack.elements[--stack.length];
 
         size_t const right_child = tree->node[FAVLT_RIGHT][node];
@@ -993,10 +993,10 @@ void pre_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle,
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void post_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void post_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -1029,7 +1029,7 @@ void post_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!handle(tree->elements + (node * tree->size), argh)) {
+                if (!handle(tree->elements + (node * tree->size), ah)) {
                     break;
                 }
 
@@ -1041,10 +1041,10 @@ void post_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void level_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const argh) {
+void level_order_favl_tree(favl_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argh && "Parameters can' be equal.");
+    error(tree != ah && "Parameters can' be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->max && "Maximum size can't be zero.");
@@ -1068,7 +1068,7 @@ void level_order_favl_tree(favl_tree_s const * const tree, handle_fn const handl
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), argh)) {
+    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), ah)) {
         // pop index
         size_t const node = queue.elements[queue.current++];
         queue.length--;

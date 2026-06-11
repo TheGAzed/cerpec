@@ -27,7 +27,7 @@ isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash,
 /// @param set Structure to copy.
 /// @param copy Function pointer to create shallow/deep copy of single element
 /// @return Set structure.
-isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy);
+isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy, void * const argc);
 
 /// @brief Insert logic wrapper mainly to remove repeated code snippeds.
 /// @param set Structure to call insert logic on.
@@ -61,7 +61,7 @@ isc_hash_set_s make_isc_hash_set(size_t const size, hash_fn const hash, compare_
     return _make_wrapper_isc_hash_set(size, hash, compare, allocator);
 }
 
-void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const argd) {
+void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const ad) {
     error(set && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
@@ -72,7 +72,7 @@ void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     // free arrays
@@ -87,7 +87,7 @@ void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void
     memset(set, 0, sizeof(isc_hash_set_s));
 }
 
-void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const argd) {
+void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const ad) {
     error(set && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
@@ -98,7 +98,7 @@ void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void *
 
     // for each index, if each index is valid node then call destroy function on its element
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     // free arrays
@@ -120,7 +120,7 @@ void clear_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void *
     set->prev = NULL;
 }
 
-isc_hash_set_s copy_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy) {
+isc_hash_set_s copy_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy, void * const ac) {
     error(set && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -130,7 +130,7 @@ isc_hash_set_s copy_isc_hash_set(isc_hash_set_s const * const set, copy_fn const
     valid(set->allocator && "Allocator can't be NULL.");
     valid(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
-    return _copy_wrapper_isc_hash_set(set, copy);
+    return _copy_wrapper_isc_hash_set(set, copy, ac);
 }
 
 bool is_empty_isc_hash_set(isc_hash_set_s const * const set) {
@@ -238,7 +238,7 @@ bool contains_isc_hash_set(isc_hash_set_s const * const set, void const * const 
     return _contains_wrapper_isc_hash_set(set, element, hash, index);
 }
 
-isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy) {
+isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy, void * const ac) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -262,7 +262,7 @@ isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash
     isc_hash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
-    isc_hash_set_s set_union = _copy_wrapper_isc_hash_set(maximum, copy);
+    isc_hash_set_s set_union = _copy_wrapper_isc_hash_set(maximum, copy, ac);
     for (size_t m = 0; m < minimum->length; ++m) {
         char const * const element = minimum->elements + (m * minimum->size);
 
@@ -282,7 +282,7 @@ isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash
             size_t const new_union_idx = min_hash % set_union.capacity;
             _insert_wrapper_isc_hash_set(&set_union, min_hash, new_union_idx);
 
-            copy(set_union.elements + (set_union.length * set_union.size), element);
+            copy(set_union.elements + (set_union.length * set_union.size), element, ac);
             set_union.length++;
         }
     }
@@ -290,7 +290,7 @@ isc_hash_set_s union_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash
     return set_union;
 }
 
-isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy) {
+isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy, void * const ac) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -332,7 +332,7 @@ isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_
             size_t const intersect_index = min_hash % set_intersect.capacity;
             _insert_wrapper_isc_hash_set(&set_intersect, min_hash, intersect_index);
 
-            copy(set_intersect.elements + (set_intersect.length * set_intersect.size), element);
+            copy(set_intersect.elements + (set_intersect.length * set_intersect.size), element, ac);
             set_intersect.length++;
         }
     }
@@ -340,7 +340,7 @@ isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_
     return set_intersect;
 }
 
-isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_hash_set_s const * const subtrahend, copy_fn const copy) {
+isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_hash_set_s const * const subtrahend, copy_fn const copy, void * const ac) {
     error(minuend && "Parameter can't be NULL.");
     error(subtrahend && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -379,7 +379,7 @@ isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_h
             size_t const subtract_index = hash % set_subtract.capacity;
             _insert_wrapper_isc_hash_set(&set_subtract, hash, subtract_index);
 
-            copy(set_subtract.elements + (set_subtract.length * set_subtract.size), element);
+            copy(set_subtract.elements + (set_subtract.length * set_subtract.size), element, ac);
             set_subtract.length++;
         }
     }
@@ -387,7 +387,7 @@ isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_h
     return set_subtract;
 }
 
-isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy) {
+isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set_s const * const set_two, copy_fn const copy, void * const ac) {
     error(set_one && "Parameter can't be NULL.");
     error(set_two && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
@@ -426,7 +426,7 @@ isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_ha
             size_t const exclude_index = hash % set_exclude.capacity;
             _insert_wrapper_isc_hash_set(&set_exclude, hash, exclude_index);
 
-            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element);
+            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element, ac);
             set_exclude.length++;
         }
     }
@@ -449,7 +449,7 @@ isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_ha
             size_t const exclude_index = hash % set_exclude.capacity;
             _insert_wrapper_isc_hash_set(&set_exclude, hash, exclude_index);
 
-            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element);
+            copy(set_exclude.elements + (set_exclude.length * set_exclude.size), element, ac);
             set_exclude.length++;
         }
     }
@@ -556,7 +556,7 @@ bool is_disjoint_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set
     return true;
 }
 
-void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const argh) {
+void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const ah) {
     error(set && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
@@ -567,7 +567,7 @@ void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle,
     valid(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     for (size_t i = 0; i < set->length; ++i) {
-        if (!handle(set->elements + (i * set->size), argh)) { break; }
+        if (!handle(set->elements + (i * set->size), ah)) { break; }
     }
 }
 
@@ -614,7 +614,7 @@ isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash,
     return (isc_hash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = allocator, };
 }
 
-isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy) {
+isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy, void * const argc) {
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
     isc_hash_set_s const replica = {
         .capacity = set->capacity, .hash = set->hash, .length = set->length, .size = set->size,
@@ -642,7 +642,7 @@ isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy
 
     // for each element continuusly in array call copy function
     for (size_t i = 0; i < set->length; ++i) {
-        copy(replica.elements + (i * replica.size), set->elements + (i * set->size));
+        copy(replica.elements + (i * replica.size), set->elements + (i * set->size), argc);
     }
 
     return replica;

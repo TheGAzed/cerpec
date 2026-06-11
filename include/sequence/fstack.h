@@ -26,20 +26,21 @@ fstack_s make_fstack(size_t const size, size_t const max, memory_s const * const
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param stack Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void destroy_fstack(fstack_s * const stack, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void destroy_fstack(fstack_s * const stack, set_fn const destroy, void * const ad);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param stack Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void clear_fstack(fstack_s * const stack, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void clear_fstack(fstack_s * const stack, set_fn const destroy, void * const ad);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param stack Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Stack structure.
-fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy);
+fstack_s copy_fstack(fstack_s const * const stack, copy_fn const copy, void * const ac);
 
 /// @brief Checks if structure is empty.
 /// @param stack Structure to check.
@@ -69,13 +70,13 @@ void peep_fstack(fstack_s const * const stack, void * const buffer);
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param stack Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param argh Generic arguments to use in function pointer.
-void each_fstack(fstack_s const * const stack, handle_fn const handle, void * const argh);
+/// @param ah Generic arguments to use in function pointer.
+void each_fstack(fstack_s const * const stack, handle_fn const handle, void * const ah);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param stack Structure to map.
 /// @param process Function pointer to process array of elements using structure length and arguments.
-/// @param argp Generic arguments to use in function pointer.
-void apply_fstack(fstack_s const * const stack, process_fn const process, void * const argp);
+/// @param ap Generic arguments to use in function pointer.
+void apply_fstack(fstack_s const * const stack, process_fn const process, void * const ap);
 
 #endif // FSTACK_H

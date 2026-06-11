@@ -37,20 +37,21 @@ iqueue_s make_iqueue(size_t const size, memory_s const * const allocator);
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const ad);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param queue Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const ad);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param queue Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Queue structure.
-iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy);
+iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy, void * const ac);
 
 /// @brief Checks if structure is empty.
 /// @param queue Structure to check.
@@ -75,13 +76,13 @@ void peek_iqueue(iqueue_s const * const queue, void * const buffer);
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param queue Structure to iterate over.
 /// @param handle Function pointer to operate on each element reference using element size and generic arguments.
-/// @param argh Generic arguments to use in function pointer.
-void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const argh);
+/// @param ah Generic arguments to use in function pointer.
+void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const ah);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param queue Structure to map.
 /// @param process Function pointer to manage array of elements using strucuter length, element size and arguments.
-/// @param argp Generic arguments to use in function pointer.
-void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const argp);
+/// @param ap Generic arguments to use in function pointer.
+void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const ap);
 
 #endif // IQUEUE_H

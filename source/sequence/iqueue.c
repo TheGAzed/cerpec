@@ -15,7 +15,7 @@ iqueue_s make_iqueue(size_t const size, memory_s const * const allocator) {
     return (iqueue_s) { .size = size, .allocator = allocator };
 }
 
-void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const argd) {
+void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const ad) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -29,7 +29,7 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const a
         // destroy elements in previous' next (so head and next)
         size_t i = start;
         for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
-            destroy(previous->next->elements + (i * queue->size), argd);
+            destroy(previous->next->elements + (i * queue->size), ad);
         }
         queue->length -= (i - start);
 
@@ -45,7 +45,7 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const a
     memset(queue, 0, sizeof(iqueue_s));
 }
 
-void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const argd) {
+void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const ad) {
     error(queue && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -59,7 +59,7 @@ void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const arg
         // destroy elements in previous' next (so head and next)
         size_t i = start;
         for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
-            destroy(previous->next->elements + (i * queue->size), argd);
+            destroy(previous->next->elements + (i * queue->size), ad);
         }
         queue->length -= (i - start);
 
@@ -75,7 +75,7 @@ void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const arg
     queue->tail = NULL;
 }
 
-iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
+iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy, void * const ac) {
     error(queue && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -103,7 +103,7 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy) {
         // outside for loop to get copied chunk size, since it can either be 'remaining' or 'IQUEUE_CHUNK'
         size_t i = start;
         for (; i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than both 'remaining' and 'IQUEUE_CHUNK'
-            copy((*current_copy)->elements + (i * queue->size), current_queue->elements + (i * queue->size));
+            copy((*current_copy)->elements + (i * queue->size), current_queue->elements + (i * queue->size), ac);
         }
         remaining -= i; // subtract copied size from remaining size using i
 
@@ -195,10 +195,10 @@ void dequeue_iqueue(iqueue_s * const queue, void * const buffer) {
     }
 }
 
-void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const argh) {
+void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const ah) {
     error(queue && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL");
-    error(queue != argh && "Parameters can't be the same.");
+    error(queue != ah && "Parameters can't be the same.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->allocator && "Allocator can't be NULL.");
@@ -213,7 +213,7 @@ void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * co
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size
             // handle on element and if zero is returned then end main function
-            if (!handle(current->elements + (i * queue->size), argh)) {
+            if (!handle(current->elements + (i * queue->size), ah)) {
                 return;
             }
         }
@@ -221,10 +221,10 @@ void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * co
     }
 }
 
-void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const argp) {
+void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const ap) {
     error(queue && "Parameter can't be NULL.");
     error(process && "Parameter can't be NULL");
-    error(queue != argp && "Parameters can't be the same.");
+    error(queue != ap && "Parameters can't be the same.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->allocator && "Allocator can't be NULL.");
@@ -246,7 +246,7 @@ void apply_iqueue(iqueue_s const * const queue, process_fn const process, void *
         remaining -= (i - start); // subtract absolute value of i and start from remaining size
     }
 
-    process(elements_array, queue->length, argp); // process initialized elements array
+    process(elements_array, queue->length, ap); // process initialized elements array
 
     index = 0, remaining = queue->length, previous = queue->tail;
     for (size_t start = queue->current; remaining; start = 0, previous = previous->next) { // save elements array back into queue

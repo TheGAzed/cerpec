@@ -135,7 +135,7 @@ frb_tree_s make_frb_tree(size_t const size, size_t const max, compare_fn const c
     return tree;
 }
 
-void destroy_frb_tree(frb_tree_s * const tree, set_fn const destroy, void * const argd) {
+void destroy_frb_tree(frb_tree_s * const tree, set_fn const destroy, void * const ad) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -150,7 +150,7 @@ void destroy_frb_tree(frb_tree_s * const tree, set_fn const destroy, void * cons
     valid(tree->node[FRBT_RIGHT] && "Rights array can't be NULL");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size), argd);
+        destroy(tree->elements + (i * tree->size), ad);
     }
     tree->allocator->free(tree->elements, tree->allocator->arg);
     tree->allocator->free(tree->color, tree->allocator->arg);
@@ -161,7 +161,7 @@ void destroy_frb_tree(frb_tree_s * const tree, set_fn const destroy, void * cons
     memset(tree, 0, sizeof(frb_tree_s));
 }
 
-void clear_frb_tree(frb_tree_s * const tree, set_fn const destroy, void * const argd) {
+void clear_frb_tree(frb_tree_s * const tree, set_fn const destroy, void * const ad) {
     error(tree && "Parameter can't be NULL.");
     error(destroy && "Parameter can't be NULL.");
 
@@ -176,14 +176,14 @@ void clear_frb_tree(frb_tree_s * const tree, set_fn const destroy, void * const 
     valid(tree->node[FRBT_RIGHT] && "Rights array can't be NULL");
 
     for (size_t i = 0; i < tree->length; ++i) {
-        destroy(tree->elements + (i * tree->size), argd);
+        destroy(tree->elements + (i * tree->size), ad);
     }
 
     tree->root = NIL;
     tree->length = 0;
 }
 
-frb_tree_s copy_frb_tree(frb_tree_s const * const tree, copy_fn const copy) {
+frb_tree_s copy_frb_tree(frb_tree_s const * const tree, copy_fn const copy, void * const ac) {
     error(tree && "Parameter can't be NULL.");
     error(copy && "Parameter can't be NULL.");
 
@@ -216,7 +216,7 @@ frb_tree_s copy_frb_tree(frb_tree_s const * const tree, copy_fn const copy) {
     error(replica.node[FRBT_RIGHT] && "Memory allocation failed.");
 
     for (size_t i = 1; i < tree->length + 1; ++i) {
-        copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size));
+        copy(replica.elements + (i * tree->size), tree->elements + (i * tree->size), ac);
     }
     memcpy(replica.color, tree->color, (tree->length + 1) * sizeof(bool));
     memcpy(replica.parent, tree->parent, (tree->length + 1) * sizeof(size_t));
@@ -831,10 +831,10 @@ void update_frb_tree(frb_tree_s const * const tree, void const * const latter, v
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void in_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const argd) {
+void in_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argd && "Parameters can't be equal.");
+    error(tree != ah && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
@@ -857,7 +857,7 @@ void in_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, vo
             node = left;
         }
 
-        if (!handle(tree->elements + (node * tree->size), argd)) { break; }
+        if (!handle(tree->elements + (node * tree->size), ah)) { break; }
 
         left_done = true;
         if (NIL != right) {
@@ -874,10 +874,10 @@ void in_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, vo
     }
 }
 
-void pre_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const argd) {
+void pre_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argd && "Parameters can't be equal.");
+    error(tree != ah && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
@@ -899,7 +899,7 @@ void pre_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, v
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), argd)) {
+    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), ah)) {
         size_t const node = stack.elements[--stack.length];
 
         size_t const right_child = tree->node[FRBT_RIGHT][node];
@@ -916,10 +916,10 @@ void pre_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, v
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void post_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const argd) {
+void post_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argd && "Parameters can't be equal.");
+    error(tree != ah && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
@@ -951,7 +951,7 @@ void post_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, 
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!handle(tree->elements + (node * tree->size), argd)) {
+                if (!handle(tree->elements + (node * tree->size), ah)) {
                     break;
                 }
 
@@ -963,10 +963,10 @@ void post_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, 
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void level_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const argd) {
+void level_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle, void * const ah) {
     error(tree && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(tree != argd && "Parameters can't be equal.");
+    error(tree != ah && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
@@ -989,7 +989,7 @@ void level_order_frb_tree(frb_tree_s const * const tree, handle_fn const handle,
     }
 
     // while queue isn't empty handle on element, pop parent and push valid children
-    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), argd)) {
+    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), ah)) {
         // pop index
         size_t const node = queue.elements[queue.current++];
         queue.length--;

@@ -29,20 +29,21 @@ fbinary_heap_s make_fbinary_heap(size_t const size, size_t const max, compare_fn
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param heap Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void destroy_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void destroy_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy, void * const ad);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param heap Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void clear_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void clear_fbinary_heap(fbinary_heap_s * const heap, set_fn const destroy, void * const ad);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param heap Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Heap structure.
-fbinary_heap_s copy_fbinary_heap(fbinary_heap_s const * const heap, copy_fn const copy);
+fbinary_heap_s copy_fbinary_heap(fbinary_heap_s const * const heap, copy_fn const copy, void * const ac);
 
 /// @brief Checks if structure is empty.
 /// @param heap Structure to check.
@@ -84,7 +85,7 @@ void meld_fbinary_heap(fbinary_heap_s * const destination, fbinary_heap_s * cons
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param heap Structure to iterate over.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param argh Generic arguments to use in function pointer.
-void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const argh);
+/// @param ah Generic arguments to use in function pointer.
+void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const ah);
 
 #endif // FBINARY_HEAP_H

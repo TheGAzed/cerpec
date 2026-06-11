@@ -41,20 +41,21 @@ ibsearch_tree_s make_ibsearch_tree(size_t const size, compare_fn const compare, 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param tree Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void destroy_ibsearch_tree(ibsearch_tree_s * const tree, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void destroy_ibsearch_tree(ibsearch_tree_s * const tree, set_fn const destroy, void * const ad);
 
 /// @brief Clears a structure and destroys its elements, but remains usable.
 /// @param tree Structure to destroy.
 /// @param destroy Function pointer to destroy a single element.
-/// @param argd Arguments for destroy function pointer.
-void clear_ibsearch_tree(ibsearch_tree_s * const tree, set_fn const destroy, void * const argd);
+/// @param ad Arguments for destroy function pointer.
+void clear_ibsearch_tree(ibsearch_tree_s * const tree, set_fn const destroy, void * const ad);
 
 /// @brief Creates a copy of a structure and all its elements.
 /// @param tree Structure to copy.
 /// @param copy Function pointer to create a deep/shallow copy of a single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Tree structure.
-ibsearch_tree_s copy_ibsearch_tree(ibsearch_tree_s const * const tree, copy_fn const copy);
+ibsearch_tree_s copy_ibsearch_tree(ibsearch_tree_s const * const tree, copy_fn const copy, void * const ac);
 
 /// @brief Checks if structure is empty.
 /// @param tree Structure to check.
@@ -160,25 +161,25 @@ void update_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const
 /// @brief Performs an in-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void in_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const arguments);
+/// @param ah Generic arguments to use in function pointer.
+void in_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah);
 
 /// @brief Performs a pre-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void pre_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const arguments);
+/// @param ah Generic arguments to use in function pointer.
+void pre_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah);
 
 /// @brief Performs a post-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void post_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const arguments);
+/// @param ah Generic arguments to use in function pointer.
+void post_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah);
 
 /// @brief Performs a level-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param arguments Generic arguments to use in function pointer.
-void level_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const arguments);
+/// @param ah Generic arguments to use in function pointer.
+void level_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah);
 
 #endif // IBSEARCH_TREE_H

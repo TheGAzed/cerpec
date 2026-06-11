@@ -49,8 +49,8 @@ void _irb_set_fill_hole(irb_set_s * const set, size_t const hole);
 void _irb_set_resize(irb_set_s * const set, size_t const size);
 
 irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
+    assert(compare && "Parameter can't be NULL.");
+    assert(size && "Parameter can't be zero.");
 
     // initialize structure
     irb_set_s const set = {
@@ -62,11 +62,11 @@ irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
         .node[IRB_SET_RIGHT] = standard.alloc(sizeof(size_t), standard.arg),
         .allocator = &standard,
     };
-    assert(set.elements && "[ERROR] Memory allocation failed.");
-    assert(set.color && "[ERROR] Memory allocation failed.");
-    assert(set.parent && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(set.elements && "Memory allocation failed.");
+    assert(set.color && "Memory allocation failed.");
+    assert(set.parent && "Memory allocation failed.");
+    assert(set.node[IRB_SET_LEFT] && "Memory allocation failed.");
+    assert(set.node[IRB_SET_RIGHT] && "Memory allocation failed.");
 
     // set NIL node since the set uses special NIL nodes
     set.color[NIL] = IBLACK_SET_COLOR;
@@ -76,9 +76,9 @@ irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
 }
 
 irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s const * const allocator) {
-    assert(compare && "[ERROR] Parameter can't be NULL.");
-    assert(size && "[ERROR] Parameter can't be zero.");
-    assert(allocator && "[ERROR] Parameter can't be NULL.");
+    assert(compare && "Parameter can't be NULL.");
+    assert(size && "Parameter can't be zero.");
+    assert(allocator && "Parameter can't be NULL.");
 
     // initialize structure
     irb_set_s const set = {
@@ -90,11 +90,11 @@ irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s con
         .node[IRB_SET_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arg),
         .allocator = allocator,
     };
-    assert(set.elements && "[ERROR] Memory allocation failed.");
-    assert(set.color && "[ERROR] Memory allocation failed.");
-    assert(set.parent && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(set.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(set.elements && "Memory allocation failed.");
+    assert(set.color && "Memory allocation failed.");
+    assert(set.parent && "Memory allocation failed.");
+    assert(set.node[IRB_SET_LEFT] && "Memory allocation failed.");
+    assert(set.node[IRB_SET_RIGHT] && "Memory allocation failed.");
 
     // set NIL node since the set uses special NIL nodes
     set.color[NIL] = IBLACK_SET_COLOR;
@@ -103,17 +103,17 @@ irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s con
     return set;
 }
 
-void destroy_irb_set(irb_set_s * const set, set_fn const destroy, void * const argd) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+void destroy_irb_set(irb_set_s * const set, set_fn const destroy, void * const ad) {
+    assert(set && "Parameter can't be NULL.");
+    assert(destroy && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     // free arrays
@@ -127,17 +127,17 @@ void destroy_irb_set(irb_set_s * const set, set_fn const destroy, void * const a
     memset(set, 0, sizeof(irb_set_s));
 }
 
-void clear_irb_set(irb_set_s * const set, set_fn const destroy, void * const argd) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(destroy && "[ERROR] Parameter can't be NULL.");
+void clear_irb_set(irb_set_s * const set, set_fn const destroy, void * const ad) {
+    assert(set && "Parameter can't be NULL.");
+    assert(destroy && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     // destroy elements in array order
     for (size_t i = 0; i < set->length; ++i) {
-        destroy(set->elements + (i * set->size), argd);
+        destroy(set->elements + (i * set->size), ad);
     }
 
     // shrink arrays to hold only one node
@@ -147,24 +147,24 @@ void clear_irb_set(irb_set_s * const set, set_fn const destroy, void * const arg
     set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], sizeof(size_t), set->allocator->arg);
     set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], sizeof(size_t), set->allocator->arg);
 
-    assert(set->elements && "[ERROR] Memory allocation failed.");
-    assert(set->color && "[ERROR] Memory allocation failed.");
-    assert(set->parent && "[ERROR] Memory allocation failed.");
-    assert(set->node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(set->node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(set->elements && "Memory allocation failed.");
+    assert(set->color && "Memory allocation failed.");
+    assert(set->parent && "Memory allocation failed.");
+    assert(set->node[IRB_SET_LEFT] && "Memory allocation failed.");
+    assert(set->node[IRB_SET_RIGHT] && "Memory allocation failed.");
 
     // clear (NOT destroy) structure
     set->root = NIL;
     set->capacity = set->length = 0;
 }
 
-irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
+irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy, void * const ac) {
+    assert(set && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     // initialize replica
     irb_set_s const replica = {
@@ -179,16 +179,16 @@ irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy) {
     };
 
     // since the structure always has one additional NIL node malloc must be checked even if capacity is zero
-    assert(replica.elements && "[ERROR] Memory allocation failed.");
-    assert(replica.color && "[ERROR] Memory allocation failed.");
-    assert(replica.parent && "[ERROR] Memory allocation failed.");
-    assert(replica.node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
-    assert(replica.node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(replica.elements && "Memory allocation failed.");
+    assert(replica.color && "Memory allocation failed.");
+    assert(replica.parent && "Memory allocation failed.");
+    assert(replica.node[IRB_SET_LEFT] && "Memory allocation failed.");
+    assert(replica.node[IRB_SET_RIGHT] && "Memory allocation failed.");
 
     // copy elements and indexes straight to replica
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < set->length + 1; ++i) {
-        copy(replica.elements + (i * set->size), set->elements + (i * set->size));
+        copy(replica.elements + (i * set->size), set->elements + (i * set->size), ac);
     }
     memcpy(replica.color, set->color, (set->length + 1) * sizeof(bool));
     memcpy(replica.parent, set->parent, (set->length + 1) * sizeof(size_t));
@@ -199,21 +199,21 @@ irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy) {
 }
 
 bool is_empty_irb_set(irb_set_s const * const set) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set && "Parameter can't be NULL.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     return !(set->length);
 }
 
 void insert_irb_set(irb_set_s * const set, void const * const element) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
+    assert(element && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     if (set->length == set->capacity) {
         size_t const capacity = set->length ? set->length * CERPEC_FACTOR : IRB_SET_CHUNK;
@@ -245,18 +245,18 @@ void insert_irb_set(irb_set_s * const set, void const * const element) {
 }
 
 void remove_irb_set(irb_set_s * const set, void const * const element, void * const buffer) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(set->length && "[ERROR] Can't get element from empty structure.");
-    assert(buffer && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
+    assert(set->length && "Can't get element from empty structure.");
+    assert(buffer && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(set->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(set->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_RIGHT] && "[INVALID] Paremeter can't be NULL.");
-    assert(NIL != set->root && "[INVALID] Paremeter can't be NIL.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
+    assert(set->elements && "Paremeter can't be NULL.");
+    assert(set->parent && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_LEFT] && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_RIGHT] && "Paremeter can't be NULL.");
+    assert(NIL != set->root && "Paremeter can't be NIL.");
 
     size_t node = set->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
@@ -274,7 +274,7 @@ void remove_irb_set(irb_set_s * const set, void const * const element, void * co
 
     if (NIL == node) {
         // element was NOT found, thus return an error
-        assert(false && "[ERROR] Element not found in set.");
+        assert(false && "Element not found in set.");
         exit(EXIT_FAILURE);
     }
 
@@ -324,16 +324,16 @@ void remove_irb_set(irb_set_s * const set, void const * const element, void * co
 }
 
 bool contains_irb_set(irb_set_s const * const set, void const * const element) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(element && "[ERROR] Parameter can't be NULL.");
+    assert(set && "Parameter can't be NULL.");
+    assert(element && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
-    assert(set->elements && "[INVALID] Paremeter can't be NULL.");
-    assert(set->parent && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_LEFT] && "[INVALID] Paremeter can't be NULL.");
-    assert(set->node[IRB_SET_RIGHT] && "[INVALID] Paremeter can't be NULL.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
+    assert(set->elements && "Paremeter can't be NULL.");
+    assert(set->parent && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_LEFT] && "Paremeter can't be NULL.");
+    assert(set->node[IRB_SET_RIGHT] && "Paremeter can't be NULL.");
 
     for (size_t node = set->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
@@ -349,27 +349,27 @@ bool contains_irb_set(irb_set_s const * const set, void const * const element) {
     return false;
 }
 
-irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy, void * const ac) {
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "Lenght can't be larger than capacity.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements to maximum's replica
     irb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
     irb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
     // copy maximum set into set union
-    irb_set_s set_union = copy_irb_set(maximum, copy);
+    irb_set_s set_union = copy_irb_set(maximum, copy, ac);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -415,7 +415,7 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
         set_union.node[IRB_SET_LEFT][(*node)] = set_union.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_union.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_union.elements + ((*node) * set_union.size), element);
+        copy(set_union.elements + ((*node) * set_union.size), element, ac);
         set_union.length++;
 
         _irb_set_insert_fixup(&set_union, (*node));
@@ -424,20 +424,20 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
     return set_union;
 }
 
-irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy, void * const ac) {
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "Lenght can't be larger than capacity.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
     // get minimum and maximum sets to avoid pointless resizing via only pushing minimum set's elements
     irb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
@@ -489,7 +489,7 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
         set_intersect.node[IRB_SET_LEFT][(*node)] = set_intersect.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_intersect.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_intersect.elements + ((*node) * set_intersect.size), element);
+        copy(set_intersect.elements + ((*node) * set_intersect.size), element, ac);
         set_intersect.length++;
 
         _irb_set_insert_fixup(&set_intersect, (*node));
@@ -498,20 +498,20 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
     return set_intersect;
 }
 
-irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * const subtrahend, copy_fn const copy) {
-    assert(minuend && "[ERROR] Parameter can't be NULL.");
-    assert(subtrahend && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(minuend->compare == subtrahend->compare && "[ERROR] Function pointers must be the same.");
-    assert(minuend->size == subtrahend->size && "[ERROR] Sizes must be the same.");
+irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * const subtrahend, copy_fn const copy, void * const ac) {
+    assert(minuend && "Parameter can't be NULL.");
+    assert(subtrahend && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(minuend->compare == subtrahend->compare && "Function pointers must be the same.");
+    assert(minuend->size == subtrahend->size && "Sizes must be the same.");
 
-    assert(minuend->compare && "[INVALID] Parameter can't be NULL.");
-    assert(minuend->size && "[INVALID] Parameter can't be zero.");
-    assert(minuend->length <= minuend->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(minuend->compare && "Parameter can't be NULL.");
+    assert(minuend->size && "Parameter can't be zero.");
+    assert(minuend->length <= minuend->capacity && "Lenght can't be larger than capacity.");
 
-    assert(subtrahend->compare && "[INVALID] Parameter can't be NULL.");
-    assert(subtrahend->size && "[INVALID] Parameter can't be zero.");
-    assert(subtrahend->length <= subtrahend->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subtrahend->compare && "Parameter can't be NULL.");
+    assert(subtrahend->size && "Parameter can't be zero.");
+    assert(subtrahend->length <= subtrahend->capacity && "Lenght can't be larger than capacity.");
 
     irb_set_s set_subtract = make_irb_set(minuend->size, minuend->compare, minuend->allocator);
 
@@ -559,7 +559,7 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
         set_subtract.node[IRB_SET_LEFT][(*node)] = set_subtract.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_subtract.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_subtract.elements + ((*node) * set_subtract.size), element);
+        copy(set_subtract.elements + ((*node) * set_subtract.size), element, ac);
         set_subtract.length++;
 
         _irb_set_insert_fixup(&set_subtract, (*node));
@@ -568,20 +568,20 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
     return set_subtract;
 }
 
-irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(copy && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two, copy_fn const copy, void * const ac) {
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(copy && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "Lenght can't be larger than capacity.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
     irb_set_s set_exclude = make_irb_set(set_one->size, set_one->compare, set_one->allocator);
 
@@ -629,7 +629,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         set_exclude.node[IRB_SET_LEFT][(*node)] = set_exclude.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_exclude.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_exclude.elements + ((*node) * set_exclude.size), element);
+        copy(set_exclude.elements + ((*node) * set_exclude.size), element, ac);
         set_exclude.length++;
 
         _irb_set_insert_fixup(&set_exclude, (*node));
@@ -679,7 +679,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         set_exclude.node[IRB_SET_LEFT][(*node)] = set_exclude.node[IRB_SET_RIGHT][(*node)] = NIL;
         set_exclude.color[(*node)] = IRED_SET_COLOR;
 
-        copy(set_exclude.elements + ((*node) * set_exclude.size), element);
+        copy(set_exclude.elements + ((*node) * set_exclude.size), element, ac);
         set_exclude.length++;
 
         _irb_set_insert_fixup(&set_exclude, (*node));
@@ -689,18 +689,18 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
 }
 
 bool is_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const subset) {
-    assert(superset && "[ERROR] Parameter can't be NULL.");
-    assert(subset && "[ERROR] Parameter can't be NULL.");
-    assert(superset->compare == subset->compare && "[ERROR] Function pointers must be the same.");
-    assert(superset->size == subset->size && "[ERROR] Sizes must be the same.");
+    assert(superset && "Parameter can't be NULL.");
+    assert(subset && "Parameter can't be NULL.");
+    assert(superset->compare == subset->compare && "Function pointers must be the same.");
+    assert(superset->size == subset->size && "Sizes must be the same.");
 
-    assert(superset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(superset->size && "[INVALID] Parameter can't be zero.");
-    assert(superset->length <= superset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(superset->compare && "Parameter can't be NULL.");
+    assert(superset->size && "Parameter can't be zero.");
+    assert(superset->length <= superset->capacity && "Lenght can't be larger than capacity.");
 
-    assert(subset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(subset->size && "[INVALID] Parameter can't be zero.");
-    assert(subset->length <= subset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subset->compare && "Parameter can't be NULL.");
+    assert(subset->size && "Parameter can't be zero.");
+    assert(subset->length <= subset->capacity && "Lenght can't be larger than capacity.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < subset->length + 1; ++i) {
@@ -727,18 +727,18 @@ bool is_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const
 }
 
 bool is_proper_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const subset) {
-    assert(superset && "[ERROR] Parameter can't be NULL.");
-    assert(subset && "[ERROR] Parameter can't be NULL.");
-    assert(superset->compare == subset->compare && "[ERROR] Function pointers must be the same.");
-    assert(superset->size == subset->size && "[ERROR] Sizes must be the same.");
+    assert(superset && "Parameter can't be NULL.");
+    assert(subset && "Parameter can't be NULL.");
+    assert(superset->compare == subset->compare && "Function pointers must be the same.");
+    assert(superset->size == subset->size && "Sizes must be the same.");
 
-    assert(superset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(superset->size && "[INVALID] Parameter can't be zero.");
-    assert(superset->length <= superset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(superset->compare && "Parameter can't be NULL.");
+    assert(superset->size && "Parameter can't be zero.");
+    assert(superset->length <= superset->capacity && "Lenght can't be larger than capacity.");
 
-    assert(subset->compare && "[INVALID] Parameter can't be NULL.");
-    assert(subset->size && "[INVALID] Parameter can't be zero.");
-    assert(subset->length <= subset->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(subset->compare && "Parameter can't be NULL.");
+    assert(subset->size && "Parameter can't be zero.");
+    assert(subset->length <= subset->capacity && "Lenght can't be larger than capacity.");
 
     // start at 1 since NIL is at zero and elements start beyond NIL
     for (size_t i = 1; i < subset->length + 1; ++i) {
@@ -765,18 +765,18 @@ bool is_proper_subset_irb_set(irb_set_s const * const superset, irb_set_s const 
 }
 
 bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * const set_two) {
-    assert(set_one && "[ERROR] Parameter can't be NULL.");
-    assert(set_two && "[ERROR] Parameter can't be NULL.");
-    assert(set_one->compare == set_two->compare && "[ERROR] Function pointers must be the same.");
-    assert(set_one->size == set_two->size && "[ERROR] Sizes must be the same.");
+    assert(set_one && "Parameter can't be NULL.");
+    assert(set_two && "Parameter can't be NULL.");
+    assert(set_one->compare == set_two->compare && "Function pointers must be the same.");
+    assert(set_one->size == set_two->size && "Sizes must be the same.");
 
-    assert(set_one->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_one->size && "[INVALID] Parameter can't be zero.");
-    assert(set_one->length <= set_one->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_one->compare && "Parameter can't be NULL.");
+    assert(set_one->size && "Parameter can't be zero.");
+    assert(set_one->length <= set_one->capacity && "Lenght can't be larger than capacity.");
 
-    assert(set_two->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set_two->size && "[INVALID] Parameter can't be zero.");
-    assert(set_two->length <= set_two->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set_two->compare && "Parameter can't be NULL.");
+    assert(set_two->size && "Parameter can't be zero.");
+    assert(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
     irb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
     irb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
@@ -805,13 +805,13 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
     return true;
 }
 
-void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * const argh) {
-    assert(set && "[ERROR] Parameter can't be NULL.");
-    assert(handle && "[ERROR] Parameter can't be NULL.");
+void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * const ah) {
+    assert(set && "Parameter can't be NULL.");
+    assert(handle && "Parameter can't be NULL.");
 
-    assert(set->compare && "[INVALID] Parameter can't be NULL.");
-    assert(set->size && "[INVALID] Parameter can't be zero.");
-    assert(set->length <= set->capacity && "[INVALID] Lenght can't be larger than capacity.");
+    assert(set->compare && "Parameter can't be NULL.");
+    assert(set->size && "Parameter can't be zero.");
+    assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     bool left_done = false;
     size_t node = set->root;
@@ -824,7 +824,7 @@ void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * co
             node = left;
         }
 
-        if (!handle(set->elements + (node * set->size), argh)) { break; }
+        if (!handle(set->elements + (node * set->size), ah)) { break; }
 
         left_done = true;
         if (NIL != right) {
@@ -1058,17 +1058,17 @@ void _irb_set_resize(irb_set_s * const set, size_t const size) {
     size_t const resize = set->capacity + 1; // +1 to account for special NIL node
 
     set->elements = set->allocator->realloc(set->elements, resize * set->size, set->allocator->arg);
-    assert(set->elements && "[ERROR] Memory allocation failed.");
+    assert(set->elements && "Memory allocation failed.");
 
     set->color = set->allocator->realloc(set->color, resize * sizeof(bool), set->allocator->arg);
-    assert(set->color && "[ERROR] Memory allocation failed.");
+    assert(set->color && "Memory allocation failed.");
 
     set->parent = set->allocator->realloc(set->parent, resize * sizeof(size_t), set->allocator->arg);
-    assert(set->parent && "[ERROR] Memory allocation failed.");
+    assert(set->parent && "Memory allocation failed.");
 
     set->node[IRB_SET_LEFT] = set->allocator->realloc(set->node[IRB_SET_LEFT], resize * sizeof(size_t), set->allocator->arg);
-    assert(set->node[IRB_SET_LEFT] && "[ERROR] Memory allocation failed.");
+    assert(set->node[IRB_SET_LEFT] && "Memory allocation failed.");
 
     set->node[IRB_SET_RIGHT] = set->allocator->realloc(set->node[IRB_SET_RIGHT], resize * sizeof(size_t), set->allocator->arg);
-    assert(set->node[IRB_SET_RIGHT] && "[ERROR] Memory allocation failed.");
+    assert(set->node[IRB_SET_RIGHT] && "Memory allocation failed.");
 }

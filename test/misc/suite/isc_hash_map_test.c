@@ -61,7 +61,7 @@ TEST COPY_01(void) {
         insert_isc_hash_map(&table, &i, &j);
     }
 
-    isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, intcpy);
+    isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, NULL, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         ASSERT(contains_key_isc_hash_map(&replica, &i));
@@ -85,7 +85,7 @@ TEST COPY_02(void) {
         insert_isc_hash_map(&table, &i, &j);
     }
 
-    isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, intcpy);
+    isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, NULL, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         ASSERT(contains_key_isc_hash_map(&replica, &i));
@@ -109,7 +109,7 @@ TEST COPY_03(void) {
         insert_isc_hash_map(&table, &i, &j);
     }
 
-    isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, intcpy);
+    isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, NULL, intcpy, NULL);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         ASSERT(contains_key_isc_hash_map(&replica, &i));

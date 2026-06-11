@@ -10,12 +10,14 @@ void chardst(void * const element, void * arg) {
     (void)(arg);
 }
 
-void * charcpy(void * const destination, void const * const source) {
+void * charcpy(void * const destination, void const * const source, void * arg) {
+    (void)(arg);
     *(char*)destination = *(char*)source;
     return destination;
 }
 
-void * charsum(void * const sum, void const * const addent) {
+void * charsum(void * const sum, void const * const addent, void * arg) {
+    (void)(arg);
     *(char*)sum += *(char*)addent;
     return sum;
 }
@@ -125,12 +127,14 @@ void uchardst(void * const element, void * arg) {
     (void)(arg);
 }
 
-void * ucharcpy(void * const destination, void const * const source) {
+void * ucharcpy(void * const destination, void const * const source, void * arg) {
+    (void)(arg);
     *(unsigned char*)destination = *(unsigned char*)source;
     return destination;
 }
 
-void * ucharsum(void * const sum, void const * const addent) {
+void * ucharsum(void * const sum, void const * const addent, void * arg) {
+    (void)(arg);
     *(unsigned char*)sum += *(unsigned char*)addent;
     return sum;
 }
@@ -246,12 +250,14 @@ void intdst(void * const element, void * arg) {
     (void)(arg);
 }
 
-void * intcpy(void * const destination, void const * const source) {
+void * intcpy(void * const destination, void const * const source, void * arg) {
+    (void)(arg);
     (*(int*)destination) = (*(int*)source);
     return destination;
 }
 
-void * intsum(void * const sum, void const * const addent) {
+void * intsum(void * const sum, void const * const addent, void * arg) {
+    (void)(arg);
     (*(int*)sum) += (*(int*)addent);
     return sum;
 }
@@ -331,12 +337,14 @@ void uintdst(void * const element, void * arg) {
     (void)(arg);
 }
 
-void * uintcpy(void * const destination, void const * const source) {
+void * uintcpy(void * const destination, void const * const source, void * arg) {
+    (void)(arg);
     (*(unsigned*)destination) = (*(unsigned*)source);
     return destination;
 }
 
-void * uintsum(void * const sum, void const * const addent) {
+void * uintsum(void * const sum, void const * const addent, void * arg) {
+    (void)(arg);
     (*(unsigned*)sum) += (*(unsigned*)addent);
     return sum;
 }
@@ -398,12 +406,14 @@ void floatdst(void * const element, void * arg) {
     (void)(arg);
 }
 
-void * floatcpy(void * const destination, void const * const source) {
+void * floatcpy(void * const destination, void const * const source, void * arg) {
+    (void)(arg);
     (*(float*)destination) = (*(float*)source);
     return destination;
 }
 
-void * floatsum(void * const sum, void const * const addent) {
+void * floatsum(void * const sum, void const * const addent, void * arg) {
+    (void)(arg);
     (*(float*)sum) += (*(float*)addent);
     return sum;
 }
@@ -448,12 +458,14 @@ void doubledst(void * const element, void * arg) {
     (void)(arg);
 }
 
-void * doublecpy(void * const destination, void const * const source) {
+void * doublecpy(void * const destination, void const * const source, void * arg) {
+    (void)(arg);
     (*(double*)destination) = (*(double*)source);
     return destination;
 }
 
-void * doublesum(void * const sum, void const * const addent) {
+void * doublesum(void * const sum, void const * const addent, void * arg) {
+    (void)(arg);
     (*(double*)sum) += (*(double*)addent);
     return sum;
 }
@@ -498,12 +510,14 @@ void sizedst(void * const element, void * arg) {
     (void)(arg);
 }
 
-void * sizecpy(void * const destination, void const * const source) {
+void * sizecpy(void * const destination, void const * const source, void * arg) {
+    (void)(arg);
     (*(size_t*)destination) = (*(size_t*)source);
     return destination;
 }
 
-void * sizesum(void * const sum, void const * const addent) {
+void * sizesum(void * const sum, void const * const addent, void * arg) {
+    (void)(arg);
     (*(size_t*)sum) += (*(size_t*)addent);
     return sum;
 }

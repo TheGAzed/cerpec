@@ -49,7 +49,7 @@ TEST COPY_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(&test, intcpy);
+    idouble_list_s replica = copy_idouble_list(&test, intcpy, NULL);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -74,7 +74,7 @@ TEST COPY_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(&test, intcpy);
+    idouble_list_s replica = copy_idouble_list(&test, intcpy, NULL);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
@@ -99,7 +99,7 @@ TEST COPY_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s replica = copy_idouble_list(&test, intcpy);
+    idouble_list_s replica = copy_idouble_list(&test, intcpy, NULL);
 
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);

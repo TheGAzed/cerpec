@@ -32,7 +32,7 @@ idouble_list_s make_idouble_list(size_t const size, memory_s const * const alloc
     return (idouble_list_s) { .size = size, .allocator = allocator, };
 }
 
-void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy, void * const argd) {
+void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -42,7 +42,7 @@ void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy, voi
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
         current = list->node[IDL_NEXT][current];
     }
 
@@ -54,7 +54,7 @@ void destroy_idouble_list(idouble_list_s * const list, set_fn const destroy, voi
     memset(list, 0, sizeof(idouble_list_s));
 }
 
-void clear_idouble_list(idouble_list_s * const list, set_fn const destroy, void * const argd) {
+void clear_idouble_list(idouble_list_s * const list, set_fn const destroy, void * const ad) {
     error(list && "Paremeter can't be NULL.");
     error(destroy && "Paremeter can't be NULL.");
 
@@ -64,7 +64,7 @@ void clear_idouble_list(idouble_list_s * const list, set_fn const destroy, void 
 
     // call destroy function for each element in list
     for (size_t current = list->head, i = list->length; i; i--) {
-        destroy(list->elements + (current * list->size), argd);
+        destroy(list->elements + (current * list->size), ad);
         current = list->node[IDL_NEXT][current];
     }
 
@@ -79,7 +79,7 @@ void clear_idouble_list(idouble_list_s * const list, set_fn const destroy, void 
     list->capacity = list->head = list->length = 0;
 }
 
-idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn const copy) {
+idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn const copy, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(copy && "Paremeter can't be NULL.");
 
@@ -101,7 +101,7 @@ idouble_list_s copy_idouble_list(idouble_list_s const * const list, copy_fn cons
 
     // copy nodes (elements and indexes) into list
     for (size_t i = 0; i < list->length; ++i) {
-        copy(replica.elements + (i * replica.size), list->elements + (i * list->size));
+        copy(replica.elements + (i * replica.size), list->elements + (i * list->size), ac);
     }
     memcpy(replica.node[IDL_NEXT], list->node[IDL_NEXT], list->length * sizeof(size_t));
     memcpy(replica.node[IDL_PREV], list->node[IDL_PREV], list->length * sizeof(size_t));
@@ -606,10 +606,10 @@ idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const
     return positive;
 }
 
-void each_next_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const argh) {
+void each_next_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const ah) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(argh != list && "Paremeters can't be the same.");
+    error(ah != list && "Paremeters can't be the same.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -617,16 +617,16 @@ void each_next_idouble_list(idouble_list_s const * const list, handle_fn const h
 
     // for each forward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDL_NEXT][current]) {
-        if (!handle(list->elements + (current * list->size), argh)) {
+        if (!handle(list->elements + (current * list->size), ah)) {
             break;
         }
     }
 }
 
-void each_prev_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const argh) {
+void each_prev_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const ah) {
     error(list && "Paremeter can't be NULL.");
     error(handle && "Paremeter can't be NULL.");
-    error(argh != list && "Paremeters can't be the same.");
+    error(ah != list && "Paremeters can't be the same.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -635,16 +635,16 @@ void each_prev_idouble_list(idouble_list_s const * const list, handle_fn const h
     // for each backward element in list call handle function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
         current = list->node[IDL_PREV][current];
-        if (!handle(list->elements + (current * list->size), argh)) {
+        if (!handle(list->elements + (current * list->size), ah)) {
             break;
         }
     }
 }
 
-void apply_idouble_list(idouble_list_s const * const list, process_fn const process, void * const argp) {
+void apply_idouble_list(idouble_list_s const * const list, process_fn const process, void * const ap) {
     error(list && "Paremeter can't be NULL.");
     error(process && "Paremeter can't be NULL.");
-    error(argp != list && "Paremeters can't be the same.");
+    error(ap != list && "Paremeters can't be the same.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->capacity && "Length exceeds capacity.");
@@ -659,7 +659,7 @@ void apply_idouble_list(idouble_list_s const * const list, process_fn const proc
     }
 
     // process elements
-    process(elements_array, list->length, argp);
+    process(elements_array, list->length, ap);
 
     // copy elements back into list
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDL_NEXT][current]) {

@@ -56,7 +56,7 @@ memory_s compose_memory(alloc_fn const alloc, realloc_fn const realloc, free_fn 
 extern const memory_s standard;
 
 typedef void   (*set_fn)     (void * const element, void * arg);
-typedef void * (*copy_fn)    (void * const destination, void const * const source);
+typedef void * (*copy_fn)    (void * const destination, void const * const source, void * arg);
 typedef size_t (*hash_fn)    (void const * const element);
 typedef int    (*compare_fn) (void const * const a, void const * const b);
 typedef bool   (*filter_fn)  (void const * const element);
