@@ -6,6 +6,7 @@
 /// @brief Finite hash set structure.
 typedef struct finite_separate_chaining_hash_set {
     hash_fn hash;
+    void * ah;
     compare_fn compare;
     char * elements;
     size_t * next, * prev, * head, * hashes;
@@ -17,18 +18,20 @@ typedef struct finite_separate_chaining_hash_set {
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param hash Function pointer to hash element into value.
+/// @param ah Arguments for hash function pointer.
 /// @param compare Function pointer to compare elements.
 /// @return Set structure.
-fsc_hash_set_s create_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, compare_fn const compare);
+fsc_hash_set_s create_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param hash Function pointer to hash element into value.
+/// @param ah Arguments for hash function pointer.
 /// @param compare Function pointer to compare elements.
 /// @param allocator Custom allocator structure.
 /// @return Set structure.
-fsc_hash_set_s make_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
+fsc_hash_set_s make_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.

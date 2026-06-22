@@ -4,7 +4,7 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     ASSERT_EQ(0, table.capacity);
     ASSERT_EQ(0, table.length);
@@ -20,7 +20,7 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     destroy_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
@@ -36,7 +36,7 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     clear_isc_hash_map(&table, intdst, NULL, intdst, NULL);
 
@@ -54,7 +54,7 @@ TEST CLEAR_01(void) {
 }
 
 TEST COPY_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -78,7 +78,7 @@ TEST COPY_01(void) {
 }
 
 TEST COPY_02(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -102,7 +102,7 @@ TEST COPY_02(void) {
 }
 
 TEST COPY_03(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -126,7 +126,7 @@ TEST COPY_03(void) {
 }
 
 TEST INSERT_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -139,7 +139,7 @@ TEST INSERT_01(void) {
 }
 
 TEST INSERT_02(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -152,7 +152,7 @@ TEST INSERT_02(void) {
 }
 
 TEST INSERT_03(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -165,7 +165,7 @@ TEST INSERT_03(void) {
 }
 
 TEST REMOVE_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -186,7 +186,7 @@ TEST REMOVE_01(void) {
 }
 
 TEST REMOVE_02(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -207,7 +207,7 @@ TEST REMOVE_02(void) {
 }
 
 TEST REMOVE_03(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -228,7 +228,7 @@ TEST REMOVE_03(void) {
 }
 
 TEST CONTAINS_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -245,7 +245,7 @@ TEST CONTAINS_01(void) {
 }
 
 TEST CONTAINS_02(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -262,7 +262,7 @@ TEST CONTAINS_02(void) {
 }
 
 TEST CONTAINS_03(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -279,7 +279,7 @@ TEST CONTAINS_03(void) {
 }
 
 TEST GET_VALUE_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -298,7 +298,7 @@ TEST GET_VALUE_01(void) {
 }
 
 TEST GET_VALUE_02(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -317,7 +317,7 @@ TEST GET_VALUE_02(void) {
 }
 
 TEST GET_VALUE_03(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         int j = i;
@@ -336,7 +336,7 @@ TEST GET_VALUE_03(void) {
 }
 
 TEST SET_VALUE_01(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         int j = i;
@@ -358,7 +358,7 @@ TEST SET_VALUE_01(void) {
 }
 
 TEST SET_VALUE_02(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         int j = i;
@@ -380,7 +380,7 @@ TEST SET_VALUE_02(void) {
 }
 
 TEST SET_VALUE_03(void) {
-    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, intcmp);
+    isc_hash_map_s table = create_isc_hash_map(sizeof(int), sizeof(int), inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         int j = i;

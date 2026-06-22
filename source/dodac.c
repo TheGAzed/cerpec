@@ -22,7 +22,8 @@ void * charsum(void * const sum, void const * const addent, void * arg) {
     return sum;
 }
 
-size_t charhshsame(void const * const element) {
+size_t charhshsame(void const * const element, void * arg) {
+    (void)(arg);
     return (size_t)(*(char*)element);
 }
 
@@ -139,7 +140,8 @@ void * ucharsum(void * const sum, void const * const addent, void * arg) {
     return sum;
 }
 
-size_t ucharhshsame(void const * const element) {
+size_t ucharhshsame(void const * const element, void * arg) {
+    (void)(arg);
     return (size_t)(*(unsigned char*)element);
 }
 
@@ -262,11 +264,13 @@ void * intsum(void * const sum, void const * const addent, void * arg) {
     return sum;
 }
 
-size_t inthshsame(void const * const element) {
+size_t inthshsame(void const * const element, void * arg) {
+    (void)(arg);
     return (size_t)(*(int*)element);
 }
 
-size_t inthshmurmur(void const * const element) {
+size_t inthshmurmur(void const * const element, void * arg) {
+    (void)(arg);
     // Fast-hash, as described by https://jonkagstrom.com/bit-mixer-construction and
     // https://code.google.com/archive/p/fast-hash.
     // In testing, this hash function provided slightly better performance than the Murmur3 mixer.
@@ -349,7 +353,8 @@ void * uintsum(void * const sum, void const * const addent, void * arg) {
     return sum;
 }
 
-size_t uinthshsame(void const * const element) {
+size_t uinthshsame(void const * const element, void * arg) {
+    (void)(arg);
     return (size_t)(*(unsigned*)element);
 }
 
@@ -418,7 +423,8 @@ void * floatsum(void * const sum, void const * const addent, void * arg) {
     return sum;
 }
 
-size_t floathshsame(void const * const element) {
+size_t floathshsame(void const * const element, void * arg) {
+    (void)(arg);
     size_t size = sizeof(float) > sizeof(size_t) ? sizeof(size_t) : sizeof(float);
     memcpy(&size, element, size);
     return size;
@@ -470,7 +476,8 @@ void * doublesum(void * const sum, void const * const addent, void * arg) {
     return sum;
 }
 
-size_t doublehshsame(void const * const element) {
+size_t doublehshsame(void const * const element, void * arg) {
+    (void)(arg);
     size_t size = sizeof(double) > sizeof(size_t) ? sizeof(size_t) : sizeof(double);
     memcpy(&size, element, size);
     return size;
@@ -522,7 +529,8 @@ void * sizesum(void * const sum, void const * const addent, void * arg) {
     return sum;
 }
 
-size_t sizehshsame(void const * const element) {
+size_t sizehshsame(void const * const element, void * arg) {
+    (void)(arg);
     return (*(size_t*)element);
 }
 
@@ -574,7 +582,8 @@ bool sizeprime(void const * const element) {
     return number > 1;
 }
 
-size_t stringhshmurmur(void const * const element) {
+size_t stringhshmurmur(void const * const element, void * arg) {
+    (void)(arg);
     char const * string = *((char**)element);
     size_t hash = DODAC_SEED;
 

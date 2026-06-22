@@ -24,7 +24,7 @@ void * charcpy(void * const destination, void const * const source, void * arg);
 
 void * charsum(void * const sum, void const * const addent, void * arg);
 
-size_t charhshsame(void const * const element);
+size_t charhshsame(void const * const element, void * arg);
 
 int charcmp(void const * const a, void const * const b);
 
@@ -70,7 +70,7 @@ void * ucharcpy(void * const destination, void const * const source, void * arg)
 
 void * ucharsum(void * const sum, void const * const addent, void * arg);
 
-size_t ucharhshsame(void const * const element);
+size_t ucharhshsame(void const * const element, void * arg);
 
 int ucharcmp(void const * const a, void const * const b);
 
@@ -116,9 +116,9 @@ void * intcpy(void * const destination, void const * const source, void * arg);
 
 void * intsum(void * const sum, void const * const addent, void * arg);
 
-size_t inthshsame(void const * const element);
+size_t inthshsame(void const * const element, void * arg);
 
-size_t inthshmurmur(void const * const element);
+size_t inthshmurmur(void const * const element, void * arg);
 
 int intcmp(void const * const a, void const * const b);
 
@@ -146,7 +146,7 @@ void * uintcpy(void * const destination, void const * const source, void * arg);
 
 void * uintsum(void * const sum, void const * const addent, void * arg);
 
-size_t uinthshsame(void const * const element);
+size_t uinthshsame(void const * const element, void * arg);
 
 int uintcmp(void const * const a, void const * const b);
 
@@ -170,7 +170,7 @@ void * floatcpy(void * const destination, void const * const source, void * arg)
 
 void * floatsum(void * const sum, void const * const addent, void * arg);
 
-size_t floathshsame(void const * const element);
+size_t floathshsame(void const * const element, void * arg);
 
 int floatcmp(void const * const a, void const * const b);
 
@@ -188,7 +188,7 @@ void * doublecpy(void * const destination, void const * const source, void * arg
 
 void * doublesum(void * const sum, void const * const addent, void * arg);
 
-size_t doublehshsame(void const * const element);
+size_t doublehshsame(void const * const element, void * arg);
 
 int doublecmp(void const * const a, void const * const b);
 
@@ -206,7 +206,7 @@ void * sizecpy(void * const destination, void const * const source, void * arg);
 
 void * sizesum(void * const sum, void const * const addent, void * arg);
 
-size_t sizehshsame(void const * const element);
+size_t sizehshsame(void const * const element, void * arg);
 
 int sizecmp(void const * const a, void const * const b);
 
@@ -224,7 +224,7 @@ bool sizeodd(void const * const element);
 
 bool sizeprime(void const * const element);
 
-size_t stringhshmurmur(void const * const element);
+size_t stringhshmurmur(void const * const element, void * arg);
 
 int stringcmp(void const * const a, void const * const b);
 

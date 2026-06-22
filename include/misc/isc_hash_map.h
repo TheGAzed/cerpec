@@ -22,6 +22,7 @@
 /// @brief Infinite hash map structure.
 typedef struct infinite_separate_chaining_hash_map {
     hash_fn hash_key;
+    void * ahk;
     compare_fn compare_key;
     char * keys, * values;
     size_t * next, * prev, * head, * hashes;
@@ -33,18 +34,20 @@ typedef struct infinite_separate_chaining_hash_map {
 /// @param key_size Size of a single key.
 /// @param value_size Size of a single value.
 /// @param hash_key Function pointer to hash element into value.
+/// @param ahk Arguments for hash function pointer.
 /// @param compare_key Function pointer to compare keys.
 /// @return Map structure.
-isc_hash_map_s create_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, compare_fn const compare_key);
+isc_hash_map_s create_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key);
 
 /// @brief Creates an empty structure.
 /// @param key_size Size of a single key.
 /// @param value_size Size of a single value.
 /// @param hash_key Function pointer to hash element into value.
 /// @param allocator Custom allocator structure.
+/// @param ahk Arguments for hash function pointer.
 /// @param compare_key Function pointer to compare keys.
 /// @return Map structure.
-isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, compare_fn const compare_key, memory_s const * const allocator);
+isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param map Structure to destroy.

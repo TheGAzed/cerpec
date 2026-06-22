@@ -15,19 +15,19 @@ void _isc_hash_table_resize(isc_hash_map_s * const table, size_t const size);
 /// @param hole Index of hole node.
 void _isc_hash_map_fill_hole(isc_hash_map_s const * const map, size_t const hole);
 
-isc_hash_map_s create_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, compare_fn const compare_key) {
+isc_hash_map_s create_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key) {
     error(hash_key && "Parameter can't be NULL.");
     error(compare_key && "Parameter can't be NULL.");
     error(key_size && "Parameter can't be zero.");
     error(value_size && "Parameter can't be zero.");
 
     return (isc_hash_map_s) {
-        .key_size = key_size, .value_size = value_size, .hash_key = hash_key,
+        .key_size = key_size, .value_size = value_size, .hash_key = hash_key, .ahk = ahk,
         .compare_key = compare_key, .allocator = &standard,
     };
 }
 
-isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, compare_fn const compare_key, memory_s const * const allocator) {
+isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, memory_s const * const allocator) {
     error(hash_key && "Parameter can't be NULL.");
     error(compare_key && "Parameter can't be NULL.");
     error(key_size && "Parameter can't be zero.");
@@ -35,8 +35,8 @@ isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size,
     error(allocator && "Parameter can't be NULL.");
 
     return (isc_hash_map_s) {
-        .key_size = key_size, .value_size = value_size, .hash_key = hash_key, .compare_key = compare_key,
-        .allocator = allocator,
+        .key_size = key_size, .value_size = value_size, .hash_key = hash_key, .ahk = ahk,
+        .compare_key = compare_key, .allocator = allocator,
     };
 }
 
@@ -183,7 +183,7 @@ void insert_isc_hash_map(isc_hash_map_s * const map, void const * const key, voi
     }
 
     // calculate hash values and index in array
-    size_t const hash = map->hash_key(key);
+    size_t const hash = map->hash_key(key, map->ahk);
     size_t const index = hash % map->capacity;
 
 #ifndef NERROR
@@ -239,7 +239,7 @@ void remove_isc_hash_map(isc_hash_map_s * const map, void const * const key, voi
     valid(map->allocator && "Allocator can't be NULL.");
 
     // calculate hash values and index in array
-    size_t const hash = map->hash_key(key);
+    size_t const hash = map->hash_key(key, map->ahk);
     size_t const index = hash % map->capacity;
 
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
@@ -282,7 +282,7 @@ bool contains_key_isc_hash_map(isc_hash_map_s const * const map, void const * co
     if (!map->capacity) { return false; }
 
     // calculate hash values and index in array
-    size_t const hash = map->hash_key(key);
+    size_t const hash = map->hash_key(key, map->ahk);
     size_t const index = hash % map->capacity;
 
     // for each node at index check if element is contained and return true or false
@@ -313,7 +313,7 @@ void get_value_isc_hash_map(isc_hash_map_s const * const map, void const * const
     valid(map->allocator && "Allocator can't be NULL.");
 
     // calculate hash values and index in array
-    size_t const hash = map->hash_key(key);
+    size_t const hash = map->hash_key(key, map->ahk);
     size_t const index = hash % map->capacity;
 
     // for each node at index check if element is contained
@@ -351,7 +351,7 @@ void set_isc_hash_map(isc_hash_map_s * const map, void const * const key, void c
     valid(map->allocator && "Allocator can't be NULL.");
 
     // calculate hash values and index in array
-    size_t const hash = map->hash_key(key);
+    size_t const hash = map->hash_key(key, map->ahk);
 
     if (!map->capacity) { goto INSERT; }
 

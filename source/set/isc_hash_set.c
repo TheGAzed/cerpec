@@ -21,7 +21,7 @@ void _isc_hash_set_resize(isc_hash_set_s * const set, size_t const size);
 /// @param compare Compare function to compare elements.
 /// @param allocator Custom allocator function.
 /// @return Set structure.
-isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator);
+isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash, void * const ah, compare_fn const compare, memory_s const * const allocator);
 
 /// @brief Copy logic wrapper mainly to repeated assertion for specific structure operations.
 /// @param set Structure to copy.
@@ -44,21 +44,21 @@ void _insert_wrapper_isc_hash_set(isc_hash_set_s const * const set, size_t const
 /// @return 'true' if element is contained, 'false' otherwise.
 bool _contains_wrapper_isc_hash_set(isc_hash_set_s const * const set, void const * const element, size_t const hash, size_t const index);
 
-isc_hash_set_s create_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare) {
+isc_hash_set_s create_isc_hash_set(size_t const size, hash_fn const hash, void * const ah, compare_fn const compare) {
     error(hash && "Parameter can't be NULL.");
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
-    return (isc_hash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = &standard, };
+    return (isc_hash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = &standard, .ah = ah, };
 }
 
-isc_hash_set_s make_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator) {
+isc_hash_set_s make_isc_hash_set(size_t const size, hash_fn const hash, void * const ah, compare_fn const compare, memory_s const * const allocator) {
     error(hash && "Parameter can't be NULL.");
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
     error(allocator && "Parameter can't be NULL.");
 
-    return _make_wrapper_isc_hash_set(size, hash, compare, allocator);
+    return _make_wrapper_isc_hash_set(size, hash, ah, compare, allocator);
 }
 
 void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const ad) {
@@ -162,7 +162,7 @@ void insert_isc_hash_set(isc_hash_set_s * const set, void const * const element)
     }
 
     // calculate hash value and index in array
-    size_t const hash = set->hash(element);
+    size_t const hash = set->hash(element, set->ah);
     size_t const index = hash % set->capacity;
 
 #ifndef NERROR
@@ -190,7 +190,7 @@ void remove_isc_hash_set(isc_hash_set_s * const set, void const * const element,
     valid(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     // calculate hash value and index in array
-    size_t const hash = set->hash(element);
+    size_t const hash = set->hash(element, set->ah);
     size_t const index = hash % set->capacity;
 
     // for each node at index check if element is contained
@@ -232,7 +232,7 @@ bool contains_isc_hash_set(isc_hash_set_s const * const set, void const * const 
     if (!set->capacity) { return false; }
 
     // calculate hash value and index in array
-    size_t const hash = set->hash(element);
+    size_t const hash = set->hash(element, set->ah);
     size_t const index = hash % set->capacity;
 
     return _contains_wrapper_isc_hash_set(set, element, hash, index);
@@ -313,7 +313,7 @@ isc_hash_set_s intersect_isc_hash_set(isc_hash_set_s const * const set_one, isc_
     isc_hash_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
     isc_hash_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
-    isc_hash_set_s set_intersect = _make_wrapper_isc_hash_set(set_one->size, set_one->hash, set_one->compare, set_one->allocator);
+    isc_hash_set_s set_intersect = _make_wrapper_isc_hash_set(set_one->size, set_one->hash, set_one->ah, set_one->compare, set_one->allocator);
     for (size_t min = 0; min < minimum->length; ++min) {
         char const * const element = minimum->elements + (min * minimum->size);
 
@@ -359,7 +359,7 @@ isc_hash_set_s subtract_isc_hash_set(isc_hash_set_s const * const minuend, isc_h
     valid(subtrahend->allocator && "Allocator can't be NULL.");
     valid(subtrahend->length <= subtrahend->capacity && "Lenght can't be larger than capacity.");
 
-    isc_hash_set_s set_subtract = _make_wrapper_isc_hash_set(minuend->size, minuend->hash, minuend->compare, minuend->allocator);
+    isc_hash_set_s set_subtract = _make_wrapper_isc_hash_set(minuend->size, minuend->hash, minuend->ah, minuend->compare, minuend->allocator);
     for (size_t min = 0; min < minuend->length; ++min) {
         // get element and set its found flag to false
         char const * const element = minuend->elements + (min * minuend->size);
@@ -406,7 +406,7 @@ isc_hash_set_s exclude_isc_hash_set(isc_hash_set_s const * const set_one, isc_ha
     valid(set_two->allocator && "Allocator can't be NULL.");
     valid(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
-    isc_hash_set_s set_exclude = _make_wrapper_isc_hash_set(set_one->size, set_one->hash, set_one->compare, set_one->allocator);
+    isc_hash_set_s set_exclude = _make_wrapper_isc_hash_set(set_one->size, set_one->hash, set_one->ah, set_one->compare, set_one->allocator);
 
     for (size_t one = 0; one < set_one->length; ++one) {
         // get element and set its found flag to false
@@ -546,7 +546,7 @@ bool is_disjoint_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set
         // get element and set its found flag to false
         char const * const element = minimum->elements + (min * minimum->size);
 
-        size_t const min_hash = minimum->hash(element);
+        size_t const min_hash = minimum->hash(element, minimum->ah);
         size_t const max_idx = min_hash % maximum->capacity;
 
         bool const contains = _contains_wrapper_isc_hash_set(maximum, element, min_hash, max_idx);
@@ -610,8 +610,8 @@ void _isc_hash_set_resize(isc_hash_set_s * const set, size_t const size) {
     }
 }
 
-isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash, compare_fn const compare, memory_s const * const allocator) {
-    return (isc_hash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = allocator, };
+isc_hash_set_s _make_wrapper_isc_hash_set(size_t const size, hash_fn const hash, void * const ah, compare_fn const compare, memory_s const * const allocator) {
+    return (isc_hash_set_s) { .size = size, .hash = hash, .compare = compare, .allocator = allocator, .ah = ah, };
 }
 
 isc_hash_set_s _copy_wrapper_isc_hash_set(isc_hash_set_s const * const set, copy_fn const copy, void * const argc) {

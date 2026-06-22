@@ -6,7 +6,7 @@
 #define FHASH_TABLE_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     ASSERT_EQ(0, table.length);
     ASSERT_EQ(sizeof(int), table.key_size);
@@ -21,7 +21,7 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     destroy_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
@@ -36,7 +36,7 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     clear_fsc_hash_map(&table, intdst, NULL, intdst, NULL);
 
@@ -53,7 +53,7 @@ TEST CLEAR_01(void) {
 }
 
 TEST COPY_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
         int j = i;
@@ -77,7 +77,7 @@ TEST COPY_01(void) {
 }
 
 TEST COPY_02(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
         int j = i;
@@ -101,7 +101,7 @@ TEST COPY_02(void) {
 }
 
 TEST INSERT_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
         int j = i;
@@ -114,7 +114,7 @@ TEST INSERT_01(void) {
 }
 
 TEST INSERT_02(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
         int j = i;
@@ -127,7 +127,7 @@ TEST INSERT_02(void) {
 }
 
 TEST REMOVE_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
         int j = i;
@@ -148,7 +148,7 @@ TEST REMOVE_01(void) {
 }
 
 TEST REMOVE_02(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
         int j = i;
@@ -169,7 +169,7 @@ TEST REMOVE_02(void) {
 }
 
 TEST CONTAINS_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
         int j = i;
@@ -186,7 +186,7 @@ TEST CONTAINS_01(void) {
 }
 
 TEST CONTAINS_02(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
         int j = i;
@@ -203,7 +203,7 @@ TEST CONTAINS_02(void) {
 }
 
 TEST GET_VALUE_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
         int j = i;
@@ -222,7 +222,7 @@ TEST GET_VALUE_01(void) {
 }
 
 TEST GET_VALUE_02(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
         int j = i;
@@ -241,7 +241,7 @@ TEST GET_VALUE_02(void) {
 }
 
 TEST SET_VALUE_01(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK - 1; ++i) {
         int j = i;
@@ -263,7 +263,7 @@ TEST SET_VALUE_01(void) {
 }
 
 TEST SET_VALUE_02(void) {
-    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, intcmp);
+    fsc_hash_map_s table = create_fsc_hash_map(sizeof(int), sizeof(int), FHASH_TABLE_CHUNK, inthshmurmur, NULL, intcmp);
 
     for (int i = 0; i < FHASH_TABLE_CHUNK; ++i) {
         int j = i;
