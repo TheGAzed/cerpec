@@ -14,5 +14,5 @@ add_library(${PROJECT_NAME} cerpec.c dodac.c
         misc/isc_hash_map.c misc/ibinary_heap.c
         misc/fbinary_heap.c misc/fsc_hash_map.c
 
-        graph/iam_graph.c
+        graph/iam_graph.c graph/cost.c
 )

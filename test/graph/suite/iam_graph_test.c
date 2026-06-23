@@ -162,7 +162,7 @@ TEST DIJKSTRA_01(void) {
     size_t const previous[DIJKSTRA_01_SIZE] = { IAM_NIL, 0, 4, 4, 1, 0, 3 };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_01_SIZE * sizeof(size_t));
 
-    destroy_iam_list(&table);
+    destroy_iam_table(&table);
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
@@ -211,7 +211,7 @@ TEST DIJKSTRA_02(void) {
     size_t const previous[DIJKSTRA_02_SIZE] = { IAM_NIL, 3, 0, 2, 3, 6, 4, 5, };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_02_SIZE * sizeof(size_t));
 
-    destroy_iam_list(&table);
+    destroy_iam_table(&table);
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();
@@ -261,7 +261,7 @@ TEST DIJKSTRA_03(void) {
     size_t const previous[DIJKSTRA_03_SIZE] = { IAM_NIL, 0, 1, 2, 5, 6, 7, 0, 2, };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_03_SIZE * sizeof(size_t));
 
-    destroy_iam_list(&table);
+    destroy_iam_table(&table);
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     PASS();

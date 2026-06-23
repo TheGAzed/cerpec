@@ -22,22 +22,6 @@ void _imatrix_graph_resize(iam_graph_s * const graph, size_t const size);
 size_t _find_parent(iam_table_s const * const table, size_t const vertex);
 void _union_set(iam_table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args);
 
-iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, void * const ac, copy_fn const juggle, void * const aj, copy_fn const sum, void * const as, void * const zero, void * const infinite) {
-    error(size && "Parameter can't be zero.");
-    error(compare && "Parameter can't be NULL.");
-    error(juggle && "Parameter can't be NULL.");
-    error(sum && "Parameter can't be NULL.");
-    error(zero && "Parameter can't be NULL.");
-    error(infinite && "Parameter can't be NULL.");
-    error(compare(infinite, zero, ac) > 0 && "Infinite must be greater than zero.");
-    error(compare(zero, infinite, ac) < 0 && "Zero must be smaller than infinity.");
-
-    return (iam_cost_s) {
-        .compare = compare, .size = size, .zero = zero, .infinite = infinite, .sum = sum, .juggle = juggle,
-        .as = as, .aj = aj, .ac = ac,
-    };
-}
-
 iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const ac, void * const none) {
     error(vertex_size && "Parameter can't be zero.");
     error(edge_size && "Parameter can't be zero.");
@@ -926,7 +910,7 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
     return table;
 }
 
-iam_table_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start) {
+iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start) {
     error(graph && "Parameter can't be NULL.");
     error(cost && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
@@ -1029,7 +1013,7 @@ iam_table_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * co
     return table;
 }
 
-iam_table_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const * const cost, process_fn const sort, void * const as, set_fn const inc, void * const ai) {
+iam_table_s kruskal_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, process_fn const sort, void * const as, set_fn const inc, void * const ai) {
     error(graph && "Parameter can't be NULL.");
     error(cost && "Parameter can't be NULL.");
     error(sort && "Parameter can't be NULL.");
@@ -1093,7 +1077,7 @@ iam_table_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const *
     return table;
 }
 
-void destroy_iam_list(iam_table_s * const table) {
+void destroy_iam_table(iam_table_s * const table) {
     error(table && "Parameter can't be NULL.");
 
     valid(table->data && "Cost data can't be NULL.");
@@ -1110,7 +1094,7 @@ void destroy_iam_list(iam_table_s * const table) {
     memset(table, 0, sizeof(iam_table_s));
 }
 
-iam_graph_s subgraph_iam_list(iam_table_s const * const table, copy_fn const copy_vertex, void * const acv, copy_fn const copy_edge, void * const ace) {
+iam_graph_s subgraph_iam_graph(iam_table_s const * const table, copy_fn const copy_vertex, void * const acv, copy_fn const copy_edge, void * const ace) {
     error(table && "Parameter can't be NULL.");
     error(copy_vertex && "Parameter can't be NULL.");
     error(copy_edge && "Parameter can't be NULL.");
@@ -1238,7 +1222,7 @@ void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index
     }
 }
 
-void each_cost_iam_list(iam_table_s const * const table, handle_fn const handle, void * const ah) {
+void each_cost_iam_graph(iam_table_s const * const table, handle_fn const handle, void * const ah) {
     error(table && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
