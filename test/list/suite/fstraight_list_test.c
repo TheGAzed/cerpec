@@ -190,7 +190,7 @@ TEST REMOVE_FIRST_01(void) {
 
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        remove_first_fstraight_list(&test, &i, &t, intcmp);
+        remove_first_fstraight_list(&test, &i, &t, intcmp, NULL);
         ASSERT_EQ(i, t);
     }
 
@@ -208,7 +208,7 @@ TEST REMOVE_FIRST_02(void) {
 
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; ++i) {
         int t = 0;
-        remove_first_fstraight_list(&test, &i, &t, intcmp);
+        remove_first_fstraight_list(&test, &i, &t, intcmp, NULL);
         ASSERT_EQ(i, t);
     }
 
@@ -406,7 +406,7 @@ TEST EXTRACT_01(void) {
         insert_at_fstraight_list(&test, &i, test.length);
     }
 
-    fstraight_list_s extract = extract_fstraight_list(&test, intodd, test.max, test.max);
+    fstraight_list_s extract = extract_fstraight_list(&test, intfilodd, NULL, test.max, test.max);
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_fstraight_list(&test, (size_t)(i) / 2, &s);
@@ -432,7 +432,7 @@ TEST EXTRACT_02(void) {
         insert_at_fstraight_list(&test, &i, test.length);
     }
 
-    fstraight_list_s extract = extract_fstraight_list(&test, intodd, test.max, test.max);
+    fstraight_list_s extract = extract_fstraight_list(&test, intfilodd, NULL, test.max, test.max);
     for (int i = 0; i < FSTRAIGHT_LIST_CHUNK; i += 2) {
         int s = 0;
         get_fstraight_list(&test, (size_t)(i) / 2, &s);

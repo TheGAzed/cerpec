@@ -86,7 +86,7 @@ size_t _irb_tree_predecessor(irb_tree_s const * const tree, void const * const e
 /// @param size New size.
 void _irb_tree_resize(irb_tree_s * const tree, size_t const size);
 
-irb_tree_s create_irb_tree(size_t const size, compare_fn const compare) {
+irb_tree_s create_irb_tree(size_t const size, compare_fn const compare, void * const ac) {
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
@@ -97,7 +97,7 @@ irb_tree_s create_irb_tree(size_t const size, compare_fn const compare) {
         .parent = standard.alloc(sizeof(size_t), standard.arg),
         .node[IRBT_LEFT] = standard.alloc(sizeof(size_t), standard.arg),
         .node[IRBT_RIGHT] = standard.alloc(sizeof(size_t), standard.arg),
-        .allocator = &standard,
+        .allocator = &standard, .ac = ac,
     };
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
@@ -112,7 +112,7 @@ irb_tree_s create_irb_tree(size_t const size, compare_fn const compare) {
     return tree;
 }
 
-irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, memory_s const * const allocator) {
+irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
@@ -123,7 +123,7 @@ irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, memory_s c
         .parent = allocator->alloc(sizeof(size_t), allocator->arg),
         .node[IRBT_LEFT] = allocator->alloc(sizeof(size_t), allocator->arg),
         .node[IRBT_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arg),
-        .allocator = allocator,
+        .allocator = allocator, .ac = ac,
     };
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
@@ -203,8 +203,8 @@ irb_tree_s copy_irb_tree(irb_tree_s const * const tree, copy_fn const copy, void
         .parent = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arg),
         .node[IRBT_LEFT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arg),
         .node[IRBT_RIGHT] = tree->allocator->alloc((tree->capacity + 1) * sizeof(size_t), tree->allocator->arg),
-        .allocator = tree->allocator,
 
+        .allocator = tree->allocator, .ac = tree->ac,
         .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare, .size = tree->size,
     };
 
@@ -256,7 +256,7 @@ void insert_irb_tree(irb_tree_s * const tree, void const * const element) {
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
 
         previous = (*node); // change parent to child
 
@@ -297,7 +297,7 @@ void remove_irb_tree(irb_tree_s * const tree, void const * const element, void *
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -336,7 +336,7 @@ bool contains_irb_tree(irb_tree_s const * const tree, void const * const element
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             return true;
         }
@@ -744,7 +744,7 @@ void update_irb_tree(irb_tree_s const * const tree, void const * const latter, v
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -1165,7 +1165,7 @@ void _irb_tree_fill_hole(irb_tree_s * const tree, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[last];
     if (NIL != parent_last) {
-        int const comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size));
+        int const comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size), tree->ac);
         size_t const node_index = comparison <= 0 ? IRBT_LEFT : IRBT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }
@@ -1175,7 +1175,7 @@ size_t _irb_tree_floor(irb_tree_s const * const tree, void const * const element
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -1194,7 +1194,7 @@ size_t _irb_tree_ceil(irb_tree_s const * const tree, void const * const element)
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -1212,14 +1212,14 @@ size_t _irb_tree_ceil(irb_tree_s const * const tree, void const * const element)
 size_t _irb_tree_successor(irb_tree_s const * const tree, void const * const element) {
     size_t successor = NIL;
 
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IRBT_RIGHT][tree->root]) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != tree->node[IRBT_RIGHT][tree->root]) {
         for (successor = tree->node[IRBT_RIGHT][tree->root]; NIL != tree->node[IRBT_LEFT][successor];) {
             successor = tree->node[IRBT_LEFT][successor];
         }
     } else {
         for (size_t n = tree->root; NIL != n;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+            int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
             if (comparison < 0) {
                 successor = n;
             }
@@ -1235,7 +1235,7 @@ size_t _irb_tree_predecessor(irb_tree_s const * const tree, void const * const e
     size_t predecessor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {

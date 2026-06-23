@@ -81,7 +81,7 @@ size_t _frb_tree_successor(frb_tree_s const * const tree, void const * const ele
 /// @return Predecessor node index of element or NIL, if no predecessor exists.
 size_t _frb_tree_predecessor(frb_tree_s const * const tree, void const * const element);
 
-frb_tree_s create_frb_tree(size_t const size, size_t const max, compare_fn const compare) {
+frb_tree_s create_frb_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac) {
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
@@ -93,7 +93,7 @@ frb_tree_s create_frb_tree(size_t const size, size_t const max, compare_fn const
         .parent = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
         .node[FRBT_LEFT] = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
         .node[FRBT_RIGHT] = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
-        .allocator = &standard,
+        .allocator = &standard, .ac = ac,
     };
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
@@ -108,7 +108,7 @@ frb_tree_s create_frb_tree(size_t const size, size_t const max, compare_fn const
     return tree;
 }
 
-frb_tree_s make_frb_tree(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
+frb_tree_s make_frb_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
@@ -120,7 +120,7 @@ frb_tree_s make_frb_tree(size_t const size, size_t const max, compare_fn const c
         .parent = allocator->alloc((max + 1) * sizeof(size_t), allocator->arg),
         .node[FRBT_LEFT] = allocator->alloc((max + 1) * sizeof(size_t), allocator->arg),
         .node[FRBT_RIGHT] = allocator->alloc((max + 1) * sizeof(size_t), allocator->arg),
-        .allocator = allocator,
+        .allocator = allocator, .ac = ac,
     };
     error(tree.elements && "Memory allocation failed.");
     error(tree.color && "Memory allocation failed.");
@@ -203,7 +203,7 @@ frb_tree_s copy_frb_tree(frb_tree_s const * const tree, copy_fn const copy, void
         .parent = tree->allocator->alloc((tree->max + 1) * sizeof(size_t), tree->allocator->arg),
         .node[FRBT_LEFT] = tree->allocator->alloc((tree->max + 1) * sizeof(size_t), tree->allocator->arg),
         .node[FRBT_RIGHT] = tree->allocator->alloc((tree->max + 1) * sizeof(size_t), tree->allocator->arg),
-        .allocator = tree->allocator,
+        .allocator = tree->allocator, .ac = tree->ac,
 
         .max = tree->max, .root = tree->root, .length = tree->length, .compare = tree->compare, .size = tree->size,
     };
@@ -277,7 +277,7 @@ void insert_frb_tree(frb_tree_s * const tree, void const * const element) {
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
 
         previous = (*node); // change parent to child
 
@@ -323,7 +323,7 @@ void remove_frb_tree(frb_tree_s * const tree, void const * const element, void *
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -363,7 +363,7 @@ bool contains_frb_tree(frb_tree_s const * const tree, void const * const element
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             return true;
         }
@@ -812,7 +812,7 @@ void update_frb_tree(frb_tree_s const * const tree, void const * const latter, v
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -1253,7 +1253,7 @@ void _frb_tree_fill_hole(frb_tree_s * const tree, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[last];
     if (NIL != parent_last) {
-        int const comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size));
+        int const comparison = tree->compare(tree->elements + (last * tree->size), tree->elements + (parent_last * tree->size), tree->ac);
         size_t const node_index = comparison <= 0 ? FRBT_LEFT : FRBT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }
@@ -1263,7 +1263,7 @@ size_t _frb_tree_floor(frb_tree_s const * const tree, void const * const element
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -1282,7 +1282,7 @@ size_t _frb_tree_ceil(frb_tree_s const * const tree, void const * const element)
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -1300,14 +1300,14 @@ size_t _frb_tree_ceil(frb_tree_s const * const tree, void const * const element)
 size_t _frb_tree_successor(frb_tree_s const * const tree, void const * const element) {
     size_t successor = NIL;
 
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[FRBT_RIGHT][tree->root]) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != tree->node[FRBT_RIGHT][tree->root]) {
         for (successor = tree->node[FRBT_RIGHT][tree->root]; NIL != tree->node[FRBT_LEFT][successor];) {
             successor = tree->node[FRBT_LEFT][successor];
         }
     } else {
         for (size_t n = tree->root; NIL != n;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+            int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
             if (comparison < 0) {
                 successor = n;
             }
@@ -1323,7 +1323,7 @@ size_t _frb_tree_predecessor(frb_tree_s const * const tree, void const * const e
     size_t predecessor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {

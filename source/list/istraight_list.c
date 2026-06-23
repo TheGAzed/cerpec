@@ -168,7 +168,7 @@ void get_istraight_list(istraight_list_s const * const list, size_t const index,
     memcpy(buffer, list->elements + (node * list->size), list->size);
 }
 
-void remove_first_istraight_list(istraight_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
+void remove_first_istraight_list(istraight_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(compare && "Paremeter can't be NULL.");
@@ -184,7 +184,7 @@ void remove_first_istraight_list(istraight_list_s * const list, void const * con
     // iterate until node with element isn't reached
     for (size_t * n = &(list->head); NIL != *n; n = list->next + (*n)) {
         char const * found = list->elements + ((*n) * list->size); // save found element
-        if (0 != compare(element, found)) { // if element isn't equal continue
+        if (0 != compare(element, found, ac)) { // if element isn't equal continue
             continue;
         }
 
@@ -397,7 +397,7 @@ istraight_list_s slice_istraight_list(istraight_list_s * const list, size_t cons
     return split;
 }
 
-istraight_list_s extract_istraight_list(istraight_list_s * const list, filter_fn const filter) {
+istraight_list_s extract_istraight_list(istraight_list_s * const list, filter_fn const filter, void * const af) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
 
@@ -414,7 +414,7 @@ istraight_list_s extract_istraight_list(istraight_list_s * const list, filter_fn
     for (size_t i = list->head, pos_idx = 0, neg_idx = 0; NIL != i; i = list->next[i]) {
         char const * element = list->elements + (i * list->size);
 
-        if (filter(element)) { // if filter value is positive push it into positive
+        if (filter(element, af)) { // if filter value is positive push it into positive
             (*pos) = pos_idx;
             if (positive.length == positive.capacity) {
                 size_t const capacity = positive.length ? positive.length * CERPEC_FACTOR : ISTRAIGHT_LIST_CHUNK;

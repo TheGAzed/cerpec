@@ -14,16 +14,18 @@ void _fsc_hash_set_fill_hole(fsc_hash_set_s const * const set, size_t const hole
 /// @param size Size of single element.
 /// @param max Maximum length of structure.
 /// @param hash Hash function to generate hash values from elements.
+/// @param ah Arguments for hash function pointer.
 /// @param compare Compare function to compare elements.
 /// @param allocator Custom allocator function.
 /// @return Set structure.
-fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, memory_s const * const allocator);
+fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Copy logic wrapper mainly to repeated assertion for specific structure operations.
 /// @param set Structure to copy.
-/// @param copy Function pointer to create shallow/deep copy of single element
+/// @param copy Function pointer to create shallow/deep copy of single element.
+/// @param ac Arguments for copy function pointer.
 /// @return Set structure.
-fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy, void * const argc);
+fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy, void * const ac);
 
 /// @brief Insert logic wrapper mainly to remove repeated code snippeds.
 /// @param set Structure to call insert logic on.
@@ -40,13 +42,13 @@ void _insert_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, size_t const
 /// @return 'true' if element is contained, 'false' otherwise.
 bool _contains_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, void const * const element, size_t const hash, size_t const index);
 
-fsc_hash_set_s create_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare) {
+fsc_hash_set_s create_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, void * const ac) {
     error(hash && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
 
     fsc_hash_set_s const set = {
-        .size = size, .hash = hash, .ah = ah, .allocator = &standard, .max = max, .compare = compare,
+        .size = size, .hash = hash, .ah = ah, .allocator = &standard, .max = max, .compare = compare, .ac = ac,
 
         .elements = standard.alloc(max * size, standard.arg),
         .hashes = standard.alloc(max * sizeof(size_t), standard.arg),
@@ -69,13 +71,13 @@ fsc_hash_set_s create_fsc_hash_set(size_t const size, size_t const max, hash_fn 
     return set;
 }
 
-fsc_hash_set_s make_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, memory_s const * const allocator) {
+fsc_hash_set_s make_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     error(hash && "Parameter can't be NULL.");
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
 
-    return _make_wrapper_fsc_hash_set(size, max, hash, ah, compare, allocator);
+    return _make_wrapper_fsc_hash_set(size, max, hash, ah, compare, ac, allocator);
 }
 
 void destroy_fsc_hash_set(fsc_hash_set_s * const set, set_fn const destroy, void * const ad) {
@@ -191,11 +193,13 @@ void insert_fsc_hash_set(fsc_hash_set_s * const set, void const * const element)
     size_t const hash = set->hash(element, set->ah);
     size_t const index = hash % set->max;
 
+#ifndef NERROR
     // check if element is in set or not
     for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
         void const * const current = set->elements + (n * set->size);
-        error((hash != set->hashes[n] || set->compare(element, current)) && "Element already in map.");
+        error((hash != set->hashes[n] || set->compare(element, current, set->ac)) && "Element already in map.");
     }
+#endif
 
     _insert_wrapper_fsc_hash_set(set, hash, index);
     memcpy(set->elements + (set->length * set->size), element, set->size);
@@ -221,7 +225,7 @@ void remove_fsc_hash_set(fsc_hash_set_s * const set, void const * const element,
 
     for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
         char const * current = set->elements + (n * set->size);
-        if (hash != set->hashes[n] || set->compare(element, current)) { // if not equal contionue
+        if (hash != set->hashes[n] || set->compare(element, current, set->ac)) { // if not equal contionue
             continue;
         } // else remove found element and return
 
@@ -336,7 +340,7 @@ fsc_hash_set_s intersect_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_
 
     size_t const smallest_max = set_one->max < set_two->max ? set_one->max : set_two->max;
 
-    fsc_hash_set_s set_intersect = _make_wrapper_fsc_hash_set(set_one->size, smallest_max, set_one->hash, set_one->ah, set_one->compare, set_one->allocator);
+    fsc_hash_set_s set_intersect = _make_wrapper_fsc_hash_set(set_one->size, smallest_max, set_one->hash, set_one->ah, set_one->compare, set_one->ac, set_one->allocator);
     for (size_t min = 0; min < minimum->length; ++min) {
         char const * const element = minimum->elements + (min * minimum->size);
 
@@ -380,7 +384,7 @@ fsc_hash_set_s subtract_fsc_hash_set(fsc_hash_set_s const * const minuend, fsc_h
     valid(subtrahend->next && "Nexts array can't be NULL.");
     valid(subtrahend->allocator && "Allocator can't be NULL.");
 
-    fsc_hash_set_s set_subtract = _make_wrapper_fsc_hash_set(minuend->size, minuend->max, minuend->hash, minuend->ah, minuend->compare, minuend->allocator);
+    fsc_hash_set_s set_subtract = _make_wrapper_fsc_hash_set(minuend->size, minuend->max, minuend->hash, minuend->ah, minuend->compare, minuend->ac, minuend->allocator);
     for (size_t min = 0; min < minuend->length; ++min) {
         // get element and set its found flag to false
         char const * const element = minuend->elements + (min * minuend->size);
@@ -427,7 +431,7 @@ fsc_hash_set_s exclude_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_ha
 
     fsc_hash_set_s const * const biggest = set_one->max >= set_two->max ? set_one : set_two;
 
-    fsc_hash_set_s set_exclude = _make_wrapper_fsc_hash_set(biggest->size, biggest->max, biggest->hash, biggest->ah, biggest->compare, biggest->allocator);
+    fsc_hash_set_s set_exclude = _make_wrapper_fsc_hash_set(biggest->size, biggest->max, biggest->hash, biggest->ah, biggest->compare, biggest->ac, biggest->allocator);
 
     for (size_t one = 0; one < set_one->length; ++one) {
         // get element and set its found flag to false
@@ -627,9 +631,9 @@ void _fsc_hash_set_fill_hole(fsc_hash_set_s const * const set, size_t const hole
     if (NIL != set->prev[set->length]) { set->next[set->prev[set->length]] = hole; }
 }
 
-fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, memory_s const * const allocator) {
+fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, hash_fn const hash, void * const ah, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     fsc_hash_set_s const set = {
-        .size = size, .hash = hash, .ah = ah, .allocator = allocator, .max = max, .compare = compare,
+        .size = size, .hash = hash, .ah = ah, .allocator = allocator, .max = max, .compare = compare, .ac = ac,
 
         .elements = allocator->alloc(max * size, allocator->arg),
         .hashes = allocator->alloc(max * sizeof(size_t), allocator->arg),
@@ -651,11 +655,11 @@ fsc_hash_set_s _make_wrapper_fsc_hash_set(size_t const size, size_t const max, h
     return set;
 }
 
-fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy, void * const argc) {
+fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy_fn const copy, void * const ac) {
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
     fsc_hash_set_s const replica = {
         .max = set->max, .hash = set->hash, .length = set->length, .size = set->size,
-        .allocator = set->allocator, .compare = set->compare,
+        .allocator = set->allocator, .compare = set->compare, .ah = set->ah, .ac = set->ac,
 
         .elements = set->allocator->alloc(set->max * set->size, set->allocator->arg),
         .hashes = set->allocator->alloc(set->max * sizeof(size_t), set->allocator->arg),
@@ -679,7 +683,7 @@ fsc_hash_set_s _copy_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, copy
 
     // for each element continuusly in array call copy function
     for (size_t i = 0; i < set->length; ++i) {
-        copy(replica.elements + (i * replica.size), set->elements + (i * set->size), argc);
+        copy(replica.elements + (i * replica.size), set->elements + (i * set->size), ac);
     }
 
     return replica;
@@ -707,7 +711,7 @@ bool _contains_wrapper_fsc_hash_set(fsc_hash_set_s const * const set, void const
     // for each node at index check if element is contained and return true or false
     for (size_t n = set->head[index]; NIL != n; n = set->next[n]) {
         void const * const current = set->elements + (n * set->size);
-        if (hash == set->hashes[n] && !set->compare(element, current)) {
+        if (hash == set->hashes[n] && !set->compare(element, current, set->ac)) {
             return true;
         }
     }

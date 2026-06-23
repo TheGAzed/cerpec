@@ -15,7 +15,7 @@ void _isc_hash_table_resize(isc_hash_map_s * const table, size_t const size);
 /// @param hole Index of hole node.
 void _isc_hash_map_fill_hole(isc_hash_map_s const * const map, size_t const hole);
 
-isc_hash_map_s create_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key) {
+isc_hash_map_s create_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, void * const ack) {
     error(hash_key && "Parameter can't be NULL.");
     error(compare_key && "Parameter can't be NULL.");
     error(key_size && "Parameter can't be zero.");
@@ -23,11 +23,11 @@ isc_hash_map_s create_isc_hash_map(size_t const key_size, size_t const value_siz
 
     return (isc_hash_map_s) {
         .key_size = key_size, .value_size = value_size, .hash_key = hash_key, .ahk = ahk,
-        .compare_key = compare_key, .allocator = &standard,
+        .compare_key = compare_key, .allocator = &standard, .ack = ack,
     };
 }
 
-isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, memory_s const * const allocator) {
+isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, void * const ack, memory_s const * const allocator) {
     error(hash_key && "Parameter can't be NULL.");
     error(compare_key && "Parameter can't be NULL.");
     error(key_size && "Parameter can't be zero.");
@@ -36,7 +36,7 @@ isc_hash_map_s make_isc_hash_map(size_t const key_size, size_t const value_size,
 
     return (isc_hash_map_s) {
         .key_size = key_size, .value_size = value_size, .hash_key = hash_key, .ahk = ahk,
-        .compare_key = compare_key, .allocator = allocator,
+        .compare_key = compare_key, .allocator = allocator, .ack = ack,
     };
 }
 
@@ -115,7 +115,7 @@ isc_hash_map_s copy_isc_hash_map(isc_hash_map_s const * const map, copy_fn const
 
     // create replica with allocated memory based on capacity
     isc_hash_map_s const replica = {
-        .capacity = map->capacity, .hash_key = map->hash_key, .length = map->length,
+        .capacity = map->capacity, .hash_key = map->hash_key, .length = map->length, .ack = map->ack, .ahk = map->ahk,
         .key_size = map->key_size, .value_size = map->value_size, .compare_key = map->compare_key,
 
         .keys = map->allocator->alloc(map->capacity * map->key_size, map->allocator->arg),
@@ -190,7 +190,7 @@ void insert_isc_hash_map(isc_hash_map_s * const map, void const * const key, voi
     // check if element is in map or not
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         void const * const current_key = map->keys + (n * map->key_size);
-        error((hash != map->hashes[n] || map->compare_key(key, current_key)) && "Key must be unique.");
+        error((hash != map->hashes[n] || map->compare_key(key, current_key, map->ack)) && "Key must be unique.");
     }
 #endif
 
@@ -244,7 +244,7 @@ void remove_isc_hash_map(isc_hash_map_s * const map, void const * const key, voi
 
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         const char * current_key = map->keys + (n * map->key_size);
-        if (hash != map->hashes[n] || map->compare_key(key, current_key)) { // if not equal contionue
+        if (hash != map->hashes[n] || map->compare_key(key, current_key, map->ack)) { // if not equal contionue
             continue;
         } // else remove found element and return
 
@@ -288,7 +288,7 @@ bool contains_key_isc_hash_map(isc_hash_map_s const * const map, void const * co
     // for each node at index check if element is contained and return true or false
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         void const * const current_key = map->keys + (n * map->key_size);
-        if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
+        if (hash == map->hashes[n] && !map->compare_key(key, current_key, map->ack)) {
             return true;
         }
     }
@@ -319,7 +319,7 @@ void get_value_isc_hash_map(isc_hash_map_s const * const map, void const * const
     // for each node at index check if element is contained
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         char const * current_key = map->keys + (n * map->key_size);
-        if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
+        if (hash == map->hashes[n] && !map->compare_key(key, current_key, map->ack)) {
             memcpy(value_buffer, map->values + (n * map->value_size), map->value_size); // copy retrieved element into buffer
             return; // return to avoid error and termination at the end of function if key wasn't found
         }
@@ -359,7 +359,7 @@ void set_isc_hash_map(isc_hash_map_s * const map, void const * const key, void c
     for (size_t n = map->head[hash % map->capacity]; NIL != n; n = map->next[n]) {
         char const * current_key = map->keys + (n * map->key_size);
 
-        if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
+        if (hash == map->hashes[n] && !map->compare_key(key, current_key, map->ack)) {
             void * current_value = map->values + (n * map->value_size);
             memcpy(value_buffer, current_value, map->value_size); // copy retrieved element into buffer
             memcpy(current_value, value, map->value_size);

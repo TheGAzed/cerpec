@@ -180,7 +180,7 @@ void get_icircular_list(icircular_list_s const * const list, size_t const index,
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_icircular_list(icircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
+void remove_first_icircular_list(icircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -200,7 +200,7 @@ void remove_first_icircular_list(icircular_list_s * const list, void const * con
         size_t const current = list->next[previous]; // save current node index
 
         // if comparison is false (not zero) continue iterating (also avoids useless depth)
-        if (0 != compare(list->elements + (current * list->size), element)) {
+        if (0 != compare(list->elements + (current * list->size), element, ac)) {
             continue;
         } // else element was found and gets removed
 
@@ -557,7 +557,7 @@ icircular_list_s split_icircular_list(icircular_list_s * const list, size_t cons
     return split;
 }
 
-icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn const filter) {
+icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn const filter, void * const af) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
 
@@ -577,7 +577,7 @@ icircular_list_s extract_icircular_list(icircular_list_s * const list, filter_fn
         size_t const current = list->next[previous]; // get current node
         char const * element = list->elements + (current * list->size); // save current element
 
-        if (filter(element)) { // if element is valid push into positive list
+        if (filter(element, af)) { // if element is valid push into positive list
             (*pos) = pos_idx;
 
             if (positive.length == positive.capacity) { // expand capacity if needed

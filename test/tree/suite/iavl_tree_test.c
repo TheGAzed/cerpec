@@ -4,7 +4,7 @@
 #include <suite.h>
 
 TEST CREATE_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     ASSERT_EQ(0, test.capacity);
     ASSERT_EQ(0, test.length);
@@ -18,7 +18,7 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     destroy_iavl_tree(&test, intdst, NULL);
 
@@ -31,7 +31,7 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     clear_iavl_tree(&test, intdst, NULL);
 
@@ -44,7 +44,7 @@ TEST CLEAR_01(void) {
 }
 
 TEST INSERT_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -56,7 +56,7 @@ TEST INSERT_01(void) {
 }
 
 TEST INSERT_02(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&test, &i);
@@ -68,7 +68,7 @@ TEST INSERT_02(void) {
 }
 
 TEST INSERT_03(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -80,7 +80,7 @@ TEST INSERT_03(void) {
 }
 
 TEST REMOVE_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -98,7 +98,7 @@ TEST REMOVE_01(void) {
 }
 
 TEST REMOVE_02(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&test, &i);
@@ -116,7 +116,7 @@ TEST REMOVE_02(void) {
 }
 
 TEST REMOVE_03(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -134,7 +134,7 @@ TEST REMOVE_03(void) {
 }
 
 TEST CONTAINS_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -150,7 +150,7 @@ TEST CONTAINS_01(void) {
 }
 
 TEST CONTAINS_02(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&test, &i);
@@ -166,7 +166,7 @@ TEST CONTAINS_02(void) {
 }
 
 TEST CONTAINS_03(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -182,7 +182,7 @@ TEST CONTAINS_03(void) {
 }
 
 TEST GET_MAX_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -203,7 +203,7 @@ TEST GET_MAX_01(void) {
 }
 
 TEST GET_MAX_02(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&test, &i);
@@ -224,7 +224,7 @@ TEST GET_MAX_02(void) {
 }
 
 TEST GET_MAX_03(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -245,7 +245,7 @@ TEST GET_MAX_03(void) {
 }
 
 TEST GET_MIN_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -266,7 +266,7 @@ TEST GET_MIN_01(void) {
 }
 
 TEST GET_MIN_02(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&test, &i);
@@ -287,7 +287,7 @@ TEST GET_MIN_02(void) {
 }
 
 TEST GET_MIN_03(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -308,7 +308,7 @@ TEST GET_MIN_03(void) {
 }
 
 TEST REMOVE_MAX_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -326,7 +326,7 @@ TEST REMOVE_MAX_01(void) {
 }
 
 TEST REMOVE_MAX_02(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&test, &i);
@@ -344,7 +344,7 @@ TEST REMOVE_MAX_02(void) {
 }
 
 TEST REMOVE_MAX_03(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -362,7 +362,7 @@ TEST REMOVE_MAX_03(void) {
 }
 
 TEST REMOVE_MIN_01(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -380,7 +380,7 @@ TEST REMOVE_MIN_01(void) {
 }
 
 TEST REMOVE_MIN_02(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&test, &i);
@@ -398,7 +398,7 @@ TEST REMOVE_MIN_02(void) {
 }
 
 TEST REMOVE_MIN_03(void) {
-    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&test, &i);
@@ -416,7 +416,7 @@ TEST REMOVE_MIN_03(void) {
 }
 
 TEST GET_FLOOR_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -436,7 +436,7 @@ TEST GET_FLOOR_01(void) {
 }
 
 TEST GET_FLOOR_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -456,7 +456,7 @@ TEST GET_FLOOR_02(void) {
 }
 
 TEST GET_FLOOR_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -476,7 +476,7 @@ TEST GET_FLOOR_03(void) {
 }
 
 TEST GET_CEIL_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -496,7 +496,7 @@ TEST GET_CEIL_01(void) {
 }
 
 TEST GET_CEIL_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -516,7 +516,7 @@ TEST GET_CEIL_02(void) {
 }
 
 TEST GET_CEIL_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -536,7 +536,7 @@ TEST GET_CEIL_03(void) {
 }
 
 TEST REMOVE_FLOOR_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -558,7 +558,7 @@ TEST REMOVE_FLOOR_01(void) {
 }
 
 TEST REMOVE_FLOOR_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -580,7 +580,7 @@ TEST REMOVE_FLOOR_02(void) {
 }
 
 TEST REMOVE_FLOOR_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -602,7 +602,7 @@ TEST REMOVE_FLOOR_03(void) {
 }
 
 TEST REMOVE_CEIL_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -624,7 +624,7 @@ TEST REMOVE_CEIL_01(void) {
 }
 
 TEST REMOVE_CEIL_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -646,7 +646,7 @@ TEST REMOVE_CEIL_02(void) {
 }
 
 TEST REMOVE_CEIL_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -668,7 +668,7 @@ TEST REMOVE_CEIL_03(void) {
 }
 
 TEST GET_SUCCESSOR_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -686,7 +686,7 @@ TEST GET_SUCCESSOR_01(void) {
 }
 
 TEST GET_SUCCESSOR_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -704,7 +704,7 @@ TEST GET_SUCCESSOR_02(void) {
 }
 
 TEST GET_SUCCESSOR_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -722,7 +722,7 @@ TEST GET_SUCCESSOR_03(void) {
 }
 
 TEST GET_PREDECESSOR_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -740,7 +740,7 @@ TEST GET_PREDECESSOR_01(void) {
 }
 
 TEST GET_PREDECESSOR_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -758,7 +758,7 @@ TEST GET_PREDECESSOR_02(void) {
 }
 
 TEST GET_PREDECESSOR_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -776,7 +776,7 @@ TEST GET_PREDECESSOR_03(void) {
 }
 
 TEST REMOVE_SUCCESSOR_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -794,7 +794,7 @@ TEST REMOVE_SUCCESSOR_01(void) {
 }
 
 TEST REMOVE_SUCCESSOR_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -812,7 +812,7 @@ TEST REMOVE_SUCCESSOR_02(void) {
 }
 
 TEST REMOVE_SUCCESSOR_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -830,7 +830,7 @@ TEST REMOVE_SUCCESSOR_03(void) {
 }
 
 TEST REMOVE_PREDECESSOR_01(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -848,7 +848,7 @@ TEST REMOVE_PREDECESSOR_01(void) {
 }
 
 TEST REMOVE_PREDECESSOR_02(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
         insert_iavl_tree(&tree, &i);
@@ -866,7 +866,7 @@ TEST REMOVE_PREDECESSOR_02(void) {
 }
 
 TEST REMOVE_PREDECESSOR_03(void) {
-    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp);
+    iavl_tree_s tree = create_iavl_tree(sizeof(int), intcmp, NULL);
 
     for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
         insert_iavl_tree(&tree, &i);

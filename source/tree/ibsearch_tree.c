@@ -55,18 +55,18 @@ void _ibsearch_tree_fill_hole(ibsearch_tree_s * const tree, size_t const hole);
 /// @param size New size.
 void _ibsearch_tree_resize(ibsearch_tree_s * const tree, size_t const size);
 
-ibsearch_tree_s create_ibsearch_tree(size_t const size, compare_fn const compare) {
+ibsearch_tree_s create_ibsearch_tree(size_t const size, compare_fn const compare, void * const ac) {
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
-    return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = &standard, };
+    return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = &standard, .ac = ac, };
 }
 
-ibsearch_tree_s make_ibsearch_tree(size_t const size, compare_fn const compare, memory_s const * const allocator) {
+ibsearch_tree_s make_ibsearch_tree(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
-    return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, };
+    return (ibsearch_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, .ac = ac, };
 }
 
 void destroy_ibsearch_tree(ibsearch_tree_s * const tree, set_fn const destroy, void * const ad) {
@@ -129,7 +129,7 @@ ibsearch_tree_s copy_ibsearch_tree(ibsearch_tree_s const * const tree, copy_fn c
         .node[IBST_RIGHT] = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arg),
 
         .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare,
-        .size = tree->size, .allocator = tree->allocator,
+        .size = tree->size, .allocator = tree->allocator, .ac = tree->ac,
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");
     error((!replica.capacity || replica.parent) && "Memory allocation failed.");
@@ -176,7 +176,7 @@ void insert_ibsearch_tree(ibsearch_tree_s * const tree, void const * const eleme
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
 
         previous = (*node); // change parent to child
         node = comparison <= 0 ? tree->node[IBST_LEFT] + (*node) : tree->node[IBST_RIGHT] + (*node);
@@ -211,7 +211,7 @@ void remove_ibsearch_tree(ibsearch_tree_s * const tree, void const * const eleme
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -249,7 +249,7 @@ bool contains_ibsearch_tree(ibsearch_tree_s const * const tree, void const * con
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             return true;
         }
@@ -407,7 +407,7 @@ void get_floor_ibsearch_tree(ibsearch_tree_s const * const tree, void const * co
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -449,7 +449,7 @@ void get_ceil_ibsearch_tree(ibsearch_tree_s const * const tree, void const * con
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -562,7 +562,7 @@ void get_successor_ibsearch_tree(ibsearch_tree_s const * const tree, void const 
 
     size_t successor = NIL;
     size_t const right = tree->node[IBST_RIGHT][tree->root];
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != right) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != right) {
         for (successor = right; NIL != tree->node[IBST_LEFT][successor];) {
             successor = tree->node[IBST_LEFT][successor];
         }
@@ -572,7 +572,7 @@ void get_successor_ibsearch_tree(ibsearch_tree_s const * const tree, void const 
 
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison < 0) {
             successor = n;
         }
@@ -612,7 +612,7 @@ void get_predecessor_ibsearch_tree(ibsearch_tree_s const * const tree, void cons
     for (size_t n = tree->root; NIL != n;) {
         size_t const left = tree->node[IBST_LEFT][n];
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -730,7 +730,7 @@ void update_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -915,7 +915,7 @@ size_t * _ibsearch_tree_floor(ibsearch_tree_s * const tree, void const * const e
     size_t * floor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -934,7 +934,7 @@ size_t * _ibsearch_tree_ceil(ibsearch_tree_s * const tree, void const * const el
     size_t * ceil = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -953,7 +953,7 @@ size_t * _ibsearch_tree_successor(ibsearch_tree_s * const tree, void const * con
     size_t * successor = NULL;
 
     size_t * const right = tree->node[IBST_RIGHT] + tree->root;
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != (*right)) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != (*right)) {
         for (successor = right; NIL != *(tree->node[IBST_LEFT] + (*successor));) {
             successor = tree->node[IBST_LEFT] + (*successor);
         }
@@ -963,7 +963,7 @@ size_t * _ibsearch_tree_successor(ibsearch_tree_s * const tree, void const * con
 
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (comparison < 0) {
             successor = n;
         }
@@ -979,7 +979,7 @@ size_t * _ibsearch_tree_predecessor(ibsearch_tree_s * const tree, void const * c
     for (size_t * n = &(tree->root); NIL != (*n);) {
         size_t * const left = tree->node[IBST_LEFT] + (*n);
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -1026,7 +1026,7 @@ void _ibsearch_tree_fill_hole(ibsearch_tree_s * const tree, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
-        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
+        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size), tree->ac);
         size_t const node_index = comparison <= 0 ? IBST_LEFT : IBST_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }

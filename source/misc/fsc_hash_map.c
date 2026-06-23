@@ -10,7 +10,7 @@
 /// @param hole Index of hole in arrays.
 void _fsc_hash_map_fill_hole(fsc_hash_map_s const * const map, size_t const hole);
 
-fsc_hash_map_s create_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key) {
+fsc_hash_map_s create_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, void * const ack) {
     error(hash_key && "Parameter can't be NULL.");
     error(compare_key && "Parameter can't be NULL.");
     error(key_size && "Parameter can't be zero.");
@@ -19,7 +19,7 @@ fsc_hash_map_s create_fsc_hash_map(size_t const key_size, size_t const value_siz
 
     fsc_hash_map_s const table =  {
         .key_size = key_size, .value_size = value_size, .hash_key = hash_key, .max = max,
-        .allocator = &standard, .compare_key = compare_key, .ahk = ahk,
+        .allocator = &standard, .compare_key = compare_key, .ahk = ahk, .ack = ack,
 
         .head = standard.alloc(max * sizeof(size_t), standard.arg),
         .next = standard.alloc(max * sizeof(size_t), standard.arg),
@@ -43,7 +43,7 @@ fsc_hash_map_s create_fsc_hash_map(size_t const key_size, size_t const value_siz
     return table;
 }
 
-fsc_hash_map_s make_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, memory_s const * const allocator) {
+fsc_hash_map_s make_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, void * const ack, memory_s const * const allocator) {
     error(hash_key && "Parameter can't be NULL.");
     error(compare_key && "Parameter can't be NULL.");
     error(key_size && "Parameter can't be zero.");
@@ -53,7 +53,7 @@ fsc_hash_map_s make_fsc_hash_map(size_t const key_size, size_t const value_size,
 
     fsc_hash_map_s const table =  {
         .key_size = key_size, .value_size = value_size, .hash_key = hash_key, .max = max,
-        .allocator = allocator, .compare_key = compare_key, .ahk = ahk,
+        .allocator = allocator, .compare_key = compare_key, .ahk = ahk, .ack = ack,
 
         .head = allocator->alloc(max * sizeof(size_t), allocator->arg),
         .next = allocator->alloc(max * sizeof(size_t), allocator->arg),
@@ -146,7 +146,7 @@ fsc_hash_map_s copy_fsc_hash_map(fsc_hash_map_s const * const map, copy_fn const
     // create replica with allocated memory based on capacity, and empty/hole list becomes NIL
     fsc_hash_map_s const replica = {
         .max = map->max, .hash_key = map->hash_key, .length = map->length,
-        .key_size = map->key_size, .value_size = map->value_size,
+        .key_size = map->key_size, .value_size = map->value_size, .ack = map->ack, .ahk = map->ahk,
 
         .keys = map->allocator->alloc(map->max * map->key_size, map->allocator->arg),
         .values = map->allocator->alloc(map->max * map->value_size, map->allocator->arg),
@@ -226,7 +226,7 @@ void insert_fsc_hash_map(fsc_hash_map_s * const map, void const * const key, voi
     // check if element is in map or not
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         void const * const current_key = map->keys + (n * map->key_size);
-        error((hash != map->hashes[n] || map->compare_key(key, current_key)) && "Element already in map.");
+        error((hash != map->hashes[n] || map->compare_key(key, current_key, map->ack)) && "Element already in map.");
     }
 #endif
 
@@ -280,7 +280,7 @@ void remove_fsc_hash_map(fsc_hash_map_s * const map, void const * const key, voi
 
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         char const * current_key = map->keys + (n * map->key_size);
-        if (hash != map->hashes[n] || map->compare_key(key, current_key)) { // if not equal continue
+        if (hash != map->hashes[n] || map->compare_key(key, current_key, map->ack)) { // if not equal continue
             continue;
         } // else remove found element and return
 
@@ -316,7 +316,7 @@ bool contains_key_fsc_hash_map(fsc_hash_map_s const * const map, void const * co
     // for each node at index check if element is contained and return true or false
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         void const * const current_key = map->keys + (n * map->key_size);
-        if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
+        if (hash == map->hashes[n] && !map->compare_key(key, current_key, map->ack)) {
             return true;
         }
     }
@@ -348,7 +348,7 @@ void get_value_fsc_hash_map(fsc_hash_map_s const * const map, void const * const
     // for each node at index check if element is contained
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         char const * current_key = map->keys + (n * map->key_size);
-        if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
+        if (hash == map->hashes[n] && !map->compare_key(key, current_key, map->ack)) {
             memcpy(value_buffer, map->values + (n * map->value_size), map->value_size); // copy retrieved element into buffer
             return; // return to avoid errorion and termination at the end of function if key wasn't found
         }
@@ -387,7 +387,7 @@ void set_fsc_hash_map(fsc_hash_map_s * const map, void const * const key, void c
     for (size_t n = map->head[index]; NIL != n; n = map->next[n]) {
         char const * current_key = map->keys + (n * map->key_size);
 
-        if (hash == map->hashes[n] && !map->compare_key(key, current_key)) {
+        if (hash == map->hashes[n] && !(map->compare_key(key, current_key, map->ack))) {
             void * current_value = map->values + (n * map->value_size);
             memcpy(value_buffer, current_value, map->value_size); // copy retrieved element into buffer
             memcpy(current_value, value, map->value_size);

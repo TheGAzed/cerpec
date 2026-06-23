@@ -84,7 +84,9 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy, void * co
     valid(queue->current < IQUEUE_CHUNK && "Current exceeds chunk.");
 
     // create properly initialized replica
-    iqueue_s replica = { .size = queue->size, .length = queue->length, .current = queue->current };
+    iqueue_s replica = {
+        .size = queue->size, .length = queue->length, .current = queue->current, .allocator = queue->allocator,
+    };
 
     // set original queue's and replica's current nodes for iteration
     struct infinite_queue_node const * current_queue = queue->tail;

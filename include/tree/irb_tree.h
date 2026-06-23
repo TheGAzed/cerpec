@@ -20,6 +20,7 @@
 /// Infinite red black tree structure.
 typedef struct infinite_red_black_tree {
     compare_fn compare;
+    void * ac;
     char * elements;
     size_t * parent;
     size_t * node[IRBT_NODE_COUNT];
@@ -31,15 +32,17 @@ typedef struct infinite_red_black_tree {
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Tree structure.
-irb_tree_s create_irb_tree(size_t const size, compare_fn const compare);
+irb_tree_s create_irb_tree(size_t const size, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @param allocator Custom allocator structure.
 /// @return Tree structure.
-irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, memory_s const * const allocator);
+irb_tree_s make_irb_tree(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param tree Structure to destroy.

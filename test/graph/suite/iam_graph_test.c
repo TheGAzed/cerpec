@@ -10,7 +10,7 @@
 
 TEST CREATE_01(void) {
     int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     ASSERT_NEQ(NULL, graph.allocator);
     ASSERT_NEQ(NULL, graph.compare);
@@ -28,7 +28,7 @@ TEST CREATE_01(void) {
 
 TEST DESTROY_01(void) {
     int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -46,7 +46,7 @@ TEST DESTROY_01(void) {
 
 TEST CLEAR_01(void) {
     int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     clear_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -67,7 +67,7 @@ TEST CLEAR_01(void) {
 TEST COPY_01(void) {
     int  none = 0;
     int const one = 1;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -87,7 +87,7 @@ TEST COPY_01(void) {
 TEST COPY_02(void) {
     int  none = 0;
     int const one = 1;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -107,7 +107,7 @@ TEST COPY_02(void) {
 TEST COPY_03(void) {
     int  none = 0;
     int const one = 1;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -128,7 +128,7 @@ TEST DIJKSTRA_01(void) {
     // SOURCE: https://www.youtube.com/watch?v=CmIQ29cUGiE
 
     int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     for (int i = 0; i < DIJKSTRA_01_SIZE; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -152,7 +152,7 @@ TEST DIJKSTRA_01(void) {
     insert_edge_iam_graph(&graph, 4, 6, edges + 10);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, NULL, intsum, NULL, &zero, &inf);
+    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
     iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
 
@@ -172,7 +172,7 @@ TEST DIJKSTRA_02(void) {
     // SOURCE: https://www.youtube.com/watch?v=5GT5hYzjNoo
 
     int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     for (int i = 0; i < DIJKSTRA_02_SIZE; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -201,7 +201,7 @@ TEST DIJKSTRA_02(void) {
     insert_edge_iam_graph(&graph, 6, 7, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, NULL, intsum, NULL, &zero, &inf);
+    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
     iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
 
@@ -221,7 +221,7 @@ TEST DIJKSTRA_03(void) {
     // SOURCE: https://www.youtube.com/watch?v=5GT5hYzjNoo
 
     int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
     for (int i = 0; i < DIJKSTRA_03_SIZE; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -251,7 +251,7 @@ TEST DIJKSTRA_03(void) {
     insert_edge_iam_graph(&graph, 7, 8, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, intcpy, NULL, intsum, NULL, &zero, &inf);
+    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
     iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
 

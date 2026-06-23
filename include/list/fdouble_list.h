@@ -73,14 +73,16 @@ void get_fdouble_list(fdouble_list_s const * const list, size_t const index, voi
 /// @param element Element to search for.
 /// @param buffer Element buffer to save removed element.
 /// @param compare Function pointer to compare parameter element with list's.
-void remove_first_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare);
+/// @param ac Arguments for compare function pointer.
+void remove_first_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac);
 
 /// @brief Removes last element equal to parameter one, based on compare function pointer.
 /// @param list Structure to remove element from.
 /// @param element Element to search for.
 /// @param buffer Element buffer to save removed element.
 /// @param compare Function pointer to compare parameter element with list's.
-void remove_last_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare);
+/// @param ac Arguments for compare function pointer.
+void remove_last_fdouble_list(fdouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac);
 
 /// @brief Removes element at index in structure.
 /// @param list Structure to remove element from.
@@ -128,10 +130,11 @@ fdouble_list_s split_fdouble_list(fdouble_list_s * const list, size_t const inde
 /// @brief Extracts elements into new structure based on filter function.
 /// @param list Structure to extracts from.
 /// @param filter Function pointer to check if element meets extract condition.
+/// @param af Arguments for filter function pointer.
 /// @param list_max Maximum length of original structure.
 /// @param extract_max Maximum length of extracted structure.
 /// @return New extracted structure.
-fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const filter, size_t const list_max, size_t const extract_max);
+fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const filter, void * const af, size_t const list_max, size_t const extract_max);
 
 /// @brief Iterates over each next element in structure based on their order.
 /// @param list Structure to iterate over.

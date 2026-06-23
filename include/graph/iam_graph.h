@@ -18,6 +18,7 @@ typedef struct infinite_adjacency_matrix_graph {
     char * vertices, * edges; // arrays of elements
     void * none;              // non-edge
     compare_fn compare;       // comapres edges and determines if they're smaller, bigger or equal
+    void * ac;
     size_t vertex_size, edge_size, vertex_length, edge_length, capacity; // size of single element, structure length and its capacity
     memory_s const * allocator;
 } iam_graph_s;
@@ -31,9 +32,9 @@ typedef struct infinite_adjacency_matrix_graph_edge {
 /// @brief Cost value of size that is comparable and is bound to <0, inf>
 typedef struct infinite_adjacency_matrix_graph_cost {
     compare_fn compare;
-    copy_fn sum, convert;
+    copy_fn sum, juggle;
     size_t size;
-    void * infinite, * zero, * ac, * as;
+    void * infinite, * zero, * aj, * as, * ac;
 } iam_cost_s;
 
 typedef struct infinite_matrix_graph_table {
@@ -46,33 +47,36 @@ typedef struct infinite_matrix_graph_table {
 /// @brief Composes a structure via its parametric properties.
 /// @param size Size of cost.
 /// @param compare Compare function pointer to do costs comparison.
-/// @param convert Convert function pointer to convert an edge (weight) into a cost.
-/// @param ac Arguments for convert function pointer.
+/// @param ac Arguments for compare function pointer.
+/// @param juggle Convert function pointer to convert an edge (weight) into a cost.
+/// @param aj Arguments for juggle convert function pointer.
 /// @param sum Add function pointer to sum two cost.
 /// @param as Arguments for sum function pointer.
 /// @param zero A cost of zero representing an instantly reachable cost.
 /// @param infinite An infinte cost representing an impossiblely reachable cost.
 /// @return Cost structure.
-iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, copy_fn const convert, void * const ac, copy_fn const sum, void * as, void * const zero, void * const infinite);
+iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, void * ac, copy_fn const juggle, void * const aj, copy_fn const sum, void * as, void * const zero, void * const infinite);
 
 /// @brief Creates an empty structure.
 /// @param vertex_size Size of a single vertex element.
 /// @param edge_size Size of a single edge element.
 /// @param compare Compare function for edge elements.
+/// @param ac Arguments for compare function pointer.
 /// @param none Non-edge element to represent absence of an edge.
 /// @return Graph structure.
 /// @note Compare function must return equal if a 'none' edge is compared with 'none' parameter.
-iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const none);
+iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * ac, void * const none);
 
 /// @brief Creates an empty structure.
 /// @param vertex_size Size of a single vertex element.
 /// @param edge_size Size of a single edge element.
 /// @param compare Compare function for edge elements.
+/// @param ac Arguments for compare function pointer.
 /// @param none Non-edge element to represent absence of an edge.
 /// @param allocator Custom allocator structure.
 /// @return Graph structure.
 /// @note Compare function must return 'equal' (0) if a non-edge is compared with 'none' parameter.
-iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const none, memory_s const * const allocator);
+iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * ac, void * const none, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param graph Structure to destroy.
@@ -210,7 +214,7 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
 /// @param cost Cost structure that defines the distance properties in table.
 /// @param heuristic Function pointer to calculate heuristic cost based on two vectices.
 /// @return A* lookup table with subgraph of shortest paths from start to end node.
-iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic);
+iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic, void * const ah);
 
 /// @brief Generate a Prim lookup array table with nodes' edges and previous indexes.
 /// @param graph Structure to generate from.

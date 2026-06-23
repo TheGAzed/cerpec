@@ -6,7 +6,7 @@
 #define FBINARY_HEAP_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     ASSERT_NEQ(NULL, heap.compare);
     ASSERT_NEQ(NULL, heap.elements);
@@ -19,7 +19,7 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     destroy_fbinary_heap(&heap, intdst, NULL);
 
@@ -32,7 +32,7 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     clear_fbinary_heap(&heap, intdst, NULL);
 
@@ -47,7 +47,7 @@ TEST CLEAR_01(void) {
 }
 
 TEST COPY_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -70,7 +70,7 @@ TEST COPY_01(void) {
 }
 
 TEST COPY_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -93,7 +93,7 @@ TEST COPY_02(void) {
 }
 
 TEST PUSH_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -105,7 +105,7 @@ TEST PUSH_01(void) {
 }
 
 TEST PUSH_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -117,7 +117,7 @@ TEST PUSH_02(void) {
 }
 
 TEST POP_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -136,7 +136,7 @@ TEST POP_01(void) {
 }
 
 TEST POP_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -155,7 +155,7 @@ TEST POP_02(void) {
 }
 
 TEST PEEP_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -171,7 +171,7 @@ TEST PEEP_01(void) {
 }
 
 TEST PEEP_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -187,7 +187,7 @@ TEST PEEP_02(void) {
 }
 
 TEST REPLACE_01(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -208,7 +208,7 @@ TEST REPLACE_01(void) {
 }
 
 TEST REPLACE_02(void) {
-    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s heap = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&heap, &i);
@@ -229,8 +229,8 @@ TEST REPLACE_02(void) {
 }
 
 TEST MELD_01(void) {
-    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
-    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
+    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FBINARY_HEAP_CHUNK - 1) / 2; ++i) {
         push_fbinary_heap(&one, &i);
@@ -256,8 +256,8 @@ TEST MELD_01(void) {
 }
 
 TEST MELD_02(void) {
-    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
-    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s one = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
+    fbinary_heap_s two = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FBINARY_HEAP_CHUNK) / 2; ++i) {
         push_fbinary_heap(&one, &i);
@@ -283,7 +283,7 @@ TEST MELD_02(void) {
 }
 
 TEST MAP_01(void) {
-    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         push_fbinary_heap(&test, &i);
@@ -304,7 +304,7 @@ TEST MAP_01(void) {
 }
 
 TEST MAP_02(void) {
-    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp);
+    fbinary_heap_s test = create_fbinary_heap(sizeof(int), FBINARY_HEAP_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         push_fbinary_heap(&test, &i);

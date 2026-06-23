@@ -75,7 +75,9 @@ ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy, void * co
     valid(deque->allocator && "Allocator can't be NULL.");
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
-    ideque_s replika = { .current = deque->current, .size = deque->size, .length = deque->length };
+    ideque_s replika = {
+        .current = deque->current, .size = deque->size, .length = deque->length, .allocator = deque->allocator,
+    };
 
     struct infinite_deque_node const * current_deque = deque->head; // save head index as current node
     struct infinite_deque_node ** current_replika = &(replika.head);

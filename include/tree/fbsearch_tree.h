@@ -10,6 +10,7 @@
 /// Finite binary search tree structure.
 typedef struct finite_binary_search_tree {
     compare_fn compare;
+    void * ac;
     char * elements;
     size_t * parent;
     size_t * node[FBSEARCH_TREE_NODE_COUNT];
@@ -21,16 +22,18 @@ typedef struct finite_binary_search_tree {
 /// @param size Size of a single element
 /// @param max Maximum length of structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Tree structure.
-fbsearch_tree_s create_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare);
+fbsearch_tree_s create_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @param max Maximum length of structure.
-/// @param allocator Custom allocator structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
+/// @param allocator Custom allocator structure.
 /// @return Tree structure.
-fbsearch_tree_s make_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator);
+fbsearch_tree_s make_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param tree Structure to destroy.

@@ -6,6 +6,7 @@
 /// @brief Finite binary heap structure.
 typedef struct finite_binary_heap {
     compare_fn compare; // compare function to push, pop and heapify heap
+    void * ac;
     char * elements;    // elements array
     size_t size, length, max;
     memory_s const * allocator;
@@ -15,16 +16,18 @@ typedef struct finite_binary_heap {
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Heap structure.
-fbinary_heap_s create_fbinary_heap(size_t const size, size_t const max, compare_fn const compare);
+fbinary_heap_s create_fbinary_heap(size_t const size, size_t const max, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @param allocator Custom allocator structure.
 /// @return Heap structure.
-fbinary_heap_s make_fbinary_heap(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator);
+fbinary_heap_s make_fbinary_heap(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param heap Structure to destroy.

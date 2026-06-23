@@ -43,7 +43,7 @@ void _frb_set_remove_fixup(frb_set_s * const set, size_t const node);
 /// @param hole Index of hole in structure's arrays.
 void _frb_set_fill_hole(frb_set_s * const set, size_t const hole);
 
-frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const compare) {
+frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const compare, void * const ac) {
     assert(compare && "Parameter can't be NULL.");
     assert(size && "Parameter can't be zero.");
     assert(max && "Parameter can't be zero.");
@@ -56,7 +56,7 @@ frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const c
         .parent = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
         .node[IRB_SET_LEFT] = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
         .node[IRB_SET_RIGHT] = standard.alloc((max + 1) * sizeof(size_t), standard.arg),
-        .allocator = &standard,
+        .allocator = &standard, .ac = ac,
     };
     assert(set.elements && "Memory allocation failed.");
     assert(set.color && "Memory allocation failed.");
@@ -71,7 +71,7 @@ frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const c
     return set;
 }
 
-frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
+frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     assert(compare && "Parameter can't be NULL.");
     assert(size && "Parameter can't be zero.");
     assert(max && "Parameter can't be zero.");
@@ -85,7 +85,7 @@ frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const com
         .parent = allocator->alloc((max + 1) *sizeof(size_t), allocator->arg),
         .node[IRB_SET_LEFT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arg),
         .node[IRB_SET_RIGHT] = allocator->alloc((max + 1) *sizeof(size_t), allocator->arg),
-        .allocator = allocator,
+        .allocator = allocator, .ac = ac,
     };
     assert(set.elements && "Memory allocation failed.");
     assert(set.color && "Memory allocation failed.");
@@ -157,7 +157,7 @@ frb_set_s copy_frb_set(frb_set_s const * const set, copy_fn const copy, void * c
         .parent = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arg),
         .node[IRB_SET_LEFT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arg),
         .node[IRB_SET_RIGHT] = set->allocator->alloc((set->max + 1) * sizeof(size_t), set->allocator->arg),
-        .allocator = set->allocator,
+        .allocator = set->allocator, .ac = set->ac,
 
         .max = set->max, .root = set->root, .length = set->length, .compare = set->compare, .size = set->size,
     };
@@ -214,7 +214,7 @@ void insert_frb_set(frb_set_s * const set, void const * const element) {
     size_t * node = &(set->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = set->compare(element, set->elements + ((*node) * set->size));
+        int const comparison = set->compare(element, set->elements + ((*node) * set->size), set->ac);
         size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
         previous = (*node); // change parent to child
@@ -251,7 +251,7 @@ void remove_frb_set(frb_set_s * const set, void const * const element, void * co
     size_t node = set->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = set->compare(element, set->elements + (node * set->size));
+        int const comparison = set->compare(element, set->elements + (node * set->size), set->ac);
         if (!comparison) {
             break;
         }
@@ -323,7 +323,7 @@ bool contains_frb_set(frb_set_s const * const set, void const * const element) {
 
     for (size_t node = set->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = set->compare(element, set->elements + (node * set->size));
+        int const comparison = set->compare(element, set->elements + (node * set->size), set->ac);
         if (!comparison) {
             return true;
         }
@@ -364,7 +364,7 @@ frb_set_s union_frb_set(frb_set_s const * const set_one, frb_set_s const * const
         bool contains = false;
         for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
+            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size), maximum->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -383,7 +383,7 @@ frb_set_s union_frb_set(frb_set_s const * const set_one, frb_set_s const * const
         size_t * node = &(set_union.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_union.compare(element, set_union.elements + ((*node) * set_union.size));
+            int const comparison = set_union.compare(element, set_union.elements + ((*node) * set_union.size), set_union.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -426,7 +426,7 @@ frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * c
 
     frb_set_s const * const smallest = set_one->max < set_two->max ? set_one : set_two;
 
-    frb_set_s set_intersect = make_frb_set(smallest->size, smallest->max, smallest->compare, smallest->allocator);
+    frb_set_s set_intersect = make_frb_set(smallest->size, smallest->max, smallest->compare, smallest->ac, smallest->allocator);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -435,7 +435,7 @@ frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * c
         bool contains = false;
         for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
+            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size), maximum->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -454,7 +454,7 @@ frb_set_s intersect_frb_set(frb_set_s const * const set_one, frb_set_s const * c
         size_t * node = &(set_intersect.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_intersect.compare(element, set_intersect.elements + ((*node) * set_intersect.size));
+            int const comparison = set_intersect.compare(element, set_intersect.elements + ((*node) * set_intersect.size), set_intersect.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -491,7 +491,7 @@ frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * co
     assert(subtrahend->size && "Parameter can't be zero.");
     assert(subtrahend->length <= subtrahend->max && "Lenght can't be larger than maximum.");
 
-    frb_set_s set_subtract = make_frb_set(minuend->size, minuend->max, minuend->compare, minuend->allocator);
+    frb_set_s set_subtract = make_frb_set(minuend->size, minuend->max, minuend->compare, minuend->ac, minuend->allocator);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -500,7 +500,7 @@ frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * co
         bool contains = false;
         for (size_t node = subtrahend->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = subtrahend->compare(element, subtrahend->elements + (node * subtrahend->size));
+            int const comparison = subtrahend->compare(element, subtrahend->elements + (node * subtrahend->size), subtrahend->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -519,7 +519,7 @@ frb_set_s subtract_frb_set(frb_set_s const * const minuend, frb_set_s const * co
         size_t * node = &(set_subtract.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_subtract.compare(element, set_subtract.elements + ((*node) * set_subtract.size));
+            int const comparison = set_subtract.compare(element, set_subtract.elements + ((*node) * set_subtract.size), set_subtract.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -558,7 +558,7 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
 
     frb_set_s const * const biggest = set_one->max >= set_two->max ? set_one : set_two;
 
-    frb_set_s set_exclude = make_frb_set(biggest->size, biggest->max, biggest->compare, biggest->allocator);
+    frb_set_s set_exclude = make_frb_set(biggest->size, biggest->max, biggest->compare, biggest->ac, biggest->allocator);
 
     // for each element in set one
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -567,7 +567,7 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
         bool contains = false;
         for (size_t node = set_two->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_two->compare(element, set_two->elements + (node * set_two->size));
+            int const comparison = set_two->compare(element, set_two->elements + (node * set_two->size), set_two->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -586,7 +586,7 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
         size_t * node = &(set_exclude.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size));
+            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size), set_exclude.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -612,7 +612,7 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
         bool contains = false;
         for (size_t node = set_one->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_one->compare(element, set_one->elements + (node * set_one->size));
+            int const comparison = set_one->compare(element, set_one->elements + (node * set_one->size), set_one->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -631,7 +631,7 @@ frb_set_s exclude_frb_set(frb_set_s const * const set_one, frb_set_s const * con
         size_t * node = &(set_exclude.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size));
+            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size), set_exclude.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -673,7 +673,7 @@ bool is_subset_frb_set(frb_set_s const * const superset, frb_set_s const * const
         bool contains = false;
         for (size_t node = superset->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = superset->compare(element, superset->elements + (node * superset->size));
+            int const comparison = superset->compare(element, superset->elements + (node * superset->size), superset->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -711,7 +711,7 @@ bool is_proper_subset_frb_set(frb_set_s const * const superset, frb_set_s const 
         bool contains = false;
         for (size_t node = superset->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = superset->compare(element, superset->elements + (node * superset->size));
+            int const comparison = superset->compare(element, superset->elements + (node * superset->size), superset->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -752,7 +752,7 @@ bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * cons
         bool contains = false;
         for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
+            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size), maximum->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -987,7 +987,7 @@ void _frb_set_fill_hole(frb_set_s * const set, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = set->parent[last];
     if (NIL != parent_last) {
-        int const comparison = set->compare(set->elements + (last * set->size), set->elements + (parent_last * set->size));
+        int const comparison = set->compare(set->elements + (last * set->size), set->elements + (parent_last * set->size), set->ac);
         size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
         set->node[node_index][parent_last] = hole;
     }

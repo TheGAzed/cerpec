@@ -6,7 +6,7 @@
 #define FRB_SET_CHUNK CERPEC_CHUNK
 
 TEST CREATE_01(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     ASSERT_EQ(0, set.length);
     ASSERT_NEQ(0, set.size);
@@ -17,7 +17,7 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     destroy_frb_set(&set, intdst, NULL);
 
@@ -28,7 +28,7 @@ TEST DESTROY_01(void) {
 }
 
 TEST CLEAR_01(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     clear_frb_set(&set, intdst, NULL);
 
@@ -41,7 +41,7 @@ TEST CLEAR_01(void) {
 }
 
 TEST INSERT_01(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set, &i);
@@ -53,7 +53,7 @@ TEST INSERT_01(void) {
 }
 
 TEST INSERT_02(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set, &i);
@@ -65,7 +65,7 @@ TEST INSERT_02(void) {
 }
 
 TEST REMOVE_01(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set, &i);
@@ -83,7 +83,7 @@ TEST REMOVE_01(void) {
 }
 
 TEST REMOVE_02(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set, &i);
@@ -101,7 +101,7 @@ TEST REMOVE_02(void) {
 }
 
 TEST CONTAINS_01(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set, &i);
@@ -117,7 +117,7 @@ TEST CONTAINS_01(void) {
 }
 
 TEST CONTAINS_02(void) {
-    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set, &i);
@@ -133,8 +133,8 @@ TEST CONTAINS_02(void) {
 }
 
 TEST UNION_01(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -155,8 +155,8 @@ TEST UNION_01(void) {
 }
 
 TEST UNION_02(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -177,8 +177,8 @@ TEST UNION_02(void) {
 }
 
 TEST UNION_03(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -202,8 +202,8 @@ TEST UNION_03(void) {
 }
 
 TEST UNION_04(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -227,8 +227,8 @@ TEST UNION_04(void) {
 }
 
 TEST UNION_05(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -252,8 +252,8 @@ TEST UNION_05(void) {
 }
 
 TEST UNION_06(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -277,8 +277,8 @@ TEST UNION_06(void) {
 }
 
 TEST INTERSECT_01(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -299,8 +299,8 @@ TEST INTERSECT_01(void) {
 }
 
 TEST INTERSECT_02(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -321,8 +321,8 @@ TEST INTERSECT_02(void) {
 }
 
 TEST INTERSECT_03(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -346,8 +346,8 @@ TEST INTERSECT_03(void) {
 }
 
 TEST INTERSECT_04(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -371,8 +371,8 @@ TEST INTERSECT_04(void) {
 }
 
 TEST INTERSECT_05(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -404,8 +404,8 @@ TEST INTERSECT_05(void) {
 }
 
 TEST INTERSECT_06(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -437,8 +437,8 @@ TEST INTERSECT_06(void) {
 }
 
 TEST SUBTRACT_01(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -459,8 +459,8 @@ TEST SUBTRACT_01(void) {
 }
 
 TEST SUBTRACT_02(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -481,8 +481,8 @@ TEST SUBTRACT_02(void) {
 }
 
 TEST SUBTRACT_03(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -510,8 +510,8 @@ TEST SUBTRACT_03(void) {
 }
 
 TEST SUBTRACT_04(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -539,8 +539,8 @@ TEST SUBTRACT_04(void) {
 }
 
 TEST SUBTRACT_05(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -564,8 +564,8 @@ TEST SUBTRACT_05(void) {
 }
 
 TEST SUBTRACT_06(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -589,8 +589,8 @@ TEST SUBTRACT_06(void) {
 }
 
 TEST EXCLUDE_01(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -611,8 +611,8 @@ TEST EXCLUDE_01(void) {
 }
 
 TEST EXCLUDE_02(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -633,8 +633,8 @@ TEST EXCLUDE_02(void) {
 }
 
 TEST EXCLUDE_03(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -658,8 +658,8 @@ TEST EXCLUDE_03(void) {
 }
 
 TEST EXCLUDE_04(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -683,8 +683,8 @@ TEST EXCLUDE_04(void) {
 }
 
 TEST EXCLUDE_05(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -712,8 +712,8 @@ TEST EXCLUDE_05(void) {
 }
 
 TEST EXCLUDE_06(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -741,8 +741,8 @@ TEST EXCLUDE_06(void) {
 }
 
 TEST IS_SUBSET_01(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -757,8 +757,8 @@ TEST IS_SUBSET_01(void) {
 }
 
 TEST IS_SUBSET_02(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -773,8 +773,8 @@ TEST IS_SUBSET_02(void) {
 }
 
 TEST IS_SUBSET_03(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -790,8 +790,8 @@ TEST IS_SUBSET_03(void) {
 }
 
 TEST IS_SUBSET_04(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -807,8 +807,8 @@ TEST IS_SUBSET_04(void) {
 }
 
 TEST IS_SUBSET_05(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -827,8 +827,8 @@ TEST IS_SUBSET_05(void) {
 }
 
 TEST IS_SUBSET_06(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -847,8 +847,8 @@ TEST IS_SUBSET_06(void) {
 }
 
 TEST IS_PROPER_SUBSET_01(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -863,8 +863,8 @@ TEST IS_PROPER_SUBSET_01(void) {
 }
 
 TEST IS_PROPER_SUBSET_02(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -879,8 +879,8 @@ TEST IS_PROPER_SUBSET_02(void) {
 }
 
 TEST IS_PROPER_SUBSET_03(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -896,8 +896,8 @@ TEST IS_PROPER_SUBSET_03(void) {
 }
 
 TEST IS_PROPER_SUBSET_04(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -913,8 +913,8 @@ TEST IS_PROPER_SUBSET_04(void) {
 }
 
 TEST IS_PROPER_SUBSET_05(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -933,8 +933,8 @@ TEST IS_PROPER_SUBSET_05(void) {
 }
 
 TEST IS_PROPER_SUBSET_06(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -953,8 +953,8 @@ TEST IS_PROPER_SUBSET_06(void) {
 }
 
 TEST IS_DISJOINT_01(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK - 1; ++i) {
         insert_frb_set(&set_one, &i);
@@ -970,8 +970,8 @@ TEST IS_DISJOINT_01(void) {
 }
 
 TEST IS_DISJOINT_02(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < FRB_SET_CHUNK; ++i) {
         insert_frb_set(&set_one, &i);
@@ -987,8 +987,8 @@ TEST IS_DISJOINT_02(void) {
 }
 
 TEST IS_DISJOINT_03(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK - 1) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -1007,8 +1007,8 @@ TEST IS_DISJOINT_03(void) {
 }
 
 TEST IS_DISJOINT_04(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < (FRB_SET_CHUNK) / 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -1027,8 +1027,8 @@ TEST IS_DISJOINT_04(void) {
 }
 
 TEST IS_DISJOINT_05(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK - 1) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);
@@ -1047,8 +1047,8 @@ TEST IS_DISJOINT_05(void) {
 }
 
 TEST IS_DISJOINT_06(void) {
-    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
-    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp);
+    frb_set_s set_one = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
+    frb_set_s set_two = create_frb_set(sizeof(int), FRB_SET_CHUNK, intcmp, NULL);
 
     for (int i = 0; i < ((FRB_SET_CHUNK) / 3) * 2; ++i) {
         insert_frb_set(&set_one, &i);

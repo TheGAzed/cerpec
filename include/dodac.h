@@ -26,9 +26,9 @@ void * charsum(void * const sum, void const * const addent, void * arg);
 
 size_t charhshsame(void const * const element, void * arg);
 
-int charcmp(void const * const a, void const * const b);
+int charcmp(void const * const a, void const * const b, void * arg);
 
-int charrcmp(void const * const a, void const * const b);
+int charrcmp(void const * const a, void const * const b, void * arg);
 
 bool charprint(void * const element, void * const format);
 
@@ -40,29 +40,29 @@ void charqsort(void * const array, size_t const lenght, void * const null);
 
 void charrqsort(void * const array, size_t const lenght, void * const null);
 
-bool chareven(void const * const element);
+bool charfileven(void const * const element, void * arg);
 
-bool charodd(void const * const element);
+bool charfilodd(void const * const element, void * arg);
 
-bool charalnum(void const * const element);
+bool charfilalnum(void const * const element, void * arg);
 
-bool charalpha(void const * const element);
+bool charfilalpha(void const * const element, void * arg);
 
-bool charcntrl(void const * const element);
+bool charfilcntrl(void const * const element, void * arg);
 
-bool chardigit(void const * const element);
+bool charfildigit(void const * const element, void * arg);
 
-bool charlower(void const * const element);
+bool charfillower(void const * const element, void * arg);
 
-bool charupper(void const * const element);
+bool charfilupper(void const * const element, void * arg);
 
-bool charpunct(void const * const element);
+bool charfilpunct(void const * const element, void * arg);
 
-bool charspace(void const * const element);
+bool charfilspace(void const * const element, void * arg);
 
-bool charxdigit(void const * const element);
+bool charfilxdigit(void const * const element, void * arg);
 
-bool charprime(void const * const element);
+bool charfilprime(void const * const element, void * arg);
 
 void uchardst(void * const element, void * arg);
 
@@ -72,9 +72,9 @@ void * ucharsum(void * const sum, void const * const addent, void * arg);
 
 size_t ucharhshsame(void const * const element, void * arg);
 
-int ucharcmp(void const * const a, void const * const b);
+int ucharcmp(void const * const a, void const * const b, void * arg);
 
-int ucharrcmp(void const * const a, void const * const b);
+int ucharrcmp(void const * const a, void const * const b, void * arg);
 
 bool ucharprint(void * const element, void * const format);
 
@@ -86,29 +86,29 @@ void ucharqsort(void * const array, size_t const lenght, void * const null);
 
 void ucharrqsort(void * const array, size_t const lenght, void * const null);
 
-bool uchareven(void const * const element);
+bool ucharfileven(void const * const element, void * arg);
 
-bool ucharodd(void const * const element);
+bool ucharfilodd(void const * const element, void * arg);
 
-bool ucharalnum(void const * const element);
+bool ucharfilalnum(void const * const element, void * arg);
 
-bool ucharalpha(void const * const element);
+bool ucharfilalpha(void const * const element, void * arg);
 
-bool ucharcntrl(void const * const element);
+bool ucharfilcntrl(void const * const element, void * arg);
 
-bool uchardigit(void const * const element);
+bool ucharfildigit(void const * const element, void * arg);
 
-bool ucharlower(void const * const element);
+bool ucharfillower(void const * const element, void * arg);
 
-bool ucharupper(void const * const element);
+bool ucharfilupper(void const * const element, void * arg);
 
-bool ucharpunct(void const * const element);
+bool ucharfilpunct(void const * const element, void * arg);
 
-bool ucharspace(void const * const element);
+bool ucharfilspace(void const * const element, void * arg);
 
-bool ucharxdigit(void const * const element);
+bool ucharfilxdigit(void const * const element, void * arg);
 
-bool ucharprime(void const * const element);
+bool ucharfilprime(void const * const element, void * arg);
 
 void intdst(void * const element, void * arg);
 
@@ -120,9 +120,9 @@ size_t inthshsame(void const * const element, void * arg);
 
 size_t inthshmurmur(void const * const element, void * arg);
 
-int intcmp(void const * const a, void const * const b);
+int intcmp(void const * const a, void const * const b, void * arg);
 
-int intrcmp(void const * const a, void const * const b);
+int intrcmp(void const * const a, void const * const b, void * arg);
 
 bool intprint(void * const element, void * const format);
 
@@ -134,11 +134,11 @@ void intqsort(void * const array, size_t const lenght, void * const null);
 
 void intrqsort(void * const array, size_t const lenght, void * const null);
 
-bool inteven(void const * const element);
+bool intfileven(void const * const element, void * arg);
 
-bool intodd(void const * const element);
+bool intfilodd(void const * const element, void * arg);
 
-bool intprime(void const * const element);
+bool intfilprime(void const * const element, void * arg);
 
 void uintdst(void * const element, void * arg);
 
@@ -148,9 +148,9 @@ void * uintsum(void * const sum, void const * const addent, void * arg);
 
 size_t uinthshsame(void const * const element, void * arg);
 
-int uintcmp(void const * const a, void const * const b);
+int uintcmp(void const * const a, void const * const b, void * arg);
 
-int uintrcmp(void const * const a, void const * const b);
+int uintrcmp(void const * const a, void const * const b, void * arg);
 
 bool uintprint(void * const element, void * const format);
 
@@ -158,11 +158,11 @@ void uintqsort(void * const array, size_t const lenght, void * const null);
 
 void uintrqsort(void * const array, size_t const lenght, void * const null);
 
-bool uinteven(void const * const element);
+bool uintfileven(void const * const element, void * arg);
 
-bool uintodd(void const * const element);
+bool uintfilodd(void const * const element, void * arg);
 
-bool uintprime(void const * const element);
+bool uintfilprime(void const * const element, void * arg);
 
 void floatdst(void * const element, void * arg);
 
@@ -172,9 +172,9 @@ void * floatsum(void * const sum, void const * const addent, void * arg);
 
 size_t floathshsame(void const * const element, void * arg);
 
-int floatcmp(void const * const a, void const * const b);
+int floatcmp(void const * const a, void const * const b, void * arg);
 
-int floatrcmp(void const * const a, void const * const b);
+int floatrcmp(void const * const a, void const * const b, void * arg);
 
 bool floatprint(void * const element, void * const format);
 
@@ -190,9 +190,9 @@ void * doublesum(void * const sum, void const * const addent, void * arg);
 
 size_t doublehshsame(void const * const element, void * arg);
 
-int doublecmp(void const * const a, void const * const b);
+int doublecmp(void const * const a, void const * const b, void * arg);
 
-int doublercmp(void const * const a, void const * const b);
+int doublercmp(void const * const a, void const * const b, void * arg);
 
 bool doubleprint(void * const element, void * const format);
 
@@ -208,9 +208,9 @@ void * sizesum(void * const sum, void const * const addent, void * arg);
 
 size_t sizehshsame(void const * const element, void * arg);
 
-int sizecmp(void const * const a, void const * const b);
+int sizecmp(void const * const a, void const * const b, void * arg);
 
-int sizercmp(void const * const a, void const * const b);
+int sizercmp(void const * const a, void const * const b, void * arg);
 
 bool sizeprint(void * const element, void * const format);
 
@@ -218,17 +218,17 @@ void sizeqsort(void * const array, size_t const lenght, void * const null);
 
 void sizerqsort(void * const array, size_t const lenght, void * const null);
 
-bool sizeeven(void const * const element);
+bool sizefileven(void const * const element, void * arg);
 
-bool sizeodd(void const * const element);
+bool sizefilodd(void const * const element, void * arg);
 
-bool sizeprime(void const * const element);
+bool sizefilprime(void const * const element, void * arg);
 
 size_t stringhshmurmur(void const * const element, void * arg);
 
-int stringcmp(void const * const a, void const * const b);
+int stringcmp(void const * const a, void const * const b, void * arg);
 
-int stringrcmp(void const * const a, void const * const b);
+int stringrcmp(void const * const a, void const * const b, void * arg);
 
 bool stringprint(void * const element, void * const format);
 

@@ -14,6 +14,7 @@
 /// @brief Inifinite binary heap structure.
 typedef struct infinite_binary_heap {
     compare_fn compare; // compare function to push, pop and heapify heap
+    void * ac;
     char * elements;    // elements array
     size_t size, length, capacity;
     memory_s const * allocator;
@@ -22,15 +23,17 @@ typedef struct infinite_binary_heap {
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Heap structure.
-ibinary_heap_s create_ibinary_heap(size_t const size, compare_fn const compare);
+ibinary_heap_s create_ibinary_heap(size_t const size, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param allocator Custom allocator structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Heap structure.
-ibinary_heap_s make_ibinary_heap(size_t const size, compare_fn const compare, memory_s const * const allocator);
+ibinary_heap_s make_ibinary_heap(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param heap Structure to destroy.

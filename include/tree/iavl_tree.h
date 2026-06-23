@@ -17,6 +17,7 @@
 /// Infinite Adelson Velsky and Landis tree structure.
 typedef struct infinite_adelson_velsky_landis_tree {
     compare_fn compare;
+    void * ac;
     char * elements;
     size_t * parent;
     size_t * node[IAVLT_NODE_COUNT];
@@ -28,15 +29,17 @@ typedef struct infinite_adelson_velsky_landis_tree {
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Tree structure.
-iavl_tree_s create_iavl_tree(size_t const size, compare_fn const compare);
+iavl_tree_s create_iavl_tree(size_t const size, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
-/// @param allocator Custom allocator structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
+/// @param allocator Custom allocator structure.
 /// @return Tree structure.
-iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, memory_s const * const allocator);
+iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param tree Structure to destroy.

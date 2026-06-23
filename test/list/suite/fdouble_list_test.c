@@ -186,7 +186,7 @@ TEST REMOVE_FIRST_01(void) {
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        remove_first_fdouble_list(&test, &i, &t, intcmp);
+        remove_first_fdouble_list(&test, &i, &t, intcmp, NULL);
         ASSERT_EQ(i, t);
     }
 
@@ -204,7 +204,7 @@ TEST REMOVE_FIRST_02(void) {
 
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; ++i) {
         int t = 0;
-        remove_first_fdouble_list(&test, &i, &t, intcmp);
+        remove_first_fdouble_list(&test, &i, &t, intcmp, NULL);
         ASSERT_EQ(i, t);
     }
 
@@ -627,7 +627,7 @@ TEST EXTRACT_01(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s extract = extract_fdouble_list(&test, intodd, test.max, test.max);
+    fdouble_list_s extract = extract_fdouble_list(&test, intfilodd, NULL, test.max, test.max);
     for (int i = 0; i < FDOUBLE_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_fdouble_list(&test, (size_t)(i) / 2, &s);
@@ -653,7 +653,7 @@ TEST EXTRACT_02(void) {
         insert_at_fdouble_list(&test, &i, test.length);
     }
 
-    fdouble_list_s extract = extract_fdouble_list(&test, intodd, test.max, test.max);
+    fdouble_list_s extract = extract_fdouble_list(&test, intfilodd, NULL, test.max, test.max);
     for (int i = 0; i < FDOUBLE_LIST_CHUNK; i += 2) {
         int s = 0;
         get_fdouble_list(&test, (size_t)(i) / 2, &s);

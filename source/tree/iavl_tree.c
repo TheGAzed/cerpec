@@ -76,19 +76,19 @@ void _iavl_tree_fill_hole(iavl_tree_s * const tree, size_t const hole);
 /// @param size New size.
 void _iavl_tree_resize(iavl_tree_s * const tree, size_t const size);
 
-iavl_tree_s create_iavl_tree(size_t const size, compare_fn const compare) {
+iavl_tree_s create_iavl_tree(size_t const size, compare_fn const compare, void * const ac) {
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
 
-    return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = &standard, };
+    return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = &standard, .ac = ac, };
 }
 
-iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, memory_s const * const allocator) {
+iavl_tree_s make_iavl_tree(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     error(compare && "Parameter can't be NULL.");
     error(size && "Parameter can't be zero.");
     error(allocator && "Parameter can't be NULL.");
 
-    return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, };
+    return (iavl_tree_s) { .root = NIL, .compare = compare, .size = size, .allocator = allocator, .ac = ac, };
 }
 
 void destroy_iavl_tree(iavl_tree_s * const tree, set_fn const destroy, void * const ad) {
@@ -154,7 +154,7 @@ iavl_tree_s copy_iavl_tree(iavl_tree_s const * const tree, copy_fn const copy, v
         .node[IAVLT_RIGHT] = tree->allocator->alloc(tree->capacity * sizeof(size_t), tree->allocator->arg),
 
         .capacity = tree->capacity, .root = tree->root, .length = tree->length, .compare = tree->compare,
-        .size = tree->size, .allocator = tree->allocator,
+        .size = tree->size, .allocator = tree->allocator, .ac = tree->ac,
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");
     error((!replica.capacity || replica.parent) && "Memory allocation failed.");
@@ -203,7 +203,7 @@ void insert_iavl_tree(iavl_tree_s * const tree, void const * const element) {
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
 
         previous = (*node); // change parent to child
         node = comparison <= 0 ? tree->node[IAVLT_LEFT] + (*node) : tree->node[IAVLT_RIGHT] + (*node);
@@ -240,7 +240,7 @@ void remove_iavl_tree(iavl_tree_s * const tree, void const * const element, void
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -279,7 +279,7 @@ bool contains_iavl_tree(iavl_tree_s const * const tree, void const * const eleme
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             return true;
         }
@@ -439,7 +439,7 @@ void get_floor_iavl_tree(iavl_tree_s const * const tree, void const * const elem
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -481,7 +481,7 @@ void get_ceil_iavl_tree(iavl_tree_s const * const tree, void const * const eleme
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -595,7 +595,7 @@ void get_successor_iavl_tree(iavl_tree_s const * const tree, void const * const 
     valid(tree->allocator && "Allocator can't be NULL.");
 
     size_t successor = NIL;
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IAVLT_RIGHT][tree->root]) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != tree->node[IAVLT_RIGHT][tree->root]) {
         for (successor = tree->node[IAVLT_RIGHT][tree->root]; NIL != tree->node[IAVLT_LEFT][successor];) {
             successor = tree->node[IAVLT_LEFT][successor];
         }
@@ -605,7 +605,7 @@ void get_successor_iavl_tree(iavl_tree_s const * const tree, void const * const 
 
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison < 0) {
             successor = n;
         }
@@ -645,7 +645,7 @@ void get_predecessor_iavl_tree(iavl_tree_s const * const tree, void const * cons
     for (size_t n = tree->root; NIL != n;) {
         size_t const left = tree->node[IAVLT_LEFT][n];
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -765,7 +765,7 @@ void update_iavl_tree(iavl_tree_s const * const tree, void const * const latter,
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -950,7 +950,7 @@ size_t * _iavl_tree_floor(iavl_tree_s * const tree, void const * const element) 
     size_t * floor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -969,7 +969,7 @@ size_t * _iavl_tree_ceil(iavl_tree_s * const tree, void const * const element) {
     size_t * ceil = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -987,7 +987,7 @@ size_t * _iavl_tree_ceil(iavl_tree_s * const tree, void const * const element) {
 size_t * _iavl_tree_successor(iavl_tree_s * const tree, void const * const element) {
     size_t * successor = NULL;
 
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[IAVLT_RIGHT][tree->root]) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != tree->node[IAVLT_RIGHT][tree->root]) {
         for (successor = tree->node[IAVLT_RIGHT] + tree->root; NIL != *(tree->node[IAVLT_LEFT] + (*successor));) {
             successor = tree->node[IAVLT_LEFT] + (*successor);
         }
@@ -997,7 +997,7 @@ size_t * _iavl_tree_successor(iavl_tree_s * const tree, void const * const eleme
 
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (comparison < 0) {
             successor = n;
         }
@@ -1012,7 +1012,7 @@ size_t * _iavl_tree_predecessor(iavl_tree_s * const tree, void const * const ele
     size_t * predecessor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -1195,7 +1195,7 @@ void _iavl_tree_fill_hole(iavl_tree_s * const tree, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
-        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
+        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size), tree->ac);
         size_t const node_index = comparison <= 0 ? IAVLT_LEFT : IAVLT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }

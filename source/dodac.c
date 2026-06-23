@@ -5,6 +5,100 @@
 #include <stdlib.h>
 #include <string.h>
 
+int cmpchar(void const * const a, void const * const b) {
+    return (int)((*(char*)a) - (*(char*)b));
+}
+
+int rcmpchar(void const * const a, void const * const b) {
+    return (int)((*(char*)b) - (*(char*)a));
+}
+
+int cmpuchar(void const * const a, void const * const b) {
+    int const a_t = (int)(*(unsigned char*)a);
+    int const b_t = (int)(*(unsigned char*)b);
+
+    return a_t - b_t;
+}
+
+int rcmpuchar(void const * const a, void const * const b) {
+    int const a_t = (int)(*(unsigned char*)a);
+    int const b_t = (int)(*(unsigned char*)b);
+
+    return b_t - a_t;
+}
+
+int cmpint(void const * const a, void const * const b) {
+    return (*(int*)a) - (*(int*)b);
+}
+
+int rcmpint(void const * const a, void const * const b) {
+    return (*(int*)b) - (*(int*)a);
+}
+
+int cmpuint(void const * const a, void const * const b) {
+    unsigned const a_temp = (*(unsigned*)a);
+    unsigned const b_temp = (*(unsigned*)b);
+
+    return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
+}
+
+int rcmpuint(void const * const a, void const * const b) {
+    unsigned const a_temp = (*(unsigned*)a);
+    unsigned const b_temp = (*(unsigned*)b);
+
+    return a_temp < b_temp ? 1 : a_temp > b_temp ? -1 : 0;
+}
+
+int cmpfloat(void const * const a, void const * const b) {
+    float const a_temp = (*(float*)a);
+    float const b_temp = (*(float*)b);
+
+    return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
+}
+
+int rcmpfloat(void const * const a, void const * const b) {
+    float const a_temp = (*(float*)a);
+    float const b_temp = (*(float*)b);
+
+    return a_temp < b_temp ? 1 : a_temp > b_temp ? -1 : 0;
+}
+
+int cmpdouble(void const * const a, void const * const b) {
+    double const a_temp = (*(double*)a);
+    double const b_temp = (*(double*)b);
+
+    return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
+}
+
+int rcmpdouble(void const * const a, void const * const b) {
+    double const a_temp = (*(double*)a);
+    double const b_temp = (*(double*)b);
+
+    return a_temp < b_temp ? 1 : a_temp > b_temp ? -1 : 0;
+}
+
+int cmpsize(void const * const a, void const * const b) {
+    size_t const a_temp = (*(size_t*)a);
+    size_t const b_temp = (*(size_t*)b);
+
+    return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
+}
+
+int rcmpsize(void const * const a, void const * const b) {
+    size_t const a_temp = (*(size_t*)a);
+    size_t const b_temp = (*(size_t*)b);
+
+    return a_temp < b_temp ? 1 : a_temp > b_temp ? -1 : 0;
+}
+
+int cmpstring(void const * const a, void const * const b) {
+    return strcmp(*((char**)(a)), *((char**)(b)));
+}
+
+int rcmpstring(void const * const a, void const * const b) {
+    return strcmp(*((char**)(b)), *((char**)(a)));
+}
+
 void chardst(void * const element, void * arg) {
     (void)(element);
     (void)(arg);
@@ -27,11 +121,13 @@ size_t charhshsame(void const * const element, void * arg) {
     return (size_t)(*(char*)element);
 }
 
-int charcmp(void const * const a, void const * const b) {
+int charcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     return (int)((*(char*)a) - (*(char*)b));
 }
 
-int charrcmp(void const * const a, void const * const b) {
+int charrcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     return (int)((*(char*)b) - (*(char*)a));
 }
 
@@ -60,59 +156,71 @@ bool chartoupper(void * const element, void * const null) {
 
 void charqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(char), charcmp);
+    qsort(array, lenght, sizeof(char), cmpchar);
 }
 
 void charrqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(char), charrcmp);
+    qsort(array, lenght, sizeof(char), rcmpchar);
 }
 
-bool chareven(void const * const element) {
+bool charfileven(void const * const element, void * arg) {
+    (void)(arg);
     return !((*(char*)element) % 2);
 }
 
-bool charodd(void const * const element) {
+bool charfilodd(void const * const element, void * arg) {
+    (void)(arg);
     return ((*(char*)element) % 2);
 }
 
-bool charalnum(void const * const element) {
+bool charfilalnum(void const * const element, void * arg) {
+    (void)(arg);
     return isalnum(*(char*)element);
 }
 
-bool charalpha(void const * const element) {
+bool charfilalpha(void const * const element, void * arg) {
+    (void)(arg);
     return isalpha(*(char*)element);
 }
 
-bool charcntrl(void const * const element) {
+bool charfilcntrl(void const * const element, void * arg) {
+    (void)(arg);
     return iscntrl(*(char*)element);
 }
 
-bool chardigit(void const * const element) {
+bool charfildigit(void const * const element, void * arg) {
+    (void)(arg);
     return isdigit(*(char*)element);
 }
 
-bool charlower(void const * const element) {
+bool charfillower(void const * const element, void * arg) {
+    (void)(arg);
     return islower(*(char*)element);
 }
 
-bool charupper(void const * const element) {
+bool charfilupper(void const * const element, void * arg) {
+    (void)(arg);
     return isupper(*(char*)element);
 }
 
-bool charpunct(void const * const element) {
+bool charfilpunct(void const * const element, void * arg) {
+    (void)(arg);
     return ispunct(*(char*)element);
 }
 
-bool charspace(void const * const element) {
+bool charfilspace(void const * const element, void * arg) {
+    (void)(arg);
     return isspace(*(char*)element);
 }
 
-bool charxdigit(void const * const element) {
+bool charfilxdigit(void const * const element, void * arg) {
+    (void)(arg);
     return isxdigit(*(char*)element);
 }
 
-bool charprime(void const * const element) {
+bool charfilprime(void const * const element, void * arg) {
+    (void)(arg);
     const char number = (*(char*)element);
     for (char i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -145,14 +253,16 @@ size_t ucharhshsame(void const * const element, void * arg) {
     return (size_t)(*(unsigned char*)element);
 }
 
-int ucharcmp(void const * const a, void const * const b) {
+int ucharcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     int const a_t = (int)(*(unsigned char*)a);
     int const b_t = (int)(*(unsigned char*)b);
 
     return a_t - b_t;
 }
 
-int ucharrcmp(void const * const a, void const * const b) {
+int ucharrcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     int const a_t = (int)(*(unsigned char*)a);
     int const b_t = (int)(*(unsigned char*)b);
 
@@ -184,59 +294,71 @@ bool uchartoupper(void * const element, void * const null) {
 
 void ucharqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(unsigned char), charcmp);
+    qsort(array, lenght, sizeof(unsigned char), cmpchar);
 }
 
 void ucharrqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(unsigned char), charrcmp);
+    qsort(array, lenght, sizeof(unsigned char), rcmpchar);
 }
 
-bool uchareven(void const * const element) {
+bool ucharfileven(void const * const element, void * arg) {
+    (void)(arg);
     return !((*(unsigned char*)element) % 2);
 }
 
-bool ucharodd(void const * const element) {
+bool ucharfilodd(void const * const element, void * arg) {
+    (void)(arg);
     return ((*(unsigned char*)element) % 2);
 }
 
-bool ucharalnum(void const * const element) {
+bool ucharfilalnum(void const * const element, void * arg) {
+    (void)(arg);
     return isalnum(*(unsigned char*)element);
 }
 
-bool ucharalpha(void const * const element) {
+bool ucharfilalpha(void const * const element, void * arg) {
+    (void)(arg);
     return isalpha(*(unsigned char*)element);
 }
 
-bool ucharcntrl(void const * const element) {
+bool ucharfilcntrl(void const * const element, void * arg) {
+    (void)(arg);
     return iscntrl(*(unsigned char*)element);
 }
 
-bool uchardigit(void const * const element) {
+bool ucharfildigit(void const * const element, void * arg) {
+    (void)(arg);
     return isdigit(*(unsigned char*)element);
 }
 
-bool ucharlower(void const * const element) {
+bool ucharfillower(void const * const element, void * arg) {
+    (void)(arg);
     return islower(*(unsigned char*)element);
 }
 
-bool ucharupper(void const * const element) {
+bool ucharfilupper(void const * const element, void * arg) {
+    (void)(arg);
     return isupper(*(unsigned char*)element);
 }
 
-bool ucharpunct(void const * const element) {
+bool ucharfilpunct(void const * const element, void * arg) {
+    (void)(arg);
     return ispunct(*(unsigned char*)element);
 }
 
-bool ucharspace(void const * const element) {
+bool ucharfilspace(void const * const element, void * arg) {
+    (void)(arg);
     return isspace(*(unsigned char*)element);
 }
 
-bool ucharxdigit(void const * const element) {
+bool ucharfilxdigit(void const * const element, void * arg) {
+    (void)(arg);
     return isxdigit(*(unsigned char*)element);
 }
 
-bool ucharprime(void const * const element) {
+bool ucharfilprime(void const * const element, void * arg) {
+    (void)(arg);
     const unsigned char number = (*(unsigned char*)element);
     for (unsigned char i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -284,11 +406,13 @@ size_t inthshmurmur(void const * const element, void * arg) {
     return key;
 }
 
-int intcmp(void const * const a, void const * const b) {
+int intcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     return (*(int*)a) - (*(int*)b);
 }
 
-int intrcmp(void const * const a, void const * const b) {
+int intrcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     return (*(int*)b) - (*(int*)a);
 }
 
@@ -309,23 +433,26 @@ bool intdecrement(void * const element, void * const value) {
 
 void intqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(int), intcmp);
+    qsort(array, lenght, sizeof(int), cmpint);
 }
 
 void intrqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(int), intrcmp);
+    qsort(array, lenght, sizeof(int), rcmpint);
 }
 
-bool inteven(void const * const element) {
+bool intfileven(void const * const element, void * arg) {
+    (void)(arg);
     return !((*(int*)element) % 2);
 }
 
-bool intodd(void const * const element) {
+bool intfilodd(void const * const element, void * arg) {
+    (void)(arg);
     return (*(int*)element) % 2;
 }
 
-bool intprime(void const * const element) {
+bool intfilprime(void const * const element, void * arg) {
+    (void)(arg);
     const int number = (*(int*)element);
     for (int i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -358,14 +485,16 @@ size_t uinthshsame(void const * const element, void * arg) {
     return (size_t)(*(unsigned*)element);
 }
 
-int uintcmp(void const * const a, void const * const b) {
+int uintcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     unsigned const a_temp = (*(unsigned*)a);
     unsigned const b_temp = (*(unsigned*)b);
 
     return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
 }
 
-int uintrcmp(void const * const a, void const * const b) {
+int uintrcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     unsigned const a_temp = (*(unsigned*)a);
     unsigned const b_temp = (*(unsigned*)b);
 
@@ -379,23 +508,26 @@ bool uintprint(void * const element, void * const format) {
 
 void uintqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(unsigned), uintcmp);
+    qsort(array, lenght, sizeof(unsigned), cmpuint);
 }
 
 void uintrqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(unsigned), uintrcmp);
+    qsort(array, lenght, sizeof(unsigned), rcmpuint);
 }
 
-bool uinteven(void const * const element) {
+bool uintfileven(void const * const element, void * arg) {
+    (void)(arg);
     return !((*(unsigned*)element) % 2);
 }
 
-bool uintodd(void const * const element) {
+bool uintfilodd(void const * const element, void * arg) {
+    (void)(arg);
     return !((*(unsigned*)element) % 2);
 }
 
-bool uintprime(void const * const element) {
+bool uintfilprime(void const * const element, void * arg) {
+    (void)(arg);
     const unsigned number = (*(unsigned*)element);
     for (unsigned i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -430,14 +562,16 @@ size_t floathshsame(void const * const element, void * arg) {
     return size;
 }
 
-int floatcmp(void const * const a, void const * const b) {
+int floatcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     float const a_temp = (*(float*)a);
     float const b_temp = (*(float*)b);
 
     return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
 }
 
-int floatrcmp(void const * const a, void const * const b) {
+int floatrcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     float const a_temp = (*(float*)a);
     float const b_temp = (*(float*)b);
 
@@ -451,12 +585,12 @@ bool floatprint(void * const element, void * const format) {
 
 void floatqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(float), floatcmp);
+    qsort(array, lenght, sizeof(float), cmpfloat);
 }
 
 void floatrqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(float), floatrcmp);
+    qsort(array, lenght, sizeof(float), rcmpfloat);
 }
 
 void doubledst(void * const element, void * arg) {
@@ -483,14 +617,16 @@ size_t doublehshsame(void const * const element, void * arg) {
     return size;
 }
 
-int doublecmp(void const * const a, void const * const b) {
+int doublecmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     double const a_temp = (*(double*)a);
     double const b_temp = (*(double*)b);
 
     return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
 }
 
-int doublercmp(void const * const a, void const * const b) {
+int doublercmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     double const a_temp = (*(double*)a);
     double const b_temp = (*(double*)b);
 
@@ -504,12 +640,12 @@ bool doubleprint(void * const element, void * const format) {
 
 void doubleqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(double), doublecmp);
+    qsort(array, lenght, sizeof(double), cmpdouble);
 }
 
 void doublerqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(double), doublercmp);
+    qsort(array, lenght, sizeof(double), rcmpdouble);
 }
 
 void sizedst(void * const element, void * arg) {
@@ -534,14 +670,16 @@ size_t sizehshsame(void const * const element, void * arg) {
     return (*(size_t*)element);
 }
 
-int sizecmp(void const * const a, void const * const b) {
+int sizecmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     size_t const a_temp = (*(size_t*)a);
     size_t const b_temp = (*(size_t*)b);
 
     return a_temp < b_temp ? -1 : a_temp > b_temp ? 1 : 0;
 }
 
-int sizercmp(void const * const a, void const * const b) {
+int sizercmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     size_t const a_temp = (*(size_t*)a);
     size_t const b_temp = (*(size_t*)b);
 
@@ -555,23 +693,26 @@ bool sizeprint(void * const element, void * const format) {
 
 void sizeqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(size_t), sizecmp);
+    qsort(array, lenght, sizeof(size_t), cmpsize);
 }
 
 void sizerqsort(void * const array, size_t const lenght, void * const null) {
     (void)(null);
-    qsort(array, lenght, sizeof(size_t), sizercmp);
+    qsort(array, lenght, sizeof(size_t), rcmpsize);
 }
 
-bool sizeeven(void const * const element) {
+bool sizefileven(void const * const element, void * arg) {
+    (void)(arg);
     return !((*(size_t*)element) % 2);
 }
 
-bool sizeodd(void const * const element) {
+bool sizefilodd(void const * const element, void * arg) {
+    (void)(arg);
     return ((*(size_t*)element) % 2);
 }
 
-bool sizeprime(void const * const element) {
+bool sizefilprime(void const * const element, void * arg) {
+    (void)(arg);
     const size_t number = (*(size_t*)element);
     for (size_t i = 2; i < number; i++) {
         if (number % i == 0 && i != number) {
@@ -598,11 +739,13 @@ size_t stringhshmurmur(void const * const element, void * arg) {
     return hash;
 }
 
-int stringcmp(void const * const a, void const * const b) {
+int stringcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     return strcmp(*((char**)(a)), *((char**)(b)));
 }
 
-int stringrcmp(void const * const a, void const * const b) {
+int stringrcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
     return strcmp(*((char**)(b)), *((char**)(a)));
 }
 
@@ -613,10 +756,10 @@ bool stringprint(void * const element, void * const format) {
 
 void stringqsort(void * const array, size_t const lenght, void * const null) {
     (void)null;
-    qsort(array, lenght, sizeof(char*), stringcmp);
+    qsort(array, lenght, sizeof(char*), cmpstring);
 }
 
 void stringrqsort(void * const array, size_t const lenght, void * const null) {
     (void)null;
-    qsort(array, lenght, sizeof(char*), stringcmp);
+    qsort(array, lenght, sizeof(char*), cmpstring);
 }

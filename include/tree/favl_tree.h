@@ -9,6 +9,7 @@
 /// Finite Adelson Velsky and Landis tree structure.
 typedef struct finite_adelson_velsky_landis_tree {
     compare_fn compare;
+    void * ac;
     char * elements;
     size_t * parent;
     size_t * node[FAVLT_NODE_COUNT];
@@ -21,16 +22,18 @@ typedef struct finite_adelson_velsky_landis_tree {
 /// @param size Size of a single element
 /// @param max Maximum length of structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Tree structure.
-favl_tree_s create_favl_tree(size_t const size, size_t const max, compare_fn const compare);
+favl_tree_s create_favl_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element
 /// @param max Maximum length of structure.
-/// @param allocator Custom allocator structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
+/// @param allocator Custom allocator structure.
 /// @return Tree structure.
-favl_tree_s make_favl_tree(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator);
+favl_tree_s make_favl_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param tree Structure to destroy.

@@ -71,14 +71,14 @@ size_t _favl_tree_remove_fixup(favl_tree_s const * const tree, size_t * const no
 /// @param hole Index of hole in structure's arrays.
 void _favl_tree_fill_hole(favl_tree_s * const tree, size_t const hole);
 
-favl_tree_s create_favl_tree(size_t const size, size_t const max, compare_fn const compare) {
+favl_tree_s create_favl_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac) {
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
 
     favl_tree_s const tree = {
         .allocator = &standard, .compare = compare, .max = max, .root = NIL, .size = size,
-        .elements = standard.alloc(size * max, standard.arg),
+        .elements = standard.alloc(size * max, standard.arg), .ac = ac,
         .height = standard.alloc(sizeof(size_t) * max, standard.arg),
         .parent = standard.alloc(sizeof(size_t) * max, standard.arg),
         .node[FAVLT_LEFT] = standard.alloc(sizeof(size_t) * max, standard.arg),
@@ -93,14 +93,14 @@ favl_tree_s create_favl_tree(size_t const size, size_t const max, compare_fn con
     return tree;
 }
 
-favl_tree_s make_favl_tree(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
+favl_tree_s make_favl_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
 
     favl_tree_s const tree = {
         .allocator = allocator, .compare = compare, .max = max, .root = NIL, .size = size,
-        .elements = allocator->alloc(size * max, allocator->arg),
+        .elements = allocator->alloc(size * max, allocator->arg), .ac = ac,
         .height = allocator->alloc(sizeof(size_t) * max, allocator->arg),
         .parent = allocator->alloc(sizeof(size_t) * max, allocator->arg),
         .node[FAVLT_LEFT] = allocator->alloc(sizeof(size_t) * max, allocator->arg),
@@ -188,7 +188,7 @@ favl_tree_s copy_favl_tree(favl_tree_s const * const tree, copy_fn const copy, v
         .node[FAVLT_RIGHT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arg),
 
         .max = tree->max, .root = tree->root, .length = tree->length, .compare = tree->compare,
-        .size = tree->size, .allocator = tree->allocator,
+        .size = tree->size, .allocator = tree->allocator, .ac = tree->ac,
     };
     error(replica.elements && "Memory allocation failed.");
     error(replica.parent && "Memory allocation failed.");
@@ -261,7 +261,7 @@ void insert_favl_tree(favl_tree_s * const tree, void const * const element) {
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
 
         previous = (*node); // change parent to child
         node = comparison <= 0 ? tree->node[FAVLT_LEFT] + (*node) : tree->node[FAVLT_RIGHT] + (*node);
@@ -304,7 +304,7 @@ void remove_favl_tree(favl_tree_s * const tree, void const * const element, void
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -345,7 +345,7 @@ bool contains_favl_tree(favl_tree_s const * const tree, void const * const eleme
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             return true;
         }
@@ -527,7 +527,7 @@ void get_floor_favl_tree(favl_tree_s const * const tree, void const * const elem
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -575,7 +575,7 @@ void get_ceil_favl_tree(favl_tree_s const * const tree, void const * const eleme
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -700,14 +700,14 @@ void get_successor_favl_tree(favl_tree_s const * const tree, void const * const 
 
     size_t successor = NIL;
     size_t const right = tree->node[FAVLT_RIGHT][tree->root];
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != right) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != right) {
         for (successor = right; NIL != tree->node[FAVLT_LEFT][successor];) {
             successor = tree->node[FAVLT_LEFT][successor];
         }
     } else {
         for (size_t n = tree->root; NIL != n;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+            int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
             if (comparison < 0) {
                 successor = n;
             }
@@ -754,7 +754,7 @@ void get_predecessor_favl_tree(favl_tree_s const * const tree, void const * cons
         size_t const left = tree->node[FAVLT_LEFT][n];
 
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -884,7 +884,7 @@ void update_favl_tree(favl_tree_s const * const tree, void const * const latter,
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -1093,7 +1093,7 @@ size_t * _favl_tree_floor(favl_tree_s * const tree, void const * const element) 
     size_t * floor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -1112,7 +1112,7 @@ size_t * _favl_tree_ceil(favl_tree_s * const tree, void const * const element) {
     size_t * ceil = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -1130,7 +1130,7 @@ size_t * _favl_tree_ceil(favl_tree_s * const tree, void const * const element) {
 size_t * _favl_tree_successor(favl_tree_s * const tree, void const * const element) {
     size_t * successor = NULL;
 
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != tree->node[FAVLT_RIGHT][tree->root]) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != tree->node[FAVLT_RIGHT][tree->root]) {
         for (successor = tree->node[FAVLT_RIGHT] + tree->root; NIL != *(tree->node[FAVLT_LEFT] + (*successor));) {
             successor = tree->node[FAVLT_LEFT] + (*successor);
         }
@@ -1140,7 +1140,7 @@ size_t * _favl_tree_successor(favl_tree_s * const tree, void const * const eleme
 
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (comparison < 0) {
             successor = n;
         }
@@ -1155,7 +1155,7 @@ size_t * _favl_tree_predecessor(favl_tree_s * const tree, void const * const ele
     size_t * predecessor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -1310,9 +1310,8 @@ size_t _favl_tree_remove_fixup(favl_tree_s const * const tree, size_t * const no
 }
 
 void _favl_tree_fill_hole(favl_tree_s * const tree, size_t const hole) {
-    if (tree->length && tree->root == tree->length) { // if head node is last array element then change index to removed one
-        tree->root = hole;
-    }
+    // if head node is last array element then change index to removed one
+    if (tree->length && tree->root == tree->length) { tree->root = hole; }
 
     // cut hole node from the rest of the tree
     tree->node[FAVLT_LEFT][hole] = tree->node[FAVLT_RIGHT][hole] = tree->parent[hole] = hole;
@@ -1325,20 +1324,16 @@ void _favl_tree_fill_hole(favl_tree_s * const tree, size_t const hole) {
 
     // redirect left child of rightmost array node if they don't overlap with removed index
     size_t const left_last = tree->node[FAVLT_LEFT][tree->length];
-    if (NIL != left_last) {
-        tree->parent[left_last] = hole;
-    }
+    if (NIL != left_last) { tree->parent[left_last] = hole; }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
     size_t const right_last = tree->node[FAVLT_RIGHT][tree->length];
-    if (NIL != right_last) {
-        tree->parent[right_last] = hole;
-    }
+    if (NIL != right_last) { tree->parent[right_last] = hole; }
 
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
-        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
+        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size), tree->ac);
         size_t const node_index = comparison <= 0 ? FAVLT_LEFT : FAVLT_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }

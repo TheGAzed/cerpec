@@ -25,8 +25,7 @@ fdeque_s make_fdeque(size_t const size, size_t const max, memory_s const * alloc
     // create finite queue with custom allocated memory and check if allocation succeded
     fdeque_s const deque = {
         .elements = allocator->alloc(size * max, allocator->arg),
-        .size = size, .max = max,
-        .allocator = allocator,
+        .size = size, .max = max, .allocator = allocator,
     };
     error(deque.elements && "Memory allocation failed.");
 

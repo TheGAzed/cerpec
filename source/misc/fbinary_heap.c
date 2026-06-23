@@ -15,13 +15,13 @@ void _fbinary_heapify_up(fbinary_heap_s const * const heap, size_t const index, 
 /// @param temporary Temporary single size element used in swaps to avoid pointless memory allocation.
 void _fbinary_heapify_down(fbinary_heap_s const * const heap, size_t const index, void * const temporary);
 
-fbinary_heap_s create_fbinary_heap(size_t const size, size_t const max, compare_fn const compare) {
+fbinary_heap_s create_fbinary_heap(size_t const size, size_t const max, compare_fn const compare, void * const ac) {
     assert(compare && "Parameter can't be NULL.");
     assert(size && "Parameter can't be zero.");
     assert(max && "Parameter can't be zero.");
 
     fbinary_heap_s const heap = {
-        .size = size, .compare = compare, .allocator = &standard, .max = max,
+        .size = size, .compare = compare, .ac = ac, .allocator = &standard, .max = max,
         .elements = standard.alloc(max * size, standard.arg),
     };
     assert(heap.elements && "Memory allocation failed.");
@@ -29,14 +29,14 @@ fbinary_heap_s create_fbinary_heap(size_t const size, size_t const max, compare_
     return heap;
 }
 
-fbinary_heap_s make_fbinary_heap(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
+fbinary_heap_s make_fbinary_heap(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     assert(compare && "Parameter can't be NULL.");
     assert(size && "Parameter can't be zero.");
     assert(max && "Parameter can't be zero.");
     assert(allocator && "Parameter can't be NULL.");
 
     fbinary_heap_s const heap = {
-        .size = size, .compare = compare, .allocator = allocator, .max = max,
+        .size = size, .compare = compare, .ac = ac, .allocator = allocator, .max = max,
         .elements = allocator->alloc(max * size, allocator->arg),
     };
     assert(heap.elements && "Memory allocation failed.");
@@ -94,7 +94,7 @@ fbinary_heap_s copy_fbinary_heap(fbinary_heap_s const * const heap, copy_fn cons
     fbinary_heap_s const replica = {
         .max = heap->max, .compare = heap->compare, .size = heap->size, .length = heap->length,
         .elements = heap->allocator->alloc(heap->max * heap->size, heap->allocator->arg),
-        .allocator = heap->allocator,
+        .allocator = heap->allocator, .ac = heap->ac,
     };
     assert(replica.elements && "Memory allocation failed.");
 
@@ -211,7 +211,7 @@ void replace_fbinary_heap(fbinary_heap_s const * const heap, size_t const index,
     assert(temporary && "Memory allocation failed.");
 
     // perform heapify up or down based on comparison (ignore comparison equal to 'zero' as heap doesn't change)
-    int const comparison = heap->compare(buffer, element);
+    int const comparison = heap->compare(buffer, element, heap->ac);
     if (comparison > 0) {
         _fbinary_heapify_up(heap, index, temporary);
     } else if (comparison < 0) {
@@ -277,7 +277,7 @@ void _fbinary_heapify_up(fbinary_heap_s const * const heap, size_t const index, 
 
     void * child = heap->elements + (c * heap->size);
     void * parent = heap->elements + (p * heap->size);
-    while (c && heap->compare(child, parent) < 0) {
+    while (c && heap->compare(child, parent, heap->ac) < 0) {
         // swap current child element with parent
         memcpy(temporary, child, heap->size);
         memmove(child, parent, heap->size);
@@ -294,19 +294,24 @@ void _fbinary_heapify_up(fbinary_heap_s const * const heap, size_t const index, 
 void _fbinary_heapify_down(fbinary_heap_s const * const heap, size_t const index, void * const temporary) {
     for (size_t p = index, c = (2 * p) + 1; c < heap->length; p = c, c = (2 * p) + 1) {
         size_t const s = c + 1;
+
+        void const * sibling = heap->elements + (s * heap->size);
+        void const * juvenile = heap->elements + (c * heap->size);
         // if right child is a valid index and it is smaller than left child change left child to right one
-        if (s < heap->length && heap->compare(heap->elements + (c * heap->size), heap->elements + (s * heap->size)) > 0) {
+        if (s < heap->length && heap->compare(juvenile, sibling, heap->ac) > 0) {
             c = s;
         }
 
+        void * const child = heap->elements + (c * heap->size);
+        void * const parent = heap->elements + (p * heap->size);
         // if child is greater, then parent is properly set and thus break from loop
-        if (heap->compare(heap->elements + (c * heap->size), heap->elements + (p * heap->size)) > 0) {
+        if (heap->compare(child, parent, heap->ac) > 0) {
             break;
         }
 
         // swap current parent element with greatest child
-        memcpy(temporary, heap->elements + (c * heap->size), heap->size);
-        memmove(heap->elements + (c * heap->size), heap->elements + (p * heap->size), heap->size);
-        memcpy(heap->elements + (p * heap->size), temporary, heap->size);
+        memcpy(temporary, child, heap->size);
+        memmove(child, parent, heap->size);
+        memcpy(parent, temporary, heap->size);
     }
 }

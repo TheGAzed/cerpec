@@ -202,7 +202,7 @@ void get_fcircular_list(fcircular_list_s const * const list, size_t const index,
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_fcircular_list(fcircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
+void remove_first_fcircular_list(fcircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -224,7 +224,7 @@ void remove_first_fcircular_list(fcircular_list_s * const list, void const * con
         size_t const current = list->next[previous]; // save current node index
 
         // if comparison is false (not zero) continue iterating (also avoids useless depth)
-        if (0 != compare(list->elements + (current * list->size), element)) {
+        if (0 != compare(list->elements + (current * list->size), element, ac)) {
             continue;
         } // else element was found and gets removed
 
@@ -579,7 +579,7 @@ fcircular_list_s split_fcircular_list(fcircular_list_s * const list, size_t cons
     return split;
 }
 
-fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn const filter, size_t const list_max, size_t const extract_max) {
+fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn const filter, void * const af, size_t const list_max, size_t const extract_max) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
     error(list_max && "Paremeter can't be zero.");
@@ -611,7 +611,7 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn
         size_t const current = list->next[previous]; // get current node
 
         char const * element = list->elements + (current * list->size); // save current element
-        if (filter(element)) { // if element is valid push into positive list
+        if (filter(element, af)) { // if element is valid push into positive list
             error(positive.length + 1 <= extract_max && "Extracted list exceeds maximum length.");
 
             (*pos) = pos_idx;

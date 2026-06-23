@@ -20,6 +20,7 @@
 /// @brief Infinite red-black set structure.
 typedef struct infinite_red_black_set {
     compare_fn compare;
+    void * ac;
     char * elements;
     size_t * parent;
     size_t * node[IRB_SET_NODE_COUNT];
@@ -31,15 +32,17 @@ typedef struct infinite_red_black_set {
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Set structure.
-irb_set_s create_irb_set(size_t const size, compare_fn const compare);
+irb_set_s create_irb_set(size_t const size, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @param allocator Custom allocator structure.
 /// @return Set structure.
-irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s const * const allocator);
+irb_set_s make_irb_set(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.

@@ -50,14 +50,14 @@ size_t _fbsearch_tree_remove_fixup(fbsearch_tree_s const * const tree, size_t * 
 /// @param hole Index of hole in structure's arrays.
 void _fbsearch_tree_fill_hole(fbsearch_tree_s * const tree, size_t const hole);
 
-fbsearch_tree_s create_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare) {
+fbsearch_tree_s create_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac) {
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
 
     fbsearch_tree_s const tree = {
         .compare = compare, .allocator = &standard, .max = max, .root = NIL, .size = size,
-        .elements = standard.alloc(max * size, standard.arg),
+        .elements = standard.alloc(max * size, standard.arg), .ac = ac,
         .parent = standard.alloc(max * sizeof(size_t), standard.arg),
         .node[FBST_RIGHT] = standard.alloc(max * sizeof(size_t), standard.arg),
         .node[FBST_LEFT] = standard.alloc(max * sizeof(size_t), standard.arg),
@@ -70,7 +70,7 @@ fbsearch_tree_s create_fbsearch_tree(size_t const size, size_t const max, compar
     return tree;
 }
 
-fbsearch_tree_s make_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator) {
+fbsearch_tree_s make_fbsearch_tree(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     error(size && "Parameter can't be zero.");
     error(max && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
@@ -78,7 +78,7 @@ fbsearch_tree_s make_fbsearch_tree(size_t const size, size_t const max, compare_
 
     fbsearch_tree_s const tree = {
         .compare = compare, .allocator = allocator, .max = max, .root = NIL, .size = size,
-        .elements = allocator->alloc(max * size, allocator->arg),
+        .elements = allocator->alloc(max * size, allocator->arg), .ac = ac,
         .parent = allocator->alloc(max * sizeof(size_t), allocator->arg),
         .node[FBST_RIGHT] = allocator->alloc(max * sizeof(size_t), allocator->arg),
         .node[FBST_LEFT] = allocator->alloc(max * sizeof(size_t), allocator->arg),
@@ -159,7 +159,7 @@ fbsearch_tree_s copy_fbsearch_tree(fbsearch_tree_s const * const tree, copy_fn c
         .node[FBST_RIGHT] = tree->allocator->alloc(tree->max * sizeof(size_t), tree->allocator->arg),
 
         .max = tree->max, .root = tree->root, .length = tree->length, .compare = tree->compare,
-        .size = tree->size, .allocator = tree->allocator,
+        .size = tree->size, .allocator = tree->allocator, .ac = tree->ac,
     };
     error(replica.elements && "Memory allocation failed.");
     error(replica.parent && "Memory allocation failed.");
@@ -227,7 +227,7 @@ void insert_fbsearch_tree(fbsearch_tree_s * const tree, void const * const eleme
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
 
         previous = (*node); // change parent to child
         node = comparison <= 0 ? tree->node[FBST_LEFT] + (*node) : tree->node[FBST_RIGHT] + (*node);
@@ -267,7 +267,7 @@ void remove_fbsearch_tree(fbsearch_tree_s * const tree, void const * const eleme
     size_t * node = &(tree->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*node) * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -306,7 +306,7 @@ bool contains_fbsearch_tree(fbsearch_tree_s const * const tree, void const * con
 
     for (size_t node = tree->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             return true;
         }
@@ -481,7 +481,7 @@ void get_floor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * co
     size_t floor = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -528,7 +528,7 @@ void get_ceil_fbsearch_tree(fbsearch_tree_s const * const tree, void const * con
     size_t ceil = NIL;
     for (size_t n = tree->root; NIL != n;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -649,14 +649,14 @@ void get_successor_fbsearch_tree(fbsearch_tree_s const * const tree, void const 
     // case: root is same as target and right child is not empty
     size_t successor = NIL;
     size_t const right = tree->node[FBST_RIGHT][tree->root];
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != right) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != right) {
         for (successor = right; NIL != tree->node[FBST_LEFT][successor];) {
             successor = tree->node[FBST_LEFT][successor];
         }
     } else {
         for (size_t n = tree->root; NIL != n;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+            int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
             if (comparison < 0) {
                 successor = n;
             }
@@ -701,7 +701,7 @@ void get_predecessor_fbsearch_tree(fbsearch_tree_s const * const tree, void cons
     for (size_t n = tree->root; NIL != n;) {
         size_t const left = tree->node[FBST_LEFT][n];
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + (n * tree->size));
+        int const comparison = tree->compare(element, tree->elements + (n * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -826,7 +826,7 @@ void update_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const
     size_t node = tree->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(latter, tree->elements + (node * tree->size));
+        int const comparison = tree->compare(latter, tree->elements + (node * tree->size), tree->ac);
         if (!comparison) {
             break;
         }
@@ -1031,7 +1031,7 @@ size_t * _fbsearch_tree_floor(fbsearch_tree_s * const tree, void const * const e
     size_t * floor = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             floor = n;
             break;
@@ -1050,7 +1050,7 @@ size_t * _fbsearch_tree_ceil(fbsearch_tree_s * const tree, void const * const el
     size_t * ceil = NULL;
     for (size_t * n = &(tree->root); NIL != (*n);) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (!comparison) {
             ceil = n;
             break;
@@ -1069,14 +1069,14 @@ size_t * _fbsearch_tree_successor(fbsearch_tree_s * const tree, void const * con
     size_t * successor = NULL;
 
     size_t * const right = tree->node[FBST_RIGHT] + tree->root;
-    if (!tree->compare(element, tree->elements + (tree->root * tree->size)) && NIL != (*right)) {
+    if (!tree->compare(element, tree->elements + (tree->root * tree->size), tree->ac) && NIL != (*right)) {
         for (successor = right; NIL != *(tree->node[FBST_LEFT] + (*successor));) {
             successor = tree->node[FBST_LEFT] + (*successor);
         }
     } else {
         for (size_t * n = &(tree->root); NIL != (*n);) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+            int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
             if (comparison < 0) {
                 successor = n;
             }
@@ -1093,7 +1093,7 @@ size_t * _fbsearch_tree_predecessor(fbsearch_tree_s * const tree, void const * c
     for (size_t * n = &(tree->root); NIL != (*n);) {
         size_t * const left = tree->node[FBST_LEFT] + (*n);
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size));
+        int const comparison = tree->compare(element, tree->elements + ((*n) * tree->size), tree->ac);
         if (comparison > 0) {
             predecessor = n;
         } else if (!comparison) {
@@ -1140,7 +1140,7 @@ void _fbsearch_tree_fill_hole(fbsearch_tree_s * const tree, size_t const hole) {
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = tree->parent[tree->length];
     if (NIL != parent_last) {
-        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size));
+        int const comparison = tree->compare(tree->elements + (tree->length * tree->size), tree->elements + (parent_last * tree->size), tree->ac);
         size_t const node_index = comparison <= 0 ? FBST_LEFT : FBST_RIGHT;
         tree->node[node_index][parent_last] = hole;
     }

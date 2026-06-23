@@ -22,34 +22,34 @@ void _imatrix_graph_resize(iam_graph_s * const graph, size_t const size);
 size_t _find_parent(iam_table_s const * const table, size_t const vertex);
 void _union_set(iam_table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args);
 
-iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, copy_fn const convert, void * const ac, copy_fn const sum, void * const as, void * const zero, void * const infinite) {
+iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, void * const ac, copy_fn const juggle, void * const aj, copy_fn const sum, void * const as, void * const zero, void * const infinite) {
     error(size && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
-    error(convert && "Parameter can't be NULL.");
+    error(juggle && "Parameter can't be NULL.");
     error(sum && "Parameter can't be NULL.");
     error(zero && "Parameter can't be NULL.");
     error(infinite && "Parameter can't be NULL.");
-    error(compare(infinite, zero) > 0 && "Infinite must be greater than zero.");
-    error(compare(zero, infinite) < 0 && "Zero must be smaller than infinity.");
+    error(compare(infinite, zero, ac) > 0 && "Infinite must be greater than zero.");
+    error(compare(zero, infinite, ac) < 0 && "Zero must be smaller than infinity.");
 
     return (iam_cost_s) {
-        .compare = compare, .size = size, .zero = zero, .infinite = infinite, .sum = sum, .convert = convert,
-        .as = ac, .ac = as
+        .compare = compare, .size = size, .zero = zero, .infinite = infinite, .sum = sum, .juggle = juggle,
+        .as = as, .aj = aj, .ac = ac,
     };
 }
 
-iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const none) {
+iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const ac, void * const none) {
     error(vertex_size && "Parameter can't be zero.");
     error(edge_size && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
     error(none && "Parameter can't be NULL.");
 
     return (iam_graph_s) {
-        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .none = none, .allocator = &standard,
+        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .ac = ac, .none = none, .allocator = &standard,
     };
 }
 
-iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const none, memory_s const * const allocator) {
+iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const ac, void * const none, memory_s const * const allocator) {
     error(vertex_size && "Parameter can't be zero.");
     error(edge_size && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
@@ -57,7 +57,7 @@ iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, com
     error(allocator && "Parameter can't be NULL.");
 
     return (iam_graph_s) {
-        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .none = none, .allocator = allocator,
+        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .ac = ac, .none = none, .allocator = allocator,
     };
 }
 
@@ -79,7 +79,7 @@ void destroy_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, v
     size_t const edge_length = (graph->vertex_length * (graph->vertex_length - 1)) / 2;
     for (size_t i = 0; i < edge_length; ++i) {
         void * edge = graph->edges + (i * graph->edge_size);
-        if (graph->compare(graph->none, edge)) {
+        if (graph->compare(graph->none, edge, graph->ac)) {
             destroy_edge(edge, ade);
         }
     }
@@ -108,7 +108,7 @@ void clear_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, voi
     size_t const edge_length = (graph->vertex_length * (graph->vertex_length - 1)) / 2;
     for (size_t i = 0; i < edge_length; ++i) {
         void * edge = graph->edges + (i * graph->edge_size);
-        if (graph->compare(graph->none, edge)) { destroy_edge(edge, ade); }
+        if (graph->compare(graph->none, edge, graph->ac)) { destroy_edge(edge, ade); }
     }
 
     graph->allocator->free(graph->vertices, graph->allocator->arg);
@@ -131,8 +131,11 @@ iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_v
 
     size_t const edge_capacity = (graph->capacity * (graph->capacity - 1)) / 2;
     iam_graph_s const replica = {
-        .vertex_size = graph->vertex_size, .edge_size = graph->edge_size, .compare = graph->compare,
-        .none = graph->none, .vertex_length = graph->vertex_length, .capacity = graph->capacity, .allocator = graph->allocator,
+        .vertex_size = graph->vertex_size, .edge_size = graph->edge_size, .compare = graph->compare, .ac = graph->ac,
+        .vertex_length = graph->vertex_length, .edge_length = graph->edge_length, .capacity = graph->capacity,
+
+        .none = graph->none,
+        .allocator = graph->allocator,
 
         .vertices = graph->allocator->alloc(graph->capacity * graph->vertex_size, graph->allocator->arg),
         .edges = graph->allocator->alloc(edge_capacity * graph->edge_size, graph->allocator->arg),
@@ -144,10 +147,12 @@ iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_v
         copy_vertex(replica.vertices + (i * replica.vertex_size), graph->vertices + (i * graph->vertex_size), acv);
     }
 
-    size_t const edge_length = (graph->vertex_length * (graph->vertex_length - 1)) / 2;
-    for (size_t i = 0; i < edge_length; ++i) {
+    size_t const max_edge_length = (graph->vertex_length * (graph->vertex_length - 1)) / 2;
+    for (size_t i = 0; i < max_edge_length; ++i) {
         void const * edge = graph->edges + (i * graph->edge_size);
-        if (graph->compare(graph->none, edge)) { copy_edge(replica.edges + (i * replica.edge_size), edge, ace); }
+        if (graph->compare(graph->none, edge, graph->ac)) {
+            copy_edge(replica.edges + (i * replica.edge_size), edge, ace);
+        }
     }
 
     return replica;
@@ -209,7 +214,7 @@ bool is_connected_iam_graph(iam_graph_s const * const graph) {
         size_t const offset = (vertex * (vertex - 1)) / 2;
         for (size_t v = 0, e = offset; v < vertex; ++v, e++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (graph->compare(graph->none, edge) && !visited[v]) {
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[v]) {
                 visited[v] = true;
                 // add recently visited vertex to stack
                 stack.array[stack.length++] = v;
@@ -219,7 +224,7 @@ bool is_connected_iam_graph(iam_graph_s const * const graph) {
 
         for (size_t v = vertex + 1, e = offset + (2 * vertex); v < graph->vertex_length; e += v++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (graph->compare(graph->none, edge) && !visited[v]) {
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[v]) {
                 visited[v] = true;
                 // add recently visited vertex to stack
                 stack.array[stack.length++] = v;
@@ -273,7 +278,7 @@ bool is_tree_iam_graph(iam_graph_s const * const graph) {
         size_t const offset = (vertex * (vertex - 1)) / 2;
         for (size_t v = 0, e = offset; v < vertex; ++v, e++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (!graph->compare(graph->none, edge)) { continue; }
+            if (!graph->compare(graph->none, edge, graph->ac)) { continue; }
 
             // if we're revisiting a vertex whose edge we havent visited yet then we're cycling back to it
             if (visited_vertex[v] && !explored_edge[e]) {
@@ -290,7 +295,7 @@ bool is_tree_iam_graph(iam_graph_s const * const graph) {
 
         for (size_t v = vertex + 1, e = offset + (2 * vertex); v < graph->vertex_length; e += v++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (!graph->compare(graph->none, edge)) { continue; }
+            if (!graph->compare(graph->none, edge, graph->ac)) { continue; }
 
             // if we're revisiting a vertex whose edge we havent visited yet then we're cycling back to it
             if (visited_vertex[v] && !explored_edge[e]) {
@@ -358,7 +363,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
         void * edge_last = graph->edges + ((start_last + r) * graph->edge_size);
 
         // if an edge exists for removed vertex then destroy it
-        if (graph->compare(graph->none, edge_index)) {
+        if (graph->compare(graph->none, edge_index, graph->ac)) {
             destroy_edge(edge_index, ade);
         }
 
@@ -374,7 +379,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
         void * edge_last = graph->edges + ((start_last + c + 1) * graph->edge_size);
 
         // if an edge exists for removed vertex then destroy it
-        if (graph->compare(graph->none, edge_index)) {
+        if (graph->compare(graph->none, edge_index, graph->ac)) {
             destroy_edge(edge_index, ade);
         }
 
@@ -385,7 +390,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
 
     // remove edge shared with last vertex in array if removed vertex isn't last and an edge exists
     void * edge_last = graph->edges + ((start_last + index) * graph->edge_size);
-    if (index != graph->vertex_length - 1 && graph->compare(graph->none, edge_last)) {
+    if (index != graph->vertex_length - 1 && graph->compare(graph->none, edge_last, graph->ac)) {
         destroy_edge(edge_last, ade);
     }
 
@@ -423,7 +428,7 @@ void insert_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
     error(index_two < graph->vertex_length && "Parameter can't exceed length.");
     error(index_one != index_two && "Parameters can't be equal.");
     error(edge && "Parameter can't be NULL.");
-    error(graph->compare(graph->none, edge) && "Parameter can't be none.");
+    error(graph->compare(graph->none, edge, graph->ac) && "Parameter can't be none.");
 
     valid(graph->compare && "Compare function can't be NULL.");
     valid(graph->edge_size && "Edge size can't be zero.");
@@ -438,7 +443,7 @@ void insert_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
 
     // assert that no edge between vertices exists yet
     char * current_edge = graph->edges + ((start_row + minimum) * graph->edge_size);
-    error(!graph->compare(graph->none, current_edge));
+    error(!graph->compare(graph->none, current_edge, graph->ac));
 
     memcpy(current_edge, edge, graph->edge_size);
     graph->edge_length++;
@@ -464,7 +469,7 @@ void remove_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
 
     // assert that an edge exists between vertices
     char * edge = graph->edges + ((start_row + minimum) * graph->edge_size);
-    error(graph->compare(graph->none, edge) && "Can't remove none.");
+    error(graph->compare(graph->none, edge, graph->ac) && "Can't remove none.");
 
     memcpy(buffer, edge, graph->edge_size);
     memcpy(edge, graph->none, graph->edge_size);
@@ -488,7 +493,7 @@ bool contains_edge_iam_graph(iam_graph_s const * const graph, size_t const index
 
     size_t const start_row = (maximum * (maximum - 1)) / 2;
 
-    return graph->compare(graph->none, graph->edges + ((start_row + minimum) * graph->edge_size));
+    return graph->compare(graph->none, graph->edges + ((start_row + minimum) * graph->edge_size), graph->ac);
 }
 
 void get_edge_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two, void * const buffer) {
@@ -509,7 +514,7 @@ void get_edge_iam_graph(iam_graph_s const * const graph, size_t const index_one,
     size_t const start_row = (maximum * (maximum - 1)) / 2;
 
     // assert that an edge exists between vertices
-    assert(graph->compare(graph->none, graph->edges + ((start_row + minimum) * graph->edge_size)));
+    assert(graph->compare(graph->none, graph->edges + ((start_row + minimum) * graph->edge_size), graph->ac));
 
     memcpy(buffer, graph->edges + ((start_row + minimum) + graph->edge_size), graph->edge_size);
 }
@@ -528,14 +533,14 @@ size_t degree_iam_graph(iam_graph_s const * const graph, size_t const index) {
     size_t const offset = (index * (index - 1)) / 2;
     for (size_t i = 0, e = offset; i < index; ++i, e++) {
         char const * edge = graph->edges + (e * graph->edge_size);
-        if (graph->compare(edge, graph->none)) {
+        if (graph->compare(edge, graph->none, graph->ac)) {
             count++;
         }
     }
 
     for (size_t i = index + 1, e = offset + (2 * index); i < graph->vertex_length; e += i++) {
         char const * edge = graph->edges + (e * graph->edge_size);
-        if (graph->compare(edge, graph->none)) {
+        if (graph->compare(edge, graph->none, graph->ac)) {
             count++;
         }
     }
@@ -590,26 +595,26 @@ iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
         size_t const offset = (vertex * (vertex - 1)) / 2;
         for (size_t i = 0, e = offset; i < vertex; ++i, e++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (graph->compare(graph->none, edge) && !visited[i]) {
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[i]) {
                 visited[i] = true;
                 queue.array[queue.current + queue.length++] = i;
             }
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->convert(table.costs + (i * table.data->size), edge, table.data->as);
+            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
         }
 
         for (size_t i = vertex + 1, e = offset + (2 * vertex); i < graph->vertex_length; e += i++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (graph->compare(graph->none, edge) && !visited[i]) {
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[i]) {
                 visited[i] = true;
                 queue.array[queue.current + queue.length++] = i;
             }
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->convert(table.costs + (i * table.data->size), edge, table.data->as);
+            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
         }
     }
 
@@ -665,26 +670,26 @@ iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
         size_t const offset = (vertex * (vertex - 1)) / 2;
         for (size_t i = 0, e = offset; i < vertex; ++i, e++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (graph->compare(graph->none, edge) && !visited[i]) {
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[i]) {
                 visited[i] = true;
                 stack.array[stack.length++] = i;
             }
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->convert(table.costs + (i * table.data->size), edge, table.data->as);
+            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
         }
 
         for (size_t i = vertex + 1, e = offset + (2 * vertex); i < graph->vertex_length; e += i++) {
             void const * edge = graph->edges + (e * graph->edge_size);
-            if (graph->compare(graph->none, edge) && !visited[i]) {
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[i]) {
                 visited[i] = true;
                 stack.array[stack.length++] = i;
             }
 
             table.previous[i] = vertex;
             memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->convert(table.costs + (i * table.data->size), edge, table.data->as);
+            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
         }
     }
 
@@ -751,19 +756,19 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
             void const * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            void const * temp = can_add ? cost->sum(cost->convert(sum_cost, edge_weight, cost->as), current_cost, cost->ac) : cost->infinite;
+            bool const can_add = graph->compare(edge_weight, graph->none, graph->ac);
+            void const * temp = can_add ? cost->sum(cost->juggle(sum_cost, edge_weight, cost->as), current_cost, cost->aj) : cost->infinite;
             memmove(sum_cost, temp, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum_cost, g_cost) < 0) {
+            if (table.data->compare(sum_cost, g_cost, table.data->ac) < 0) {
                 table.previous[j] = current;
                 memcpy(g_cost, sum_cost, table.data->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost) > 0) {
+            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
                 memcpy(minimum.cost, g_cost, table.data->size);
                 minimum.vertex = j;
             }
@@ -776,19 +781,19 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
             void const * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            void const * temp = can_add ? cost->sum(cost->convert(sum_cost, edge_weight, cost->as), current_cost, cost->ac) : cost->infinite;
+            bool const can_add = graph->compare(edge_weight, graph->none, graph->ac);
+            void const * temp = can_add ? cost->sum(cost->juggle(sum_cost, edge_weight, cost->as), current_cost, cost->aj) : cost->infinite;
             memmove(sum_cost, temp, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum_cost, g_cost) < 0) {
+            if (table.data->compare(sum_cost, g_cost, table.data->ac) < 0) {
                 table.previous[j] = current;
                 memcpy(g_cost, sum_cost, table.data->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost) > 0) {
+            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
                 memcpy(minimum.cost, g_cost, table.data->size);
                 minimum.vertex = j;
             }
@@ -801,7 +806,7 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
     return table;
 }
 
-iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic) {
+iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic, void * const ah) {
     error(graph && "Parameter can't be NULL.");
     error(cost && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
@@ -861,24 +866,24 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
             void const * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            void const * temp = can_add ? cost->sum(cost->convert(sum_cost, edge_weight, cost->as), current_cost, cost->ac) : cost->infinite;
+            bool const can_add = graph->compare(edge_weight, graph->none, graph->ac);
+            void const * temp = can_add ? cost->sum(cost->juggle(sum_cost, edge_weight, cost->as), current_cost, cost->aj) : cost->infinite;
             memmove(sum_cost, temp, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum_cost, g_cost) < 0) {
+            if (table.data->compare(sum_cost, g_cost, table.data->ac) < 0) {
                 table.previous[j] = current;
                 memcpy(g_cost, sum_cost, table.data->size);
             }
 
             // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
-            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size));
+            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size), ah);
             // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
-            bool const can_sum = cost->compare(g_cost, cost->infinite) && cost->compare(h_cost, cost->infinite);
-            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost, cost->ac) : cost->infinite, cost->size);
+            bool const can_sum = cost->compare(g_cost, cost->infinite, cost->ac) && cost->compare(h_cost, cost->infinite, cost->ac);
+            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost, cost->aj) : cost->infinite, cost->size);
 
             // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
-            if (table.data->compare(minimum.cost, f_cost) > 0) {
+            if (table.data->compare(minimum.cost, f_cost, table.data->ac) > 0) {
                 memcpy(minimum.cost, f_cost, table.data->size);
                 minimum.vertex = j;
             }
@@ -891,24 +896,24 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
             void const * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            bool const can_add = graph->compare(edge_weight, graph->none);
-            void const * temp = can_add ? cost->sum(cost->convert(sum_cost, edge_weight, cost->as), current_cost, cost->ac) : cost->infinite;
+            bool const can_add = graph->compare(edge_weight, graph->none, graph->ac);
+            void const * temp = can_add ? cost->sum(cost->juggle(sum_cost, edge_weight, cost->as), current_cost, cost->aj) : cost->infinite;
             memmove(sum_cost, temp, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum_cost, g_cost) < 0) {
+            if (table.data->compare(sum_cost, g_cost, table.data->ac) < 0) {
                 table.previous[j] = current;
                 memcpy(g_cost, sum_cost, table.data->size);
             }
 
             // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
-            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size));
+            heuristic(h_cost, graph->vertices + (current * graph->vertex_size), graph->vertices + (end * graph->vertex_size), ah);
             // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
-            bool const can_sum = cost->compare(g_cost, cost->infinite) && cost->compare(h_cost, cost->infinite);
-            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost, cost->ac) : cost->infinite, cost->size);
+            bool const can_sum = cost->compare(g_cost, cost->infinite, cost->ac) && cost->compare(h_cost, cost->infinite, cost->ac);
+            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost, cost->aj) : cost->infinite, cost->size);
 
             // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
-            if (table.data->compare(minimum.cost, f_cost) > 0) {
+            if (table.data->compare(minimum.cost, f_cost, table.data->ac) > 0) {
                 memcpy(minimum.cost, f_cost, table.data->size);
                 minimum.vertex = j;
             }
@@ -976,18 +981,18 @@ iam_table_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * co
             void const * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            bool const can_convert = graph->compare(edge_weight, graph->none);
-            memmove(weight_cost, can_convert ? cost->convert(weight_cost, edge_weight, cost->as) : cost->infinite, cost->size);
+            bool const can_convert = graph->compare(edge_weight, graph->none, graph->ac);
+            memmove(weight_cost, can_convert ? cost->juggle(weight_cost, edge_weight, cost->as) : cost->infinite, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(weight_cost, g_cost) < 0) {
+            if (table.data->compare(weight_cost, g_cost, table.data->ac) < 0) {
                 table.previous[j] = current;
                 memcpy(g_cost, weight_cost, table.data->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost) > 0) {
+            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
                 memcpy(minimum.cost, g_cost, table.data->size);
                 minimum.vertex = j;
             }
@@ -1000,18 +1005,18 @@ iam_table_s prim_iam_list(iam_graph_s const * const graph, iam_cost_s const * co
             void const * edge_weight = graph->edges + (e * graph->edge_size);
             void * g_cost = table.costs + (j * table.data->size);
 
-            bool const can_convert = graph->compare(edge_weight, graph->none);
-            memmove(weight_cost, can_convert ? cost->convert(weight_cost, edge_weight, cost->as) : cost->infinite, cost->size);
+            bool const can_convert = graph->compare(edge_weight, graph->none, graph->ac);
+            memmove(weight_cost, can_convert ? cost->juggle(weight_cost, edge_weight, cost->as) : cost->infinite, cost->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(weight_cost, g_cost) < 0) {
+            if (table.data->compare(weight_cost, g_cost, table.data->ac) < 0) {
                 table.previous[j] = current;
                 memcpy(g_cost, weight_cost, table.data->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost) > 0) {
+            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
                 memcpy(minimum.cost, g_cost, table.data->size);
                 minimum.vertex = j;
             }
@@ -1061,7 +1066,7 @@ iam_table_s kruskal_iam_list(iam_graph_s const * const graph, iam_cost_s const *
             size_t const offset = (j * (j - 1)) / 2;
             void * edge_weight = graph->edges + ((offset + i) * graph->edge_size);
 
-            if (graph->compare(edge_weight, graph->none)) {
+            if (graph->compare(edge_weight, graph->none, graph->ac)) {
                 valid(edge_index < graph->edge_length && "Edge index exceeds lenght.");
                 kruskal_edges[edge_index++] = (iam_edge_s) { .edge = edge_weight, .vertices = { i, j }};
             }
@@ -1141,7 +1146,7 @@ iam_graph_s subgraph_iam_list(iam_table_s const * const table, copy_fn const cop
         copy_vertex(subgraph.vertices + (i * subgraph.vertex_size), table->graph->vertices + (i * table->graph->vertex_size), acv);
 
         char const * cost = table->costs + (table->data->size * i);
-        if (table->data->compare(cost, table->data->zero) && table->data->compare(cost, table->data->infinite)) {
+        if (table->data->compare(cost, table->data->zero, table->data->ac) && table->data->compare(cost, table->data->infinite, table->data->ac)) {
             size_t const index_one = i;
             size_t const index_two = table->previous[i];
 
@@ -1192,7 +1197,7 @@ void each_edge_iam_graph(iam_graph_s const * const graph, handle_fn const handle
 
             // if edge is none continue since handle can't be performed (first condition is false so other won't be checked.)
             // if handler terminates (returns false) end loop
-            if (graph->compare(&weight, graph->none) && !handle(&edge, ah)) {
+            if (graph->compare(&weight, graph->none, graph->ac) && !handle(&edge, ah)) {
                 return;
             }
         }
@@ -1216,7 +1221,7 @@ void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index
 
         // if edge is none continue since handle can't be performed (first condition is false so other won't be checked.)
         // if handler terminates (returns false) end loop
-        if (graph->compare(edge, graph->none) && !handle(vertex, ah)) {
+        if (graph->compare(edge, graph->none, graph->ac) && !handle(vertex, ah)) {
             return;
         }
     }
@@ -1227,7 +1232,7 @@ void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index
 
         // if edge is none continue since handle can't be performed (first condition is false so other won't be checked.)
         // if handler terminates (returns false) end loop
-        if (graph->compare(edge, graph->none) && !handle(vertex, ah)) {
+        if (graph->compare(edge, graph->none, graph->ac) && !handle(vertex, ah)) {
             return;
         }
     }
@@ -1285,7 +1290,7 @@ bool each_path_iam_list(iam_table_s const * const table, size_t const end, handl
 
     table->graph->allocator->free(stack.array, table->graph->allocator->arg);
 
-    return !table->data->compare(table->costs + (top * table->data->size), table->data->zero);
+    return !table->data->compare(table->costs + (top * table->data->size), table->data->zero, table->data->ac);
 }
 
 void _imatrix_graph_resize(iam_graph_s * const graph, size_t const size) {
@@ -1317,9 +1322,9 @@ void _union_set(iam_table_s const * const table, size_t const source, size_t con
 
     void * source_cost = table->costs + (source_root * table->data->size);
     void const * destination_cost = table->costs + (destination_root * table->data->size);
-    if (table->data->compare(source_cost, destination_cost) < 0) {
+    if (table->data->compare(source_cost, destination_cost, table->data->ac) < 0) {
         table->previous[source_root] = destination_root;
-    } else if (table->data->compare(source_cost, destination_cost) > 0) {
+    } else if (table->data->compare(source_cost, destination_cost, table->data->ac) > 0) {
         table->previous[destination_root] = source_root;
     } else {
         table->previous[destination_root] = source_root;

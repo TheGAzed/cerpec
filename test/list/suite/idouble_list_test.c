@@ -239,7 +239,7 @@ TEST REMOVE_FIRST_01(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; ++i) {
         int t = 0;
-        remove_first_idouble_list(&test, &i, &t, intcmp);
+        remove_first_idouble_list(&test, &i, &t, intcmp, NULL);
         ASSERT_EQ(i, t);
     }
 
@@ -257,7 +257,7 @@ TEST REMOVE_FIRST_02(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; ++i) {
         int t = 0;
-        remove_first_idouble_list(&test, &i, &t, intcmp);
+        remove_first_idouble_list(&test, &i, &t, intcmp, NULL);
         ASSERT_EQ(i, t);
     }
 
@@ -275,7 +275,7 @@ TEST REMOVE_FIRST_03(void) {
 
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; ++i) {
         int t = 0;
-        remove_first_idouble_list(&test, &i, &t, intcmp);
+        remove_first_idouble_list(&test, &i, &t, intcmp, NULL);
         ASSERT_EQ(i, t);
     }
 
@@ -827,7 +827,7 @@ TEST EXTRACT_01(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s extract = extract_idouble_list(&test, intodd);
+    idouble_list_s extract = extract_idouble_list(&test, intfilodd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK - 1; i += 2) {
         int s = 0;
         get_idouble_list(&test, (size_t)(i) / 2, &s);
@@ -853,7 +853,7 @@ TEST EXTRACT_02(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s extract = extract_idouble_list(&test, intodd);
+    idouble_list_s extract = extract_idouble_list(&test, intfilodd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK; i += 2) {
         int s = 0;
         get_idouble_list(&test, (size_t)(i) / 2, &s);
@@ -879,7 +879,7 @@ TEST EXTRACT_03(void) {
         insert_at_idouble_list(&test, &i, test.length);
     }
 
-    idouble_list_s extract = extract_idouble_list(&test, intodd);
+    idouble_list_s extract = extract_idouble_list(&test, intfilodd, NULL);
     for (int i = 0; i < IDOUBLE_LIST_CHUNK + 1; i += 2) {
         int s = 0;
         get_idouble_list(&test, (size_t)(i) / 2, &s);

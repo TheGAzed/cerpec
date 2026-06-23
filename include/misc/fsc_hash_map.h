@@ -8,6 +8,7 @@ typedef struct finite_separate_chaining_hash_map {
     hash_fn hash_key;
     void * ahk;
     compare_fn compare_key;
+    void * ack;
     char * keys, * values;
     size_t * next, * prev, * head, * hashes;
     size_t key_size, value_size, length, max;
@@ -21,8 +22,9 @@ typedef struct finite_separate_chaining_hash_map {
 /// @param hash_key Function pointer to hash element into value.
 /// @param ahk Arguments for hash function pointer.
 /// @param compare_key Function pointer to compare keys.
+/// @param ack Arguments for compare function pointer.
 /// @return Map structure.
-fsc_hash_map_s create_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key);
+fsc_hash_map_s create_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, void * const ack);
 
 /// @brief Creates an empty structure.
 /// @param key_size Size of a single key.
@@ -31,9 +33,10 @@ fsc_hash_map_s create_fsc_hash_map(size_t const key_size, size_t const value_siz
 /// @param hash_key Function pointer to hash element into value.
 /// @param ahk Arguments for hash function pointer.
 /// @param compare_key Function pointer to compare keys.
+/// @param ack Arguments for compare function pointer.
 /// @param allocator Custom allocator structure.
 /// @return Map structure.
-fsc_hash_map_s make_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, memory_s const * const allocator);
+fsc_hash_map_s make_fsc_hash_map(size_t const key_size, size_t const value_size, size_t const max, hash_fn const hash_key, void * const ahk, compare_fn const compare_key, void * const ack, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param map Structure to destroy.

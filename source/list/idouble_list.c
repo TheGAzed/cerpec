@@ -184,7 +184,7 @@ void get_idouble_list(idouble_list_s const * const list, size_t const index, voi
     memcpy(buffer, list->elements + (current * list->size), list->size);
 }
 
-void remove_first_idouble_list(idouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
+void remove_first_idouble_list(idouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -201,7 +201,7 @@ void remove_first_idouble_list(idouble_list_s * const list, void const * const e
     // for each element in list travel forward
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[IDL_NEXT][current]) {
         char const * const found = list->elements + (current * list->size);
-        if (0 != compare(element, found)) { // if element isn't found continue
+        if (0 != compare(element, found, ac)) { // if element isn't found continue
             continue;
         } // else remove element and return successfully
 
@@ -229,7 +229,7 @@ void remove_first_idouble_list(idouble_list_s * const list, void const * const e
     exit(EXIT_FAILURE);
 }
 
-void remove_last_idouble_list(idouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare) {
+void remove_last_idouble_list(idouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {
     error(list && "Paremeter can't be NULL.");
     error(element && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
@@ -248,7 +248,7 @@ void remove_last_idouble_list(idouble_list_s * const list, void const * const el
         current = list->node[IDL_PREV][current];
 
         char const * found = list->elements + (current * list->size);
-        if (0 != compare(element, found)) { // if element isn't found continue
+        if (0 != compare(element, found, ac)) { // if element isn't found continue
             continue;
         } // else remove element and return successfully
 
@@ -551,7 +551,7 @@ idouble_list_s split_idouble_list(idouble_list_s * const list, size_t const inde
     return split;
 }
 
-idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const filter) {
+idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const filter, void * const af) {
     error(list && "Paremeter can't be NULL.");
     error(filter && "Paremeter can't be NULL.");
 
@@ -567,7 +567,7 @@ idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const
     for (size_t i = 0, current = list->head; i < length; ++i) {
         char const * element = list->elements + (current * list->size);
 
-        if (!filter(element)) { // if no extraction go to next list node and continue
+        if (!filter(element, af)) { // if no extraction go to next list node and continue
             current = list->node[IDL_NEXT][current];
             continue;
         } // else extract and append list node into positive list

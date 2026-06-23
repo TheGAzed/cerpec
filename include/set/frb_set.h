@@ -12,6 +12,7 @@
 /// @brief Finite red-black tree set structure.
 typedef struct finite_red_black_set {
     compare_fn compare;
+    void * ac;
     char * elements;
     size_t * parent;
     size_t * node[IRB_SET_NODE_COUNT];
@@ -24,16 +25,18 @@ typedef struct finite_red_black_set {
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @return Set structure.
-frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const compare);
+frb_set_s create_frb_set(size_t const size, size_t const max, compare_fn const compare, void * const ac);
 
 /// @brief Creates an empty structure.
 /// @param size Size of a single element.
 /// @param max Maximum length of structure.
 /// @param compare Function pointer to compare elements.
+/// @param ac Arguments for compare function pointer.
 /// @param allocator Custom allocator structure.
 /// @return Set structure.
-frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const compare, memory_s const * const allocator);
+frb_set_s make_frb_set(size_t const size, size_t const max, compare_fn const compare, void * const ac, memory_s const * const allocator);
 
 /// @brief Destroys a structure and its elements, but makes it unusable.
 /// @param set Structure to destroy.

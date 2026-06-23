@@ -58,10 +58,10 @@ extern const memory_s standard;
 typedef void   (*set_fn)     (void * const element, void * arg);
 typedef void * (*copy_fn)    (void * const destination, void const * const source, void * arg);
 typedef size_t (*hash_fn)    (void const * const element, void * arg);
-typedef int    (*compare_fn) (void const * const a, void const * const b);
-typedef bool   (*filter_fn)  (void const * const element);
+typedef int    (*compare_fn) (void const * const a, void const * const b, void * arg);
+typedef bool   (*filter_fn)  (void const * const element, void * arg);
 typedef bool   (*handle_fn)  (void * const element, void * arg);
 typedef void   (*process_fn) (void * const array, size_t const lenght, void * arg);
-typedef void   (*operate_fn) (void * const result, void const * const a, void const * const b);
+typedef void   (*operate_fn) (void * const result, void const * const a, void const * const b, void * arg);
 
 #endif // CERPEC_H

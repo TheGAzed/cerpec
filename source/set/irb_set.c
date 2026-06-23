@@ -48,7 +48,7 @@ void _irb_set_fill_hole(irb_set_s * const set, size_t const hole);
 /// @param size New size.
 void _irb_set_resize(irb_set_s * const set, size_t const size);
 
-irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
+irb_set_s create_irb_set(size_t const size, compare_fn const compare, void * const ac) {
     assert(compare && "Parameter can't be NULL.");
     assert(size && "Parameter can't be zero.");
 
@@ -60,7 +60,7 @@ irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
         .parent = standard.alloc(sizeof(size_t), standard.arg),
         .node[IRB_SET_LEFT] = standard.alloc(sizeof(size_t), standard.arg),
         .node[IRB_SET_RIGHT] = standard.alloc(sizeof(size_t), standard.arg),
-        .allocator = &standard,
+        .allocator = &standard, .ac = ac,
     };
     assert(set.elements && "Memory allocation failed.");
     assert(set.color && "Memory allocation failed.");
@@ -75,7 +75,7 @@ irb_set_s create_irb_set(size_t const size, compare_fn const compare) {
     return set;
 }
 
-irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s const * const allocator) {
+irb_set_s make_irb_set(size_t const size, compare_fn const compare, void * const ac, memory_s const * const allocator) {
     assert(compare && "Parameter can't be NULL.");
     assert(size && "Parameter can't be zero.");
     assert(allocator && "Parameter can't be NULL.");
@@ -88,7 +88,7 @@ irb_set_s make_irb_set(size_t const size, compare_fn const compare, memory_s con
         .parent = allocator->alloc(sizeof(size_t), allocator->arg),
         .node[IRB_SET_LEFT] = allocator->alloc(sizeof(size_t), allocator->arg),
         .node[IRB_SET_RIGHT] = allocator->alloc(sizeof(size_t), allocator->arg),
-        .allocator = allocator,
+        .allocator = allocator, .ac = ac,
     };
     assert(set.elements && "Memory allocation failed.");
     assert(set.color && "Memory allocation failed.");
@@ -173,7 +173,7 @@ irb_set_s copy_irb_set(irb_set_s const * const set, copy_fn const copy, void * c
         .parent = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arg),
         .node[IRB_SET_LEFT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arg),
         .node[IRB_SET_RIGHT] = set->allocator->alloc((set->capacity + 1) * sizeof(size_t), set->allocator->arg),
-        .allocator = set->allocator,
+        .allocator = set->allocator, .ac = set->ac,
 
         .capacity = set->capacity, .root = set->root, .length = set->length, .compare = set->compare, .size = set->size,
     };
@@ -224,7 +224,7 @@ void insert_irb_set(irb_set_s * const set, void const * const element) {
     size_t * node = &(set->root); // pointer to later change actual index of the empty child
     while (NIL != (*node)) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = set->compare(element, set->elements + ((*node) * set->size));
+        int const comparison = set->compare(element, set->elements + ((*node) * set->size), set->ac);
         size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
         previous = (*node); // change parent to child
@@ -261,7 +261,7 @@ void remove_irb_set(irb_set_s * const set, void const * const element, void * co
     size_t node = set->root; // pointer to later change actual index of the empty child
     while (NIL != node) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = set->compare(element, set->elements + (node * set->size));
+        int const comparison = set->compare(element, set->elements + (node * set->size), set->ac);
         if (!comparison) {
             break;
         }
@@ -337,7 +337,7 @@ bool contains_irb_set(irb_set_s const * const set, void const * const element) {
 
     for (size_t node = set->root; NIL != node;) {
         // calculate and determine next child node, i.e. if left or right child
-        int const comparison = set->compare(element, set->elements + (node * set->size));
+        int const comparison = set->compare(element, set->elements + (node * set->size), set->ac);
         if (!comparison) {
             return true;
         }
@@ -378,7 +378,7 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
         bool contains = false;
         for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
+            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size), maximum->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -402,7 +402,7 @@ irb_set_s union_irb_set(irb_set_s const * const set_one, irb_set_s const * const
         size_t * node = &(set_union.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_union.compare(element, set_union.elements + ((*node) * set_union.size));
+            int const comparison = set_union.compare(element, set_union.elements + ((*node) * set_union.size), set_union.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -443,7 +443,7 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
     irb_set_s const * const minimum = set_one->length < set_two->length ? set_one : set_two;
     irb_set_s const * const maximum = set_one->length >= set_two->length ? set_one : set_two;
 
-    irb_set_s set_intersect = make_irb_set(set_one->size, set_one->compare, set_one->allocator);
+    irb_set_s set_intersect = make_irb_set(set_one->size, set_one->compare, set_one->ac, set_one->allocator);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -452,7 +452,7 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
         bool contains = false;
         for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
+            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size), maximum->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -476,7 +476,7 @@ irb_set_s intersect_irb_set(irb_set_s const * const set_one, irb_set_s const * c
         size_t * node = &(set_intersect.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_intersect.compare(element, set_intersect.elements + ((*node) * set_intersect.size));
+            int const comparison = set_intersect.compare(element, set_intersect.elements + ((*node) * set_intersect.size), set_intersect.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -513,7 +513,7 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
     assert(subtrahend->size && "Parameter can't be zero.");
     assert(subtrahend->length <= subtrahend->capacity && "Lenght can't be larger than capacity.");
 
-    irb_set_s set_subtract = make_irb_set(minuend->size, minuend->compare, minuend->allocator);
+    irb_set_s set_subtract = make_irb_set(minuend->size, minuend->compare, minuend->ac, minuend->allocator);
 
     // for each element in minimum set
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -522,7 +522,7 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
         bool contains = false;
         for (size_t node = subtrahend->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = subtrahend->compare(element, subtrahend->elements + (node * subtrahend->size));
+            int const comparison = subtrahend->compare(element, subtrahend->elements + (node * subtrahend->size), subtrahend->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -546,7 +546,7 @@ irb_set_s subtract_irb_set(irb_set_s const * const minuend, irb_set_s const * co
         size_t * node = &(set_subtract.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_subtract.compare(element, set_subtract.elements + ((*node) * set_subtract.size));
+            int const comparison = set_subtract.compare(element, set_subtract.elements + ((*node) * set_subtract.size), set_subtract.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -583,7 +583,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
     assert(set_two->size && "Parameter can't be zero.");
     assert(set_two->length <= set_two->capacity && "Lenght can't be larger than capacity.");
 
-    irb_set_s set_exclude = make_irb_set(set_one->size, set_one->compare, set_one->allocator);
+    irb_set_s set_exclude = make_irb_set(set_one->size, set_one->compare, set_one->ac, set_one->allocator);
 
     // for each element in set one
     // start at 1 since NIL is at zero and elements start beyond NIL
@@ -592,7 +592,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         bool contains = false;
         for (size_t node = set_two->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_two->compare(element, set_two->elements + (node * set_two->size));
+            int const comparison = set_two->compare(element, set_two->elements + (node * set_two->size), set_two->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -616,7 +616,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         size_t * node = &(set_exclude.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size));
+            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size), set_exclude.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -642,7 +642,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         bool contains = false;
         for (size_t node = set_one->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_one->compare(element, set_one->elements + (node * set_one->size));
+            int const comparison = set_one->compare(element, set_one->elements + (node * set_one->size), set_one->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -666,7 +666,7 @@ irb_set_s exclude_irb_set(irb_set_s const * const set_one, irb_set_s const * con
         size_t * node = &(set_exclude.root); // pointer to later change actual index of the empty child
         while (NIL != (*node)) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size));
+            int const comparison = set_exclude.compare(element, set_exclude.elements + ((*node) * set_exclude.size), set_exclude.ac);
             size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
 
             previous = (*node); // change parent to child
@@ -708,7 +708,7 @@ bool is_subset_irb_set(irb_set_s const * const superset, irb_set_s const * const
         bool contains = false;
         for (size_t node = superset->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = superset->compare(element, superset->elements + (node * superset->size));
+            int const comparison = superset->compare(element, superset->elements + (node * superset->size), superset->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -746,7 +746,7 @@ bool is_proper_subset_irb_set(irb_set_s const * const superset, irb_set_s const 
         bool contains = false;
         for (size_t node = superset->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = superset->compare(element, superset->elements + (node * superset->size));
+            int const comparison = superset->compare(element, superset->elements + (node * superset->size), superset->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -787,7 +787,7 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
         bool contains = false;
         for (size_t node = maximum->root; NIL != node;) {
             // calculate and determine next child node, i.e. if left or right child
-            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size));
+            int const comparison = maximum->compare(element, maximum->elements + (node * maximum->size), maximum->ac);
             if (!comparison) {
                 contains = true;
                 break;
@@ -1018,10 +1018,9 @@ void _irb_set_remove_fixup(irb_set_s * const set, size_t const node) {
 }
 
 void _irb_set_fill_hole(irb_set_s * const set, size_t const hole) {
+    // if head node is last array element then change index to removed one
     size_t const last = set->length + 1;
-    if (set->length && set->root == last) { // if head node is last array element then change index to removed one
-        set->root = hole;
-    }
+    if (set->length && set->root == last) { set->root = hole; }
 
     // cut hole node from the rest of the set
     set->node[IRB_SET_LEFT][hole] = set->node[IRB_SET_RIGHT][hole] = set->parent[hole] = hole;
@@ -1034,20 +1033,16 @@ void _irb_set_fill_hole(irb_set_s * const set, size_t const hole) {
 
     // redirect left child of rightmost array node if they don't overlap with removed index
     size_t const left_last = set->node[IRB_SET_LEFT][last];
-    if (NIL != left_last) {
-        set->parent[left_last] = hole;
-    }
+    if (NIL != left_last) { set->parent[left_last] = hole; }
 
     // redirect right child of rightmost array node if they don't overlap with removed index
     size_t const right_last = set->node[IRB_SET_RIGHT][last];
-    if (NIL != right_last) {
-        set->parent[right_last] = hole;
-    }
+    if (NIL != right_last) { set->parent[right_last] = hole; }
 
     // redirect parent of rightmost array node if they don't overlap with removed index
     size_t const parent_last = set->parent[last];
     if (NIL != parent_last) {
-        int const comparison = set->compare(set->elements + (last * set->size), set->elements + (parent_last * set->size));
+        int const comparison = set->compare(set->elements + (last * set->size), set->elements + (parent_last * set->size), set->ac);
         size_t const node_index = comparison <= 0 ? IRB_SET_LEFT : IRB_SET_RIGHT;
         set->node[node_index][parent_last] = hole;
     }
