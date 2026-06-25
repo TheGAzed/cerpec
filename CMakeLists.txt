@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.22.1)
 
-project(CERPEC)
+project(CERPEC C)
 
 add_subdirectory(source)
 add_subdirectory(include)
 
-option(CERPEC_INCLUDE_TEST "Include cerpec unit tests." ON)
+option(CERPEC_TEST "Include cerpec unit tests." ON)
 
-if (CERPEC_INCLUDE_TEST)
+if (CERPEC_TEST)
     add_subdirectory(external)
 
     include(CTest)

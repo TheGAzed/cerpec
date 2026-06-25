@@ -41,6 +41,50 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    frb_tree_s tree = create_frb_tree(sizeof(int), FRB_TREE_CHUNK, intcmp, NULL);
+
+    for (int i = 0; i < FRB_TREE_CHUNK - 1; ++i) {
+        insert_frb_tree(&tree, &i);
+    }
+
+    frb_tree_s replica = copy_frb_tree(&tree, intcpy, NULL);
+
+    ASSERT_EQ(tree.allocator, replica.allocator);
+    ASSERT_EQ(tree.compare, replica.compare);
+    ASSERT_EQ(tree.ac, replica.ac);
+    ASSERT_EQ(tree.length, replica.length);
+    ASSERT_EQ(tree.max, replica.max);
+    ASSERT_EQ(tree.size, replica.size);
+
+    destroy_frb_tree(&replica, intdst, NULL);
+    destroy_frb_tree(&tree, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    frb_tree_s tree = create_frb_tree(sizeof(int), FRB_TREE_CHUNK, intcmp, NULL);
+
+    for (int i = 0; i < FRB_TREE_CHUNK; ++i) {
+        insert_frb_tree(&tree, &i);
+    }
+
+    frb_tree_s replica = copy_frb_tree(&tree, intcpy, NULL);
+
+    ASSERT_EQ(tree.allocator, replica.allocator);
+    ASSERT_EQ(tree.compare, replica.compare);
+    ASSERT_EQ(tree.ac, replica.ac);
+    ASSERT_EQ(tree.length, replica.length);
+    ASSERT_EQ(tree.max, replica.max);
+    ASSERT_EQ(tree.size, replica.size);
+
+    destroy_frb_tree(&replica, intdst, NULL);
+    destroy_frb_tree(&tree, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_01(void) {
     frb_tree_s tree = create_frb_tree(sizeof(int), FRB_TREE_CHUNK, intcmp, NULL);
 
@@ -603,6 +647,7 @@ TEST REMOVE_PREDECESSOR_02(void) {
 
 SUITE (frb_tree_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02);

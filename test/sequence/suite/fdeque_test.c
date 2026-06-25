@@ -43,6 +43,46 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    fdeque_s test = create_fdeque(sizeof(int), FDEQUE_CHUNK);
+
+    for (int i = 0; i < FDEQUE_CHUNK - 1; ++i) {
+        enqueue_front_fdeque(&test, &i);
+    }
+
+    fdeque_s replica = copy_fdeque(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fdeque(&test, intdst, NULL);
+    destroy_fdeque(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    fdeque_s test = create_fdeque(sizeof(int), FDEQUE_CHUNK);
+
+    for (int i = 0; i < FDEQUE_CHUNK; ++i) {
+        enqueue_front_fdeque(&test, &i);
+    }
+
+    fdeque_s replica = copy_fdeque(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fdeque(&test, intdst, NULL);
+    destroy_fdeque(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST ENQUEUE_FRONT_01(void) {
     fdeque_s test = create_fdeque(sizeof(int), FDEQUE_CHUNK);
 
@@ -529,6 +569,7 @@ TEST APPLY_04(void) {
 
 SUITE (fdeque_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02);
     RUN_TEST(ENQUEUE_FRONT_01); RUN_TEST(ENQUEUE_FRONT_02);
     RUN_TEST(ENQUEUE_BACK_01); RUN_TEST(ENQUEUE_BACK_02);
     RUN_TEST(PEEK_FRONT_01); RUN_TEST(PEEK_FRONT_02);

@@ -55,6 +55,7 @@ TEST COPY_01(void) {
 
     fstraight_list_s replica = copy_fstraight_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);
@@ -81,6 +82,7 @@ TEST COPY_02(void) {
 
     fstraight_list_s replica = copy_fstraight_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);

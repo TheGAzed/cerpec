@@ -43,6 +43,46 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    fstack_s test = create_fstack(sizeof(int), FSTACK_CHUNK);
+
+    for (int i = 0; i < FSTACK_CHUNK - 1; ++i) {
+        push_fstack(&test, &i);
+    }
+
+    fstack_s replica = copy_fstack(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fstack(&test, intdst, NULL);
+    destroy_fstack(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    fstack_s test = create_fstack(sizeof(int), FSTACK_CHUNK);
+
+    for (int i = 0; i < FSTACK_CHUNK; ++i) {
+        push_fstack(&test, &i);
+    }
+
+    fstack_s replica = copy_fstack(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fstack(&test, intdst, NULL);
+    destroy_fstack(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST PUSH_01(void) {
     fstack_s test = create_fstack(sizeof(int), FSTACK_CHUNK);
 
@@ -259,6 +299,7 @@ TEST APPLY_04(void) {
 
 SUITE (fstack_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02);
     RUN_TEST(PUSH_01); RUN_TEST(PUSH_02);
     RUN_TEST(PEEP_01); RUN_TEST(PEEP_02);
     RUN_TEST(POP_01); RUN_TEST(POP_02);

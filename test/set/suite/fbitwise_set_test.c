@@ -49,6 +49,46 @@ TEST INSERT_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    fbitwise_set_s set = create_fbitwise_set(FBITWISE_SET_CHUNK);
+
+    for (size_t i = 0; i < FBITWISE_SET_CHUNK - 1; ++i) {
+        insert_fbitwise_set(&set, i);
+    }
+
+    fbitwise_set_s replica = copy_fbitwise_set(&set);
+
+    ASSERT_EQ(set.allocator, replica.allocator);
+    ASSERT_EQ(set.length, replica.length);
+    ASSERT_EQ(set.length, replica.length);
+    ASSERT_EQ(set.max, replica.max);
+
+    destroy_fbitwise_set(&set);
+    destroy_fbitwise_set(&replica);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    fbitwise_set_s set = create_fbitwise_set(FBITWISE_SET_CHUNK);
+
+    for (size_t i = 0; i < FBITWISE_SET_CHUNK; ++i) {
+        insert_fbitwise_set(&set, i);
+    }
+
+    fbitwise_set_s replica = copy_fbitwise_set(&set);
+
+    ASSERT_EQ(set.allocator, replica.allocator);
+    ASSERT_EQ(set.length, replica.length);
+    ASSERT_EQ(set.length, replica.length);
+    ASSERT_EQ(set.max, replica.max);
+
+    destroy_fbitwise_set(&set);
+    destroy_fbitwise_set(&replica);
+
+    PASS();
+}
+
 TEST INSERT_02(void) {
     fbitwise_set_s set = create_fbitwise_set(FBITWISE_SET_CHUNK);
 
@@ -1062,6 +1102,7 @@ TEST IS_DISJOINT_06(void) {
 SUITE (fbitwise_set_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02);
     RUN_TEST(UNION_01); RUN_TEST(UNION_02); RUN_TEST(UNION_03);

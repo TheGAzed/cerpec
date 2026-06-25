@@ -56,6 +56,12 @@ TEST COPY_01(void) {
 
     ibinary_heap_s replica = copy_ibinary_heap(&heap, intcpy, NULL);
 
+    ASSERT_EQ(heap.allocator, replica.allocator);
+    ASSERT_EQ(heap.compare, replica.compare);
+    ASSERT_EQ(heap.ac, replica.ac);
+    ASSERT_EQ(heap.length, replica.length);
+    ASSERT_EQ(heap.size, replica.size);
+
     for (int i = 0; i < IBINARY_HEAP_CHUNK - 1; ++i) {
         int a = 0, b = 0;
         pop_ibinary_heap(&heap, &a);
@@ -79,6 +85,12 @@ TEST COPY_02(void) {
 
     ibinary_heap_s replica = copy_ibinary_heap(&heap, intcpy, NULL);
 
+    ASSERT_EQ(heap.allocator, replica.allocator);
+    ASSERT_EQ(heap.compare, replica.compare);
+    ASSERT_EQ(heap.ac, replica.ac);
+    ASSERT_EQ(heap.length, replica.length);
+    ASSERT_EQ(heap.size, replica.size);
+
     for (int i = 0; i < IBINARY_HEAP_CHUNK; ++i) {
         int a = 0, b = 0;
         pop_ibinary_heap(&heap, &a);
@@ -101,6 +113,12 @@ TEST COPY_03(void) {
     }
 
     ibinary_heap_s replica = copy_ibinary_heap(&heap, intcpy, NULL);
+
+    ASSERT_EQ(heap.allocator, replica.allocator);
+    ASSERT_EQ(heap.compare, replica.compare);
+    ASSERT_EQ(heap.ac, replica.ac);
+    ASSERT_EQ(heap.length, replica.length);
+    ASSERT_EQ(heap.size, replica.size);
 
     for (int i = 0; i < IBINARY_HEAP_CHUNK + 1; ++i) {
         int a = 0, b = 0;

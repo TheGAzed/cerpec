@@ -43,6 +43,63 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK - 1; ++i) {
+        enqueue_front_ideque(&test, &i);
+    }
+
+    ideque_s replica = copy_ideque(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_ideque(&test, intdst, NULL);
+    destroy_ideque(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK; ++i) {
+        enqueue_front_ideque(&test, &i);
+    }
+
+    ideque_s replica = copy_ideque(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_ideque(&test, intdst, NULL);
+    destroy_ideque(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_03(void) {
+    ideque_s test = create_ideque(sizeof(int));
+
+    for (int i = 0; i < IDEQUE_CHUNK + 1; ++i) {
+        enqueue_front_ideque(&test, &i);
+    }
+
+    ideque_s replica = copy_ideque(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_ideque(&test, intdst, NULL);
+    destroy_ideque(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST ENQUEUE_FRONT_01(void) {
     ideque_s test = create_ideque(sizeof(int));
 
@@ -783,6 +840,7 @@ TEST APPLY_06(void) {
 
 SUITE (ideque_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(ENQUEUE_FRONT_01); RUN_TEST(ENQUEUE_FRONT_02); RUN_TEST(ENQUEUE_FRONT_03);
     RUN_TEST(ENQUEUE_BACK_01); RUN_TEST(ENQUEUE_BACK_02); RUN_TEST(ENQUEUE_BACK_03);
     RUN_TEST(PEEK_FRONT_01); RUN_TEST(PEEK_FRONT_02); RUN_TEST(PEEK_FRONT_03);

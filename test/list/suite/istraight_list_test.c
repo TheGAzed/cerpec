@@ -53,6 +53,7 @@ TEST COPY_01(void) {
 
     istraight_list_s replica = copy_istraight_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);
@@ -79,6 +80,7 @@ TEST COPY_02(void) {
 
     istraight_list_s replica = copy_istraight_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);
@@ -105,6 +107,7 @@ TEST COPY_03(void) {
 
     istraight_list_s replica = copy_istraight_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);

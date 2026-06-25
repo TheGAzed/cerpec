@@ -53,6 +53,7 @@ TEST COPY_01(void) {
 
     fdouble_list_s replica = copy_fdouble_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 
@@ -78,6 +79,7 @@ TEST COPY_02(void) {
 
     fdouble_list_s replica = copy_fdouble_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 

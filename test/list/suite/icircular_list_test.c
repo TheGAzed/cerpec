@@ -51,6 +51,7 @@ TEST COPY_01(void) {
 
     icircular_list_s replica = copy_icircular_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);
@@ -77,6 +78,7 @@ TEST COPY_02(void) {
 
     icircular_list_s replica = copy_icircular_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);
@@ -103,6 +105,7 @@ TEST COPY_03(void) {
 
     icircular_list_s replica = copy_icircular_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
     ASSERT_EQ(NIL, replica.empty);

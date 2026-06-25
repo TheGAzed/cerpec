@@ -38,6 +38,60 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    ibitwise_set_s set = create_ibitwise_set();
+
+    for (size_t i = 0; i < IBITWISE_SET_CHUNK - 1; ++i) {
+        insert_ibitwise_set(&set, i);
+    }
+
+    ibitwise_set_s replica = copy_ibitwise_set(&set);
+
+    ASSERT_EQ(set.allocator, replica.allocator);
+    ASSERT_EQ(set.length, replica.length);
+
+    destroy_ibitwise_set(&set);
+    destroy_ibitwise_set(&replica);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    ibitwise_set_s set = create_ibitwise_set();
+
+    for (size_t i = 0; i < IBITWISE_SET_CHUNK; ++i) {
+        insert_ibitwise_set(&set, i);
+    }
+
+    ibitwise_set_s replica = copy_ibitwise_set(&set);
+
+    ASSERT_EQ(set.allocator, replica.allocator);
+    ASSERT_EQ(set.length, replica.length);
+
+    destroy_ibitwise_set(&set);
+    destroy_ibitwise_set(&replica);
+
+    PASS();
+}
+
+TEST COPY_03(void) {
+    ibitwise_set_s set = create_ibitwise_set();
+
+    for (size_t i = 0; i < IBITWISE_SET_CHUNK + 1; ++i) {
+        insert_ibitwise_set(&set, i);
+    }
+
+    ibitwise_set_s replica = copy_ibitwise_set(&set);
+
+    ASSERT_EQ(set.allocator, replica.allocator);
+    ASSERT_EQ(set.length, replica.length);
+
+    destroy_ibitwise_set(&set);
+    destroy_ibitwise_set(&replica);
+
+    PASS();
+}
+
 TEST INSERT_01(void) {
     ibitwise_set_s set = create_ibitwise_set();
 
@@ -1573,6 +1627,7 @@ TEST IS_DISJOINT_09(void) {
 
 SUITE (ibitwise_set_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02); RUN_TEST(INSERT_03);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02); RUN_TEST(REMOVE_03);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02); RUN_TEST(CONTAINS_03);

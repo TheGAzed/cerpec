@@ -43,6 +43,63 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    iqueue_s test = create_iqueue(sizeof(int));
+
+    for (int i = 0; i < IQUEUE_CHUNK - 1; ++i) {
+        enqueue_iqueue(&test, &i);
+    }
+
+    iqueue_s replica = copy_iqueue(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_iqueue(&test, intdst, NULL);
+    destroy_iqueue(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    iqueue_s test = create_iqueue(sizeof(int));
+
+    for (int i = 0; i < IQUEUE_CHUNK; ++i) {
+        enqueue_iqueue(&test, &i);
+    }
+
+    iqueue_s replica = copy_iqueue(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_iqueue(&test, intdst, NULL);
+    destroy_iqueue(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_03(void) {
+    iqueue_s test = create_iqueue(sizeof(int));
+
+    for (int i = 0; i < IQUEUE_CHUNK + 1; ++i) {
+        enqueue_iqueue(&test, &i);
+    }
+
+    iqueue_s replica = copy_iqueue(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_iqueue(&test, intdst, NULL);
+    destroy_iqueue(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST ENQUEUE_01(void) {
     iqueue_s test = create_iqueue(sizeof(int));
 
@@ -366,6 +423,7 @@ TEST APPLY_06(void) {
 
 SUITE (iqueue_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(ENQUEUE_01); RUN_TEST(ENQUEUE_02); RUN_TEST(ENQUEUE_03);
     RUN_TEST(PEEK_01); RUN_TEST(PEEK_02); RUN_TEST(PEEK_03);
     RUN_TEST(DEQUEUE_01); RUN_TEST(DEQUEUE_02); RUN_TEST(DEQUEUE_03);

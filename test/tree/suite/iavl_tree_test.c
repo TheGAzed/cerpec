@@ -43,6 +43,69 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IAVL_TREE_CHUNK - 1; ++i) {
+        insert_iavl_tree(&test, &i);
+    }
+
+    iavl_tree_s replica = copy_iavl_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_iavl_tree(&replica, intdst, NULL);
+    destroy_iavl_tree(&test, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IAVL_TREE_CHUNK; ++i) {
+        insert_iavl_tree(&test, &i);
+    }
+
+    iavl_tree_s replica = copy_iavl_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_iavl_tree(&replica, intdst, NULL);
+    destroy_iavl_tree(&test, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_03(void) {
+    iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IAVL_TREE_CHUNK + 1; ++i) {
+        insert_iavl_tree(&test, &i);
+    }
+
+    iavl_tree_s replica = copy_iavl_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_iavl_tree(&replica, intdst, NULL);
+    destroy_iavl_tree(&test, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_01(void) {
     iavl_tree_s test = create_iavl_tree(sizeof(int), intcmp, NULL);
 
@@ -885,6 +948,7 @@ TEST REMOVE_PREDECESSOR_03(void) {
 
 SUITE (iavl_tree_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02); RUN_TEST(INSERT_03);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02); RUN_TEST(REMOVE_03);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02); RUN_TEST(CONTAINS_03);

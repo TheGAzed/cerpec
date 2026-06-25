@@ -53,6 +53,69 @@ TEST INSERT_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    irb_tree_s tree = create_irb_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IRB_TREE_CHUNK - 1; ++i) {
+        insert_irb_tree(&tree, &i);
+    }
+
+    irb_tree_s replica = copy_irb_tree(&tree, intcpy, NULL);
+
+    ASSERT_EQ(tree.allocator, replica.allocator);
+    ASSERT_EQ(tree.compare, replica.compare);
+    ASSERT_EQ(tree.ac, replica.ac);
+    ASSERT_EQ(tree.length, replica.length);
+    ASSERT_EQ(tree.size, replica.size);
+
+    destroy_irb_tree(&tree, intdst, NULL);
+    destroy_irb_tree(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    irb_tree_s tree = create_irb_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IRB_TREE_CHUNK; ++i) {
+        insert_irb_tree(&tree, &i);
+    }
+
+    irb_tree_s replica = copy_irb_tree(&tree, intcpy, NULL);
+
+    ASSERT_EQ(tree.allocator, replica.allocator);
+    ASSERT_EQ(tree.compare, replica.compare);
+    ASSERT_EQ(tree.ac, replica.ac);
+    ASSERT_EQ(tree.length, replica.length);
+    ASSERT_EQ(tree.size, replica.size);
+
+    destroy_irb_tree(&tree, intdst, NULL);
+    destroy_irb_tree(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_03(void) {
+    irb_tree_s tree = create_irb_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IRB_TREE_CHUNK + 1; ++i) {
+        insert_irb_tree(&tree, &i);
+    }
+
+    irb_tree_s replica = copy_irb_tree(&tree, intcpy, NULL);
+
+    ASSERT_EQ(tree.allocator, replica.allocator);
+    ASSERT_EQ(tree.compare, replica.compare);
+    ASSERT_EQ(tree.ac, replica.ac);
+    ASSERT_EQ(tree.length, replica.length);
+    ASSERT_EQ(tree.size, replica.size);
+
+    destroy_irb_tree(&tree, intdst, NULL);
+    destroy_irb_tree(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_02(void) {
     irb_tree_s tree = create_irb_tree(sizeof(int), intcmp, NULL);
 
@@ -884,6 +947,7 @@ TEST REMOVE_PREDECESSOR_03(void) {
 SUITE (irb_tree_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02); RUN_TEST(INSERT_03);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02); RUN_TEST(REMOVE_03);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02); RUN_TEST(CONTAINS_03);
     RUN_TEST(GET_MAX_01); RUN_TEST(GET_MAX_02); RUN_TEST(GET_MAX_03);

@@ -43,6 +43,69 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IBSEARCH_TREE_CHUNK - 1; ++i) {
+        insert_ibsearch_tree(&test, &i);
+    }
+
+    ibsearch_tree_s replica = copy_ibsearch_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_ibsearch_tree(&test, intdst, NULL);
+    destroy_ibsearch_tree(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IBSEARCH_TREE_CHUNK; ++i) {
+        insert_ibsearch_tree(&test, &i);
+    }
+
+    ibsearch_tree_s replica = copy_ibsearch_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_ibsearch_tree(&test, intdst, NULL);
+    destroy_ibsearch_tree(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_03(void) {
+    ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp, NULL);
+
+    for (int i = 0; i < IBSEARCH_TREE_CHUNK + 1; ++i) {
+        insert_ibsearch_tree(&test, &i);
+    }
+
+    ibsearch_tree_s replica = copy_ibsearch_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_ibsearch_tree(&test, intdst, NULL);
+    destroy_ibsearch_tree(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_01(void) {
     ibsearch_tree_s test = create_ibsearch_tree(sizeof(int), intcmp, NULL);
 
@@ -885,6 +948,7 @@ TEST REMOVE_PREDECESSOR_03(void) {
 
 SUITE (ibsearch_tree_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02); RUN_TEST(INSERT_03);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02); RUN_TEST(REMOVE_03);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02); RUN_TEST(CONTAINS_03);

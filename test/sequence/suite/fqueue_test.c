@@ -43,6 +43,46 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    fqueue_s test = create_fqueue(sizeof(int), FQUEUE_CHUNK);
+
+    for (int i = 0; i < FQUEUE_CHUNK - 1; ++i) {
+        enqueue_fqueue(&test, &i);
+    }
+
+    fqueue_s replica = copy_fqueue(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fqueue(&test, intdst, NULL);
+    destroy_fqueue(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    fqueue_s test = create_fqueue(sizeof(int), FQUEUE_CHUNK);
+
+    for (int i = 0; i < FQUEUE_CHUNK; ++i) {
+        enqueue_fqueue(&test, &i);
+    }
+
+    fqueue_s replica = copy_fqueue(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fqueue(&test, intdst, NULL);
+    destroy_fqueue(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST ENQUEUE_01(void) {
     fqueue_s test = create_fqueue(sizeof(int), FQUEUE_CHUNK);
 
@@ -259,6 +299,7 @@ TEST APPLY_04(void) {
 
 SUITE (fqueue_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02);
     RUN_TEST(ENQUEUE_01); RUN_TEST(ENQUEUE_02);
     RUN_TEST(PEEK_01); RUN_TEST(PEEK_02);
     RUN_TEST(DEQUEUE_01); RUN_TEST(DEQUEUE_02);

@@ -55,6 +55,13 @@ TEST COPY_01(void) {
 
     fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy, NULL);
 
+    ASSERT_EQ(heap.allocator, replica.allocator);
+    ASSERT_EQ(heap.compare, replica.compare);
+    ASSERT_EQ(heap.ac, replica.ac);
+    ASSERT_EQ(heap.length, replica.length);
+    ASSERT_EQ(heap.size, replica.size);
+    ASSERT_EQ(heap.max, replica.max);
+
     for (int i = 0; i < FBINARY_HEAP_CHUNK - 1; ++i) {
         int a = 0, b = 0;
         pop_fbinary_heap(&heap, &a);
@@ -77,6 +84,13 @@ TEST COPY_02(void) {
     }
 
     fbinary_heap_s replica = copy_fbinary_heap(&heap, intcpy, NULL);
+
+    ASSERT_EQ(heap.allocator, replica.allocator);
+    ASSERT_EQ(heap.compare, replica.compare);
+    ASSERT_EQ(heap.ac, replica.ac);
+    ASSERT_EQ(heap.length, replica.length);
+    ASSERT_EQ(heap.size, replica.size);
+    ASSERT_EQ(heap.max, replica.max);
 
     for (int i = 0; i < FBINARY_HEAP_CHUNK; ++i) {
         int a = 0, b = 0;

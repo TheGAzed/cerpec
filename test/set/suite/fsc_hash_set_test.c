@@ -43,6 +43,52 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    fsc_hash_set_s set = create_fsc_hash_set(sizeof(int), FSC_HASH_SET_CHUNK, inthshmurmur, NULL, intcmp, NULL);
+
+    for (int i = 0; i < FSC_HASH_SET_CHUNK - 1; ++i) {
+        insert_fsc_hash_set(&set, &i);
+    }
+
+    fsc_hash_set_s replica = copy_fsc_hash_set(&set, intcpy, NULL);
+
+    ASSERT_EQ(set.allocator, replica.allocator);
+    ASSERT_EQ(set.compare, replica.compare);
+    ASSERT_EQ(set.ac, replica.ac);
+    ASSERT_EQ(set.hash, replica.hash);
+    ASSERT_EQ(set.length, replica.length);
+    ASSERT_EQ(set.max, replica.max);
+    ASSERT_EQ(set.size, replica.size);
+
+    destroy_fsc_hash_set(&set, intdst, NULL);
+    destroy_fsc_hash_set(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    fsc_hash_set_s set = create_fsc_hash_set(sizeof(int), FSC_HASH_SET_CHUNK, inthshmurmur, NULL, intcmp, NULL);
+
+    for (int i = 0; i < FSC_HASH_SET_CHUNK; ++i) {
+        insert_fsc_hash_set(&set, &i);
+    }
+
+    fsc_hash_set_s replica = copy_fsc_hash_set(&set, intcpy, NULL);
+
+    ASSERT_EQ(set.allocator, replica.allocator);
+    ASSERT_EQ(set.compare, replica.compare);
+    ASSERT_EQ(set.ac, replica.ac);
+    ASSERT_EQ(set.hash, replica.hash);
+    ASSERT_EQ(set.length, replica.length);
+    ASSERT_EQ(set.max, replica.max);
+    ASSERT_EQ(set.size, replica.size);
+
+    destroy_fsc_hash_set(&set, intdst, NULL);
+    destroy_fsc_hash_set(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_01(void) {
     fsc_hash_set_s set = create_fsc_hash_set(sizeof(int), FSC_HASH_SET_CHUNK, inthshmurmur, NULL, intcmp, NULL);
 
@@ -1071,6 +1117,7 @@ TEST IS_DISJOINT_06(void) {
 
 SUITE (fsc_hash_set_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02);

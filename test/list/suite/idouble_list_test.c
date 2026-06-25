@@ -51,6 +51,7 @@ TEST COPY_01(void) {
 
     idouble_list_s replica = copy_idouble_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 
@@ -76,6 +77,7 @@ TEST COPY_02(void) {
 
     idouble_list_s replica = copy_idouble_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 
@@ -101,6 +103,7 @@ TEST COPY_03(void) {
 
     idouble_list_s replica = copy_idouble_list(&test, intcpy, NULL);
 
+    ASSERT_EQ(test.allocator, replica.allocator);
     ASSERT_EQ(test.size, replica.size);
     ASSERT_EQ(test.length, replica.length);
 

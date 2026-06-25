@@ -46,6 +46,63 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    istack_s test = create_istack(sizeof(int));
+
+    for (int i = 0; i < ISTACK_CHUNK - 1; ++i) {
+        push_istack(&test, &i);
+    }
+
+    istack_s replica = copy_istack(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_istack(&test, intdst, NULL);
+    destroy_istack(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    istack_s test = create_istack(sizeof(int));
+
+    for (int i = 0; i < ISTACK_CHUNK; ++i) {
+        push_istack(&test, &i);
+    }
+
+    istack_s replica = copy_istack(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_istack(&test, intdst, NULL);
+    destroy_istack(&replica, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_03(void) {
+    istack_s test = create_istack(sizeof(int));
+
+    for (int i = 0; i < ISTACK_CHUNK + 1; ++i) {
+        push_istack(&test, &i);
+    }
+
+    istack_s replica = copy_istack(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_istack(&test, intdst, NULL);
+    destroy_istack(&replica, intdst, NULL);
+
+    PASS();
+}
+
 TEST PUSH_01(void) {
     istack_s test = create_istack(sizeof(int));
 
@@ -369,6 +426,7 @@ TEST APPLY_06(void) {
 
 SUITE (istack_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(PUSH_01); RUN_TEST(PUSH_02); RUN_TEST(PUSH_03);
     RUN_TEST(PEEP_01); RUN_TEST(PEEP_02); RUN_TEST(PEEP_03);
     RUN_TEST(POP_01); RUN_TEST(POP_02); RUN_TEST(POP_03);

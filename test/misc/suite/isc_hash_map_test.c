@@ -63,6 +63,14 @@ TEST COPY_01(void) {
 
     isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, NULL, intcpy, NULL);
 
+    ASSERT_EQ(table.allocator, replica.allocator);
+    ASSERT_EQ(table.compare_key, replica.compare_key);
+    ASSERT_EQ(table.ack, replica.ack);
+    ASSERT_EQ(table.hash_key, replica.hash_key);
+    ASSERT_EQ(table.key_size, replica.key_size);
+    ASSERT_EQ(table.length, replica.length);
+    ASSERT_EQ(table.value_size, replica.value_size);
+
     for (int i = 0; i < ISC_HASH_MAP_CHUNK - 1; ++i) {
         ASSERT(contains_key_isc_hash_map(&replica, &i));
 
@@ -87,6 +95,14 @@ TEST COPY_02(void) {
 
     isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, NULL, intcpy, NULL);
 
+    ASSERT_EQ(table.allocator, replica.allocator);
+    ASSERT_EQ(table.compare_key, replica.compare_key);
+    ASSERT_EQ(table.ack, replica.ack);
+    ASSERT_EQ(table.hash_key, replica.hash_key);
+    ASSERT_EQ(table.key_size, replica.key_size);
+    ASSERT_EQ(table.length, replica.length);
+    ASSERT_EQ(table.value_size, replica.value_size);
+
     for (int i = 0; i < ISC_HASH_MAP_CHUNK; ++i) {
         ASSERT(contains_key_isc_hash_map(&replica, &i));
 
@@ -110,6 +126,14 @@ TEST COPY_03(void) {
     }
 
     isc_hash_map_s replica = copy_isc_hash_map(&table, intcpy, NULL, intcpy, NULL);
+
+    ASSERT_EQ(table.allocator, replica.allocator);
+    ASSERT_EQ(table.compare_key, replica.compare_key);
+    ASSERT_EQ(table.ack, replica.ack);
+    ASSERT_EQ(table.hash_key, replica.hash_key);
+    ASSERT_EQ(table.key_size, replica.key_size);
+    ASSERT_EQ(table.length, replica.length);
+    ASSERT_EQ(table.value_size, replica.value_size);
 
     for (int i = 0; i < ISC_HASH_MAP_CHUNK + 1; ++i) {
         ASSERT(contains_key_isc_hash_map(&replica, &i));

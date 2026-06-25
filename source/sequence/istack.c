@@ -66,7 +66,7 @@ istack_s copy_istack(istack_s const * const stack, copy_fn const copy, void * co
 
     // create replica to initialize and return
     istack_s const replica = {
-        .capacity = stack->capacity, .length = 0, .size = stack->size, .allocator = stack->allocator,
+        .capacity = stack->capacity, .length = stack->length, .size = stack->size, .allocator = stack->allocator,
         .elements = stack->allocator->alloc(stack->capacity * stack->size, stack->allocator->arg),
     };
     error((!replica.capacity || replica.elements) && "Memory allocation failed.");

@@ -43,6 +43,50 @@ TEST CLEAR_01(void) {
     PASS();
 }
 
+TEST COPY_01(void) {
+    fbsearch_tree_s test = create_fbsearch_tree(sizeof(int), CERPEC_CHUNK, intcmp, NULL);
+
+    for (int i = 0; i < FBSEARCH_TREE_CHUNK - 1; ++i) {
+        insert_fbsearch_tree(&test, &i);
+    }
+
+    fbsearch_tree_s replica = copy_fbsearch_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fbsearch_tree(&replica, intdst, NULL);
+    destroy_fbsearch_tree(&test, intdst, NULL);
+
+    PASS();
+}
+
+TEST COPY_02(void) {
+    fbsearch_tree_s test = create_fbsearch_tree(sizeof(int), CERPEC_CHUNK, intcmp, NULL);
+
+    for (int i = 0; i < FBSEARCH_TREE_CHUNK; ++i) {
+        insert_fbsearch_tree(&test, &i);
+    }
+
+    fbsearch_tree_s replica = copy_fbsearch_tree(&test, intcpy, NULL);
+
+    ASSERT_EQ(test.allocator, replica.allocator);
+    ASSERT_EQ(test.compare, replica.compare);
+    ASSERT_EQ(test.ac, replica.ac);
+    ASSERT_EQ(test.length, replica.length);
+    ASSERT_EQ(test.max, replica.max);
+    ASSERT_EQ(test.size, replica.size);
+
+    destroy_fbsearch_tree(&replica, intdst, NULL);
+    destroy_fbsearch_tree(&test, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_01(void) {
     fbsearch_tree_s test = create_fbsearch_tree(sizeof(int), CERPEC_CHUNK, intcmp, NULL);
 
@@ -605,6 +649,7 @@ TEST REMOVE_PREDECESSOR_02(void) {
 
 SUITE (fbsearch_tree_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
+    RUN_TEST(COPY_01); RUN_TEST(COPY_02);
     RUN_TEST(INSERT_01); RUN_TEST(INSERT_02);
     RUN_TEST(REMOVE_01); RUN_TEST(REMOVE_02);
     RUN_TEST(CONTAINS_01); RUN_TEST(CONTAINS_02);
