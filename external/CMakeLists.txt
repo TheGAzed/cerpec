@@ -1,2 +1,2 @@
-add_library(GREATEST INTERFACE "")
-target_include_directories(GREATEST INTERFACE greatest)
+add_library(greatest INTERFACE "")
+target_include_directories(greatest INTERFACE greatest)

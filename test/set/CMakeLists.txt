@@ -8,5 +8,5 @@ add_executable(set_test main.c
 )
 
 target_include_directories(set_test PUBLIC suite)
-target_link_libraries(set_test PRIVATE GREATEST CERPEC)
+target_link_libraries(set_test PRIVATE greatest ${PROJECT_NAME})
 add_test(NAME SET_TEST COMMAND set_test)

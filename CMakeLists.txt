@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22.1)
 
-project(CERPEC C)
+project(cerpec C)
 
 add_subdirectory(source)
 add_subdirectory(include)

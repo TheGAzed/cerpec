@@ -61,7 +61,7 @@ typedef size_t (*hash_fn)    (void const * const element, void * arg);
 typedef int    (*compare_fn) (void const * const a, void const * const b, void * arg);
 typedef bool   (*filter_fn)  (void const * const element, void * arg);
 typedef bool   (*handle_fn)  (void * const element, void * arg);
-typedef void   (*process_fn) (void * const array, size_t const lenght, void * arg);
+typedef void   (*process_fn) (void * const array, size_t const length, void * arg);
 typedef void   (*operate_fn) (void * const result, void const * const a, void const * const b, void * arg);
 
 #endif // CERPEC_H

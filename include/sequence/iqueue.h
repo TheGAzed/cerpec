@@ -81,7 +81,7 @@ void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * co
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param queue Structure to map.
-/// @param process Function pointer to manage array of elements using strucuter length, element size and arguments.
+/// @param process Function pointer to manage array of elements using structure length, element size and arguments.
 /// @param ap Generic arguments to use in function pointer.
 void apply_iqueue(iqueue_s const * const queue, process_fn const process, void * const ap);
 

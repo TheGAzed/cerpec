@@ -11,14 +11,18 @@ void _ibinary_heap_resize(ibinary_heap_s * const heap, size_t const size);
 /// @brief Performs heapify up operation on heap.
 /// @param heap Heap to heapify.
 /// @param index Start index to perform heapify.
-/// @param temporary Temporary single size element used in swaps to avoid pointless memory allocation.
-void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index, void * const temporary);
+void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index);
 
 /// @brief Performs heapify down operation on heap.
 /// @param heap Heap to heapify.
 /// @param index Start index to perform heapify.
-/// @param temporary Temporary single size element used in swaps to avoid pointless memory allocation.
-void _ibinary_heapify_down(ibinary_heap_s const * const heap, size_t const index, void * const temporary);
+void _ibinary_heapify_down(ibinary_heap_s const * const heap, size_t const index);
+
+/// @brief Swaps two elements based on their size.
+/// @param a First element to swap.
+/// @param b second element to swap
+/// @param size Size of singular element.
+void _ibinary_heap_swap(void * const a, void * const b, size_t const size);
 
 ibinary_heap_s create_ibinary_heap(size_t const size, compare_fn const compare, void * const ac) {
     assert(compare && "Parameter can't be NULL.");
@@ -125,14 +129,7 @@ void push_ibinary_heap(ibinary_heap_s * const heap, void const * const element) 
     // append element to the end of the structure
     memcpy(heap->elements + (heap->length * heap->size), element, heap->size);
 
-    // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
-    assert(temporary && "Memory allocation failed.");
-
-    _ibinary_heapify_up(heap, heap->length, temporary);
-
-    heap->allocator->free(temporary, heap->allocator->arg);
-
+    _ibinary_heapify_up(heap, heap->length);
     heap->length++;
 }
 
@@ -152,17 +149,11 @@ void pop_ibinary_heap(ibinary_heap_s * const heap, void * const buffer) {
     // put last element in first's place (memory may overlap)
     memmove(heap->elements, heap->elements + (heap->length * heap->size), heap->size);
 
-    // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
-    assert(temporary && "Memory allocation failed.");
-
-    _ibinary_heapify_down(heap, 0, temporary);
+    _ibinary_heapify_down(heap, 0);
 
     if (heap->length <= heap->capacity / CERPEC_FACTOR && (heap->length > IBINARY_HEAP_CHUNK || !heap->length)) {
         _ibinary_heap_resize(heap, heap->length);
     }
-
-    heap->allocator->free(temporary, heap->allocator->arg);
 }
 
 void peep_ibinary_heap(ibinary_heap_s const * const heap, void * const buffer) {
@@ -192,19 +183,13 @@ void replace_ibinary_heap(ibinary_heap_s const * const heap, size_t const index,
     // place parameter element into removed element's place
     memcpy(heap->elements + (index * heap->size), element, heap->size);
 
-    // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = heap->allocator->alloc(heap->size, heap->allocator->arg);
-    assert(temporary && "Memory allocation failed.");
-
     // perform heapify up or down based on comparison (ignore comparison equal to 'zero' as heap doesn't change)
     int const comparison = heap->compare(buffer, element, heap->ac);
     if (comparison > 0) {
-        _ibinary_heapify_up(heap, index, temporary);
+        _ibinary_heapify_up(heap, index);
     } else if (comparison < 0) {
-        _ibinary_heapify_down(heap, index, temporary);
+        _ibinary_heapify_down(heap, index);
     }
-
-    heap->allocator->free(temporary, heap->allocator->arg);
 }
 
 void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * const source) {
@@ -235,18 +220,12 @@ void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * cons
     source->length = source->capacity = 0;
     source->elements = NULL;
 
-    // create temporary element holder outside of loop for swaps in heap fixup
-    void * temporary = destination->allocator->alloc(destination->size, destination->allocator->arg);
-    assert(temporary && "Memory allocation failed.");
-
     // for each element at half index call
     size_t const start = (destination->length / 2) - 1; // value may underflow when length is less than two
     for (size_t i = 0; destination->length > 1 && i <= start; ++i) {
         size_t const reverse = start - i;
-        _ibinary_heapify_down(destination, reverse, temporary);
+        _ibinary_heapify_down(destination, reverse);
     }
-
-    destination->allocator->free(temporary, destination->allocator->arg);
 }
 
 void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const ah) {
@@ -267,7 +246,7 @@ void _ibinary_heap_resize(ibinary_heap_s * const heap, size_t const size) {
     assert((!size || heap->elements) && "Memory allocation failed.");
 }
 
-void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index, void * const temporary) {
+void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index) {
     // while current top child index is not zero and current element is greater than its parent
     size_t c = index;
     size_t p = (c - 1) / 2;
@@ -276,9 +255,7 @@ void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index, 
     void * parent = heap->elements + (p * heap->size);
     while (c && heap->compare(child, parent, heap->ac) < 0) {
         // swap current child element with parent
-        memcpy(temporary, child, heap->size);
-        memmove(child, parent, heap->size);
-        memcpy(parent, temporary, heap->size);
+        _ibinary_heap_swap(child, parent, heap->size);
 
         // change current child to parent and parent to grand-parent
         c = p;
@@ -288,7 +265,7 @@ void _ibinary_heapify_up(ibinary_heap_s const * const heap, size_t const index, 
     }
 }
 
-void _ibinary_heapify_down(ibinary_heap_s const * const heap, size_t const index, void * const temporary) {
+void _ibinary_heapify_down(ibinary_heap_s const * const heap, size_t const index) {
     for (size_t p = index, c = (2 * p) + 1; c < heap->length; p = c, c = (2 * p) + 1) {
         size_t const s = c + 1;
 
@@ -307,8 +284,15 @@ void _ibinary_heapify_down(ibinary_heap_s const * const heap, size_t const index
         }
 
         // swap current parent element with greatest child
-        memcpy(temporary, child, heap->size);
-        memmove(child, parent, heap->size);
-        memcpy(parent, temporary, heap->size);
+        _ibinary_heap_swap(child, parent, heap->size);
+    }
+}
+
+void _ibinary_heap_swap(void * const a, void * const b, size_t const size) {
+    char * const _a = a, * const _b = b;
+    for (size_t i = 0; i < size; ++i) {
+        char const temp = _a[i];
+        _a[i] = _b[i];
+        _b[i] = temp;
     }
 }

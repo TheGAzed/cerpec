@@ -16,17 +16,18 @@
 
 /// @brief Infinte adjacency matrix graph data structure.
 typedef struct infinite_adjacency_matrix_graph {
-    char * vertices, * edges; // arrays of elements
+    char * vertices, * edges; // arrays of vertices and edges
     void * none;              // non-edge
-    compare_fn compare;       // comapres edges and determines if they're smaller, bigger or equal
+    compare_fn compare;       // compares edge weights and determines if they're smaller, bigger or equal
     void * ac;
-    size_t vertex_size, edge_size, vertex_length, edge_length, capacity; // size of single element, structure length and its capacity
+    size_t vertex_size, edge_size; // sizes of single vertex and edge
+    size_t vertex_length, edge_length, capacity; // vertex and edge count and its vertex capacity
     memory_s const * allocator;
 } iam_graph_s;
 
 /// @brief Graph edge represented by itself (or weight) and two vertex indexes.
 typedef struct infinite_adjacency_matrix_graph_edge {
-    char * edge; // edge first to simplify weight comparison by dereferencing it directly to edge type
+    char * edge;
     size_t vertices[2];
 } iam_edge_s;
 
