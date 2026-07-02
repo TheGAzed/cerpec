@@ -29,7 +29,8 @@ iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, c
     error(none && "Parameter can't be NULL.");
 
     return (iam_graph_s) {
-        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .ac = ac, .none = none, .allocator = &standard,
+        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .ac = ac, .none = none,
+        .allocator = &standard,
     };
 }
 
@@ -41,7 +42,8 @@ iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, com
     error(allocator && "Parameter can't be NULL.");
 
     return (iam_graph_s) {
-        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .ac = ac, .none = none, .allocator = allocator,
+        .vertex_size = vertex_size, .edge_size = edge_size, .compare = compare, .ac = ac, .none = none,
+        .allocator = allocator,
     };
 }
 
@@ -92,7 +94,9 @@ void clear_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, voi
     size_t const edge_length = (graph->vertex_length * (graph->vertex_length - 1)) / 2;
     for (size_t i = 0; i < edge_length; ++i) {
         void * edge = graph->edges + (i * graph->edge_size);
-        if (graph->compare(graph->none, edge, graph->ac)) { destroy_edge(edge, ade); }
+        if (graph->compare(graph->none, edge, graph->ac)) {
+            destroy_edge(edge, ade);
+        }
     }
 
     graph->allocator->free(graph->vertices, graph->allocator->arg);
@@ -380,11 +384,14 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
 
     // save removed index into buffer and move last vertex into removed's position
     graph->vertex_length--;
-    memcpy(buffer, graph->vertices + (graph->vertex_length * graph->vertex_size), graph->vertex_size);
-    memmove(graph->vertices + (index * graph->vertex_size), graph->vertices + (graph->vertex_length * graph->vertex_size), graph->vertex_size);
+    void const * last = graph->vertices + (graph->vertex_length * graph->vertex_size);
+    void * removed = graph->vertices + (index * graph->vertex_size);
+    memcpy(buffer, removed, graph->vertex_size);
+    memmove(removed, last, graph->vertex_size); // memmove since removed could be last
 
     // shrink graph if elements fit into smaller memory chunk
-    if (graph->vertex_length <= graph->capacity / CERPEC_FACTOR && (graph->vertex_length > IAM_GRAPH_CHUNK || !graph->vertex_length)) {
+    if (graph->vertex_length <= graph->capacity / CERPEC_FACTOR &&
+        (graph->vertex_length > IAM_GRAPH_CHUNK || !graph->vertex_length)) {
         _imatrix_graph_resize(graph, graph->vertex_length);
     }
 
@@ -558,7 +565,7 @@ iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         visited[i] = false;
         memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_NIL;
+        table.previous[i] = IAM_SPECIAL;
     }
     memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
 
@@ -634,7 +641,7 @@ iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         visited[i] = false;
         memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_NIL;
+        table.previous[i] = IAM_SPECIAL;
     }
     memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
 
@@ -709,7 +716,7 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         visited[i] = false;
         memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_NIL;
+        table.previous[i] = IAM_SPECIAL;
     }
     memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
 
@@ -723,11 +730,11 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
     memcpy(minimum.cost, table.data->zero, table.data->size);
 
     char * sum_cost = buffer + cost->size;
-    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
+    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && end != minimum.vertex && IAM_SPECIAL != minimum.vertex; ++i) {
         size_t const current = minimum.vertex;
         void const * current_cost = table.costs + (minimum.vertex * table.data->size);
 
-        minimum.vertex = IAM_NIL;
+        minimum.vertex = IAM_SPECIAL;
         memcpy(minimum.cost, table.data->infinite, table.data->size);
 
         visited[current] = true;
@@ -817,7 +824,7 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         visited[i] = false;
         memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_NIL;
+        table.previous[i] = IAM_SPECIAL;
     }
     memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
 
@@ -833,11 +840,11 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
     char * sum_cost = buffer + cost->size;
     char * h_cost = buffer + (2 * cost->size);
     char * f_cost = buffer + (3 * cost->size);
-    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && end != minimum.vertex && IAM_NIL != minimum.vertex; ++i) {
+    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && end != minimum.vertex && IAM_SPECIAL != minimum.vertex; ++i) {
         size_t const current = minimum.vertex;
         void const * current_cost = table.costs + (minimum.vertex * table.data->size);
 
-        minimum.vertex = IAM_NIL;
+        minimum.vertex = IAM_SPECIAL;
         memcpy(minimum.cost, table.data->infinite, table.data->size);
 
         visited[current] = true;
@@ -935,7 +942,7 @@ iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * c
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         visited[i] = false;
         memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_NIL;
+        table.previous[i] = IAM_SPECIAL;
     }
     memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
 
@@ -949,10 +956,10 @@ iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * c
     memcpy(minimum.cost, table.data->zero, table.data->size);
 
     char * weight_cost = buffer + cost->size;
-    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && IAM_NIL != minimum.vertex; ++i) {
+    for (size_t i = 0; graph->vertex_length && i < graph->vertex_length - 1 && IAM_SPECIAL != minimum.vertex; ++i) {
         size_t const current = minimum.vertex;
 
-        minimum.vertex = IAM_NIL;
+        minimum.vertex = IAM_SPECIAL;
         memcpy(minimum.cost, table.data->infinite, table.data->size);
 
         visited[current] = true;
@@ -1258,7 +1265,7 @@ bool each_path_iam_list(iam_table_s const * const table, size_t const end, handl
     error((!table->graph->vertex_length || stack.array) && "Memory allocation failed.");
 
     stack.array[stack.length++] = end;
-    for (size_t i = table->previous[stack.array[stack.length - 1]]; IAM_NIL != i;) {
+    for (size_t i = table->previous[stack.array[stack.length - 1]]; IAM_SPECIAL != i;) {
         stack.array[stack.length++] = i;
 
         i = table->previous[stack.array[stack.length - 1]];

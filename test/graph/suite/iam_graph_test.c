@@ -154,12 +154,12 @@ TEST DIJKSTRA_01(void) {
     int zero = 0, inf = INT_MAX;
     const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
-    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
+    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_SPECIAL);
 
     int const costs[DIJKSTRA_01_SIZE] = { 0, 2, 6, 4, 3, 3, 5 };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_01_SIZE * sizeof(int));
 
-    size_t const previous[DIJKSTRA_01_SIZE] = { IAM_NIL, 0, 4, 4, 1, 0, 3 };
+    size_t const previous[DIJKSTRA_01_SIZE] = { IAM_SPECIAL, 0, 4, 4, 1, 0, 3 };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_01_SIZE * sizeof(size_t));
 
     destroy_iam_table(&table);
@@ -203,12 +203,12 @@ TEST DIJKSTRA_02(void) {
     int zero = 0, inf = INT_MAX;
     const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
-    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
+    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_SPECIAL);
 
     int const costs[DIJKSTRA_02_SIZE] = { 0, 6, 2, 4, 5, 8, 6, 11, };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_02_SIZE * sizeof(int));
 
-    size_t const previous[DIJKSTRA_02_SIZE] = { IAM_NIL, 3, 0, 2, 3, 6, 4, 5, };
+    size_t const previous[DIJKSTRA_02_SIZE] = { IAM_SPECIAL, 3, 0, 2, 3, 6, 4, 5, };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_02_SIZE * sizeof(size_t));
 
     destroy_iam_table(&table);
@@ -253,12 +253,12 @@ TEST DIJKSTRA_03(void) {
     int zero = 0, inf = INT_MAX;
     const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
-    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_NIL);
+    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_SPECIAL);
 
     int const costs[DIJKSTRA_03_SIZE] = { 0, 4, 12, 19, 21, 11, 9, 8, 14, };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_03_SIZE * sizeof(int));
 
-    size_t const previous[DIJKSTRA_03_SIZE] = { IAM_NIL, 0, 1, 2, 5, 6, 7, 0, 2, };
+    size_t const previous[DIJKSTRA_03_SIZE] = { IAM_SPECIAL, 0, 1, 2, 5, 6, 7, 0, 2, };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_03_SIZE * sizeof(size_t));
 
     destroy_iam_table(&table);

@@ -12,7 +12,7 @@
 #   error "Chunk size must be a power of 2."
 #endif
 
-#define IAM_NIL ((size_t)(-1))
+#define IAM_SPECIAL ((size_t)(-1))
 
 /// @brief Infinte adjacency matrix graph data structure.
 typedef struct infinite_adjacency_matrix_graph {
@@ -21,7 +21,7 @@ typedef struct infinite_adjacency_matrix_graph {
     compare_fn compare;       // compares edge weights and determines if they're smaller, bigger or equal
     void * ac;
     size_t vertex_size, edge_size; // sizes of single vertex and edge
-    size_t vertex_length, edge_length, capacity; // vertex and edge count and its vertex capacity
+    size_t vertex_length, edge_length, capacity; // vertex and edge count and graph's vertex capacity
     memory_s const * allocator;
 } iam_graph_s;
 
@@ -31,7 +31,7 @@ typedef struct infinite_adjacency_matrix_graph_edge {
     size_t vertices[2];
 } iam_edge_s;
 
-typedef struct infinite_matrix_graph_table {
+typedef struct infinite_adjacency_matrix_graph_table {
     iam_graph_s const * graph;
     iam_cost_s const * data;
     size_t * previous;
@@ -45,7 +45,7 @@ typedef struct infinite_matrix_graph_table {
 /// @param ac Arguments for compare function pointer.
 /// @param none Non-edge element to represent absence of an edge.
 /// @return Graph structure.
-/// @note Compare function must return equal if a 'none' edge is compared with 'none' parameter.
+/// @note Compare function must return 'equal' (0) if a non-edge is compared with 'none' parameter.
 iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * ac, void * const none);
 
 /// @brief Creates an empty structure.
@@ -168,7 +168,7 @@ size_t degree_iam_graph(iam_graph_s const * const graph, size_t const index);
 /// @param graph Structure to traverse.
 /// @param cost Cost structure that defines the distance properties in table.
 /// @param start Starting vertex index.
-/// @param end Last vertex index, or 'IAM_NIL' if all vertex shortest path.
+/// @param end Last vertex index, or 'IAM_SPECIAL' if all vertex shortest path.
 /// @return Breadth first search lookup table with subgraph from start node to all other nodes.
 iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
 
@@ -176,14 +176,14 @@ iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
 /// @param graph Structure to traverse.
 /// @param cost Cost structure that defines the distance properties in table.
 /// @param start Starting vertex index.
-/// @param end Last vertex index, or 'IAM_NIL' if all vertex paths.
+/// @param end Last vertex index, or 'IAM_SPECIAL' if all vertex paths.
 /// @return Depth first search lookup table with subgraph from start node to all other nodes.
 iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
 
 /// @brief Generate a Dijkstra lookup array table with nodes' edge sums and previous indexes.
 /// @param graph Structure to generate from.
 /// @param start Starting vertex index.
-/// @param end Last vertex index, or 'IAM_NIL' if all vertex shortest path.
+/// @param end Last vertex index, or 'IAM_SPECIAL' if all vertex shortest path.
 /// @param cost Cost structure that defines the distance properties in table.
 /// @return Dijkstra lookup table with subgraph of shortest paths from start node to all other nodes.
 iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end);
