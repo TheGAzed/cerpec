@@ -543,7 +543,7 @@ iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
     error(graph && "Parameter can't be NULL.");
     error(cost && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
-    error((end < graph->vertex_length || end == IAM_NIL) && "Parameter can't exceed length.");
+    error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
 
     valid(graph->compare && "Compare function can't be NULL.");
     valid(graph->edge_size && "Edge size can't be zero.");
@@ -619,7 +619,7 @@ iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
     error(graph && "Parameter can't be NULL.");
     error(cost && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
-    error((end < graph->vertex_length || end == IAM_NIL) && "Parameter can't exceed length.");
+    error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
 
     valid(graph->compare && "Compare function can't be NULL.");
     valid(graph->edge_size && "Edge size can't be zero.");
@@ -694,7 +694,7 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
     error(graph && "Parameter can't be NULL.");
     error(cost && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
-    error((end < graph->vertex_length || end == IAM_NIL) && "Parameter can't exceed length.");
+    error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
 
     valid(graph->compare && "Compare function can't be NULL.");
     valid(graph->edge_size && "Edge size can't be zero.");
