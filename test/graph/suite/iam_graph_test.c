@@ -124,6 +124,372 @@ TEST COPY_03(void) {
     PASS();
 }
 
+TEST IS_EMPTY_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    ASSERT(is_empty_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_EMPTY_02(void) {
+    int none = 0;
+    int const one = 1;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    insert_vertex_iam_graph(&graph, &one);
+
+    ASSERT_FALSE(is_empty_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_COMPLETE_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    ASSERT(is_complete_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_COMPLETE_02(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    int const one = 1;
+    insert_vertex_iam_graph(&graph, &one);
+
+    ASSERT(is_complete_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_COMPLETE_03(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    int const one = 1, two = 2;
+    insert_vertex_iam_graph(&graph, &one);
+    insert_vertex_iam_graph(&graph, &two);
+
+    ASSERT_FALSE(is_complete_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_COMPLETE_04(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    int const one = 1, two = 2;
+    insert_vertex_iam_graph(&graph, &one);
+    insert_vertex_iam_graph(&graph, &two);
+
+    int const edge = 42;
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+
+    ASSERT(is_complete_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_COMPLETE_05(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        for (size_t j = i + 1; j < IAM_GRAPH_CHUNK - 1; ++j) {
+            insert_edge_iam_graph(&graph, i, j, &edge);
+        }
+    }
+
+    ASSERT(is_complete_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_COMPLETE_06(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        for (size_t j = i + 1; j < IAM_GRAPH_CHUNK; ++j) {
+            insert_edge_iam_graph(&graph, i, j, &edge);
+        }
+    }
+
+    ASSERT(is_complete_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_COMPLETE_07(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        for (size_t j = i + 1; j < IAM_GRAPH_CHUNK + 1; ++j) {
+            insert_edge_iam_graph(&graph, i, j, &edge);
+        }
+    }
+
+    ASSERT(is_complete_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_CONNECTED_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    ASSERT_FALSE(is_connected_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_CONNECTED_02(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    int const one = 1;
+    insert_vertex_iam_graph(&graph, &one);
+
+    ASSERT(is_connected_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_CONNECTED_03(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    int const one = 1, two = 2;
+    insert_vertex_iam_graph(&graph, &one);
+    insert_vertex_iam_graph(&graph, &two);
+
+    ASSERT_FALSE(is_connected_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_CONNECTED_04(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    int const one = 1, two = 2;
+    insert_vertex_iam_graph(&graph, &one);
+    insert_vertex_iam_graph(&graph, &two);
+
+    int const edge = 42;
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+
+    ASSERT(is_connected_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_CONNECTED_05(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    ASSERT(is_connected_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_CONNECTED_06(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    ASSERT(is_connected_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_CONNECTED_07(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    ASSERT(is_connected_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST INSERT_VERTEX_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST INSERT_VERTEX_02(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST INSERT_VERTEX_03(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST INSERT_EDGE_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 1;
+    for (size_t i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        for (size_t j = i + 1; j < IAM_GRAPH_CHUNK - 1; ++j) {
+            insert_edge_iam_graph(&graph, i, j, &edge);
+        }
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST INSERT_EDGE_02(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 1;
+    for (size_t i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        for (size_t j = i + 1; j < IAM_GRAPH_CHUNK; ++j) {
+            insert_edge_iam_graph(&graph, i, j, &edge);
+        }
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST INSERT_EDGE_03(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 1;
+    for (size_t i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        for (size_t j = i + 1; j < IAM_GRAPH_CHUNK + 1; ++j) {
+            insert_edge_iam_graph(&graph, i, j, &edge);
+        }
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
 TEST DIJKSTRA_01(void) {
     // SOURCE: https://www.youtube.com/watch?v=CmIQ29cUGiE
 
@@ -270,5 +636,10 @@ TEST DIJKSTRA_03(void) {
 SUITE (iam_graph_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
+    RUN_TEST(IS_EMPTY_01); RUN_TEST(IS_EMPTY_02);
+    RUN_TEST(IS_COMPLETE_01); RUN_TEST(IS_COMPLETE_02); RUN_TEST(IS_COMPLETE_03); RUN_TEST(IS_COMPLETE_04); RUN_TEST(IS_COMPLETE_05); RUN_TEST(IS_COMPLETE_06); RUN_TEST(IS_COMPLETE_07);
+    RUN_TEST(IS_CONNECTED_01); RUN_TEST(IS_CONNECTED_02); RUN_TEST(IS_CONNECTED_03); RUN_TEST(IS_CONNECTED_04); RUN_TEST(IS_CONNECTED_05); RUN_TEST(IS_CONNECTED_06); RUN_TEST(IS_CONNECTED_07);
+    RUN_TEST(INSERT_VERTEX_01); RUN_TEST(INSERT_VERTEX_02); RUN_TEST(INSERT_VERTEX_03);
+    RUN_TEST(INSERT_EDGE_01); RUN_TEST(INSERT_EDGE_02); RUN_TEST(INSERT_EDGE_03);
     RUN_TEST(DIJKSTRA_01); RUN_TEST(DIJKSTRA_02); RUN_TEST(DIJKSTRA_03);
 }

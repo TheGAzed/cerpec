@@ -18,7 +18,7 @@ struct iam_graph_smallest {
     void * cost;
 };
 
-void _imatrix_graph_resize(iam_graph_s * const graph, size_t const size);
+void _iam_graph_resize(iam_graph_s * const graph, size_t const size);
 size_t _find_parent(iam_table_s const * const table, size_t const vertex);
 void _union_set(iam_table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args);
 
@@ -179,7 +179,7 @@ bool is_connected_iam_graph(iam_graph_s const * const graph) {
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    // early return since an empty graph is NOT connected
+    // early return since an empty (null) graph is NOT connected
     // also avoid unnecessary allocation and invalid memory access
     if (!graph->vertex_length) { return false; }
 
@@ -320,7 +320,7 @@ size_t insert_vertex_iam_graph(iam_graph_s * const graph, void const * const ver
 
     if (graph->vertex_length == graph->capacity) {
         size_t const capacity = graph->vertex_length ? graph->vertex_length * CERPEC_FACTOR : IAM_GRAPH_CHUNK;
-        _imatrix_graph_resize(graph, capacity);
+        _iam_graph_resize(graph, capacity);
     }
 
     memcpy(graph->vertices + (graph->vertex_length * graph->vertex_size), vertex, graph->vertex_size);
@@ -392,7 +392,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
     // shrink graph if elements fit into smaller memory chunk
     if (graph->vertex_length <= graph->capacity / CERPEC_FACTOR &&
         (graph->vertex_length > IAM_GRAPH_CHUNK || !graph->vertex_length)) {
-        _imatrix_graph_resize(graph, graph->vertex_length);
+        _iam_graph_resize(graph, graph->vertex_length);
     }
 
     // if last index was removed return an invalid index, else return the last vertex' index before it was moved
@@ -1284,7 +1284,7 @@ bool each_path_iam_list(iam_table_s const * const table, size_t const end, handl
     return !table->data->compare(table->costs + (top * table->data->size), table->data->zero, table->data->ac);
 }
 
-void _imatrix_graph_resize(iam_graph_s * const graph, size_t const size) {
+void _iam_graph_resize(iam_graph_s * const graph, size_t const size) {
     size_t const old_edge_capacity = (graph->capacity * (graph->capacity - 1)) / 2;
     size_t const new_edge_capacity = (size * (size - 1)) / 2;
 
