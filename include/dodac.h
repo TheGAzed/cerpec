@@ -18,6 +18,8 @@
 #define SIZE_FORMAT "%zu "
 #define STRING_FORMAT "%s "
 
+void voiddst(void * const element, void * arg);
+
 void chardst(void * const element, void * arg);
 
 void * charcpy(void * const destination, void const * const source, void * arg);

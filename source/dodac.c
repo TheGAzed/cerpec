@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+void voiddst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
+}
+
 int cmpchar(void const * const a, void const * const b) {
     return (int)((*(char*)a) - (*(char*)b));
 }
