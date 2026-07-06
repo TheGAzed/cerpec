@@ -7,6 +7,8 @@
 #define DIJKSTRA_01_SIZE 7
 #define DIJKSTRA_02_SIZE 8
 #define DIJKSTRA_03_SIZE 9
+#define CLAW_TREE_SIZE 4
+#define CATERPILLAR_TREE_SIZE 15
 
 TEST CREATE_01(void) {
     int none = 0;
@@ -391,6 +393,138 @@ TEST IS_CONNECTED_07(void) {
     PASS();
 }
 
+TEST IS_TREE_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    ASSERT(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_TREE_02(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    ASSERT(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_TREE_03(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    ASSERT(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_TREE_04(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    // claw tree graph
+    /*
+     * 0
+     * |
+     * 1 -- 2
+     * |
+     * 3
+     */
+    for (int i = 0; i < CLAW_TREE_SIZE; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 1, 3, &edge);
+
+    ASSERT(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_TREE_05(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    // caterpillar tree graph
+    /*
+     * 00    03    06    09    12
+     * |     |     |     |     |
+     * 01 -- 04 -- 07 -- 10 -- 13
+     * |     |     |     |     |
+     * 02    05    08    11    14
+     */
+    for (int i = 0; i < CATERPILLAR_TREE_SIZE; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+
+    insert_edge_iam_graph(&graph, 3, 4, &edge);
+    insert_edge_iam_graph(&graph, 4, 5, &edge);
+
+    insert_edge_iam_graph(&graph, 6, 7, &edge);
+    insert_edge_iam_graph(&graph, 7, 8, &edge);
+
+    insert_edge_iam_graph(&graph,  9, 10, &edge);
+    insert_edge_iam_graph(&graph, 10, 11, &edge);
+
+    insert_edge_iam_graph(&graph, 12, 13, &edge);
+    insert_edge_iam_graph(&graph, 13, 14, &edge);
+
+    insert_edge_iam_graph(&graph,  1,  4, &edge);
+    insert_edge_iam_graph(&graph,  4,  7, &edge);
+    insert_edge_iam_graph(&graph,  7, 10, &edge);
+    insert_edge_iam_graph(&graph, 10, 13, &edge);
+
+    ASSERT(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_VERTEX_01(void) {
     int none = 0;
     iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
@@ -639,6 +773,7 @@ SUITE (iam_graph_test) {
     RUN_TEST(IS_EMPTY_01); RUN_TEST(IS_EMPTY_02);
     RUN_TEST(IS_COMPLETE_01); RUN_TEST(IS_COMPLETE_02); RUN_TEST(IS_COMPLETE_03); RUN_TEST(IS_COMPLETE_04); RUN_TEST(IS_COMPLETE_05); RUN_TEST(IS_COMPLETE_06); RUN_TEST(IS_COMPLETE_07);
     RUN_TEST(IS_CONNECTED_01); RUN_TEST(IS_CONNECTED_02); RUN_TEST(IS_CONNECTED_03); RUN_TEST(IS_CONNECTED_04); RUN_TEST(IS_CONNECTED_05); RUN_TEST(IS_CONNECTED_06); RUN_TEST(IS_CONNECTED_07);
+    RUN_TEST(IS_TREE_01); RUN_TEST(IS_TREE_02); RUN_TEST(IS_TREE_03); RUN_TEST(IS_TREE_04); RUN_TEST(IS_TREE_05);
     RUN_TEST(INSERT_VERTEX_01); RUN_TEST(INSERT_VERTEX_02); RUN_TEST(INSERT_VERTEX_03);
     RUN_TEST(INSERT_EDGE_01); RUN_TEST(INSERT_EDGE_02); RUN_TEST(INSERT_EDGE_03);
     RUN_TEST(DIJKSTRA_01); RUN_TEST(DIJKSTRA_02); RUN_TEST(DIJKSTRA_03);
