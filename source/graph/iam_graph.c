@@ -370,7 +370,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
     for (size_t c = index, start_col = start_row + c; c < graph->vertex_length - 1; c++, start_col += c) {
         // calculate removed and last vertex' edges
         void * edge_index = graph->edges + ((start_col + c) * graph->edge_size);
-        void * edge_last = graph->edges + ((start_last + c + 1) * graph->edge_size);
+        void * edge_last = graph->edges + ((start_last + c) * graph->edge_size);
 
         // if an edge exists for removed vertex then destroy it
         if (graph->compare(graph->none, edge_index, graph->ac)) {
