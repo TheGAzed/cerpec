@@ -9,6 +9,9 @@
 #define DIJKSTRA_03_SIZE 9
 #define CLAW_TREE_SIZE 4
 #define CATERPILLAR_TREE_SIZE 15
+#define TRIANGLE_GRAPH_SIZE 3
+#define SQUARE_GRAPH_SIZE 4
+#define PENTAGON_GRAPH_SIZE 5
 
 TEST CREATE_01(void) {
     int none = 0;
@@ -525,6 +528,87 @@ TEST IS_TREE_05(void) {
     PASS();
 }
 
+TEST IS_TREE_06(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    // triangle graph
+    /*
+     * 00-
+     * |   \
+     * 01 - 02
+     */
+    for (int i = 0; i < TRIANGLE_GRAPH_SIZE; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 2, 0, &edge);
+
+    ASSERT_FALSE(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_TREE_07(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    // square graph
+    /*
+     * 00 - 03
+     * |    |
+     * 01 - 02
+     */
+    for (int i = 0; i < SQUARE_GRAPH_SIZE; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 2, 3, &edge);
+    insert_edge_iam_graph(&graph, 3, 0, &edge);
+
+    ASSERT_FALSE(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST IS_TREE_08(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    // square graph
+    /*
+     * 00 - 04 -
+     * |       03
+     * 01 - 02 -
+     */
+    for (int i = 0; i < PENTAGON_GRAPH_SIZE; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 2, 3, &edge);
+    insert_edge_iam_graph(&graph, 3, 4, &edge);
+    insert_edge_iam_graph(&graph, 4, 0, &edge);
+
+    ASSERT_FALSE(is_tree_iam_graph(&graph));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
 TEST INSERT_VERTEX_01(void) {
     int none = 0;
     iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
@@ -557,6 +641,78 @@ TEST INSERT_VERTEX_03(void) {
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST REMOVE_VERTEX_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int vertex = -1;
+    remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
+    ASSERT_EQ(0, vertex);
+
+    while (graph.vertex_length) {
+        vertex = -1;
+        remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
+        int const expected = (int)(graph.vertex_length + 1);
+        ASSERT_EQ(expected, vertex);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST REMOVE_VERTEX_02(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int vertex = -1;
+    remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
+    ASSERT_EQ(0, vertex);
+
+    while (graph.vertex_length) {
+        vertex = -1;
+        remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
+        int const expected = (int)(graph.vertex_length + 1);
+        ASSERT_EQ(expected, vertex);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST REMOVE_VERTEX_03(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int vertex = -1;
+    remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
+    ASSERT_EQ(0, vertex);
+
+    while (graph.vertex_length) {
+        vertex = -1;
+        remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
+        int const expected = (int)(graph.vertex_length + 1);
+        ASSERT_EQ(expected, vertex);
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -771,10 +927,14 @@ SUITE (iam_graph_test) {
     RUN_TEST(CREATE_01); RUN_TEST(DESTROY_01); RUN_TEST(CLEAR_01);
     RUN_TEST(COPY_01); RUN_TEST(COPY_02); RUN_TEST(COPY_03);
     RUN_TEST(IS_EMPTY_01); RUN_TEST(IS_EMPTY_02);
-    RUN_TEST(IS_COMPLETE_01); RUN_TEST(IS_COMPLETE_02); RUN_TEST(IS_COMPLETE_03); RUN_TEST(IS_COMPLETE_04); RUN_TEST(IS_COMPLETE_05); RUN_TEST(IS_COMPLETE_06); RUN_TEST(IS_COMPLETE_07);
-    RUN_TEST(IS_CONNECTED_01); RUN_TEST(IS_CONNECTED_02); RUN_TEST(IS_CONNECTED_03); RUN_TEST(IS_CONNECTED_04); RUN_TEST(IS_CONNECTED_05); RUN_TEST(IS_CONNECTED_06); RUN_TEST(IS_CONNECTED_07);
+    RUN_TEST(IS_COMPLETE_01); RUN_TEST(IS_COMPLETE_02); RUN_TEST(IS_COMPLETE_03); RUN_TEST(IS_COMPLETE_04);
+    RUN_TEST(IS_COMPLETE_05); RUN_TEST(IS_COMPLETE_06); RUN_TEST(IS_COMPLETE_07);
+    RUN_TEST(IS_CONNECTED_01); RUN_TEST(IS_CONNECTED_02); RUN_TEST(IS_CONNECTED_03); RUN_TEST(IS_CONNECTED_04);
+    RUN_TEST(IS_CONNECTED_05); RUN_TEST(IS_CONNECTED_06); RUN_TEST(IS_CONNECTED_07);
     RUN_TEST(IS_TREE_01); RUN_TEST(IS_TREE_02); RUN_TEST(IS_TREE_03); RUN_TEST(IS_TREE_04); RUN_TEST(IS_TREE_05);
+    RUN_TEST(IS_TREE_06); RUN_TEST(IS_TREE_07); RUN_TEST(IS_TREE_08);
     RUN_TEST(INSERT_VERTEX_01); RUN_TEST(INSERT_VERTEX_02); RUN_TEST(INSERT_VERTEX_03);
+    RUN_TEST(REMOVE_VERTEX_01); RUN_TEST(REMOVE_VERTEX_02); RUN_TEST(REMOVE_VERTEX_03);
     RUN_TEST(INSERT_EDGE_01); RUN_TEST(INSERT_EDGE_02); RUN_TEST(INSERT_EDGE_03);
     RUN_TEST(DIJKSTRA_01); RUN_TEST(DIJKSTRA_02); RUN_TEST(DIJKSTRA_03);
 }
