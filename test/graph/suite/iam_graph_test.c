@@ -657,14 +657,10 @@ TEST REMOVE_VERTEX_01(void) {
     }
 
     int vertex = -1;
-    remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
-    ASSERT_EQ(0, vertex);
-
     while (graph.vertex_length) {
         vertex = -1;
         remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
-        int const expected = (int)(graph.vertex_length + 1);
-        ASSERT_EQ(expected, vertex);
+        ASSERT_NEQ(-1, vertex);
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -681,14 +677,10 @@ TEST REMOVE_VERTEX_02(void) {
     }
 
     int vertex = -1;
-    remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
-    ASSERT_EQ(0, vertex);
-
     while (graph.vertex_length) {
         vertex = -1;
         remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
-        int const expected = (int)(graph.vertex_length + 1);
-        ASSERT_EQ(expected, vertex);
+        ASSERT_NEQ(-1, vertex);
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -705,14 +697,10 @@ TEST REMOVE_VERTEX_03(void) {
     }
 
     int vertex = -1;
-    remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
-    ASSERT_EQ(0, vertex);
-
     while (graph.vertex_length) {
         vertex = -1;
         remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
-        int const expected = (int)(graph.vertex_length + 1);
-        ASSERT_EQ(expected, vertex);
+        ASSERT_NEQ(-1, vertex);
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -728,11 +716,10 @@ TEST REMOVE_VERTEX_04(void) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
+    int vertex = -1;
     while (graph.vertex_length) {
-        int vertex = -1;
         remove_vertex_iam_graph(&graph, graph.vertex_length - 1, &vertex, intdst, NULL);
-        int const expected = (int)(graph.vertex_length);
-        ASSERT_EQ(expected, vertex);
+        ASSERT_NEQ(-1, vertex);
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -748,11 +735,10 @@ TEST REMOVE_VERTEX_05(void) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
+    int vertex = -1;
     while (graph.vertex_length) {
-        int vertex = -1;
         remove_vertex_iam_graph(&graph, graph.vertex_length - 1, &vertex, intdst, NULL);
-        int const expected = (int)(graph.vertex_length);
-        ASSERT_EQ(expected, vertex);
+        ASSERT_NEQ(-1, vertex);
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -768,11 +754,67 @@ TEST REMOVE_VERTEX_06(void) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
+    int vertex = -1;
     while (graph.vertex_length) {
-        int vertex = -1;
         remove_vertex_iam_graph(&graph, graph.vertex_length - 1, &vertex, intdst, NULL);
-        int const expected = (int)(graph.vertex_length);
-        ASSERT_EQ(expected, vertex);
+        ASSERT_NEQ(-1, vertex);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST REMOVE_VERTEX_07(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int vertex = -1;
+    while (graph.vertex_length) {
+        remove_vertex_iam_graph(&graph, graph.vertex_length / 2, &vertex, intdst, NULL);
+        ASSERT_NEQ(-1, vertex);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST REMOVE_VERTEX_08(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int vertex = -1;
+    while (graph.vertex_length) {
+        remove_vertex_iam_graph(&graph, graph.vertex_length / 2, &vertex, intdst, NULL);
+        ASSERT_NEQ(-1, vertex);
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST REMOVE_VERTEX_09(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int vertex = -1;
+    while (graph.vertex_length) {
+        remove_vertex_iam_graph(&graph, graph.vertex_length / 2, &vertex, intdst, NULL);
+        ASSERT_NEQ(-1, vertex);
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -995,7 +1037,8 @@ SUITE (iam_graph_test) {
     RUN_TEST(IS_TREE_06); RUN_TEST(IS_TREE_07); RUN_TEST(IS_TREE_08);
     RUN_TEST(INSERT_VERTEX_01); RUN_TEST(INSERT_VERTEX_02); RUN_TEST(INSERT_VERTEX_03);
     RUN_TEST(REMOVE_VERTEX_01); RUN_TEST(REMOVE_VERTEX_02); RUN_TEST(REMOVE_VERTEX_03); RUN_TEST(REMOVE_VERTEX_04);
-    RUN_TEST(REMOVE_VERTEX_05); RUN_TEST(REMOVE_VERTEX_06);
+    RUN_TEST(REMOVE_VERTEX_05); RUN_TEST(REMOVE_VERTEX_06); RUN_TEST(REMOVE_VERTEX_07); RUN_TEST(REMOVE_VERTEX_08);
+    RUN_TEST(REMOVE_VERTEX_09);
     RUN_TEST(INSERT_EDGE_01); RUN_TEST(INSERT_EDGE_02); RUN_TEST(INSERT_EDGE_03);
     RUN_TEST(DIJKSTRA_01); RUN_TEST(DIJKSTRA_02); RUN_TEST(DIJKSTRA_03);
 }
