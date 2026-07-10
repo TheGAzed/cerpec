@@ -90,12 +90,13 @@ iqueue_s copy_iqueue(iqueue_s const * const queue, copy_fn const copy, void * co
 
     // set original queue's and replica's current nodes for iteration
     struct infinite_queue_node const * current_queue = queue->tail;
-    struct infinite_queue_node ** current_copy = &(replica.tail); // two pointer list to remove special .head case
+    struct infinite_queue_node ** current_copy = &(replica.tail); // two pointer list to remove special head case
 
     struct infinite_queue_node * last = NULL;
     for (size_t remaining = queue->length, start = queue->current; remaining; start = 0) {
         // allocate new node for replica
-        last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node) + (IQUEUE_CHUNK * queue->size), queue->allocator->arg);
+        last = (*current_copy) = queue->allocator->alloc(sizeof(struct infinite_queue_node) +
+            (IQUEUE_CHUNK * queue->size), queue->allocator->arg);
         error((*current_copy) && "Memory allocation failed");
 
         // redirect current replica's node with replica's tail for circularity
