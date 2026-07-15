@@ -117,14 +117,14 @@ void set_isc_hash_map(isc_hash_map_s * const map, void const * const key, void c
 
 /// @brief Iterates over each key in structure.
 /// @param map Structure to iterate over.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void each_key_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to handle each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void each_key_isc_hash_map(isc_hash_map_s const * const map, manage_fn const manage, void * const am);
 
 /// @brief Iterates over each value in structure.
 /// @param map Structure to iterate over.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void each_value_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to handle each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void each_value_isc_hash_map(isc_hash_map_s const * const map, manage_fn const manage, void * const am);
 
 #endif // ISC_HASH_MAP_H

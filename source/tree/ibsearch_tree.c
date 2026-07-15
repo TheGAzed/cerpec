@@ -749,10 +749,10 @@ void update_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const
     memcpy(tree->elements + (node * tree->size), latter, tree->size);
 }
 
-void in_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah) {
+void in_order_ibsearch_tree(ibsearch_tree_s const * const tree, manage_fn const manage, void * const am) {
     error(tree && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(tree != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(tree != am && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->compare && "Compare function can't be NULL.");
@@ -766,7 +766,7 @@ void in_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const 
             node = tree->node[IBST_LEFT][node];
         }
 
-        if (!handle(tree->elements + (node * tree->size), ah)) {
+        if (!manage(tree->elements + (node * tree->size), am)) {
             break;
         }
 
@@ -790,10 +790,10 @@ void in_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const 
     }
 }
 
-void pre_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah) {
+void pre_order_ibsearch_tree(ibsearch_tree_s const * const tree, manage_fn const manage, void * const am) {
     error(tree && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(tree != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(tree != am && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->compare && "Compare function can't be NULL.");
@@ -810,7 +810,7 @@ void pre_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const
         stack.elements[stack.length++] = tree->root;
     }
 
-    while (stack.length && handle(tree->elements + (stack.elements[stack.length - 1] * tree->size), ah)) {
+    while (stack.length && manage(tree->elements + (stack.elements[stack.length - 1] * tree->size), am)) {
         size_t const node = stack.elements[--stack.length];
 
         size_t const right_child = tree->node[IBST_RIGHT][node];
@@ -827,10 +827,10 @@ void pre_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void post_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah) {
+void post_order_ibsearch_tree(ibsearch_tree_s const * const tree, manage_fn const manage, void * const am) {
     error(tree && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(tree != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(tree != am && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->compare && "Compare function can't be NULL.");
@@ -850,14 +850,14 @@ void post_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn cons
         if (NIL != node) { // if node is valid push it onto the stack and go to node's left child
             stack.elements[stack.length++] = node;
             node = tree->node[IBST_LEFT][node];
-        } else { // else node is invalid, thus pop a new node from the stack, handle on element, and go to node's right child
+        } else { // else node is invalid, thus pop a new node from the stack, manage on element, and go to node's right child
             size_t const peek = stack.elements[stack.length - 1];
 
             size_t const peek_right = tree->node[IBST_RIGHT][peek];
             if (NIL != peek_right && peek_right != last) {
                 node = peek_right;
             } else {
-                if (!handle(tree->elements + (node * tree->size), ah)) {
+                if (!manage(tree->elements + (node * tree->size), am)) {
                     break;
                 }
 
@@ -869,10 +869,10 @@ void post_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn cons
     tree->allocator->free(stack.elements, tree->allocator->arg);
 }
 
-void level_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn const handle, void * const ah) {
+void level_order_ibsearch_tree(ibsearch_tree_s const * const tree, manage_fn const manage, void * const am) {
     error(tree && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(tree != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(tree != am && "Parameters can't be equal.");
 
     valid(tree->size && "Size can't be zero.");
     valid(tree->compare && "Compare function can't be NULL.");
@@ -890,7 +890,7 @@ void level_order_ibsearch_tree(ibsearch_tree_s const * const tree, handle_fn con
     }
 
     // while queue isn't empty operate on element, pop parent and push valid children
-    while (queue.length && handle(tree->elements + (queue.elements[queue.current] * tree->size), ah)) {
+    while (queue.length && manage(tree->elements + (queue.elements[queue.current] * tree->size), am)) {
         // pop index
         size_t const node = queue.elements[queue.current++];
         queue.length--;

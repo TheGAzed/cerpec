@@ -135,8 +135,8 @@ bool is_disjoint_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set
 
 /// @brief Iterates over each element in structure.
 /// @param set Structure to iterate over.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to mamage each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void each_isc_hash_set(isc_hash_set_s const * const set, manage_fn const manage, void * const am);
 
 #endif // ISC_HASH_SET_H

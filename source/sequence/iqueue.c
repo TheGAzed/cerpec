@@ -198,10 +198,10 @@ void dequeue_iqueue(iqueue_s * const queue, void * const buffer) {
     }
 }
 
-void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const ah) {
+void each_iqueue(iqueue_s const * const queue, manage_fn const manage, void * const am) {
     error(queue && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL");
-    error(queue != ah && "Parameters can't be the same.");
+    error(manage && "Parameter can't be NULL");
+    error(queue != am && "Parameters can't be the same.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->allocator && "Allocator can't be NULL.");
@@ -215,8 +215,8 @@ void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * co
 
         size_t i = start; // save i outside loop to later use it in subtraction
         for (;i < remaining && i < IQUEUE_CHUNK; ++i) { // while i is less than either remaining size or node's array size
-            // handle on element and if zero is returned then end main function
-            if (!handle(current->elements + (i * queue->size), ah)) {
+            // manage on element and if zero is returned then end main function
+            if (!manage(current->elements + (i * queue->size), am)) {
                 return;
             }
         }

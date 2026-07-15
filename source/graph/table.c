@@ -1,8 +1,12 @@
 #include <graph/table.h>
 
-table_s compose_table(size_t const size, compare_fn const compare, void * const ac, copy_fn const juggle, void * const aj, copy_fn const sum, void * const as, void * const zero, void * const infinite) {
+table_s compose_table(
+    size_t const size, compare_fn const compare, void * const ac, copy_fn const juggle, void * const aj,
+    copy_fn const sum, void * const as, set_fn const destroy, void * const ad, void * const zero, void * const infinite) {
+
     error(size && "Parameter can't be zero.");
     error(compare && "Parameter can't be NULL.");
+    error(destroy && "Parameter can't be NULL.");
     error(juggle && "Parameter can't be NULL.");
     error(sum && "Parameter can't be NULL.");
     error(zero && "Parameter can't be NULL.");
@@ -12,6 +16,6 @@ table_s compose_table(size_t const size, compare_fn const compare, void * const 
 
     return (table_s) {
         .compare = compare, .size = size, .zero = zero, .infinite = infinite, .sum = sum, .juggle = juggle,
-        .as = as, .aj = aj, .ac = ac,
+        .as = as, .aj = aj, .ac = ac, .destroy = destroy, .ad = ad,
     };
 }

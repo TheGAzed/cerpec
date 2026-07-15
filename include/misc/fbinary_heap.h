@@ -87,8 +87,8 @@ void meld_fbinary_heap(fbinary_heap_s * const destination, fbinary_heap_s * cons
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param heap Structure to iterate over.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to handle each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void each_fbinary_heap(fbinary_heap_s const * const heap, manage_fn const manage, void * const am);
 
 #endif // FBINARY_HEAP_H

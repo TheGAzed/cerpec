@@ -649,10 +649,10 @@ fcircular_list_s extract_fcircular_list(fcircular_list_s * const list, filter_fn
     return positive;
 }
 
-void each_fcircular_list(fcircular_list_s const * const list, handle_fn const handle, void * const ah) {
+void each_fcircular_list(fcircular_list_s const * const list, manage_fn const manage, void * const am) {
     error(list && "Paremeter can't be NULL.");
-    error(handle && "Paremeter can't be NULL.");
-    error(list != ah && "Parameters can't be equal.");
+    error(manage && "Paremeter can't be NULL.");
+    error(list != am && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -661,10 +661,10 @@ void each_fcircular_list(fcircular_list_s const * const list, handle_fn const ha
     valid(list->elements && "Elements array can't be NULL.");
     valid(list->next && "Next array can't be NULL.");
 
-    // iterate over each element calling handle function
+    // iterate over each element calling manage function
     for (size_t i = 0, current = list->tail; i < list->length; ++i) {
-        current = list->next[current]; // go to next node to avoid initial tail handle
-        if (!handle(list->elements + (current * list->size), ah)) {
+        current = list->next[current]; // go to next node to avoid initial tail manage
+        if (!manage(list->elements + (current * list->size), am)) {
             return;
         }
     }

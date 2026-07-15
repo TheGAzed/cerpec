@@ -228,15 +228,15 @@ void meld_ibinary_heap(ibinary_heap_s * const destination, ibinary_heap_s * cons
     }
 }
 
-void each_ibinary_heap(ibinary_heap_s const * const heap, handle_fn const handle, void * const ah) {
+void each_ibinary_heap(ibinary_heap_s const * const heap, manage_fn const manage, void * const am) {
     assert(heap && "Parameter can't be NULL.");
-    assert(handle && "Parameter can't be NULL.");
+    assert(manage && "Parameter can't be NULL.");
 
     assert(heap->compare && "Parameter can't be NULL.");
     assert(heap->size && "Parameter can't be zero.");
     assert(heap->allocator && "Paremeter can't be NULL.");
 
-    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), ah); ++i) {}
+    for (size_t i = 0; i < heap->length && manage(heap->elements + (i * heap->size), am); ++i) {}
 }
 
 void _ibinary_heap_resize(ibinary_heap_s * const heap, size_t const size) {

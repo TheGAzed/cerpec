@@ -144,17 +144,17 @@ void peep_istack(istack_s const * const stack, void * const buffer) {
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void each_istack(istack_s const * const stack, handle_fn const handle, void * const ah) {
+void each_istack(istack_s const * const stack, manage_fn const manage, void * const am) {
     error(stack && "Paremeter can't be NULL.");
-    error(handle && "Paremeter can't be NULL.");
-    error(stack != ah && "Parameters can't be the same.");
+    error(manage && "Paremeter can't be NULL.");
+    error(stack != am && "Parameters can't be the same.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->length <= stack->capacity && "Length exceeds capacity.");
     valid(stack->allocator && "Allocator can't be NULL.");
 
     // iterate over each element from bottom to the top of stack
-    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, ah); e += stack->size) {}
+    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && manage(e, am); e += stack->size) {}
 }
 
 void apply_istack(istack_s const * const stack, process_fn const process, void * const ap) {

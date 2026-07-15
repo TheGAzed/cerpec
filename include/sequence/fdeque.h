@@ -84,15 +84,15 @@ void peek_back_fdeque(fdeque_s const * const deque, void * const buffer);
 
 /// @brief Iterates over each element in structure starting from the front.
 /// @param deque Structure to iterate over.
-/// @param handle Function pointer to operate on each element reference using element size and generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void each_front_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to operate on each element reference using element size and generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void each_front_fdeque(fdeque_s const * const deque, manage_fn const manage, void * const am);
 
 /// @brief Iterates over each element in structure starting from the back.
 /// @param deque Structure to iterate over.
-/// @param handle Function pointer to operate on each element reference using element size and arguments.
-/// @param ah Generic arguments to use in function pointer.
-void each_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to operate on each element reference using element size and arguments.
+/// @param am Generic arguments to use in function pointer.
+void each_back_fdeque(fdeque_s const * const deque, manage_fn const manage, void * const am);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param deque Structure to map.

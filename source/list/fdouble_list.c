@@ -681,10 +681,10 @@ fdouble_list_s extract_fdouble_list(fdouble_list_s * const list, filter_fn const
     return positive;
 }
 
-void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const ah) {
+void each_next_fdouble_list(fdouble_list_s const * const list, manage_fn const manage, void * const am) {
     error(list && "Paremeter can't be NULL.");
-    error(handle && "Paremeter can't be NULL.");
-    error(list != ah && "Parameters can't be equal.");
+    error(manage && "Paremeter can't be NULL.");
+    error(list != am && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -694,18 +694,18 @@ void each_next_fdouble_list(fdouble_list_s const * const list, handle_fn const h
     valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
-    // for each forward element in list call handle function and break if it returns false
+    // for each forward element in list call manage function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i, current = list->node[FDL_NEXT][current]) {
-        if (!handle(list->elements + (current * list->size), ah)) {
+        if (!manage(list->elements + (current * list->size), am)) {
             break;
         }
     }
 }
 
-void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const handle, void * const ah) {
+void each_prev_fdouble_list(fdouble_list_s const * const list, manage_fn const manage, void * const am) {
     error(list && "Paremeter can't be NULL.");
-    error(handle && "Paremeter can't be NULL.");
-    error(list != ah && "Parameters can't be equal.");
+    error(manage && "Paremeter can't be NULL.");
+    error(list != am && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->length <= list->max && "Length exceeds maximum.");
@@ -715,10 +715,10 @@ void each_prev_fdouble_list(fdouble_list_s const * const list, handle_fn const h
     valid(list->node[FDL_NEXT] && "Next array can't be NULL.");
     valid(list->node[FDL_PREV] && "Previous array can't be NULL.");
 
-    // for each backward element in list call handle function and break if it returns false
+    // for each backward element in list call manage function and break if it returns false
     for (size_t i = 0, current = list->head; i < list->length; ++i) {
         current = list->node[FDL_PREV][current];
-        if (!handle(list->elements + (current * list->size), ah)) {
+        if (!manage(list->elements + (current * list->size), am)) {
             break;
         }
     }

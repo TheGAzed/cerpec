@@ -133,15 +133,15 @@ idouble_list_s extract_idouble_list(idouble_list_s * const list, filter_fn const
 
 /// @brief Iterates over each next element in structure based on their order.
 /// @param list Structure to iterate over.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic void pointer arguments for function pointer.
-void each_next_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to handle each element reference using generic arguments.
+/// @param am Generic void pointer arguments for function pointer.
+void each_next_idouble_list(idouble_list_s const * const list, manage_fn const manage, void * const am);
 
 /// @brief Iterates over each previous element in structure based on their order.
 /// @param list Structure to iterate over.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic void pointer arguments for function pointer.
-void each_prev_idouble_list(idouble_list_s const * const list, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to handle each element reference using generic arguments.
+/// @param am Generic void pointer arguments for function pointer.
+void each_prev_idouble_list(idouble_list_s const * const list, manage_fn const manage, void * const am);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param list Structure to manage.

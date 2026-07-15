@@ -585,9 +585,9 @@ bool is_disjoint_fsc_hash_set(fsc_hash_set_s const * const set_one, fsc_hash_set
     return true;
 }
 
-void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle, void * const ah) {
+void each_fsc_hash_set(fsc_hash_set_s const * const set, manage_fn const manage, void * const am) {
     error(set && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
+    error(manage && "Parameter can't be NULL.");
 
     valid(set->hash && "Hash function can't be NULL.");
     valid(set->size && "Size can't be zero.");
@@ -598,7 +598,7 @@ void each_fsc_hash_set(fsc_hash_set_s const * const set, handle_fn const handle,
     valid(set->allocator && "Allocator can't be NULL.");
 
     for (size_t i = 0; i < set->length; ++i) {
-        if (!handle(set->elements + (i * set->size), ah)) { break; }
+        if (!manage(set->elements + (i * set->size), am)) { break; }
     }
 }
 

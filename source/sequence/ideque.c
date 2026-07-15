@@ -271,10 +271,10 @@ void dequeue_back_ideque(ideque_s * const deque, void * const buffer) {
     }
 }
 
-void each_front_ideque(ideque_s const * const deque, handle_fn const handle, void * const ah) {
+void each_front_ideque(ideque_s const * const deque, manage_fn const manage, void * const am) {
     error(deque && "Parameter is NULL.");
-    error(handle && "Parameter is NULL.");
-    error(deque != ah && "Parameters can't be the same.");
+    error(manage && "Parameter is NULL.");
+    error(deque != am && "Parameters can't be the same.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->allocator && "Allocator can't be NULL.");
@@ -286,7 +286,7 @@ void each_front_ideque(ideque_s const * const deque, handle_fn const handle, voi
         size_t i = start;
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
             // if operate returns false then terminate main function
-            if (!handle(current->elements + (i * deque->size), ah)) {
+            if (!manage(current->elements + (i * deque->size), am)) {
                 return;
             }
         }
@@ -296,10 +296,10 @@ void each_front_ideque(ideque_s const * const deque, handle_fn const handle, voi
     }
 }
 
-void each_back_ideque(ideque_s const * const deque, handle_fn const handle, void * const ah) {
+void each_back_ideque(ideque_s const * const deque, manage_fn const manage, void * const am) {
     error(deque && "Parameter is NULL.");
-    error(handle && "Parameter is NULL.");
-    error(deque != ah && "Parameters can't be the same.");
+    error(manage && "Parameter is NULL.");
+    error(deque != am && "Parameters can't be the same.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->allocator && "Allocator can't be NULL.");
@@ -312,8 +312,8 @@ void each_back_ideque(ideque_s const * const deque, handle_fn const handle, void
         size_t const node_index = l % IDEQUE_CHUNK; // calculate last element index in node
         size_t i = 0; // save number of operated elements in node
         for (; i <= node_index && r; ++i, r--) { // until node index is reached and elements remain
-            // handle on reversed i to start from last element in node
-            if (!handle(current->elements + ((node_index - i) * deque->size), ah)) {
+            // manage on reversed i to start from last element in node
+            if (!manage(current->elements + ((node_index - i) * deque->size), am)) {
                 return;
             }
         }

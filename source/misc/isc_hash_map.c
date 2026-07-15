@@ -398,10 +398,10 @@ INSERT:
     map->length++;
 }
 
-void each_key_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const ah) {
+void each_key_isc_hash_map(isc_hash_map_s const * const map, manage_fn const manage, void * const am) {
     error(map && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(map != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(map != am && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -411,16 +411,16 @@ void each_key_isc_hash_map(isc_hash_map_s const * const map, handle_fn const han
 
     // iterate over each valid key in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
-        if (!handle(map->keys + (i * map->key_size), ah)) {
+        if (!manage(map->keys + (i * map->key_size), am)) {
             break; // return since we need to break-off of two loops
         }
     }
 }
 
-void each_value_isc_hash_map(isc_hash_map_s const * const map, handle_fn const handle, void * const ah) {
+void each_value_isc_hash_map(isc_hash_map_s const * const map, manage_fn const manage, void * const am) {
     error(map && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(map != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(map != am && "Parameters can't be equal.");
 
     valid(map->hash_key && "Hash function can't be NULL.");
     valid(map->key_size && "Key size can't be zero.");
@@ -430,7 +430,7 @@ void each_value_isc_hash_map(isc_hash_map_s const * const map, handle_fn const h
 
     // iterate over each valid value in lists (since they're sequentially we only need to iterate through values array)
     for (size_t i = 0; i < map->length; ++i) {
-        if (!handle(map->values + (i * map->value_size), ah)) {
+        if (!manage(map->values + (i * map->value_size), am)) {
             break; // return since we need to break-off of two loops
         }
     }

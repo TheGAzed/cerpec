@@ -274,10 +274,10 @@ void peek_back_fdeque(fdeque_s const * const deque, void * const buffer) {
     memcpy(buffer, deque->elements + (position * deque->size), deque->size);
 }
 
-void each_front_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const ah) {
+void each_front_fdeque(fdeque_s const * const deque, manage_fn const manage, void * const am) {
     error(deque && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(deque != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(deque != am && "Parameters can't be equal.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->max && "Maximum can't be zero.");
@@ -294,17 +294,17 @@ void each_front_fdeque(fdeque_s const * const deque, handle_fn const handle, voi
     // create flag to save handle return value when handling is terminated
     bool is_handle = true;
     for (size_t i = deque->current; i < (right_length + deque->current) && is_handle; ++i) {
-        is_handle = handle(deque->elements + (i * deque->size), ah);
+        is_handle = manage(deque->elements + (i * deque->size), am);
     }
     for (size_t i = 0; i < left_length && is_handle; ++i) {
-        is_handle = handle(deque->elements + (i * deque->size), ah);
+        is_handle = manage(deque->elements + (i * deque->size), am);
     }
 }
 
-void each_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void * const ah) {
+void each_back_fdeque(fdeque_s const * const deque, manage_fn const manage, void * const am) {
     error(deque && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(deque != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(deque != am && "Parameters can't be equal.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->max && "Maximum can't be zero.");
@@ -318,16 +318,16 @@ void each_back_fdeque(fdeque_s const * const deque, handle_fn const handle, void
     size_t const right_length = absolute > deque->max ? deque->max - deque->current : deque->length;
     size_t const left_length = deque->length - right_length;
 
-    // create flag to save handle return value when handling is terminated
+    // create flag to save manage return value when handling is terminated
     // also reverse the order of element access compared to 'front' alternative
     bool is_handle = true;
     for (size_t i = 0; i < left_length && is_handle; ++i) {
         const size_t reverse = left_length - i - 1;
-        is_handle = handle(deque->elements + (reverse * deque->size), ah);
+        is_handle = manage(deque->elements + (reverse * deque->size), am);
     }
     for (size_t i = 0; i < right_length && is_handle; ++i) {
         const size_t reverse = right_length - i - 1;
-        is_handle = handle(deque->elements + ((reverse + deque->current) * deque->size), ah);
+        is_handle = manage(deque->elements + ((reverse + deque->current) * deque->size), am);
     }
 }
 

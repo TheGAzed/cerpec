@@ -570,10 +570,10 @@ fstraight_list_s extract_fstraight_list(fstraight_list_s * const list, filter_fn
     return positive;
 }
 
-void each_fstraight_list(fstraight_list_s const * const list, handle_fn const handle, void * const ah) {
+void each_fstraight_list(fstraight_list_s const * const list, manage_fn const manage, void * const am) {
     error(list && "Paremeter can't be NULL.");
-    error(handle && "Paremeter can't be NULL.");
-    error(list != ah && "Parameters can't be equal.");
+    error(manage && "Paremeter can't be NULL.");
+    error(list != am && "Parameters can't be equal.");
 
     valid(list->size && "Size can't be zero.");
     valid(list->max && "Maximum can't be zero.");
@@ -582,7 +582,7 @@ void each_fstraight_list(fstraight_list_s const * const list, handle_fn const ha
     valid(list->elements && "Elements array can't be NULL.");
     valid(list->next && "Next array can't be NULL.");
 
-    for (size_t i = list->head; NIL != i && handle(list->elements + (i * list->size), ah); i = list->next[i]) {}
+    for (size_t i = list->head; NIL != i && manage(list->elements + (i * list->size), am); i = list->next[i]) {}
 }
 
 void apply_fstraight_list(fstraight_list_s const * const list, process_fn const process, void * const ap) {

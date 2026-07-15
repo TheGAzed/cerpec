@@ -208,10 +208,10 @@ void peek_fqueue(fqueue_s const * const queue, void * const buffer) {
     memcpy(buffer, queue->elements + (queue->current * queue->size), queue->size);
 }
 
-void each_fqueue(fqueue_s const * const queue, handle_fn const handle, void * const ah) {
+void each_fqueue(fqueue_s const * const queue, manage_fn const manage, void * const am) {
     error(queue && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(queue != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(queue != am && "Parameters can't be equal.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->max && "Maximum can't be zero.");
@@ -225,13 +225,13 @@ void each_fqueue(fqueue_s const * const queue, handle_fn const handle, void * co
     size_t const right_length = absolute > queue->max ? queue->max - queue->current : queue->length;
     size_t const left_length = queue->length - right_length;
 
-    // save temporary handle flag to check if handler hasn't terminated during iteration
+    // save temporary manage flag to check if handler hasn't terminated during iteration
     bool is_handle = true;
     for (size_t i = queue->current; i < (right_length + queue->current) && is_handle; ++i) {
-        is_handle = handle(queue->elements + (i * queue->size), ah);
+        is_handle = manage(queue->elements + (i * queue->size), am);
     }
     for (size_t i = 0; i < left_length && is_handle; ++i) {
-        is_handle = handle(queue->elements + (i * queue->size), ah);
+        is_handle = manage(queue->elements + (i * queue->size), am);
     }
 }
 

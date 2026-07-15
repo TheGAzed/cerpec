@@ -172,10 +172,10 @@ void peep_fstack(fstack_s const * const stack, void * const buffer) {
     memcpy(buffer, stack->elements + ((stack->length - 1) * stack->size), stack->size);
 }
 
-void each_fstack(fstack_s const * const stack, handle_fn const handle, void * const ah) {
+void each_fstack(fstack_s const * const stack, manage_fn const manage, void * const am) {
     error(stack && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
-    error(stack != ah && "Parameters can't be equal.");
+    error(manage && "Parameter can't be NULL.");
+    error(stack != am && "Parameters can't be equal.");
 
     valid(stack->size && "Size can't be zero.");
     valid(stack->max && "Maximum can't be zero.");
@@ -184,7 +184,7 @@ void each_fstack(fstack_s const * const stack, handle_fn const handle, void * co
     valid(stack->length <= stack->max && "Length exceeds maximum.");
 
     // empty for loop since all the logic can just fit into its expressions
-    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && handle(e, ah); e += stack->size) {}
+    for (char * e = stack->elements; e < stack->elements + (stack->length * stack->size) && manage(e, am); e += stack->size) {}
 }
 
 void apply_fstack(fstack_s const * const stack, process_fn const process, void * const ap) {

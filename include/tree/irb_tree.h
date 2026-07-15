@@ -166,26 +166,26 @@ void update_irb_tree(irb_tree_s const * const tree, void const * const latter, v
 
 /// @brief Performs an in-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void in_order_irb_tree(irb_tree_s const * const tree, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to manage each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void in_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am);
 
 /// @brief Performs a pre-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void pre_order_irb_tree(irb_tree_s const * const tree, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to manage each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void pre_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am);
 
 /// @brief Performs a post-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void post_order_irb_tree(irb_tree_s const * const tree, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to manage each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void post_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am);
 
 /// @brief Performs a level-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
-/// @param handle Function pointer to handle each element reference using generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void level_order_irb_tree(irb_tree_s const * const tree, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to manage each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void level_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am);
 
 #endif // IRB_TREE_H

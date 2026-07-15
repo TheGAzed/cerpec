@@ -237,16 +237,16 @@ void meld_fbinary_heap(fbinary_heap_s * const destination, fbinary_heap_s * cons
     }
 }
 
-void each_fbinary_heap(fbinary_heap_s const * const heap, handle_fn const handle, void * const ah) {
+void each_fbinary_heap(fbinary_heap_s const * const heap, manage_fn const manage, void * const am) {
     assert(heap && "Parameter can't be NULL.");
-    assert(handle && "Parameter can't be NULL.");
+    assert(manage && "Parameter can't be NULL.");
 
     assert(heap->compare && "Parameter can't be NULL.");
     assert(heap->size && "Parameter can't be zero.");
     assert(heap->allocator && "Paremeter can't be NULL.");
     assert(heap->max && "Paremeter can't be zero.");
 
-    for (size_t i = 0; i < heap->length && handle(heap->elements + (i * heap->size), ah); ++i) {}
+    for (size_t i = 0; i < heap->length && manage(heap->elements + (i * heap->size), am); ++i) {}
 }
 
 void _fbinary_heapify_up(fbinary_heap_s const * const heap, size_t const index) {

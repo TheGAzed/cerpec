@@ -558,9 +558,9 @@ bool is_disjoint_isc_hash_set(isc_hash_set_s const * const set_one, isc_hash_set
     return true;
 }
 
-void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle, void * const ah) {
+void each_isc_hash_set(isc_hash_set_s const * const set, manage_fn const manage, void * const am) {
     error(set && "Parameter can't be NULL.");
-    error(handle && "Parameter can't be NULL.");
+    error(manage && "Parameter can't be NULL.");
 
     valid(set->size && "Size can't be zero.");
     valid(set->hash && "Hash function can't be NULL.");
@@ -569,7 +569,7 @@ void each_isc_hash_set(isc_hash_set_s const * const set, handle_fn const handle,
     valid(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
     for (size_t i = 0; i < set->length; ++i) {
-        if (!handle(set->elements + (i * set->size), ah)) { break; }
+        if (!manage(set->elements + (i * set->size), am)) { break; }
     }
 }
 

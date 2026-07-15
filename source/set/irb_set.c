@@ -805,9 +805,9 @@ bool is_disjoint_irb_set(irb_set_s const * const set_one, irb_set_s const * cons
     return true;
 }
 
-void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * const ah) {
+void each_irb_set(irb_set_s const * const set, manage_fn const manage, void * const am) {
     assert(set && "Parameter can't be NULL.");
-    assert(handle && "Parameter can't be NULL.");
+    assert(manage && "Parameter can't be NULL.");
 
     assert(set->compare && "Parameter can't be NULL.");
     assert(set->size && "Parameter can't be zero.");
@@ -824,7 +824,7 @@ void each_irb_set(irb_set_s const * const set, handle_fn const handle, void * co
             node = left;
         }
 
-        if (!handle(set->elements + (node * set->size), ah)) { break; }
+        if (!manage(set->elements + (node * set->size), am)) { break; }
 
         left_done = true;
         if (NIL != right) {

@@ -770,15 +770,15 @@ bool is_disjoint_frb_set(frb_set_s const * const set_one, frb_set_s const * cons
     return true;
 }
 
-void each_frb_set(frb_set_s const * const set, handle_fn const handle, void * const ah) {
+void each_frb_set(frb_set_s const * const set, manage_fn const manage, void * const am) {
     assert(set && "Parameter can't be NULL.");
-    assert(handle && "Parameter can't be NULL.");
+    assert(manage && "Parameter can't be NULL.");
 
     assert(set->compare && "Parameter can't be NULL.");
     assert(set->size && "Parameter can't be zero.");
     assert(set->length <= set->max && "Lenght can't be larger than maximum.");
 
-    for (size_t i = 0; i < set->length && handle(set->elements + (i * set->size), ah); ++i) {}
+    for (size_t i = 0; i < set->length && manage(set->elements + (i * set->size), am); ++i) {}
 }
 
 void _frb_set_left_rotate(frb_set_s * const set, size_t const node) {

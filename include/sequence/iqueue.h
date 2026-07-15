@@ -75,9 +75,9 @@ void peek_iqueue(iqueue_s const * const queue, void * const buffer);
 
 /// @brief Iterates over each element in structure starting from the beginning.
 /// @param queue Structure to iterate over.
-/// @param handle Function pointer to operate on each element reference using element size and generic arguments.
-/// @param ah Generic arguments to use in function pointer.
-void each_iqueue(iqueue_s const * const queue, handle_fn const handle, void * const ah);
+/// @param manage Function pointer to operate on each element reference using element size and generic arguments.
+/// @param am Generic arguments to use in function pointer.
+void each_iqueue(iqueue_s const * const queue, manage_fn const manage, void * const am);
 
 /// @brief Apply each element in structure into an array to manage.
 /// @param queue Structure to map.

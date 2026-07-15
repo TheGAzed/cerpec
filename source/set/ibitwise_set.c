@@ -340,9 +340,9 @@ bool is_disjoint_ibitwise_set(ibitwise_set_s const * const set_one, ibitwise_set
     return true;
 }
 
-void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const handle, void * const ah) {
+void each_index_ibitwise_set(ibitwise_set_s const * const set, manage_fn const manage, void * const am) {
     assert(set && "Parameter can't be NULL.");
-    assert(handle && "Parameter can't be NULL.");
+    assert(manage && "Parameter can't be NULL.");
 
     assert(set->length <= set->capacity && "Lenght can't be larger than capacity.");
 
@@ -355,7 +355,7 @@ void each_index_ibitwise_set(ibitwise_set_s const * const set, handle_fn const h
         unsigned const bit = 1U << (BIT_COUNT - relative - 1);
 
         // if bit isn't set continue, and if handle function returns false break the loop and quit main function
-        if ((set->bits[idx] & bit) && !handle(&temp, ah)) {
+        if ((set->bits[idx] & bit) && !manage(&temp, am)) {
             break;
         }
     }
