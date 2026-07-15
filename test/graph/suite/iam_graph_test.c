@@ -1,6 +1,7 @@
 #include <limits.h>
 
 #include <graph/iam_graph.h>
+#include <graph/table.h>
 
 #include <suite.h>
 
@@ -1114,18 +1115,18 @@ TEST REMOVE_EDGE_05(void) {
     int none = 0;
     iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
-    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     int edge = 1;
-    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
         insert_edge_iam_graph(&graph, i - 1, i, &edge);
         edge++;
     }
 
     edge = 1;
-    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
         int got = -1;
         remove_edge_iam_graph(&graph, i - 1, i, &got);
         ASSERT_EQ(edge, got);
@@ -1141,23 +1142,215 @@ TEST REMOVE_EDGE_06(void) {
     int none = 0;
     iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
 
-    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     int edge = 1;
-    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_edge_iam_graph(&graph, i - 1, i, &edge);
         edge++;
     }
 
     edge = 1;
-    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
         int got = -1;
         remove_edge_iam_graph(&graph, i - 1, i, &got);
         ASSERT_EQ(edge, got);
         edge++;
     }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_01(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        ASSERT_FALSE(contains_edge_iam_graph(&graph, i - 1, i));
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_02(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
+        ASSERT_FALSE(contains_edge_iam_graph(&graph, i - 1, i));
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_03(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        ASSERT_FALSE(contains_edge_iam_graph(&graph, i - 1, i));
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_04(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        ASSERT(contains_edge_iam_graph(&graph, i - 1, i));
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_05(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
+        ASSERT(contains_edge_iam_graph(&graph, i - 1, i));
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_06(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        ASSERT(contains_edge_iam_graph(&graph, i - 1, i));
+    }
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_07(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    int removed = -1;
+    size_t const index_one = ((IAM_GRAPH_CHUNK - 1) / 2) - 1;
+    size_t const index_two = ((IAM_GRAPH_CHUNK - 1) / 2);
+    remove_edge_iam_graph(&graph, index_one, index_two, &removed);
+
+    ASSERT_FALSE(contains_edge_iam_graph(&graph, index_one, index_two));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_08(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    int removed = -1;
+    size_t const index_one = ((IAM_GRAPH_CHUNK) / 2) - 1;
+    size_t const index_two = ((IAM_GRAPH_CHUNK) / 2);
+    remove_edge_iam_graph(&graph, index_one, index_two, &removed);
+
+    ASSERT_FALSE(contains_edge_iam_graph(&graph, index_one, index_two));
+
+    destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
+
+    PASS();
+}
+
+TEST CONTAINS_EDGE_09(void) {
+    int none = 0;
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+
+    for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_vertex_iam_graph(&graph, &i);
+    }
+
+    int const edge = 42;
+    for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
+    }
+
+    int removed = -1;
+    size_t const index_one = ((IAM_GRAPH_CHUNK + 1) / 2) - 1;
+    size_t const index_two = ((IAM_GRAPH_CHUNK + 1) / 2);
+    remove_edge_iam_graph(&graph, index_one, index_two, &removed);
+
+    ASSERT_FALSE(contains_edge_iam_graph(&graph, index_one, index_two));
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -1192,9 +1385,9 @@ TEST DIJKSTRA_01(void) {
     insert_edge_iam_graph(&graph, 4, 6, edges + 10);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
+    table_s table = compose_table(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
-    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_SPECIAL);
+    dijkstra_iam_graph(&graph, &table, 0, IAM_SPECIAL);
 
     int const costs[DIJKSTRA_01_SIZE] = { 0, 2, 6, 4, 3, 3, 5 };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_01_SIZE * sizeof(int));
@@ -1241,9 +1434,9 @@ TEST DIJKSTRA_02(void) {
     insert_edge_iam_graph(&graph, 6, 7, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
+    table_s table = compose_table(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
-    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_SPECIAL);
+    dijkstra_iam_graph(&graph, &table, 0, IAM_SPECIAL);
 
     int const costs[DIJKSTRA_02_SIZE] = { 0, 6, 2, 4, 5, 8, 6, 11, };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_02_SIZE * sizeof(int));
@@ -1291,9 +1484,9 @@ TEST DIJKSTRA_03(void) {
     insert_edge_iam_graph(&graph, 7, 8, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    const iam_cost_s cost = compose_iam_cost(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
+    table_s table = compose_table(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, &zero, &inf);
 
-    iam_table_s table = dijkstra_iam_graph(&graph, &cost, 0, IAM_SPECIAL);
+    dijkstra_iam_graph(&graph, &table, 0, IAM_SPECIAL);
 
     int const costs[DIJKSTRA_03_SIZE] = { 0, 4, 12, 19, 21, 11, 9, 8, 14, };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_03_SIZE * sizeof(int));
@@ -1326,5 +1519,8 @@ SUITE (iam_graph_test) {
     RUN_TEST(INSERT_EDGE_01); RUN_TEST(INSERT_EDGE_02); RUN_TEST(INSERT_EDGE_03);
     RUN_TEST(REMOVE_EDGE_01); RUN_TEST(REMOVE_EDGE_02); RUN_TEST(REMOVE_EDGE_03); RUN_TEST(REMOVE_EDGE_04);
     RUN_TEST(REMOVE_EDGE_05); RUN_TEST(REMOVE_EDGE_06);
+    RUN_TEST(CONTAINS_EDGE_01); RUN_TEST(CONTAINS_EDGE_02); RUN_TEST(CONTAINS_EDGE_03); RUN_TEST(CONTAINS_EDGE_04);
+    RUN_TEST(CONTAINS_EDGE_05); RUN_TEST(CONTAINS_EDGE_06); RUN_TEST(CONTAINS_EDGE_07); RUN_TEST(CONTAINS_EDGE_08);
+    RUN_TEST(CONTAINS_EDGE_09);
     RUN_TEST(DIJKSTRA_01); RUN_TEST(DIJKSTRA_02); RUN_TEST(DIJKSTRA_03);
 }

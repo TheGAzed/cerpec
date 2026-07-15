@@ -24,12 +24,13 @@ void destroy_ideque(ideque_s * const deque, set_fn const destroy, void * const a
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
     struct infinite_deque_node * current = deque->head; // save head index as current node
-    for (size_t start = deque->current; deque->length; start = 0) { // for every node in deque list until size is not zero
+    // for every node in deque list until size is not zero
+    for (size_t start = deque->current, remaining = deque->length; remaining; start = 0) {
         size_t i = start; // set i outside of nested for loop to save its value
-        for (; i < (deque->length + start) && i < IDEQUE_CHUNK; ++i) { // destroy each element in node
+        for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // destroy each element in node
             destroy(current->elements + (i * deque->size), ad);
         }
-        deque->length -= (i - start); // subtract absolute value of i and start from deque's size
+        remaining -= (i - start); // subtract absolute value of i and start from deque's size
 
         struct infinite_deque_node * temp = current; // save current node as temporary to free later
         current = current->next; // go to next node
@@ -75,37 +76,39 @@ ideque_s copy_ideque(ideque_s const * const deque, copy_fn const copy, void * co
     valid(deque->allocator && "Allocator can't be NULL.");
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
-    ideque_s replika = {
+    ideque_s replica = {
         .current = deque->current, .size = deque->size, .length = deque->length, .allocator = deque->allocator,
     };
 
     struct infinite_deque_node const * current_deque = deque->head; // save head index as current node
-    struct infinite_deque_node ** current_replika = &(replika.head);
-    size_t remaining = deque->length; // save remaining size as parameter to decrement for loop
-    for (size_t start = deque->current; remaining; start = 0) { // while remaining size is not zero
+    struct infinite_deque_node ** current_replica = &(replica.head);
+    for (size_t start = deque->current, remaining = deque->length; remaining; start = 0) { // while remaining remains
         // allocate node for replica
-        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) + (IDEQUE_CHUNK * deque->size), deque->allocator->arg);
+        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) +
+            (IDEQUE_CHUNK * deque->size), deque->allocator->arg);
         error(node && "Memory allocation failed.");
 
         // copy each element from old to replica
         size_t i = start;
-        for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
+        for (; i < IDEQUE_CHUNK && i < remaining + start; ++i) { // operate on each element in node
             copy(node->elements + (i * deque->size), current_deque->elements + (i * deque->size), ac);
         }
-
-        (*current_replika) = node->prev = node; // *current_copy and node's prev will point to node
-        node->next = replika.head; // node's next points to head (if *current_copy is head then node's next points to node)
-        // node's prev points to list_copy.head's prev (if *current_copy is head then head/node->prev is node, else node->prev is previous node)
-        node->prev = replika.head->prev;
-        replika.head->prev = node; // head's prev points to node (if *current_copy is head then head/node prev is node, else head prev is last node)
-
         remaining -= (i - start); // decrement remaining size by operated size of current node
 
-        current_replika = &((*current_replika)->next); // go to next's node pointer
+        // current_replica and node's prev will point to node
+        (*current_replica) = node->prev = node;
+        // node's next points to head (if current_replica is head then node's next points to node)
+        node->next = replica.head;
+        // node's prev points to head's prev (if current_replica is head then head/prev is node, else prev is previous node)
+        node->prev = replica.head->prev;
+        // head's prev points to node (if current_copy is head then head/node prev is node, else head prev is last node)
+        replica.head->prev = node;
+
+        current_replica = &((*current_replica)->next); // go to next's node pointer
         current_deque = current_deque->next; // go to next node
     }
 
-    return replika;
+    return replica;
 }
 
 bool is_empty_ideque(ideque_s const * const deque) {

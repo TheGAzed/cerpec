@@ -25,13 +25,13 @@ void destroy_iqueue(iqueue_s * const queue, set_fn const destroy, void * const a
 
     // for each node starting from tail (previous to head)
     struct infinite_queue_node * previous = queue->tail;
-    for (size_t start = queue->current; queue->length; start = 0) {
+    for (size_t start = queue->current, remaining = queue->length; remaining; start = 0) {
         // destroy elements in previous' next (so head and next)
         size_t i = start;
-        for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
+        for (; i < IQUEUE_CHUNK && i < remaining; ++i) {
             destroy(previous->next->elements + (i * queue->size), ad);
         }
-        queue->length -= (i - start);
+        remaining -= (i - start);
 
         // save destroyed node and cut it from queue list
         struct infinite_queue_node * temp = previous->next;
@@ -55,13 +55,13 @@ void clear_iqueue(iqueue_s * const queue, set_fn const destroy, void * const ad)
 
     // for each node starting from tail (previous to head)
     struct infinite_queue_node * previous = queue->tail;
-    for (size_t start = queue->current; queue->length; start = 0) {
+    for (size_t start = queue->current, remaining = queue->length; remaining; start = 0) {
         // destroy elements in previous' next (so head and next)
         size_t i = start;
-        for (; i < queue->length && i < IQUEUE_CHUNK; ++i) {
+        for (; i < IQUEUE_CHUNK && i < remaining; ++i) {
             destroy(previous->next->elements + (i * queue->size), ad);
         }
-        queue->length -= (i - start);
+        remaining -= (i - start);
 
         // save destroyed node and cut it from queue list
         struct infinite_queue_node * temp = previous->next;

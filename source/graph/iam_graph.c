@@ -27,9 +27,30 @@ struct family_stack {
     size_t length;
 };
 
+/// @brief Resize function for graph.
+/// @param graph Graph to resize.
+/// @param size New size to resize into.
 void _iam_graph_resize(iam_graph_s * const graph, size_t const size);
-size_t _find_parent(iam_table_s const * const table, size_t const vertex);
-void _union_set(iam_table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args);
+
+/// @brief Initialize set table
+/// @param table
+/// @param vertex_length
+void _make_set(table_s const * table, size_t const vertex_length);
+
+/// @brief Find parent helper funtion for union set function used in Kruskal's MST algorithm.
+/// @param table Kruskal table structure to for parent.
+/// @param vertex Index of child vertex to search parent.
+/// @return Parent vertex index.
+/// @note  Also known as find-set in disjoint sets.
+size_t _find_parent(table_s const * const table, size_t const vertex);
+
+/// @brief Union set function to union two disjoint sets commonly used in Kruskal's MST algorithm.
+/// @param table Table of vertices with costs/ranks.
+/// @param source Source vertex index to union.
+/// @param destination Destination vertex idnex to union.
+/// @param increment Increment function pointer to increment source parent's rank.
+/// @param increment_args Increment function pointer arguments.
+void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args);
 
 iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size, compare_fn const compare, void * const ac, void * const none) {
     error(vertex_size && "Parameter can't be zero.");
@@ -81,6 +102,7 @@ void destroy_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, v
 
     graph->allocator->free(graph->vertices, graph->allocator->arg);
     graph->allocator->free(graph->edges, graph->allocator->arg);
+    graph->allocator->free(graph->degrees, graph->allocator->arg);
 
     memset(graph, 0, sizeof(iam_graph_s));
 }
@@ -110,6 +132,7 @@ void clear_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, voi
 
     graph->allocator->free(graph->vertices, graph->allocator->arg);
     graph->allocator->free(graph->edges, graph->allocator->arg);
+    graph->allocator->free(graph->degrees, graph->allocator->arg);
 
     graph->capacity = graph->vertex_length = 0;
     graph->vertices = graph->edges = NULL;
@@ -126,6 +149,7 @@ iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_v
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
+    // initialize replica copy
     size_t const edge_capacity = (graph->capacity * (graph->capacity - 1)) / 2;
     iam_graph_s const replica = {
         .vertex_size = graph->vertex_size, .edge_size = graph->edge_size, .compare = graph->compare, .ac = graph->ac,
@@ -134,21 +158,29 @@ iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_v
         .none = graph->none,
         .allocator = graph->allocator,
 
+        .degrees = graph->allocator->alloc(graph->capacity * sizeof(size_t), graph->allocator->arg),
         .vertices = graph->allocator->alloc(graph->capacity * graph->vertex_size, graph->allocator->arg),
         .edges = graph->allocator->alloc(edge_capacity * graph->edge_size, graph->allocator->arg),
     };
     error((!replica.capacity || replica.vertices) && "Memory allocation failed.");
     error((!edge_capacity || replica.edges) && "Memory allocation failed.");
 
+    // memory copy degrees
+    memcpy(replica.degrees, graph->degrees, graph->capacity * sizeof(size_t));
+
+    // function copy each vertex
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         copy_vertex(replica.vertices + (i * replica.vertex_size), graph->vertices + (i * graph->vertex_size), acv);
     }
 
+    // function copy each edge (and non-edge)
     size_t const max_edge_length = (graph->vertex_length * (graph->vertex_length - 1)) / 2;
     for (size_t i = 0; i < max_edge_length; ++i) {
         void const * edge = graph->edges + (i * graph->edge_size);
         if (graph->compare(graph->none, edge, graph->ac)) {
             copy_edge(replica.edges + (i * replica.edge_size), edge, ace);
+        } else {
+            memcpy(replica.edges + (i * replica.edge_size), graph->none, graph->edge_size);
         }
     }
 
@@ -329,6 +361,7 @@ size_t insert_vertex_iam_graph(iam_graph_s * const graph, void const * const ver
         _iam_graph_resize(graph, capacity);
     }
 
+    graph->degrees[graph->vertex_length] = 0;
     memcpy(graph->vertices + (graph->vertex_length * graph->vertex_size), vertex, graph->vertex_size);
 
     return graph->vertex_length++;
@@ -359,6 +392,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
         // if an edge exists for removed vertex then destroy it
         if (graph->compare(graph->none, edge_index, graph->ac)) {
             destroy_edge(edge_index, ade);
+            graph->degrees[r]--;
         }
 
         // memmove since pointers can point to the same memory
@@ -375,6 +409,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
         // if an edge exists for removed vertex then destroy it
         if (graph->compare(graph->none, edge_index, graph->ac)) {
             destroy_edge(edge_index, ade);
+            graph->degrees[c]--;
         }
 
         // memmove since pointers can point to the same memory
@@ -393,6 +428,7 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
     void const * last = graph->vertices + (graph->vertex_length * graph->vertex_size);
     void * removed = graph->vertices + (index * graph->vertex_size);
     memcpy(buffer, removed, graph->vertex_size);
+    graph->degrees[index] = graph->degrees[graph->vertex_length]; // move last vertex' degree to removed index
     memmove(removed, last, graph->vertex_size); // memmove since removed could be last
 
     // shrink graph if elements fit into smaller memory chunk
@@ -433,15 +469,22 @@ void insert_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
+    // reflect edge insertion in vertex one's and two's degrees
+    graph->degrees[index_one]++;
+    graph->degrees[index_two]++;
+
+    // get smallest and largest vertex index for edge insertion calculations
     size_t const minimum = index_one < index_two ? index_one : index_two;
     size_t const maximum = index_one >= index_two ? index_one : index_two;
 
+    // calculate start row in flattened 2D array
     size_t const start_row = (maximum * (maximum - 1)) / 2;
 
     // assert that no edge between vertices exists yet
     char * current_edge = graph->edges + ((start_row + minimum) * graph->edge_size);
-    error(!graph->compare(graph->none, current_edge, graph->ac));
+    error(!graph->compare(current_edge, graph->none, graph->ac));
 
+    // copy new edge into edge array buffer and increment edge count
     memcpy(current_edge, edge, graph->edge_size);
     graph->edge_length++;
 }
@@ -459,15 +502,22 @@ void remove_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
+    // reflect edge insertion in vertex one's and two's degrees
+    graph->degrees[index_one]++;
+    graph->degrees[index_two]++;
+
+    // get smallest and largest vertex index for edge removal calculations
     size_t const minimum = index_one < index_two ? index_one : index_two;
     size_t const maximum = index_one >= index_two ? index_one : index_two;
 
+    // calculate start row in flattened 2D array
     size_t const start_row = (maximum * (maximum - 1)) / 2;
 
     // assert that an edge exists between vertices
     char * edge = graph->edges + ((start_row + minimum) * graph->edge_size);
     error(graph->compare(graph->none, edge, graph->ac) && "Can't remove none.");
 
+    // copy removed edge into remove buffer and replace removed graph edge with non-edge
     memcpy(buffer, edge, graph->edge_size);
     memcpy(edge, graph->none, graph->edge_size);
     graph->edge_length--;
@@ -526,28 +576,12 @@ size_t degree_iam_graph(iam_graph_s const * const graph, size_t const index) {
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    size_t count = 0;
-    size_t const offset = (index * (index - 1)) / 2;
-    for (size_t i = 0, e = offset; i < index; ++i, e++) {
-        char const * edge = graph->edges + (e * graph->edge_size);
-        if (graph->compare(edge, graph->none, graph->ac)) {
-            count++;
-        }
-    }
-
-    for (size_t i = index + 1, e = offset + (2 * index); i < graph->vertex_length; e += i, i++) {
-        char const * edge = graph->edges + (e * graph->edge_size);
-        if (graph->compare(edge, graph->none, graph->ac)) {
-            count++;
-        }
-    }
-
-    return count;
+    return graph->degrees[index];
 }
 
-iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end) {
+void bfs_iam_graph(iam_graph_s const * const graph, table_s * const table, size_t const start, size_t const end) {
     error(graph && "Parameter can't be NULL.");
-    error(cost && "Parameter can't be NULL.");
+    error(table && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
     error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
 
@@ -560,20 +594,18 @@ iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
     bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arg);
     error((!graph->vertex_length || visited) && "Memory allocation failed.");
 
-    iam_table_s const table = {
-        .data = cost, .graph = graph,
-        .costs = graph->allocator->alloc(graph->vertex_length * cost->size, graph->allocator->arg),
-        .previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
-    };
-    error((!graph->vertex_length || table.costs) && "Memory allocation failed.");
-    error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
+    table->graph = graph;
+    table->costs = graph->allocator->alloc(graph->vertex_length * table->size, graph->allocator->arg);
+    error((!graph->vertex_length || table->costs) && "Memory allocation failed.");
+    table->previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg);
+    error((!graph->vertex_length || table->previous) && "Memory allocation failed.");
 
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         visited[i] = false;
-        memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_SPECIAL;
+        memcpy(table->costs + (i * table->size), table->infinite, table->size);
+        table->previous[i] = IAM_SPECIAL;
     }
-    memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
+    memcpy(table->costs + (table->size * start), table->zero, table->size);
 
     struct iam_graph_queue queue = {
         .array = graph->allocator->alloc(sizeof(size_t) * graph->vertex_length, graph->allocator->arg),
@@ -597,9 +629,9 @@ iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
                 queue.array[queue.current + queue.length++] = i;
             }
 
-            table.previous[i] = vertex;
-            memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
+            table->previous[i] = vertex;
+            memcpy(table->costs + (i * table->size), table->zero, table->size);
+            table->juggle(table->costs + (i * table->size), edge, table->as);
         }
 
         for (size_t i = vertex + 1, e = offset + (2 * vertex); i < graph->vertex_length; e += i, i++) {
@@ -609,21 +641,19 @@ iam_table_s bfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
                 queue.array[queue.current + queue.length++] = i;
             }
 
-            table.previous[i] = vertex;
-            memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
+            table->previous[i] = vertex;
+            memcpy(table->costs + (i * table->size), table->zero, table->size);
+            table->juggle(table->costs + (i * table->size), edge, table->as);
         }
     }
 
     graph->allocator->free(queue.array, graph->allocator->arg);
     graph->allocator->free(visited, graph->allocator->arg);
-
-    return table;
 }
 
-iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end) {
+void dfs_iam_graph(iam_graph_s const * const graph, table_s * const table, size_t const start, size_t const end) {
     error(graph && "Parameter can't be NULL.");
-    error(cost && "Parameter can't be NULL.");
+    error(table && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
     error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
 
@@ -636,20 +666,18 @@ iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
     bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arg);
     error((!graph->vertex_length || visited) && "Memory allocation failed.");
 
-    iam_table_s const table = {
-        .data = cost, .graph = graph,
-        .costs = graph->allocator->alloc(graph->vertex_length * graph->edge_size, graph->allocator->arg),
-        .previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
-    };
-    error((!graph->vertex_length || table.costs) && "Memory allocation failed.");
-    error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
+    table->graph = graph;
+    table->costs = graph->allocator->alloc(graph->vertex_length * table->size, graph->allocator->arg);
+    error((!graph->vertex_length || table->costs) && "Memory allocation failed.");
+    table->previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg);
+    error((!graph->vertex_length || table->previous) && "Memory allocation failed.");
 
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         visited[i] = false;
-        memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_SPECIAL;
+        memcpy(table->costs + (i * table->size), table->infinite, table->size);
+        table->previous[i] = IAM_SPECIAL;
     }
-    memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
+    memcpy(table->costs + (table->size * start), table->zero, table->size);
 
     struct iam_graph_stack stack = {
         .array = graph->allocator->alloc(sizeof(size_t) * graph->vertex_length, graph->allocator->arg),
@@ -672,9 +700,9 @@ iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
                 stack.array[stack.length++] = i;
             }
 
-            table.previous[i] = vertex;
-            memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
+            table->previous[i] = vertex;
+            memcpy(table->costs + (i * table->size), table->zero, table->size);
+            table->juggle(table->costs + (i * table->size), edge, table->as);
         }
 
         for (size_t i = vertex + 1, e = offset + (2 * vertex); i < graph->vertex_length; e += i, i++) {
@@ -684,21 +712,19 @@ iam_table_s dfs_iam_graph(iam_graph_s const * const graph, iam_cost_s const * co
                 stack.array[stack.length++] = i;
             }
 
-            table.previous[i] = vertex;
-            memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-            table.data->juggle(table.costs + (i * table.data->size), edge, table.data->as);
+            table->previous[i] = vertex;
+            memcpy(table->costs + (i * table->size), table->zero, table->size);
+            table->juggle(table->costs + (i * table->size), edge, table->as);
         }
     }
 
     graph->allocator->free(stack.array, graph->allocator->arg);
     graph->allocator->free(visited, graph->allocator->arg);
-
-    return table;
 }
 
-iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end) {
+void dijkstra_iam_graph(iam_graph_s const * const graph, table_s * const table, size_t const start, size_t const end) {
     error(graph && "Parameter can't be NULL.");
-    error(cost && "Parameter can't be NULL.");
+    error(table && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
     error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
 
@@ -708,20 +734,17 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    // initialize table
-    iam_table_s const table = {
-        .data = cost, .graph = graph,
-        .costs = graph->allocator->alloc(graph->vertex_length * cost->size, graph->allocator->arg),
-        .previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
-    };
-    error((!graph->vertex_length || table.costs) && "Memory allocation failed.");
-    error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
+    table->graph = graph;
+    table->costs = graph->allocator->alloc(graph->vertex_length * table->size, graph->allocator->arg);
+    error((!graph->vertex_length || table->costs) && "Memory allocation failed.");
+    table->previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg);
+    error((!graph->vertex_length || table->previous) && "Memory allocation failed.");
 
     for (size_t i = 0; i < graph->vertex_length; ++i) {
-        memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_SPECIAL;
+        memcpy(table->costs + (i * table->size), table->infinite, table->size);
+        table->previous[i] = IAM_SPECIAL;
     }
-    memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
+    memcpy(table->costs + (table->size * start), table->zero, table->size);
 
     // initialize visited array
     bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arg);
@@ -729,22 +752,22 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
     memset(visited, 0, sizeof(bool) * graph->vertex_length);
 
     // allocate for both minimum and sum
-    char * buffer = graph->allocator->alloc(2 * cost->size, graph->allocator->arg);
+    char * buffer = graph->allocator->alloc(2 * table->size, graph->allocator->arg);
     error(buffer && "Memory allocation failed.");
 
     // initialize current minimum vertex
     struct iam_graph_smallest minimum = {
         .vertex = start, .cost = buffer,
     };
-    memcpy(minimum.cost, table.data->zero, table.data->size);
+    memcpy(minimum.cost, table->zero, table->size);
 
-    char * sum = buffer + cost->size;
+    char * sum = buffer + table->size;
     for (size_t i = 0; i < graph->vertex_length - 1 && end != minimum.vertex && IAM_SPECIAL != minimum.vertex; ++i) {
         size_t const v = minimum.vertex;
-        void const * v_cost = table.costs + (minimum.vertex * table.data->size);
+        void const * v_cost = table->costs + (minimum.vertex * table->size);
 
         minimum.vertex = IAM_SPECIAL;
-        memcpy(minimum.cost, table.data->infinite, table.data->size);
+        memcpy(minimum.cost, table->infinite, table->size);
 
         visited[v] = true;
 
@@ -754,22 +777,22 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
 
             // save edges for access
             void const * edge = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (u * table.data->size);
+            void * g_cost = table->costs + (u * table->size);
 
             bool const can_sum = graph->compare(edge, graph->none, graph->ac);
-            void const * temp = can_sum ? cost->sum(cost->juggle(sum, edge, cost->as), v_cost, cost->aj) : cost->infinite;
-            memmove(sum, temp, cost->size);
+            void const * temp = can_sum ? table->sum(table->juggle(sum, edge, table->as), v_cost, table->aj) : table->infinite;
+            memmove(sum, temp, table->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum, g_cost, table.data->ac) < 0) {
-                table.previous[u] = v;
-                memcpy(g_cost, sum, table.data->size);
+            if (table->compare(sum, g_cost, table->ac) < 0) {
+                table->previous[u] = v;
+                memcpy(g_cost, sum, table->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
-                memcpy(minimum.cost, g_cost, table.data->size);
+            if (table->compare(minimum.cost, g_cost, table->ac) > 0) {
+                memcpy(minimum.cost, g_cost, table->size);
                 minimum.vertex = u;
             }
         }
@@ -779,22 +802,22 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
 
             // save edges for access
             void const * edge = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (u * table.data->size);
+            void * g_cost = table->costs + (u * table->size);
 
             bool const can_add = graph->compare(edge, graph->none, graph->ac);
-            void const * temp = can_add ? cost->sum(cost->juggle(sum, edge, cost->as), v_cost, cost->aj) : cost->infinite;
-            memmove(sum, temp, cost->size);
+            void const * temp = can_add ? table->sum(table->juggle(sum, edge, table->as), v_cost, table->aj) : table->infinite;
+            memmove(sum, temp, table->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum, g_cost, table.data->ac) < 0) {
-                table.previous[u] = v;
-                memcpy(g_cost, sum, table.data->size);
+            if (table->compare(sum, g_cost, table->ac) < 0) {
+                table->previous[u] = v;
+                memcpy(g_cost, sum, table->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
-                memcpy(minimum.cost, g_cost, table.data->size);
+            if (table->compare(minimum.cost, g_cost, table->ac) > 0) {
+                memcpy(minimum.cost, g_cost, table->size);
                 minimum.vertex = u;
             }
         }
@@ -802,13 +825,11 @@ iam_table_s dijkstra_iam_graph(iam_graph_s const * const graph, iam_cost_s const
 
     graph->allocator->free(visited, graph->allocator->arg);
     graph->allocator->free(buffer, graph->allocator->arg);
-
-    return table;
 }
 
-iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start, size_t const end, operate_fn const heuristic, void * const ah) {
+void a_star_iam_graph(iam_graph_s const * const graph, table_s * const table, size_t const start, size_t const end, operate_fn const heuristic, void * const ah) {
     error(graph && "Parameter can't be NULL.");
-    error(cost && "Parameter can't be NULL.");
+    error(table && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
     error(end < graph->vertex_length && "Parameter can't exceed length.");
     error(heuristic && "Parameter can't be NULL.");
@@ -819,20 +840,17 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    // initialize table
-    iam_table_s const table = {
-        .data = cost, .graph = graph,
-        .costs = graph->allocator->alloc(graph->vertex_length * cost->size, graph->allocator->arg),
-        .previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
-    };
-    error((!graph->vertex_length || table.costs) && "Memory allocation failed.");
-    error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
+    table->graph = graph;
+    table->costs = graph->allocator->alloc(graph->vertex_length * table->size, graph->allocator->arg);
+    error((!graph->vertex_length || table->costs) && "Memory allocation failed.");
+    table->previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg);
+    error((!graph->vertex_length || table->previous) && "Memory allocation failed.");
 
     for (size_t i = 0; i < graph->vertex_length; ++i) {
-        memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_SPECIAL;
+        memcpy(table->costs + (i * table->size), table->infinite, table->size);
+        table->previous[i] = IAM_SPECIAL;
     }
-    memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
+    memcpy(table->costs + (table->size * start), table->zero, table->size);
 
     // initialize visited array
     bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arg);
@@ -840,24 +858,24 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
     memset(visited, 0, sizeof(bool) * graph->vertex_length);
 
     // allocate for all costs to later free at once
-    char * buffer = graph->allocator->alloc(4 * cost->size, graph->allocator->arg);
+    char * buffer = graph->allocator->alloc(4 * table->size, graph->allocator->arg);
     error(buffer && "Memory allocation failed.");
 
     // initialize current minimum vertex
     struct iam_graph_smallest minimum = {
         .vertex = start, .cost = buffer,
     };
-    memcpy(minimum.cost, table.data->zero, table.data->size);
+    memcpy(minimum.cost, table->zero, table->size);
 
-    char * sum = buffer + cost->size;
-    char * h_cost = buffer + (2 * cost->size);
-    char * f_cost = buffer + (3 * cost->size);
+    char * sum = buffer + table->size;
+    char * h_cost = buffer + (2 * table->size);
+    char * f_cost = buffer + (3 * table->size);
     for (size_t i = 0; i < graph->vertex_length - 1 && end != minimum.vertex && IAM_SPECIAL != minimum.vertex; ++i) {
         size_t const v = minimum.vertex;
-        void const * v_cost = table.costs + (minimum.vertex * table.data->size);
+        void const * v_cost = table->costs + (minimum.vertex * table->size);
 
         minimum.vertex = IAM_SPECIAL;
-        memcpy(minimum.cost, table.data->infinite, table.data->size);
+        memcpy(minimum.cost, table->infinite, table->size);
 
         visited[v] = true;
 
@@ -867,27 +885,27 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
 
             // save edges for access
             void const * edge = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (u * table.data->size);
+            void * g_cost = table->costs + (u * table->size);
 
             bool const can_add = graph->compare(edge, graph->none, graph->ac);
-            void const * temp = can_add ? cost->sum(cost->juggle(sum, edge, cost->as), v_cost, cost->aj) : cost->infinite;
-            memmove(sum, temp, cost->size);
+            void const * temp = can_add ? table->sum(table->juggle(sum, edge, table->as), v_cost, table->aj) : table->infinite;
+            memmove(sum, temp, table->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum, g_cost, table.data->ac) < 0) {
-                table.previous[u] = v;
-                memcpy(g_cost, sum, table.data->size);
+            if (table->compare(sum, g_cost, table->ac) < 0) {
+                table->previous[u] = v;
+                memcpy(g_cost, sum, table->size);
             }
 
             // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
             heuristic(h_cost, graph->vertices + (v * graph->vertex_size), graph->vertices + (end * graph->vertex_size), ah);
             // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
-            bool const can_sum = cost->compare(g_cost, cost->infinite, cost->ac) && cost->compare(h_cost, cost->infinite, cost->ac);
-            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost, cost->aj) : cost->infinite, cost->size);
+            bool const can_sum = table->compare(g_cost, table->infinite, table->ac) && table->compare(h_cost, table->infinite, table->ac);
+            memcpy(f_cost, can_sum ? table->sum(h_cost, g_cost, table->aj) : table->infinite, table->size);
 
             // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
-            if (table.data->compare(minimum.cost, f_cost, table.data->ac) > 0) {
-                memcpy(minimum.cost, f_cost, table.data->size);
+            if (table->compare(minimum.cost, f_cost, table->ac) > 0) {
+                memcpy(minimum.cost, f_cost, table->size);
                 minimum.vertex = u;
             }
         }
@@ -897,27 +915,27 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
 
             // save edges for access
             void const * edge = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (u * table.data->size);
+            void * g_cost = table->costs + (u * table->size);
 
             bool const can_add = graph->compare(edge, graph->none, graph->ac);
-            void const * temp = can_add ? cost->sum(cost->juggle(sum, edge, cost->as), v_cost, cost->aj) : cost->infinite;
-            memmove(sum, temp, cost->size);
+            void const * temp = can_add ? table->sum(table->juggle(sum, edge, table->as), v_cost, table->aj) : table->infinite;
+            memmove(sum, temp, table->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(sum, g_cost, table.data->ac) < 0) {
-                table.previous[u] = v;
-                memcpy(g_cost, sum, table.data->size);
+            if (table->compare(sum, g_cost, table->ac) < 0) {
+                table->previous[u] = v;
+                memcpy(g_cost, sum, table->size);
             }
 
             // after vertex cost was updated determine F(n) by adding updated G(n) {as vertex cost} and H(n) together
             heuristic(h_cost, graph->vertices + (v * graph->vertex_size), graph->vertices + (end * graph->vertex_size), ah);
             // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
-            bool const can_sum = cost->compare(g_cost, cost->infinite, cost->ac) && cost->compare(h_cost, cost->infinite, cost->ac);
-            memcpy(f_cost, can_sum ? cost->sum(h_cost, g_cost, cost->aj) : cost->infinite, cost->size);
+            bool const can_sum = table->compare(g_cost, table->infinite, table->ac) && table->compare(h_cost, table->infinite, table->ac);
+            memcpy(f_cost, can_sum ? table->sum(h_cost, g_cost, table->aj) : table->infinite, table->size);
 
             // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
-            if (table.data->compare(minimum.cost, f_cost, table.data->ac) > 0) {
-                memcpy(minimum.cost, f_cost, table.data->size);
+            if (table->compare(minimum.cost, f_cost, table->ac) > 0) {
+                memcpy(minimum.cost, f_cost, table->size);
                 minimum.vertex = u;
             }
         }
@@ -925,13 +943,11 @@ iam_table_s a_star_iam_graph(iam_graph_s const * const graph, iam_cost_s const *
 
     graph->allocator->free(visited, graph->allocator->arg);
     graph->allocator->free(buffer, graph->allocator->arg);
-
-    return table;
 }
 
-iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, size_t const start) {
+void prim_iam_graph(iam_graph_s const * const graph, table_s * const table, size_t const start) {
     error(graph && "Parameter can't be NULL.");
-    error(cost && "Parameter can't be NULL.");
+    error(table && "Parameter can't be NULL.");
     error(start < graph->vertex_length && "Parameter can't exceed length.");
 
     valid(graph->compare && "Compare function can't be NULL.");
@@ -940,20 +956,17 @@ iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * c
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    // initialize table
-    iam_table_s const table = {
-        .data = cost, .graph = graph,
-        .costs = graph->allocator->alloc(graph->vertex_length * cost->size, graph->allocator->arg),
-        .previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
-    };
-    error((!graph->vertex_length || table.costs) && "Memory allocation failed.");
-    error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
+    table->graph = graph;
+    table->costs = graph->allocator->alloc(graph->vertex_length * table->size, graph->allocator->arg);
+    error((!graph->vertex_length || table->costs) && "Memory allocation failed.");
+    table->previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg);
+    error((!graph->vertex_length || table->previous) && "Memory allocation failed.");
 
     for (size_t i = 0; i < graph->vertex_length; ++i) {
-        memcpy(table.costs + (i * table.data->size), table.data->infinite, table.data->size);
-        table.previous[i] = IAM_SPECIAL;
+        memcpy(table->costs + (i * table->size), table->infinite, table->size);
+        table->previous[i] = IAM_SPECIAL;
     }
-    memcpy(table.costs + (table.data->size * start), table.data->zero, table.data->size);
+    memcpy(table->costs + (table->size * start), table->zero, table->size);
 
     // initialize visited array
     bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arg);
@@ -961,21 +974,21 @@ iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * c
     memset(visited, 0, sizeof(bool) * graph->vertex_length);
 
     // allocate for both minimum and sum
-    char * buffer = graph->allocator->alloc(2 * cost->size, graph->allocator->arg);
+    char * buffer = graph->allocator->alloc(2 * table->size, graph->allocator->arg);
     error(buffer && "Memory allocation failed.");
 
     // initialize current minimum vertex
     struct iam_graph_smallest minimum = {
         .vertex = start, .cost = buffer,
     };
-    memcpy(minimum.cost, table.data->zero, table.data->size);
+    memcpy(minimum.cost, table->zero, table->size);
 
-    char * weight_cost = buffer + cost->size;
+    char * weight_cost = buffer + table->size;
     for (size_t i = 0; i < graph->vertex_length - 1 && IAM_SPECIAL != minimum.vertex; ++i) {
         size_t const v = minimum.vertex;
 
         minimum.vertex = IAM_SPECIAL;
-        memcpy(minimum.cost, table.data->infinite, table.data->size);
+        memcpy(minimum.cost, table->infinite, table->size);
 
         visited[v] = true;
 
@@ -985,21 +998,21 @@ iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * c
 
             // save edges for access
             void const * edge = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (u * table.data->size);
+            void * g_cost = table->costs + (u * table->size);
 
             bool const can_juggle = graph->compare(edge, graph->none, graph->ac);
-            memmove(weight_cost, can_juggle ? cost->juggle(weight_cost, edge, cost->as) : cost->infinite, cost->size);
+            memmove(weight_cost, can_juggle ? table->juggle(weight_cost, edge, table->as) : table->infinite, table->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(weight_cost, g_cost, table.data->ac) < 0) {
-                table.previous[u] = v;
-                memcpy(g_cost, weight_cost, table.data->size);
+            if (table->compare(weight_cost, g_cost, table->ac) < 0) {
+                table->previous[u] = v;
+                memcpy(g_cost, weight_cost, table->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
-                memcpy(minimum.cost, g_cost, table.data->size);
+            if (table->compare(minimum.cost, g_cost, table->ac) > 0) {
+                memcpy(minimum.cost, g_cost, table->size);
                 minimum.vertex = u;
             }
         }
@@ -1009,21 +1022,21 @@ iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * c
 
             // save edges for access
             void const * edge = graph->edges + (e * graph->edge_size);
-            void * g_cost = table.costs + (u * table.data->size);
+            void * g_cost = table->costs + (u * table->size);
 
             bool const can_juggle = graph->compare(edge, graph->none, graph->ac);
-            memmove(weight_cost, can_juggle ? cost->juggle(weight_cost, edge, cost->as) : cost->infinite, cost->size);
+            memmove(weight_cost, can_juggle ? table->juggle(weight_cost, edge, table->as) : table->infinite, table->size);
 
             // if G's cost is smaller destroy table's non-infinite and set it to sum
-            if (table.data->compare(weight_cost, g_cost, table.data->ac) < 0) {
-                table.previous[u] = v;
-                memcpy(g_cost, weight_cost, table.data->size);
+            if (table->compare(weight_cost, g_cost, table->ac) < 0) {
+                table->previous[u] = v;
+                memcpy(g_cost, weight_cost, table->size);
             }
 
             // if index edge exists and either distance edge is none or distance edge is bigger than index edge
             // then make index edge the new distance edge, and set minimum node to loop index
-            if (table.data->compare(minimum.cost, g_cost, table.data->ac) > 0) {
-                memcpy(minimum.cost, g_cost, table.data->size);
+            if (table->compare(minimum.cost, g_cost, table->ac) > 0) {
+                memcpy(minimum.cost, g_cost, table->size);
                 minimum.vertex = u;
             }
         }
@@ -1031,13 +1044,11 @@ iam_table_s prim_iam_graph(iam_graph_s const * const graph, iam_cost_s const * c
 
     graph->allocator->free(visited, graph->allocator->arg);
     graph->allocator->free(buffer, graph->allocator->arg);
-
-    return table;
 }
 
-iam_table_s kruskal_iam_graph(iam_graph_s const * const graph, iam_cost_s const * const cost, process_fn const sort, void * const as, set_fn const inc, void * const ai) {
+void kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, process_fn const sort, void * const as, set_fn const inc, void * const ai) {
     error(graph && "Parameter can't be NULL.");
-    error(cost && "Parameter can't be NULL.");
+    error(table && "Parameter can't be NULL.");
     error(sort && "Parameter can't be NULL.");
     error(inc && "Parameter can't be NULL.");
 
@@ -1047,26 +1058,21 @@ iam_table_s kruskal_iam_graph(iam_graph_s const * const graph, iam_cost_s const 
     valid(graph->none && "Non-edge can't be NULL.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    // initialize return table
-    iam_table_s const table = {
-        .data = cost, .graph = graph,
-        .costs = graph->allocator->alloc(graph->vertex_length * cost->size, graph->allocator->arg),
-        .previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
-    };
-    error((!graph->vertex_length || table.costs) && "Memory allocation failed.");
-    error((!graph->vertex_length || table.previous) && "Memory allocation failed.");
+    table->graph = graph;
+    table->costs = graph->allocator->alloc(graph->vertex_length * table->size, graph->allocator->arg);
+    error((!graph->vertex_length || table->costs) && "Memory allocation failed.");
+    table->previous = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg);
+    error((!graph->vertex_length || table->previous) && "Memory allocation failed.");
 
     // initialize edge array defined by the edge itself and vertices making it up
     iam_edge_s * kruskal_edges = graph->allocator->alloc(graph->edge_length * sizeof(iam_edge_s), graph->allocator->arg);
     error((!graph->edge_length || kruskal_edges) && "Memory allocation failed.");
 
-    // set edge array
+    _make_set(table, graph->vertex_length);
+
+    // initialize edge array
     size_t edge_index = 0;
     for (size_t i = 0; i < graph->vertex_length; ++i) {
-        // initializer table's previous and rank costs
-        memcpy(table.costs + (i * table.data->size), table.data->zero, table.data->size);
-        table.previous[i] = i;
-
         // initialize edge array to sort
         for (size_t j = i + 1; j < graph->vertex_length; ++j) {
             size_t const offset = (j * (j - 1)) / 2;
@@ -1079,67 +1085,68 @@ iam_table_s kruskal_iam_graph(iam_graph_s const * const graph, iam_cost_s const 
         }
     }
 
-    // sort edges based on its edge (weight)
+    // sort edge array based on its edge (weight)
     sort(kruskal_edges, graph->vertex_length, as);
 
     // Kruskal's algorithm with sorted edges
     for (int i = 0; i < graph->edge_length; ++i) {
         iam_edge_s const smallest = kruskal_edges[i]; // get the next smallest edge from sorted array of edges
 
-        size_t const source = _find_parent(&table, smallest.vertices[0]);
-        size_t const destination = _find_parent(&table, smallest.vertices[1]);
+        size_t const source      = _find_parent(table, smallest.vertices[0]);
+        size_t const destination = _find_parent(table, smallest.vertices[1]);
 
         if (source != destination) {
-            _union_set(&table, source, destination, inc, ai);
+            _union_set(table, source, destination, inc, ai);
         }
     }
 
     graph->allocator->free(kruskal_edges, graph->allocator->arg);
-
-    return table;
 }
 
-void destroy_iam_table(iam_table_s * const table) {
+void destroy_iam_table(table_s * const table) {
     error(table && "Parameter can't be NULL.");
 
-    valid(table->data && "Cost data can't be NULL.");
-    valid(table->graph && "Table graph can't be NULL.");
-    valid(table->graph->compare && "Compare function can't be NULL.");
-    valid(table->graph->edge_size && "Edge size can't be zero.");
-    valid(table->graph->vertex_size && "Edge size can't be zero.");
-    valid(table->graph->none && "Non-edge can't be NULL.");
-    valid(table->graph->allocator && "Allocator can't be NULL.");
+    iam_graph_s const * graph = table->graph;
 
-    table->graph->allocator->free(table->costs, table->graph->allocator->arg);
-    table->graph->allocator->free(table->previous, table->graph->allocator->arg);
+    valid(graph && "Table graph can't be NULL.");
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->edge_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
 
-    memset(table, 0, sizeof(iam_table_s));
+    graph->allocator->free(table->costs, graph->allocator->arg);
+    graph->allocator->free(table->previous, graph->allocator->arg);
+
+
+    memset(table, 0, sizeof(table_s));
 }
 
-iam_graph_s subgraph_iam_graph(iam_table_s const * const table, copy_fn const copy_vertex, void * const acv, copy_fn const copy_edge, void * const ace) {
+iam_graph_s subgraph_iam_graph(table_s const * const table, copy_fn const copy_vertex, void * const acv, copy_fn const copy_edge, void * const ace) {
     error(table && "Parameter can't be NULL.");
     error(copy_vertex && "Parameter can't be NULL.");
     error(copy_edge && "Parameter can't be NULL.");
 
-    valid(table->data && "Cost data can't be NULL.");
-    valid(table->graph && "Table graph can't be NULL.");
-    valid(table->graph->compare && "Compare function can't be NULL.");
-    valid(table->graph->edge_size && "Edge size can't be zero.");
-    valid(table->graph->vertex_size && "Edge size can't be zero.");
-    valid(table->graph->none && "Non-edge can't be NULL.");
-    valid(table->graph->allocator && "Allocator can't be NULL.");
+    iam_graph_s const * graph = table->graph;
 
-    size_t const edge_capacity = (table->graph->capacity * (table->graph->capacity - 1)) / 2;
+    valid(graph && "Table graph can't be NULL.");
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->edge_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
+
+    size_t const edge_capacity = (graph->capacity * (graph->capacity - 1)) / 2;
     iam_graph_s const subgraph = {
-        .vertex_size = table->graph->vertex_size, .edge_size = table->graph->edge_size, .compare = table->graph->compare,
-        .none = table->graph->none, .vertex_length = table->graph->vertex_length, .capacity = table->graph->capacity,
-        .allocator = table->graph->allocator,
+        .vertex_size = graph->vertex_size, .edge_size = graph->edge_size, .compare = graph->compare,
+        .none = graph->none, .vertex_length = graph->vertex_length, .capacity = graph->capacity,
+        .allocator = graph->allocator,
 
-        .vertices = table->graph->allocator->alloc(table->graph->capacity * table->graph->vertex_size, table->graph->allocator->arg),
-        .edges = table->graph->allocator->alloc(edge_capacity * table->graph->edge_size, table->graph->allocator->arg),
+        .vertices = graph->allocator->alloc(graph->capacity * graph->vertex_size, graph->allocator->arg),
+        .edges = graph->allocator->alloc(edge_capacity * graph->edge_size, graph->allocator->arg),
     };
-    error((!table->graph->capacity || subgraph.vertices) && "Memory allocation failed.");
-    error((!table->graph->capacity || subgraph.edges) && "Memory allocation failed.");
+    error((!graph->capacity || subgraph.vertices) && "Memory allocation failed.");
+    error((!graph->capacity || subgraph.edges) && "Memory allocation failed.");
 
     // initialize all edges to none/invalid
     for (size_t i = 0; i < edge_capacity; ++i) {
@@ -1148,14 +1155,14 @@ iam_graph_s subgraph_iam_graph(iam_table_s const * const table, copy_fn const co
     }
 
     // create vertex copies and subgraph edge copies based on existing cost
-    for (size_t i = 0; i < table->graph->vertex_length; ++i) {
-        copy_vertex(subgraph.vertices + (i * subgraph.vertex_size), table->graph->vertices + (i * table->graph->vertex_size), acv);
+    for (size_t i = 0; i < graph->vertex_length; ++i) {
+        copy_vertex(subgraph.vertices + (i * subgraph.vertex_size), graph->vertices + (i * graph->vertex_size), acv);
 
-        char const * cost = table->costs + (table->data->size * i);
+        char const * cost = table->costs + (table->size * i);
 
-        void * a_c = table->data->ac;
-        void const * zero = table->data->zero, * infinite = table->data->infinite;
-        if (table->data->compare(cost, zero, a_c) && table->data->compare(cost, infinite, a_c)) {
+        void * a_c = table->ac;
+        void const * zero = table->zero, * infinite = table->infinite;
+        if (table->compare(cost, zero, a_c) && table->compare(cost, infinite, a_c)) {
             size_t const index_one = i;
             size_t const index_two = table->previous[i];
 
@@ -1165,7 +1172,7 @@ iam_graph_s subgraph_iam_graph(iam_table_s const * const table, copy_fn const co
             size_t const start_row = (maximum * (maximum - 1)) / 2;
 
             char * subgraph_edge = subgraph.edges + ((start_row + minimum) * subgraph.edge_size);
-            char const * graph_edge = table->graph->edges + ((start_row + minimum) * table->graph->edge_size);
+            char const * graph_edge = graph->edges + ((start_row + minimum) * graph->edge_size);
             copy_edge(subgraph_edge, graph_edge, ace);
         }
     }
@@ -1251,40 +1258,42 @@ void each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index
     }
 }
 
-void each_cost_iam_graph(iam_table_s const * const table, handle_fn const handle, void * const ah) {
+void each_cost_iam_graph(table_s const * const table, handle_fn const handle, void * const ah) {
     error(table && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
 
-    valid(table->data && "Cost data can't be NULL.");
-    valid(table->graph && "Table graph can't be NULL.");
-    valid(table->graph->compare && "Compare function can't be NULL.");
-    valid(table->graph->edge_size && "Edge size can't be zero.");
-    valid(table->graph->vertex_size && "Edge size can't be zero.");
-    valid(table->graph->none && "Non-edge can't be NULL.");
-    valid(table->graph->allocator && "Allocator can't be NULL.");
+    iam_graph_s const * graph = table->graph;
 
-    for (size_t i = 0; i < table->graph->vertex_length; ++i) {
-        if (!handle(table->costs + (table->data->size * i), ah)) { break; }
+    valid(graph && "Table graph can't be NULL.");
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->edge_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
+
+    for (size_t i = 0; i < graph->vertex_length; ++i) {
+        if (!handle(table->costs + (table->size * i), ah)) { break; }
     }
 }
 
-bool each_path_iam_list(iam_table_s const * const table, size_t const end, handle_fn const handle, void * const ah) {
+bool each_path_iam_list(table_s const * const table, size_t const end, handle_fn const handle, void * const ah) {
     error(table && "Parameter can't be NULL.");
     error(handle && "Parameter can't be NULL.");
-    error(end < table->graph->vertex_length && "Parameter can't exceed length.");
 
-    valid(table->data && "Cost data can't be NULL.");
-    valid(table->graph && "Table graph can't be NULL.");
-    valid(table->graph->compare && "Compare function can't be NULL.");
-    valid(table->graph->edge_size && "Edge size can't be zero.");
-    valid(table->graph->vertex_size && "Edge size can't be zero.");
-    valid(table->graph->none && "Non-edge can't be NULL.");
-    valid(table->graph->allocator && "Allocator can't be NULL.");
+    iam_graph_s const * graph = table->graph;
+    error(end < graph->vertex_length && "Parameter can't exceed length.");
+
+    valid(graph && "Table graph can't be NULL.");
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->edge_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
 
     struct iam_graph_stack stack = {
-        .array = table->graph->allocator->alloc(sizeof(size_t) * table->graph->vertex_length, table->graph->allocator->arg),
+        .array = graph->allocator->alloc(sizeof(size_t) * graph->vertex_length, graph->allocator->arg),
     };
-    error((!table->graph->vertex_length || stack.array) && "Memory allocation failed.");
+    error((!graph->vertex_length || stack.array) && "Memory allocation failed.");
 
     stack.array[stack.length++] = end;
     for (size_t i = table->previous[stack.array[stack.length - 1]]; IAM_SPECIAL != i;) {
@@ -1295,15 +1304,15 @@ bool each_path_iam_list(iam_table_s const * const table, size_t const end, handl
     size_t const top = stack.array[stack.length - 1];
 
     while (stack.length--) {
-        char * vertex = table->graph->vertices + (stack.array[stack.length] * table->graph->vertex_size);
+        char * vertex = graph->vertices + (stack.array[stack.length] * graph->vertex_size);
         if (!handle(vertex, ah)) {
             break;
         }
     }
 
-    table->graph->allocator->free(stack.array, table->graph->allocator->arg);
+    graph->allocator->free(stack.array, graph->allocator->arg);
 
-    return !table->data->compare(table->costs + (top * table->data->size), table->data->zero, table->data->ac);
+    return !table->compare(table->costs + (top * table->size), table->zero, table->ac);
 }
 
 void _iam_graph_resize(iam_graph_s * const graph, size_t const size) {
@@ -1318,9 +1327,18 @@ void _iam_graph_resize(iam_graph_s * const graph, size_t const size) {
     }
 
     graph->vertices = graph->allocator->realloc(graph->vertices, size * graph->vertex_size, graph->allocator->arg);
+    graph->degrees = graph->allocator->realloc(graph->degrees, size * sizeof(size_t), graph->allocator->arg);
 }
 
-size_t _find_parent(iam_table_s const * const table, size_t const vertex) {
+void _make_set(table_s const * table, size_t const vertex_length) {
+    for (size_t i = 0; i < vertex_length; ++i) {
+        // initializer table's previous and rank costs
+        memcpy(table->costs + (i * table->size), table->zero, table->size);
+        table->previous[i] = i;
+    }
+}
+
+size_t _find_parent(table_s const * const table, size_t const vertex) {
     size_t start = vertex;
     while (start != table->previous[vertex]) {
         start = table->previous[start];
@@ -1329,15 +1347,16 @@ size_t _find_parent(iam_table_s const * const table, size_t const vertex) {
     return start;
 }
 
-void _union_set(iam_table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args) {
+void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args) {
     size_t const source_root = _find_parent(table, source);
     size_t const destination_root = _find_parent(table, destination);
 
-    void * source_cost = table->costs + (source_root * table->data->size);
-    void const * destination_cost = table->costs + (destination_root * table->data->size);
-    if (table->data->compare(source_cost, destination_cost, table->data->ac) < 0) {
+    // union set algorithm
+    void * source_cost = table->costs + (source_root * table->size);
+    void const * destination_cost = table->costs + (destination_root * table->size);
+    if (table->compare(source_cost, destination_cost, table->ac) < 0) {
         table->previous[source_root] = destination_root;
-    } else if (table->data->compare(source_cost, destination_cost, table->data->ac) > 0) {
+    } else if (table->compare(source_cost, destination_cost, table->ac) > 0) {
         table->previous[destination_root] = source_root;
     } else {
         table->previous[destination_root] = source_root;

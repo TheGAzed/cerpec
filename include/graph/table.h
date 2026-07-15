@@ -1,15 +1,18 @@
-#ifndef COST_H
-#define COST_H
+#ifndef TABLE_H
+#define TABLE_H
 
 #include <cerpec.h>
 
 /// @brief Cost value of size that is comparable and is bound to <0, inf>
-typedef struct infinite_adjacency_matrix_graph_cost {
+typedef struct graph_table {
     compare_fn compare;
     copy_fn sum, juggle;
     size_t size;
     void * infinite, * zero, * aj, * as, * ac;
-} iam_cost_s;
+    size_t * previous;
+    char * costs;
+    void const * graph;
+} table_s;
 
 /// @brief Composes a structure via its parametric properties.
 /// @param size Size of cost.
@@ -22,6 +25,6 @@ typedef struct infinite_adjacency_matrix_graph_cost {
 /// @param zero A cost of zero representing an instantly reachable cost.
 /// @param infinite An infinte cost representing an impossiblely reachable cost.
 /// @return Cost structure.
-iam_cost_s compose_iam_cost(size_t const size, compare_fn const compare, void * ac, copy_fn const juggle, void * const aj, copy_fn const sum, void * as, void * const zero, void * const infinite);
+table_s compose_table(size_t const size, compare_fn const compare, void * ac, copy_fn const juggle, void * const aj, copy_fn const sum, void * as, void * const zero, void * const infinite);
 
-#endif //COST_H
+#endif // TABLE_H
