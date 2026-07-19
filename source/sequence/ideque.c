@@ -51,12 +51,13 @@ void clear_ideque(ideque_s * const deque, set_fn const destroy, void * const ad)
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
     struct infinite_deque_node * current = deque->head; // save head index as current node
-    for (size_t start = deque->current; deque->length; start = 0) { // for every node in deque list until size is not zero
+    // for every node in deque list until size is not zero
+    for (size_t start = deque->current, remaining = deque->length; remaining; start = 0) {
         size_t i = start; // set i outside of nested for loop to save its value
-        for (; i < (deque->length + start) && i < IDEQUE_CHUNK; ++i) { // destroy each element in node
+        for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // destroy each element in node
             destroy(current->elements + (i * deque->size), ad);
         }
-        deque->length -= (i - start); // subtract absolute value of i and start from deque's size
+        remaining -= (i - start); // subtract absolute value of i and start from deque's size
 
         struct infinite_deque_node * temp = current; // save current node as temporary to free later
         current = current->next; // go to next node
@@ -148,7 +149,7 @@ void enqueue_front_ideque(ideque_s * const deque, void const * const buffer) {
     }
 
     deque->length++; // increment size for new element insertion
-    deque->current--; // if current was 0 then current will be 'LIST_ARRAY_DEQUE_CHUNK - 1'
+    deque->current--; // if current was 0 then current will be 'IDEQUE_CHUNK - 1'
     memcpy(deque->head->elements + (deque->current * deque->size), buffer, deque->size); // copy element into deque's head
 }
 
@@ -229,8 +230,8 @@ void dequeue_front_ideque(ideque_s * const deque, void * const buffer) {
     if ((IDEQUE_CHUNK == deque->current) || !(deque->length)) {
         struct infinite_deque_node * head = deque->head; // temporary save pointer to head node
 
-        deque->head->next->prev = deque->head->prev; // set head next's previous pointer to tail/head's previous
-        deque->head->prev->next = deque->head->next; // set tail's next node to head's next node
+        head->next->prev = head->prev; // set head next's previous pointer to tail/head's previous
+        head->prev->next = head->next; // set tail's next node to head's next node
 
         // if deque's size is zero then set head to NULL, else it's head's next node
         deque->head = deque->length ? deque->head->next : NULL;
@@ -281,8 +282,8 @@ void each_front_ideque(ideque_s const * const deque, manage_fn const manage, voi
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
     struct infinite_deque_node * current = deque->head; // save head node as current pointer
-    size_t remaining = deque->length; // save remaining size as parameter to decrement for loop
-    for (size_t start = deque->current; remaining; start = 0) { // while remaining size is not zero
+    // while remaining size is not zero
+    for (size_t start = deque->current, remaining = deque->length; remaining; start = 0) {
         size_t i = start;
         for (; i < (remaining + start) && i < IDEQUE_CHUNK; ++i) { // operate on each element in node
             // if operate returns false then terminate main function
@@ -306,18 +307,18 @@ void each_back_ideque(ideque_s const * const deque, manage_fn const manage, void
     valid(deque->current < IDEQUE_CHUNK && "Current exceeds chunk.");
 
     struct infinite_deque_node * current = deque->head; // save head node as current pointer
-    for (size_t r = deque->length, l = deque->length + deque->current - 1; r;) {
+    for (size_t remaining = deque->length, last = deque->current + deque->length - 1; remaining;) {
         current = current->prev; // fist go to tail and other previous nodes
 
-        size_t const node_index = l % IDEQUE_CHUNK; // calculate last element index in node
+        size_t const node_index = last % IDEQUE_CHUNK; // calculate last element index in node
         size_t i = 0; // save number of operated elements in node
-        for (; i <= node_index && r; ++i, r--) { // until node index is reached and elements remain
+        for (; i <= node_index && remaining; ++i, remaining--) { // until node index is reached and elements remain
             // manage on reversed i to start from last element in node
             if (!manage(current->elements + ((node_index - i) * deque->size), am)) {
                 return;
             }
         }
-        l -= i; // may undeflow
+        last -= i; // may underflow
     }
 }
 
