@@ -50,12 +50,12 @@ target_link_libraries([target-name] PRIVATE cerpec)
 
 ### [TREE](source/tree)
 - BINARY SEARCH TREE
-- ALV TREE
+- AVL TREE
 - RED-BLACK TREE
 
 ### [MISC](source/misc)
 - BINARY HEAP
-- HASH MAP
+- SEPARATE CHAINING HASH MAP
 
 # DODAC
 
