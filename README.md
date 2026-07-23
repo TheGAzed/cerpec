@@ -1,6 +1,6 @@
 # CERPEC
 
-CERPEC is a personal project that aims to recreate popular data structures for the C programming language. These are divided based on their length into finite and 'infinite' (adjustable) structures.
+Cerpec is a personal project that aims to recreate popular data structures for the C programming language. These are divided based on their length into finite and 'infinite' (adjustable) structures.
 
 ## Prerequisite
 C compiler that supports at least the **C99 standard**, for example:
@@ -56,3 +56,13 @@ target_link_libraries([target-name] PRIVATE cerpec)
 ### [MISC](source/misc)
 - BINARY HEAP
 - HASH MAP
+
+# DODAC
+
+The cerpec library comes with a separately provided **dodac** library implementing some function pointer used in the data structures. These data types are: **char**, **unsigned char**, **int**, **unsigned int**, **float**, **double**, **size_t**, and string character pointers (**char***).
+
+> [!CAUTION]
+> String compare functions **stringcmp** and **stringrcmp** use **strcmp** under the hood - making null termination mandatory.
+
+> [!CAUTION]
+> Floating point (float and double) data type comparisons may not be precise and epsilon-comparison isn't supported yet.
