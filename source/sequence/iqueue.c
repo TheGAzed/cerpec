@@ -141,11 +141,11 @@ void peek_iqueue(iqueue_s const * const queue, void * const buffer) {
     memcpy(buffer, queue->tail->next->elements + (queue->current * queue->size), queue->size);
 }
 
-void enqueue_iqueue(iqueue_s * const queue, void const * const buffer) {
+void enqueue_iqueue(iqueue_s * const queue, void const * const element) {
     error(queue && "Parameter can't be NULL.");
-    error(buffer && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
     error(~(queue->length) && "Queue's size will overflow.");
-    error(queue != buffer && "Parameters can't be the same.");
+    error(queue != element && "Parameters can't be the same.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->allocator && "Allocator can't be NULL.");
@@ -166,7 +166,7 @@ void enqueue_iqueue(iqueue_s * const queue, void const * const buffer) {
         queue->tail = node;
     }
 
-    memcpy(queue->tail->elements + (next_index * queue->size), buffer, queue->size);
+    memcpy(queue->tail->elements + (next_index * queue->size), element, queue->size);
     queue->length++;
 }
 

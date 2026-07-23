@@ -13,22 +13,23 @@ C compiler that supports at least the **C99 standard**, for example:
 ## Download
 
 - Either save it as a ZIP, then unzip it in your project
-- or load it as a submodule:
+- or clone it locally:
 
 ```bash
 # example: 
-git submodule add https://github.com/TheGAzed/cerpec.git
+git clone --recursive https://github.com/TheGAzed/cerpec.git
 ```
 
 ## Initialize
+
+CMake code snipped showing how to add and link **cerpec** as a library:
 
 ```cmake
 set(CERPEC_TEST OFF)
 add_subdirectory([path-to-folder]/cerpec)
 # ...
-target_link_libraries([target-name] PRIVATE CERPEC)
+target_link_libraries([target-name] PRIVATE cerpec)
 ```
-
 
 ## **List of Implemented Data Structures:**
 

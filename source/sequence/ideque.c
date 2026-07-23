@@ -122,10 +122,10 @@ bool is_empty_ideque(ideque_s const * const deque) {
     return (deque->length == 0);
 }
 
-void enqueue_front_ideque(ideque_s * const deque, void const * const buffer) {
+void enqueue_front_ideque(ideque_s * const deque, void const * const element) {
     error(deque && "Parameter is NULL.");
-    error(buffer && "Parameter is NULL.");
-    error(deque != buffer && "Parameters can't be the same.");
+    error(element && "Parameter is NULL.");
+    error(deque != element && "Parameters can't be the same.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->allocator && "Allocator can't be NULL.");
@@ -135,7 +135,8 @@ void enqueue_front_ideque(ideque_s * const deque, void const * const buffer) {
         deque->current = IDEQUE_CHUNK; // make current into list array chunk size to prevent future underflow
 
         // allocate node for replica
-        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) + (IDEQUE_CHUNK * deque->size), deque->allocator->arg);
+        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) +
+            (IDEQUE_CHUNK * deque->size), deque->allocator->arg);
         error(node && "Memory allocation failed.");
 
         if (deque->head) { // if head exists
@@ -150,13 +151,13 @@ void enqueue_front_ideque(ideque_s * const deque, void const * const buffer) {
 
     deque->length++; // increment size for new element insertion
     deque->current--; // if current was 0 then current will be 'IDEQUE_CHUNK - 1'
-    memcpy(deque->head->elements + (deque->current * deque->size), buffer, deque->size); // copy element into deque's head
+    memcpy(deque->head->elements + (deque->current * deque->size), element, deque->size); // copy element into deque's head
 }
 
-void enqueue_back_ideque(ideque_s * const deque, void const * const buffer) {
+void enqueue_back_ideque(ideque_s * const deque, void const * const element) {
     error(deque && "Parameter is NULL.");
-    error(buffer && "Parameter is NULL.");
-    error(deque != buffer && "Parameters can't be the same.");
+    error(element && "Parameter is NULL.");
+    error(deque != element && "Parameters can't be the same.");
 
     valid(deque->size && "Size can't be zero.");
     valid(deque->allocator && "Allocator can't be NULL.");
@@ -164,7 +165,8 @@ void enqueue_back_ideque(ideque_s * const deque, void const * const buffer) {
 
     size_t const next_index = ((deque->current + deque->length) % IDEQUE_CHUNK);
     if (!next_index) { // if next index to insert into is zero
-        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) + (IDEQUE_CHUNK * deque->size), deque->allocator->arg);
+        struct infinite_deque_node * node = deque->allocator->alloc(sizeof(struct infinite_deque_node) +
+            (IDEQUE_CHUNK * deque->size), deque->allocator->arg);
         error(node && "Memory allocation failed.");
 
         if (deque->head) { // if head exists
@@ -178,7 +180,7 @@ void enqueue_back_ideque(ideque_s * const deque, void const * const buffer) {
     }
 
     deque->length++; // increment size for new element insertion
-    memcpy(deque->head->prev->elements + (next_index * deque->size), buffer, deque->size); // copy element into deque's tail
+    memcpy(deque->head->prev->elements + (next_index * deque->size), element, deque->size); // copy element into deque's tail
 }
 
 void peek_front_ideque(ideque_s const * const deque, void * const buffer) {

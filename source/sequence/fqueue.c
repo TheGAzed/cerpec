@@ -151,11 +151,11 @@ bool is_full_fqueue(fqueue_s const * const queue) {
     return (queue->length == queue->max); // return comparison of length and max
 }
 
-void enqueue_fqueue(fqueue_s * const queue, void const * const buffer) {
+void enqueue_fqueue(fqueue_s * const queue, void const * const element) {
     error(queue && "Parameter can't be NULL.");
-    error(buffer && "Parameter can't be NULL.");
+    error(element && "Parameter can't be NULL.");
     error(queue->length != queue->max && "Structure is full.");
-    error(queue != buffer && "Parameters can't be equal.");
+    error(queue != element && "Parameters can't be equal.");
 
     valid(queue->size && "Size can't be zero.");
     valid(queue->max && "Maximum can't be zero.");
@@ -168,7 +168,7 @@ void enqueue_fqueue(fqueue_s * const queue, void const * const buffer) {
     size_t const position = (queue->current + queue->length) % queue->max;
 
     // set new element to the end of the elements array and increment queue's length
-    memcpy(queue->elements + (position * queue->size), buffer, queue->size);
+    memcpy(queue->elements + (position * queue->size), element, queue->size);
     queue->length++;
 }
 

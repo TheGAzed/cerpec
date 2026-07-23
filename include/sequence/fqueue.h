@@ -54,8 +54,8 @@ bool is_full_fqueue(fqueue_s const * const queue);
 
 /// @brief Enqueues a single element to the end of the structure.
 /// @param queue Structure to enqueue into.
-/// @param buffer Element buffer to enqueue.
-void enqueue_fqueue(fqueue_s * const queue, void const * const buffer);
+/// @param element Element buffer to enqueue.
+void enqueue_fqueue(fqueue_s * const queue, void const * const element);
 
 /// @brief Dequeues a single element from the start of the structure.
 /// @param queue Structure to dequeue from.

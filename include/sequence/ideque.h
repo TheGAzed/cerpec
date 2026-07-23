@@ -61,13 +61,13 @@ bool is_empty_ideque(ideque_s const * const deque);
 
 /// @brief Enqueues a single element to the front of the structure.
 /// @param deque Structure to enqueue into.
-/// @param buffer Element buffer to enqueue.
-void enqueue_front_ideque(ideque_s * const deque, void const * const buffer);
+/// @param element Element buffer to enqueue.
+void enqueue_front_ideque(ideque_s * const deque, void const * const element);
 
 /// @brief Enqueues a single element to the back of the structure.
 /// @param deque Structure to enqueue into.
-/// @param buffer Element buffer to enqueue.
-void enqueue_back_ideque(ideque_s * const deque, void const * const buffer);
+/// @param element Element buffer to enqueue.
+void enqueue_back_ideque(ideque_s * const deque, void const * const element);
 
 /// @brief Dequeues a single element from the front of the structure.
 /// @param deque Structure to dequeue from.
