@@ -27,6 +27,11 @@ struct family_stack {
     size_t length;
 };
 
+struct visited_list_array {
+    bool * set;
+    size_t head, length, * next, * prev;
+};
+
 /// @brief Resize function for graph.
 /// @param graph Graph to resize.
 /// @param size New size to resize into.
@@ -51,6 +56,8 @@ size_t _find_parent(table_s const * const table, size_t const vertex);
 /// @param increment Increment function pointer to increment source parent's rank.
 /// @param increment_args Increment function pointer arguments.
 void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args);
+
+void _set_visited(struct visited_list_array * const visited, size_t const index);
 
 iam_graph_s create_iam_graph(size_t const vertex_size, size_t const weight_size, compare_fn const compare, void * const ac, void * const none) {
     error(vertex_size && "Parameter can't be zero.");
@@ -286,7 +293,6 @@ bool is_tree_iam_graph(iam_graph_s const * const graph) {
     // double vertex stack to store both parent and child node
     struct family_stack stack = {
         .array = graph->allocator->alloc(sizeof(struct family) * graph->vertex_length, graph->allocator->arg),
-        .length = 0,
     };
     error(stack.array && "Memory allocation failed.");
 
@@ -330,7 +336,6 @@ CLEANUP:
     return !contains_cycle && (graph->vertex_length == visited_vertex_count); // check with count to detect unvisited
 }
 
-// TODO: finish this with dfs and visited list-array
 bool is_cyclic_iam_graph(iam_graph_s const * const graph) {
     error(graph && "Parameter can't be NULL.");
 
@@ -345,7 +350,84 @@ bool is_cyclic_iam_graph(iam_graph_s const * const graph) {
         return false;
     }
 
-    return false;
+    // initialize visited list array set for best access, removal and unvisited non-connected graphs
+    struct visited_list_array visited = {
+        .set = graph->allocator->alloc(graph->vertex_length * sizeof(bool), graph->allocator->arg),
+        .next = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
+        .prev = graph->allocator->alloc(graph->vertex_length * sizeof(size_t), graph->allocator->arg),
+        .length = graph->vertex_length,
+    };
+    error(visited.set && "Memory allocation failed.");
+    error(visited.next && "Memory allocation failed.");
+    error(visited.prev && "Memory allocation failed.");
+
+    // set visited set to false
+    memset(visited.set, 0, sizeof(bool) * graph->vertex_length);
+
+    // initialize visited list array to circualr doubly linked list
+    for (size_t i = 0; i < graph->vertex_length; ++i) {
+        visited.next[i] = i + 1;
+        visited.prev[i] = i - 1;
+    }
+    // since vertex length is not zero (thanks to early return), no underflow array access should occur
+    visited.next[graph->vertex_length - 1] = 0;
+    visited.prev[0] = graph->vertex_length - 1;
+
+    // double vertex stack to store both parent and child node
+    struct family_stack stack = {
+        .array = graph->allocator->alloc(sizeof(struct family) * graph->vertex_length, graph->allocator->arg),
+    };
+    error(stack.array && "Memory allocation failed.");
+
+    // set contains cycle flag for goto cleanup in nested loops
+    bool contains_cycle = false;
+    while (visited.length) {
+        // get unvisited head vertex in case of non-connected graph, set it to visited and add it to the stack
+        size_t const current = visited.head;
+        stack.array[stack.length++] = (struct family) { .parent = IAM_SPECIAL, .child = current };
+        _set_visited(&visited, current);
+
+        // loop until stack is empty
+        // end program if cycle was found by goto jumping to cleanup
+        while (stack.length) {
+            // get visited vertex from child pair
+            struct family const pair = stack.array[--stack.length];
+            size_t const v = pair.child;
+
+            // while each neighbor of v is iterated
+            size_t const v_off = (v * (v - 1)) / 2;
+            for (size_t i = 0; i < graph->vertex_length - 1; i++) {
+                size_t const i_off = (i * (i + 1)) / 2;
+
+                // get neighbor index and edge weight array position
+                size_t const u = (i < v) ? i : i + 1;
+                size_t const e = v <= i ? i_off + v : v_off + i;
+
+                // get edge weight and check if it is valid
+                void const * edge = graph->edges + (e * graph->weight_size);
+                if (!graph->compare(graph->none, edge, graph->ac)) { continue; }
+
+                // if vertex u wasn't visited, then visit it and add pair to stack
+                // else if neighbor isn't parent, then cycle was found (leave nested loops)
+                if (!visited.set[u]) {
+                    _set_visited(&visited, u);
+                    stack.array[stack.length++] = (struct family) { .parent = v, .child = u };
+                } else if (pair.parent != u) {
+                    contains_cycle = true;
+                    goto CLEANUP;
+                }
+            }
+        }
+    }
+
+CLEANUP:
+    graph->allocator->free(stack.array, graph->allocator->arg);
+
+    graph->allocator->free(visited.set, graph->allocator->arg);
+    graph->allocator->free(visited.next, graph->allocator->arg);
+    graph->allocator->free(visited.prev, graph->allocator->arg);
+
+    return contains_cycle;
 }
 
 size_t insert_vertex_iam_graph(iam_graph_s * const graph, void const * const vertex) {
@@ -1306,7 +1388,7 @@ size_t _find_parent(table_s const * const table, size_t const vertex) {
 
 void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args) {
     // find source and destination roots
-    size_t const source_root = _find_parent(table, source);
+    size_t const source_root      = _find_parent(table, source);
     size_t const destination_root = _find_parent(table, destination);
 
     // union set algorithm
@@ -1320,4 +1402,18 @@ void _union_set(table_s const * const table, size_t const source, size_t const d
         table->previous[destination_root] = source_root;
         increment(source_cost, increment_args);
     }
+}
+
+void _set_visited(struct visited_list_array * const visited, size_t const index) {
+    visited->set[index] = true;
+
+    // if index is head, thne head must be updated to its next node index
+    if (index == visited->head) {
+        visited->head = visited->next[index];
+    }
+    // cur out visited index node from visited set list
+    visited->prev[visited->next[index]] = visited->prev[index];
+    visited->next[visited->prev[index]] = visited->next[index];
+
+    visited->length--;
 }

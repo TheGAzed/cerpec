@@ -103,8 +103,8 @@ bool is_tree_iam_graph(iam_graph_s const * const graph);
 /// @brief A graph is cyclic if its connected components contain loops.
 /// @param graph Structure to check.
 /// @return 'true' if graph is a cyclic, 'false' otherwise.
-/// @note The algorithm uses DFS to determine circularity. A graph doesn't need to be connected, cycles are checked for
-/// all vertices.
+/// @note The algorithm uses DFS to determine circularity.
+/// Since graph doesn't need to be connected, cycles are checked for all subgraph vertices.
 bool is_cyclic_iam_graph(iam_graph_s const * const graph);
 
 /// @brief Inserts a single vertex element into the structure.
