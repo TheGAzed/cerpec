@@ -159,7 +159,7 @@ void insert_at_icircular_list(icircular_list_s * const list, void const * const 
     list->length++;
 }
 
-void get_icircular_list(icircular_list_s const * const list, size_t const index, void * const buffer) {
+size_t get_icircular_list(icircular_list_s const * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(list->length && "Can't get element from empty list->");
@@ -178,6 +178,7 @@ void get_icircular_list(icircular_list_s const * const list, size_t const index,
     }
 
     memcpy(buffer, list->elements + (current * list->size), list->size);
+    return current;
 }
 
 void remove_first_icircular_list(icircular_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {

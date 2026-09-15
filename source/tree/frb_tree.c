@@ -375,7 +375,7 @@ bool contains_frb_tree(frb_tree_s const * const tree, void const * const element
     return false;
 }
 
-void get_max_frb_tree(frb_tree_s const * const tree, void * const buffer) {
+size_t get_max_frb_tree(frb_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -402,9 +402,10 @@ void get_max_frb_tree(frb_tree_s const * const tree, void * const buffer) {
     }
 
     memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
+    return maximum;
 }
 
-void get_min_frb_tree(frb_tree_s const * const tree, void * const buffer) {
+size_t get_min_frb_tree(frb_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -431,6 +432,7 @@ void get_min_frb_tree(frb_tree_s const * const tree, void * const buffer) {
     }
 
     memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
+    return minimum;
 }
 
 void remove_max_frb_tree(frb_tree_s * const tree, void * const buffer) {
@@ -501,7 +503,7 @@ void remove_min_frb_tree(frb_tree_s * const tree, void * const buffer) {
     _frb_tree_fill_hole(tree, minimum);
 }
 
-void get_floor_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_floor_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -532,9 +534,10 @@ void get_floor_frb_tree(frb_tree_s const * const tree, void const * const elemen
     }
 
     memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
+    return floor;
 }
 
-void get_ceil_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_ceil_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -565,6 +568,7 @@ void get_ceil_frb_tree(frb_tree_s const * const tree, void const * const element
     }
 
     memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
+    return ceil;
 }
 
 void remove_floor_frb_tree(frb_tree_s * const tree, void const * const element, void * const buffer) {
@@ -643,7 +647,7 @@ void remove_ceil_frb_tree(frb_tree_s * const tree, void const * const element, v
     _frb_tree_fill_hole(tree, ceil);
 }
 
-void get_successor_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_successor_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -674,9 +678,10 @@ void get_successor_frb_tree(frb_tree_s const * const tree, void const * const el
     }
 
     memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
+    return successor;
 }
 
-void get_predecessor_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_predecessor_frb_tree(frb_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -707,6 +712,7 @@ void get_predecessor_frb_tree(frb_tree_s const * const tree, void const * const 
     }
 
     memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
+    return predecessor;
 }
 
 void remove_successor_frb_tree(frb_tree_s * const tree, void const * const element, void * const buffer) {

@@ -147,7 +147,7 @@ void insert_at_istraight_list(istraight_list_s * const list, void const * const 
     list->length++;
 }
 
-void get_istraight_list(istraight_list_s const * const list, size_t const index, void * const buffer) {
+size_t get_istraight_list(istraight_list_s const * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(list->length && "List can't be empty.");
@@ -159,13 +159,14 @@ void get_istraight_list(istraight_list_s const * const list, size_t const index,
     valid(list->allocator && "Allocator can't be NULL.");
 
     // iterate until node at index isn't reached
-    size_t node = list->head;
+    size_t current = list->head;
     for (size_t i = 0; i < index; ++i) {
-        node = list->next[node];
+        current = list->next[current];
     }
 
     // copy element into buffer
-    memcpy(buffer, list->elements + (node * list->size), list->size);
+    memcpy(buffer, list->elements + (current * list->size), list->size);
+    return current;
 }
 
 void remove_first_istraight_list(istraight_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {

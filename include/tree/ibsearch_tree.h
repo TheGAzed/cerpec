@@ -86,13 +86,15 @@ bool contains_ibsearch_tree(ibsearch_tree_s const * const tree, void const * con
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save element.
 /// @note Maximum element as specified by compare fucntion pointer.
-void get_max_ibsearch_tree(ibsearch_tree_s const * const tree, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_max_ibsearch_tree(ibsearch_tree_s const * const tree, void * const buffer);
 
 /// @brief Gets the minimum element in structure.
 /// @param tree Structure to get from.
 /// @param buffer Buffer to save element.
 /// @note Minimum element as specified by compare fucntion pointer.
-void get_min_ibsearch_tree(ibsearch_tree_s const * const tree, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_min_ibsearch_tree(ibsearch_tree_s const * const tree, void * const buffer);
 
 /// @brief Gets and removes the maximum element in structure.
 /// @param tree Structure to get from.
@@ -110,13 +112,15 @@ void remove_min_ibsearch_tree(ibsearch_tree_s * const tree, void * const buffer)
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save element.
-void get_floor_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_floor_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
 
 /// @brief Gets the ceil based on parameter element.
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save element.
-void get_ceil_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_ceil_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
 
 /// @brief Gets and removes the floor element.
 /// @param tree Structure to get from.
@@ -134,13 +138,15 @@ void remove_ceil_ibsearch_tree(ibsearch_tree_s * const tree, void const * const 
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save removed element.
-void get_successor_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_successor_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
 
 /// @brief Gets the in-order predecessor of parameter element.
 /// @param tree Structure to get from.
 /// @param element Element buffer to search.
 /// @param buffer Buffer to save removed element.
-void get_predecessor_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_predecessor_ibsearch_tree(ibsearch_tree_s const * const tree, void const * const element, void * const buffer);
 
 /// @brief Gets and removes the in-order successor element.
 /// @param tree Structure to get from.

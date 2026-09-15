@@ -296,7 +296,7 @@ bool contains_key_isc_hash_map(isc_hash_map_s const * const map, void const * co
     return false;
 }
 
-void get_value_isc_hash_map(isc_hash_map_s const * const map, void const * const key, void * const value_buffer) {
+size_t get_value_isc_hash_map(isc_hash_map_s const * const map, void const * const key, void * const value_buffer) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(value_buffer && "Parameter can't be NULL.");
@@ -321,7 +321,7 @@ void get_value_isc_hash_map(isc_hash_map_s const * const map, void const * const
         char const * current_key = map->keys + (n * map->key_size);
         if (hash == map->hashes[n] && !map->compare_key(key, current_key, map->ack)) {
             memcpy(value_buffer, map->values + (n * map->value_size), map->value_size); // copy retrieved element into buffer
-            return; // return to avoid error and termination at the end of function if key wasn't found
+            return n; // return to avoid error and termination at the end of function if key wasn't found
         }
     }
 

@@ -317,7 +317,7 @@ bool contains_fbsearch_tree(fbsearch_tree_s const * const tree, void const * con
     return false;
 }
 
-void get_max_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buffer) {
+size_t get_max_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -344,9 +344,10 @@ void get_max_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buff
     }
 
     memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
+    return maximum;
 }
 
-void get_min_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buffer) {
+size_t get_min_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -373,6 +374,7 @@ void get_min_fbsearch_tree(fbsearch_tree_s const * const tree, void * const buff
     }
 
     memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
+    return minimum;
 }
 
 void remove_max_fbsearch_tree(fbsearch_tree_s * const tree, void * const buffer) {
@@ -455,7 +457,7 @@ void remove_min_fbsearch_tree(fbsearch_tree_s * const tree, void * const buffer)
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void get_floor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_floor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -500,9 +502,10 @@ void get_floor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * co
     }
 
     memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
+    return floor;
 }
 
-void get_ceil_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_ceil_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -547,6 +550,7 @@ void get_ceil_fbsearch_tree(fbsearch_tree_s const * const tree, void const * con
     }
 
     memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
+    return ceil;
 }
 
 void remove_floor_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element, void * const buffer) {
@@ -623,7 +627,7 @@ void remove_ceil_fbsearch_tree(fbsearch_tree_s * const tree, void const * const 
     _fbsearch_tree_fill_hole(tree, hole);
 }
 
-void get_successor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_successor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -672,9 +676,10 @@ void get_successor_fbsearch_tree(fbsearch_tree_s const * const tree, void const 
     }
 
     memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
+    return successor;
 }
 
-void get_predecessor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_predecessor_fbsearch_tree(fbsearch_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -723,6 +728,7 @@ void get_predecessor_fbsearch_tree(fbsearch_tree_s const * const tree, void cons
     }
 
     memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
+    return predecessor;
 }
 
 void remove_successor_fbsearch_tree(fbsearch_tree_s * const tree, void const * const element, void * const buffer) {

@@ -96,7 +96,8 @@ bool contains_key_fsc_hash_map(fsc_hash_map_s const * const map, void const * co
 /// @param map Structure to get value.
 /// @param key Key to value.
 /// @param value_buffer Value buffer to save retrieved value.
-void get_value_fsc_hash_map(fsc_hash_map_s const * const map, void const * const key, void * const value_buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_value_fsc_hash_map(fsc_hash_map_s const * const map, void const * const key, void * const value_buffer);
 
 /// @brief Sets value based on key.
 /// @param map Structure to set value.

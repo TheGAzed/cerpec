@@ -157,7 +157,8 @@ bool contains_weight_iam_graph(iam_graph_s const * const graph, size_t const ind
 /// @param index_one First vertex index of edge.
 /// @param index_two Second vertex index of edge.
 /// @param buffer Element buffer to save edge.
-void get_weight_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_weight_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two, void * const buffer);
 
 /// @brief Calculates the number of edges that are incident to the vertex index.
 /// @param graph Structure to get from.

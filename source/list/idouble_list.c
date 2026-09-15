@@ -162,7 +162,7 @@ void insert_at_idouble_list(idouble_list_s * const list, void const * const elem
     list->length++;
 }
 
-void get_idouble_list(idouble_list_s const * const list, size_t const index, void * const buffer) {
+size_t get_idouble_list(idouble_list_s const * const list, size_t const index, void * const buffer) {
     error(list && "Paremeter can't be NULL.");
     error(buffer && "Paremeter can't be NULL.");
     error(index < list->length && "Paremeter can't be greater than length.");
@@ -182,6 +182,7 @@ void get_idouble_list(idouble_list_s const * const list, size_t const index, voi
 
     // copy retrieved element into buffer
     memcpy(buffer, list->elements + (current * list->size), list->size);
+    return current;
 }
 
 void remove_first_idouble_list(idouble_list_s * const list, void const * const element, void * const buffer, compare_fn const compare, void * const ac) {

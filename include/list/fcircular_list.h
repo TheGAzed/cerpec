@@ -64,7 +64,8 @@ void insert_at_fcircular_list(fcircular_list_s * const list, void const * const 
 /// @param list Structure to get element from.
 /// @param index Index to get element at.
 /// @param buffer Element buffer to save gotten element.
-void get_fcircular_list(fcircular_list_s const * const list, size_t const index, void * const buffer);
+/// @return Array index of retrieved element in structure.
+size_t get_fcircular_list(fcircular_list_s const * const list, size_t const index, void * const buffer);
 
 /// @brief Removes first element equal to parameter one, based on compare function pointer.
 /// @param list Structure to remove element from.

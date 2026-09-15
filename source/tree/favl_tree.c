@@ -356,7 +356,7 @@ bool contains_favl_tree(favl_tree_s const * const tree, void const * const eleme
     return false;
 }
 
-void get_max_favl_tree(favl_tree_s const * const tree, void * const buffer) {
+size_t get_max_favl_tree(favl_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -384,9 +384,10 @@ void get_max_favl_tree(favl_tree_s const * const tree, void * const buffer) {
     }
 
     memcpy(buffer, tree->elements + (maximum * tree->size), tree->size);
+    return maximum;
 }
 
-void get_min_favl_tree(favl_tree_s const * const tree, void * const buffer) {
+size_t get_min_favl_tree(favl_tree_s const * const tree, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -414,6 +415,7 @@ void get_min_favl_tree(favl_tree_s const * const tree, void * const buffer) {
     }
 
     memcpy(buffer, tree->elements + (minimum * tree->size), tree->size);
+    return minimum;
 }
 
 void remove_max_favl_tree(favl_tree_s * const tree, void * const buffer) {
@@ -500,7 +502,7 @@ void remove_min_favl_tree(favl_tree_s * const tree, void * const buffer) {
     _favl_tree_rebalance(tree, (*minimum));
 }
 
-void get_floor_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_floor_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -546,9 +548,10 @@ void get_floor_favl_tree(favl_tree_s const * const tree, void const * const elem
     }
 
     memcpy(buffer, tree->elements + (floor * tree->size), tree->size);
+    return floor;
 }
 
-void get_ceil_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_ceil_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -594,6 +597,7 @@ void get_ceil_favl_tree(favl_tree_s const * const tree, void const * const eleme
     }
 
     memcpy(buffer, tree->elements + (ceil * tree->size), tree->size);
+    return ceil;
 }
 
 void remove_floor_favl_tree(favl_tree_s * const tree, void const * const element, void * const buffer) {
@@ -674,7 +678,7 @@ void remove_ceil_favl_tree(favl_tree_s * const tree, void const * const element,
     _favl_tree_rebalance(tree, (*ceil));
 }
 
-void get_successor_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_successor_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -723,9 +727,10 @@ void get_successor_favl_tree(favl_tree_s const * const tree, void const * const 
     }
 
     memcpy(buffer, tree->elements + (successor * tree->size), tree->size);
+    return successor;
 }
 
-void get_predecessor_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
+size_t get_predecessor_favl_tree(favl_tree_s const * const tree, void const * const element, void * const buffer) {
     error(tree && "Parameter can't be NULL.");
     error(tree->length && "Can't get element from empty structure.");
     error(buffer && "Parameter can't be NULL.");
@@ -776,6 +781,7 @@ void get_predecessor_favl_tree(favl_tree_s const * const tree, void const * cons
     }
 
     memcpy(buffer, tree->elements + (predecessor * tree->size), tree->size);
+    return predecessor;
 }
 
 void remove_successor_favl_tree(favl_tree_s * const tree, void const * const element, void * const buffer) {

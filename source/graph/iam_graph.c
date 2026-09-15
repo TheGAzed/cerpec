@@ -627,7 +627,7 @@ bool contains_weight_iam_graph(iam_graph_s const * const graph, size_t const ind
     return graph->compare(graph->none, graph->edges + ((start_row + minimum) * graph->weight_size), graph->ac);
 }
 
-void get_weight_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two, void * const buffer) {
+size_t get_weight_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two, void * const buffer) {
     error(graph && "Parameter can't be NULL.");
     error(index_one < graph->vertex_length && "Parameter can't exceed length.");
     error(index_two < graph->vertex_length && "Parameter can't exceed length.");
@@ -643,11 +643,12 @@ void get_weight_iam_graph(iam_graph_s const * const graph, size_t const index_on
     size_t const maximum = index_one >= index_two ? index_one : index_two;
 
     size_t const start_row = (maximum * (maximum - 1)) / 2;
-
+    size_t const current_weight = start_row + minimum;
     // assert that an edge exists between vertices
-    assert(graph->compare(graph->none, graph->edges + ((start_row + minimum) * graph->weight_size), graph->ac));
+    assert(graph->compare(graph->none, graph->edges + (current_weight * graph->weight_size), graph->ac));
 
-    memcpy(buffer, graph->edges + ((start_row + minimum) + graph->weight_size), graph->weight_size);
+    memcpy(buffer, graph->edges + (current_weight + graph->weight_size), graph->weight_size);
+    return current_weight;
 }
 
 size_t degree_iam_graph(iam_graph_s const * const graph, size_t const index) {
