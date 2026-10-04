@@ -162,13 +162,6 @@ void remove_successor_frb_tree(frb_tree_s * const tree, void const * const eleme
 /// @param buffer Buffer to save removed element.
 void remove_predecessor_frb_tree(frb_tree_s * const tree, void const * const element, void * const buffer);
 
-/// @brief Gets and replaces the previous instance of element with new parameter one.
-/// @param tree Structure to get from.
-/// @param latter Latter buffer to search by.
-/// @param former Former buffer to save replaced element.
-/// @note Both 'former' and 'latter' must be equal based on comparison function pointer.
-void update_frb_tree(frb_tree_s const * const tree, void const * const latter, void * const former);
-
 /// @brief Performs an in-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.
 /// @param manage Function pointer to manage each element reference using generic arguments.

@@ -862,53 +862,6 @@ void remove_predecessor_favl_tree(favl_tree_s * const tree, void const * const e
     _favl_tree_rebalance(tree, (*predecessor));
 }
 
-void update_favl_tree(favl_tree_s const * const tree, void const * const latter, void * const former) {
-    error(tree && "Parameter can't be NULL.");
-    error(tree->length && "Can't get element from empty structure.");
-    error(latter && "Parameter can't be NULL.");
-    error(former && "Parameter can't be NULL.");
-    error(tree != latter && "Parameters can' be equal.");
-    error(tree != former && "Parameters can' be equal.");
-    error(former != latter && "Parameters can' be equal.");
-    error(tree->elements && "Paremeter can't be NULL.");
-    error(tree->parent && "Paremeter can't be NULL.");
-    error(tree->node[FAVLT_LEFT] && "Paremeter can't be NULL.");
-    error(tree->node[FAVLT_RIGHT] && "Paremeter can't be NULL.");
-    error(NIL != tree->root && "Paremeter can't be NIL.");
-
-    valid(tree->size && "Size can't be zero.");
-    valid(tree->max && "Maximum size can't be zero.");
-    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
-    valid(tree->compare && "Compare function can't be NULL.");
-    valid(tree->allocator && "Allocator can't be NULL.");
-    valid(tree->elements && "Elements array can't be NULL.");
-    valid(tree->height && "Height array can't be NULL.");
-    valid(tree->parent && "Parent array can't be NULL.");
-    valid(tree->node[FAVLT_LEFT] && "Lefts array can't be NULL.");
-    valid(tree->node[FAVLT_RIGHT] && "Rights array can't be NULL.");
-
-    size_t node = tree->root; // pointer to later change actual index of the empty child
-    while (NIL != node) {
-        // calculate and determine next child node, i.e. if left or right child
-        int const comparison = tree->compare(latter, tree->elements + (node * tree->size), tree->ac);
-        if (!comparison) {
-            break;
-        }
-
-        // go to next child node
-        node = (comparison < 0) ? tree->node[FAVLT_LEFT][node] : tree->node[FAVLT_RIGHT][node];
-    }
-
-    if (NIL == node) {
-        // element was NOT found, thus return an error
-        error(false && "Element not found in structure.");
-        exit(EXIT_FAILURE);
-    }
-
-    memcpy(former, tree->elements + (node * tree->size), tree->size);
-    memcpy(tree->elements + (node * tree->size), latter, tree->size);
-}
-
 void in_order_favl_tree(favl_tree_s const * const tree, manage_fn const manage, void * const am) {
     error(tree && "Parameter can't be NULL.");
     error(manage && "Parameter can't be NULL.");
