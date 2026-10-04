@@ -880,6 +880,52 @@ void in_order_frb_tree(frb_tree_s const * const tree, manage_fn const manage, vo
     }
 }
 
+void reverse_in_order_frb_tree(frb_tree_s const * const tree, manage_fn const manage, void * const am) {
+    error(tree && "Parameter can't be NULL.");
+    error(manage && "Parameter can't be NULL.");
+    error(tree != am && "Parameters can't be equal.");
+
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->max && "Lenght can't be larger than maximum.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
+    valid(tree->elements && "Elements array can't be NULL");
+    valid(tree->color && "Color array can't be NULL");
+    valid(tree->parent && "Parents array can't be NULL");
+    valid(tree->node[FRBT_LEFT] && "Lefts array can't be NULL");
+    valid(tree->node[FRBT_RIGHT] && "Rights array can't be NULL");
+
+    bool right_done = false;
+    size_t node = tree->root;
+    while (NIL != node) {
+        while (!right_done && NIL != tree->node[FRBT_RIGHT][node]) {
+            node = tree->node[FRBT_RIGHT][node];
+        }
+
+        if (!manage(tree->elements + (node * tree->size), am)) {
+            break;
+        }
+
+        right_done = true;
+        if (NIL != tree->node[FRBT_LEFT][node]) {
+            right_done = false;
+            node = tree->node[FRBT_LEFT][node];
+        } else if (NIL != tree->parent[node]) {
+            while (NIL != tree->parent[node] && node == tree->node[FRBT_LEFT][tree->parent[node]]) {
+                node = tree->parent[node];
+            }
+
+            if (NIL == tree->parent[node]) {
+                break;
+            }
+
+            node = tree->parent[node];
+        } else {
+            break;
+        }
+    }
+}
+
 void pre_order_frb_tree(frb_tree_s const * const tree, manage_fn const manage, void * const am) {
     error(tree && "Parameter can't be NULL.");
     error(manage && "Parameter can't be NULL.");

@@ -173,7 +173,17 @@ void update_irb_tree(irb_tree_s const * const tree, void const * const latter, v
 /// @param tree Structure to traverse.
 /// @param manage Function pointer to manage each element reference using generic arguments.
 /// @param am Generic arguments to use in function pointer.
+/// @note Algorithm relies on parent-based non-recursive, non-stack and non-Morris traversal.
+/// @see https://www.geeksforgeeks.org/dsa/inorder-non-threaded-binary-tree-traversal-without-recursion-or-stack/
 void in_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am);
+
+/// @brief Performs a reverse in-order traversal of structure using operate function and generic arguments.
+/// @param tree Structure to traverse.
+/// @param manage Function pointer to manage each element reference using generic arguments.
+/// @param am Generic arguments to use in function pointer.
+/// @note Algorithm relies on parent-based non-recursive, non-stack and non-Morris traversal.
+/// @see https://www.geeksforgeeks.org/dsa/inorder-non-threaded-binary-tree-traversal-without-recursion-or-stack/
+void reverse_in_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am);
 
 /// @brief Performs a pre-order traversal of structure using operate function and generic arguments.
 /// @param tree Structure to traverse.

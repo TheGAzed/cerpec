@@ -807,6 +807,47 @@ void in_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, vo
     }
 }
 
+void reverse_in_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am) {
+    error(tree && "Parameter can't be NULL.");
+    error(manage && "Parameter can't be NULL.");
+    error(tree != am && "Parameters can't be equal.");
+
+    valid(tree->size && "Size can't be zero.");
+    valid(tree->length <= tree->capacity && "Lenght can't be larger than capacity.");
+    valid(tree->compare && "Compare function can't be NULL.");
+    valid(tree->allocator && "Allocator can't be NULL.");
+
+    bool right_done = false;
+    size_t node = tree->root;
+    while (NIL != node) {
+        while (!right_done && NIL != tree->node[IRBT_RIGHT][node]) {
+            node = tree->node[IRBT_RIGHT][node];
+        }
+
+        if (!manage(tree->elements + (node * tree->size), am)) {
+            break;
+        }
+
+        right_done = true;
+        if (NIL != tree->node[IRBT_LEFT][node]) {
+            right_done = false;
+            node = tree->node[IRBT_LEFT][node];
+        } else if (NIL != tree->parent[node]) {
+            while (NIL != tree->parent[node] && node == tree->node[IRBT_LEFT][tree->parent[node]]) {
+                node = tree->parent[node];
+            }
+
+            if (NIL == tree->parent[node]) {
+                break;
+            }
+
+            node = tree->parent[node];
+        } else {
+            break;
+        }
+    }
+}
+
 void pre_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, void * const am) {
     error(tree && "Parameter can't be NULL.");
     error(manage && "Parameter can't be NULL.");
