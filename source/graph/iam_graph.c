@@ -1110,6 +1110,103 @@ void kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, p
     graph->allocator->free(kruskal_edges, graph->allocator->arg);
 }
 
+void each_vertex_bfs_iam_graph(iam_graph_s const * const graph, size_t const start, size_t const end, manage_fn const manage, void * const am) {
+    error(graph && "Parameter can't be NULL.");
+    error(start < graph->vertex_length && "Parameter can't exceed length.");
+    error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
+
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->weight_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
+
+    bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arg);
+    error((!graph->vertex_length || visited) && "Memory allocation failed.");
+    memset(visited, 0, graph->vertex_length * sizeof(bool));
+
+    struct iam_graph_queue queue = {
+        .array = graph->allocator->alloc(sizeof(size_t) * graph->vertex_length, graph->allocator->arg),
+    };
+    error((!graph->vertex_length || queue.array) && "Memory allocation failed.");
+
+    if (graph->vertex_length) {
+        visited[start] = true;
+        queue.array[queue.length++] = start;
+    }
+
+    while (queue.length && end != queue.array[queue.current]) {
+        size_t const v = queue.array[queue.current++];
+        queue.length--;
+        manage(graph->vertices + (v * graph->vertex_size), am);
+
+        size_t const v_off = (v * (v - 1)) / 2;
+        for (size_t i = 0; i < graph->vertex_length - 1; i++) {
+            size_t const i_off = (i * (i + 1)) / 2;
+
+            size_t const u = (i < v) ? i : i + 1;
+            size_t const e = v <= i ? i_off + v : v_off + i;
+
+            void const * edge = graph->edges + (e * graph->weight_size);
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[u]) {
+                visited[u] = true;
+                queue.array[queue.current + queue.length++] = u;
+            }
+        }
+    }
+
+    graph->allocator->free(queue.array, graph->allocator->arg);
+    graph->allocator->free(visited, graph->allocator->arg);
+}
+
+void each_vertex_dfs_iam_graph(iam_graph_s const * const graph, size_t const start, size_t const end, manage_fn const manage, void * const am) {
+    error(graph && "Parameter can't be NULL.");
+    error(start < graph->vertex_length && "Parameter can't exceed length.");
+    error((end < graph->vertex_length || end == IAM_SPECIAL) && "Parameter can't exceed length.");
+
+    valid(graph->compare && "Compare function can't be NULL.");
+    valid(graph->weight_size && "Edge size can't be zero.");
+    valid(graph->vertex_size && "Edge size can't be zero.");
+    valid(graph->none && "Non-edge can't be NULL.");
+    valid(graph->allocator && "Allocator can't be NULL.");
+
+    bool * visited = graph->allocator->alloc(sizeof(bool) * graph->vertex_length, graph->allocator->arg);
+    error((!graph->vertex_length || visited) && "Memory allocation failed.");
+    memset(visited, 0, sizeof(bool) * graph->vertex_length);
+
+    struct iam_graph_stack stack = {
+        .array = graph->allocator->alloc(sizeof(size_t) * graph->vertex_length, graph->allocator->arg),
+    };
+    error((!graph->vertex_length || stack.array) && "Memory allocation failed.");
+
+    if (graph->vertex_length) {
+        visited[start] = true;
+        stack.array[stack.length++] = start;
+    }
+
+    while (stack.length && end != stack.array[stack.length - 1]) {
+        size_t const v = stack.array[--stack.length];
+        manage(graph->vertices + (v * graph->vertex_size), am);
+
+        size_t const v_off = (v * (v - 1)) / 2;
+        for (size_t i = 0; i < graph->vertex_length - 1; i++) {
+            size_t const i_off = (i * (i + 1)) / 2;
+
+            size_t const u = (i < v) ? i : i + 1;
+            size_t const e = v <= i ? i_off + v : v_off + i;
+
+            void const * edge = graph->edges + (e * graph->weight_size);
+            if (graph->compare(graph->none, edge, graph->ac) && !visited[u]) {
+                visited[u] = true;
+                stack.array[stack.length++] = u;
+            }
+        }
+    }
+
+    graph->allocator->free(stack.array, graph->allocator->arg);
+    graph->allocator->free(visited, graph->allocator->arg);
+}
+
 void destroy_iam_table(table_s * const table) {
     error(table && "Parameter can't be NULL.");
 

@@ -211,6 +211,10 @@ void prim_iam_graph(iam_graph_s const * const graph, table_s * const table, size
 /// @param ai Arguments for increment function pointer.
 void kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, process_fn const sort, void * const as, set_fn const inc, void * const ai);
 
+void each_vertex_bfs_iam_graph(iam_graph_s const * const graph, size_t const start, size_t const end, manage_fn const manage, void * const am);
+
+void each_vertex_dfs_iam_graph(iam_graph_s const * const graph, size_t const start, size_t const end, manage_fn const manage, void * const am);
+
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param table Structure to destroy.
 void destroy_iam_table(table_s * const table);
