@@ -104,6 +104,27 @@ int rcmpstring(void const * const a, void const * const b) {
     return strcmp(*((char**)(b)), *((char**)(a)));
 }
 
+void booldst(void * const element, void * arg) {
+    (void)(element);
+    (void)(arg);
+}
+
+int boolcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
+    int const a_t = (int)(*(bool*)a);
+    int const b_t = (int)(*(bool*)b);
+
+    return a_t - b_t;
+}
+
+int boolrcmp(void const * const a, void const * const b, void * arg) {
+    (void)(arg);
+    int const a_t = (int)(*(bool*)a);
+    int const b_t = (int)(*(bool*)b);
+
+    return b_t - a_t;
+}
+
 void chardst(void * const element, void * arg) {
     (void)(element);
     (void)(arg);

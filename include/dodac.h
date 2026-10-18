@@ -20,6 +20,12 @@
 
 void voiddst(void * const element, void * arg);
 
+void booldst(void * const element, void * arg);
+
+int boolcmp(void const * const a, void const * const b, void * arg);
+
+int boolrcmp(void const * const a, void const * const b, void * arg);
+
 void chardst(void * const element, void * arg);
 
 void * charcpy(void * const destination, void const * const source, void * arg);
