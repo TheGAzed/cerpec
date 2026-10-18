@@ -114,7 +114,7 @@ size_t get_value_isc_hash_map(isc_hash_map_s const * const map, void const * con
 /// @param value New value to insert.
 /// @param value_buffer Old value buffer to save replaced value.
 /// @note When key doesn't exist it performs an insert, otherwise the old value is replace with the new one.
-void set_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value, void * const value_buffer);
+void set_value_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value, void * const value_buffer);
 
 /// @brief Iterates over each key in structure.
 /// @param map Structure to iterate over.

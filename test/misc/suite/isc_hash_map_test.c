@@ -369,7 +369,7 @@ TEST SET_VALUE_01(void) {
 
     int a = -1;
     const int key = (ISC_HASH_MAP_CHUNK - 1) / 2, value = 42;
-    set_isc_hash_map(&table, &key, &value, &a);
+    set_value_isc_hash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((ISC_HASH_MAP_CHUNK - 1) / 2, a);
     int b = -1;
@@ -391,7 +391,7 @@ TEST SET_VALUE_02(void) {
 
     int a = -1;
     const int key = (ISC_HASH_MAP_CHUNK) / 2, value = 42;
-    set_isc_hash_map(&table, &key, &value, &a);
+    set_value_isc_hash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((ISC_HASH_MAP_CHUNK) / 2, a);
     int b = -1;
@@ -413,7 +413,7 @@ TEST SET_VALUE_03(void) {
 
     int a = -1;
     const int key = (ISC_HASH_MAP_CHUNK + 1) / 2, value = 42;
-    set_isc_hash_map(&table, &key, &value, &a);
+    set_value_isc_hash_map(&table, &key, &value, &a);
 
     ASSERT_EQ((ISC_HASH_MAP_CHUNK + 1) / 2, a);
     int b = -1;

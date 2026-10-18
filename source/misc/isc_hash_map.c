@@ -329,7 +329,7 @@ size_t get_value_isc_hash_map(isc_hash_map_s const * const map, void const * con
     exit(EXIT_FAILURE); // terminate on error
 }
 
-void set_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value, void * const value_buffer) {
+void set_value_isc_hash_map(isc_hash_map_s * const map, void const * const key, void const * const value, void * const value_buffer) {
     error(map && "Parameter can't be NULL.");
     error(key && "Parameter can't be NULL.");
     error(value_buffer && "Parameter can't be NULL.");
