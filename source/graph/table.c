@@ -1,21 +1,9 @@
 #include <graph/table.h>
 
-table_s compose_table(
-    size_t const size, compare_fn const compare, void * const ac, copy_fn const juggle, void * const aj,
-    copy_fn const sum, void * const as, set_fn const destroy, void * const ad, void * const zero, void * const infinite) {
-
+table_s compose_table(size_t const size, copy_fn const convert, void * const ac, void * const zero, void * const infinite) {
     error(size && "Parameter can't be zero.");
-    error(compare && "Parameter can't be NULL.");
-    error(destroy && "Parameter can't be NULL.");
-    error(juggle && "Parameter can't be NULL.");
-    error(sum && "Parameter can't be NULL.");
     error(zero && "Parameter can't be NULL.");
     error(infinite && "Parameter can't be NULL.");
-    error(compare(infinite, zero, ac) > 0 && "Infinite must be greater than zero.");
-    error(compare(zero, infinite, ac) < 0 && "Zero must be smaller than infinity.");
 
-    return (table_s) {
-        .compare = compare, .size = size, .zero = zero, .infinite = infinite, .sum = sum, .juggle = juggle,
-        .as = as, .aj = aj, .ac = ac, .destroy = destroy, .ad = ad,
-    };
+    return (table_s) { .size = size, .zero = zero, .infinite = infinite, .convert = convert, .ac = ac, };
 }

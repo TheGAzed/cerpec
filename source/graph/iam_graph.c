@@ -54,8 +54,11 @@ size_t _find_parent(table_s const * const table, size_t const vertex);
 /// @param source Source vertex index to union.
 /// @param destination Destination vertex idnex to union.
 /// @param increment Increment function pointer to increment source parent's rank.
-/// @param increment_args Increment function pointer arguments.
-void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args);
+/// @param ai Increment function pointer arguments.
+/// @param compare
+/// @param ac
+void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * const ai, compare_fn
+                const compare, void * const ac);
 
 void _set_visited(struct visited_list_array * const visited, size_t const index);
 
@@ -587,8 +590,8 @@ void remove_weight_iam_graph(iam_graph_s * const graph, size_t const index_one, 
     valid(graph->allocator && "Allocator can't be NULL.");
 
     // reflect edge insertion in vertex one's and two's degrees
-    graph->degrees[index_one]++;
-    graph->degrees[index_two]++;
+    graph->degrees[index_one]--;
+    graph->degrees[index_two]--;
 
     // get smallest and largest vertex index for edge removal calculations
     size_t const minimum = index_one < index_two ? index_one : index_two;
@@ -645,7 +648,7 @@ size_t get_weight_iam_graph(iam_graph_s const * const graph, size_t const index_
     size_t const start_row = (maximum * (maximum - 1)) / 2;
     size_t const current_weight = start_row + minimum;
     // assert that an edge exists between vertices
-    assert(graph->compare(graph->none, graph->edges + (current_weight * graph->weight_size), graph->ac));
+    error(graph->compare(graph->none, graph->edges + (current_weight * graph->weight_size), graph->ac));
 
     memcpy(buffer, graph->edges + (current_weight + graph->weight_size), graph->weight_size);
     return current_weight;
@@ -957,7 +960,7 @@ void a_star_iam_graph(iam_graph_s const * const graph, table_s * const table, si
             heuristic(h_cost, graph->vertices + (v * graph->vertex_size), graph->vertices + (end * graph->vertex_size), ah);
             // neither g_cost nor h_cost is infinite (used to prevent potential overflow while summing)
             bool const can_sum = table->compare(g_cost, table->infinite, table->ac) && table->compare(h_cost, table->infinite, table->ac);
-            memcpy(f_cost, can_sum ? table->sum(h_cost, g_cost, table->aj) : table->infinite, table->size);
+            memcpy(f_cost, can_sum ? table->sum(h_cost, g_cost, table->as) : table->infinite, table->size);
 
             // if F(n)'s cost is smaller than the current minimum cost then set minimum cost to F(n)'s
             if (table->compare(minimum.cost, f_cost, table->ac) > 0) {
@@ -1103,7 +1106,7 @@ void kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, p
         size_t const destination = _find_parent(table, smallest.vertices[1]);
 
         if (source != destination) {
-            _union_set(table, source, destination, inc, ai);
+            _union_set(table, source, destination, inc, ai, TODO, TODO);
         }
     }
 
@@ -1484,7 +1487,8 @@ size_t _find_parent(table_s const * const table, size_t const vertex) {
     return start;
 }
 
-void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * increment_args) {
+void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * const ai, compare_fn
+                const compare, void * const ac) {
     // find source and destination roots
     size_t const source_root      = _find_parent(table, source);
     size_t const destination_root = _find_parent(table, destination);
@@ -1498,7 +1502,7 @@ void _union_set(table_s const * const table, size_t const source, size_t const d
         table->previous[destination_root] = source_root;
     } else {
         table->previous[destination_root] = source_root;
-        increment(source_cost, increment_args);
+        increment(source_cost, ai);
     }
 }
 
