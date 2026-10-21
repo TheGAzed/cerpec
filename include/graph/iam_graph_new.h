@@ -209,15 +209,16 @@ void _prim_iam_graph(iam_graph_s const * const graph, table_s * const table, siz
 /// @param sort Function pointer to sort special array of edge-vertices - 'iam_edge_s', for Kruskal's algorithm.
 /// @param table Cost structure that defines the distance properties in table.
 /// @param as Arguments for sorting function.
-/// @param inc Function pointer to increment rank cost by one.
+/// @param increment Function pointer to increment rank cost by one.
 /// @param ai Arguments for increment function pointer.
-void _kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, process_fn const sort, void * const as, set_fn const inc, void * const ai);
+/// @param compare
+/// @param ac
+void _kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, process_fn const sort, void * const as, set_fn const increment, void * const ai, compare_fn
+                        const compare, void * const ac);
 
 /// @brief Destroys a structure, and its elements and makes it unusable.
 /// @param table Structure to destroy.
-/// @param destroy_cost Function pointer to destroy a single cost element.
-/// @param adc Arguments for destroy function pointer.
-void _destroy_iam_table(table_s * const table, set_fn const destroy_cost, void * const adc);
+void _destroy_iam_table(table_s * const table);
 
 /// @brief Creates a subgraph copy of specified graph based on its table.
 /// @param table Structure to reference.
@@ -225,10 +226,13 @@ void _destroy_iam_table(table_s * const table, set_fn const destroy_cost, void *
 /// @param acv Arguments for copy vertex function pointer.
 /// @param copy_edge Function pointer to create a deep/shallow copy of a single edge element.
 /// @param ace Arguments for copy edge function pointer.
+/// @param compare
+/// @param ac
 /// @return Matrix graph structure.
 /// @note The algorithm should be used for minimum spanning tree implementations like Prim and Kruskal,
 /// but one can also generate trees from path finding implementations.
-iam_graph_s _subgraph_iam_graph(table_s const * const table, copy_fn const copy_vertex, void * const acv, copy_fn const copy_edge, void * const ace);
+iam_graph_s _subgraph_iam_graph(table_s const * const table, copy_fn const copy_vertex, void * const acv, copy_fn const copy_edge, void * const ace, compare_fn
+                                const compare, void * const ac);
 
 /// @brief Iterates over each vertex element in structure starting from the beginning.
 /// @param graph Structure to iterate.
@@ -248,12 +252,19 @@ void _each_edge_iam_graph(iam_graph_s const * const graph, manage_fn const manag
 /// @param am Arguments for manage function pointer.
 void _each_weight_iam_graph(iam_graph_s const * const graph, manage_fn const manage, void * const am);
 
-/// @brief Iterates over each neighbor of a vertex index.
+/// @brief Iterates over each neighbor weight of a vertex index.
 /// @param graph Structure to iterate.
 /// @param index Index of vertex to iterate neighbors.
 /// @param manage Function pointer to manage each element reference using generic arguments.
 /// @param am Arguments for manage function pointer.
-void _each_neighbor_iam_graph(iam_graph_s const * const graph, size_t const index, manage_fn const manage, void * const am);
+void _each_neighbor_weight_iam_graph(iam_graph_s const * const graph, size_t const index, manage_fn const manage, void * const am);
+
+/// @brief Iterates over each neighbor edge (iam_edge_s) of a vertex index.
+/// @param graph Structure to iterate.
+/// @param index Index of vertex to iterate neighbors.
+/// @param manage Function pointer to manage each element reference using generic arguments.
+/// @param am Arguments for manage function pointer.
+void _each_neighbor_edge_iam_graph(iam_graph_s const * const graph, size_t const index, manage_fn const manage, void * const am);
 
 /// @brief Iterates over each cost element in structure starting from the beginning.
 /// @param table Structure to iterate.
@@ -269,7 +280,7 @@ void _each_cost_iam_graph(table_s const * const table, manage_fn const manage, v
 /// @return 'true' if path exists, 'false' otherwise.
 /// @note The algorithm should be used with shortest path find implementations, i.e. Dijkstra and A*,
 /// to traverse the path from 'end' vertex to the start one, but one can also traverse MSP tables with it.
-bool _each_path_iam_table(table_s const * const table, size_t const end, manage_fn const manage, void * const am);
+size_t _each_path_iam_table(table_s const * const table, size_t const end, manage_fn const manage, void * const am);
 
 /// @brief Iterates over each vertex of the specified structure using breadth first search.
 /// @param graph Structure to iterate.

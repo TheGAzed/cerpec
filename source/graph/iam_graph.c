@@ -1096,7 +1096,7 @@ void kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, p
     }
 
     // sort edge array based on its edge (weight)
-    sort(kruskal_edges, graph->vertex_length, as);
+    sort(kruskal_edges, graph->edge_length, as);
 
     // Kruskal's algorithm with sorted edges
     for (int i = 0; i < graph->edge_length; ++i) {
