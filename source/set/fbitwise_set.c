@@ -21,11 +21,11 @@ fbitwise_set_s create_fbitwise_set(size_t const max) {
     // create structure with allocated memory based on bits
     fbitwise_set_s const set = {
         .allocator = &standard, .max = max,
-        .bits = standard.alloc(size, standard.arg),
+        .bits = standard.alloc(size * sizeof(unsigned), standard.arg),
     };
     error(set.bits && "Memory allocation failed.");
 
-    memset(set.bits, 0, size);
+    memset(set.bits, 0, size * sizeof(unsigned));
 
     return set;
 }

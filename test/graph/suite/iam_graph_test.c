@@ -15,17 +15,14 @@
 #define PENTAGON_GRAPH_SIZE 5
 
 TEST CREATE_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     ASSERT_NEQ(NULL, graph.allocator);
-    ASSERT_NEQ(NULL, graph.compare);
     ASSERT_EQ(0, graph.capacity);
-    ASSERT_NEQ(0, graph.weight_size);
+    ASSERT_NEQ(0, graph.edge_size);
     ASSERT_NEQ(0, graph.vertex_size);
     ASSERT_EQ(NULL, graph.edges);
     ASSERT_EQ(NULL, graph.vertices);
-    ASSERT_NEQ(NULL, graph.none);
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -33,37 +30,31 @@ TEST CREATE_01(void) {
 }
 
 TEST DESTROY_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     ASSERT_EQ(NULL, graph.allocator);
-    ASSERT_EQ(NULL, graph.compare);
     ASSERT_EQ(0, graph.capacity);
-    ASSERT_EQ(0, graph.weight_size);
+    ASSERT_EQ(0, graph.edge_size);
     ASSERT_EQ(0, graph.vertex_size);
     ASSERT_EQ(NULL, graph.edges);
     ASSERT_EQ(NULL, graph.vertices);
-    ASSERT_EQ(NULL, graph.none);
 
     PASS();
 }
 
 TEST CLEAR_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     clear_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     ASSERT_NEQ(NULL, graph.allocator);
-    ASSERT_NEQ(NULL, graph.compare);
     ASSERT_EQ(0, graph.capacity);
-    ASSERT_NEQ(0, graph.weight_size);
+    ASSERT_NEQ(0, graph.edge_size);
     ASSERT_NEQ(0, graph.vertex_size);
     ASSERT_EQ(NULL, graph.edges);
     ASSERT_EQ(NULL, graph.vertices);
-    ASSERT_NEQ(NULL, graph.none);
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -71,9 +62,8 @@ TEST CLEAR_01(void) {
 }
 
 TEST COPY_01(void) {
-    int  none = 0;
     int const one = 1;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -81,7 +71,7 @@ TEST COPY_01(void) {
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         for (int j = i + 1; j < IAM_GRAPH_CHUNK - 1; ++j) {
-            insert_weight_iam_graph(&graph, (size_t)i, (size_t)j, &one);
+            insert_edge_iam_graph(&graph, (size_t)i, (size_t)j, &one);
         }
     }
 
@@ -91,9 +81,8 @@ TEST COPY_01(void) {
 }
 
 TEST COPY_02(void) {
-    int  none = 0;
     int const one = 1;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -101,7 +90,7 @@ TEST COPY_02(void) {
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         for (int j = i + 1; j < IAM_GRAPH_CHUNK; ++j) {
-            insert_weight_iam_graph(&graph, (size_t)i, (size_t)j, &one);
+            insert_edge_iam_graph(&graph, (size_t)i, (size_t)j, &one);
         }
     }
 
@@ -111,9 +100,8 @@ TEST COPY_02(void) {
 }
 
 TEST COPY_03(void) {
-    int  none = 0;
     int const one = 1;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -121,7 +109,7 @@ TEST COPY_03(void) {
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         for (int j = i + 1; j < IAM_GRAPH_CHUNK + 1; ++j) {
-            insert_weight_iam_graph(&graph, (size_t)i, (size_t)j, &one);
+            insert_edge_iam_graph(&graph, (size_t)i, (size_t)j, &one);
         }
     }
 
@@ -131,8 +119,7 @@ TEST COPY_03(void) {
 }
 
 TEST IS_EMPTY_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     ASSERT(is_empty_iam_graph(&graph));
 
@@ -142,9 +129,8 @@ TEST IS_EMPTY_01(void) {
 }
 
 TEST IS_EMPTY_02(void) {
-    int none = 0;
     int const one = 1;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     insert_vertex_iam_graph(&graph, &one);
 
@@ -156,8 +142,7 @@ TEST IS_EMPTY_02(void) {
 }
 
 TEST IS_COMPLETE_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     ASSERT(is_complete_iam_graph(&graph));
 
@@ -167,8 +152,7 @@ TEST IS_COMPLETE_01(void) {
 }
 
 TEST IS_COMPLETE_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     int const one = 1;
     insert_vertex_iam_graph(&graph, &one);
@@ -181,8 +165,7 @@ TEST IS_COMPLETE_02(void) {
 }
 
 TEST IS_COMPLETE_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     int const one = 1, two = 2;
     insert_vertex_iam_graph(&graph, &one);
@@ -196,15 +179,14 @@ TEST IS_COMPLETE_03(void) {
 }
 
 TEST IS_COMPLETE_04(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     int const one = 1, two = 2;
     insert_vertex_iam_graph(&graph, &one);
     insert_vertex_iam_graph(&graph, &two);
 
     int const edge = 42;
-    insert_weight_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
 
     ASSERT(is_complete_iam_graph(&graph));
 
@@ -214,8 +196,7 @@ TEST IS_COMPLETE_04(void) {
 }
 
 TEST IS_COMPLETE_05(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -224,7 +205,7 @@ TEST IS_COMPLETE_05(void) {
     int const edge = 42;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK - 1; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
         }
     }
 
@@ -236,8 +217,7 @@ TEST IS_COMPLETE_05(void) {
 }
 
 TEST IS_COMPLETE_06(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -246,7 +226,7 @@ TEST IS_COMPLETE_06(void) {
     int const edge = 42;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
         }
     }
 
@@ -258,8 +238,7 @@ TEST IS_COMPLETE_06(void) {
 }
 
 TEST IS_COMPLETE_07(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -268,7 +247,7 @@ TEST IS_COMPLETE_07(void) {
     int const edge = 42;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK + 1; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
         }
     }
 
@@ -280,8 +259,7 @@ TEST IS_COMPLETE_07(void) {
 }
 
 TEST IS_CONNECTED_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     ASSERT_FALSE(is_connected_iam_graph(&graph));
 
@@ -291,8 +269,7 @@ TEST IS_CONNECTED_01(void) {
 }
 
 TEST IS_CONNECTED_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     int const one = 1;
     insert_vertex_iam_graph(&graph, &one);
@@ -305,8 +282,7 @@ TEST IS_CONNECTED_02(void) {
 }
 
 TEST IS_CONNECTED_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     int const one = 1, two = 2;
     insert_vertex_iam_graph(&graph, &one);
@@ -320,15 +296,14 @@ TEST IS_CONNECTED_03(void) {
 }
 
 TEST IS_CONNECTED_04(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     int const one = 1, two = 2;
     insert_vertex_iam_graph(&graph, &one);
     insert_vertex_iam_graph(&graph, &two);
 
     int const edge = 42;
-    insert_weight_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
 
     ASSERT(is_connected_iam_graph(&graph));
 
@@ -338,8 +313,7 @@ TEST IS_CONNECTED_04(void) {
 }
 
 TEST IS_CONNECTED_05(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -347,7 +321,7 @@ TEST IS_CONNECTED_05(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     ASSERT(is_connected_iam_graph(&graph));
@@ -358,8 +332,7 @@ TEST IS_CONNECTED_05(void) {
 }
 
 TEST IS_CONNECTED_06(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -367,7 +340,7 @@ TEST IS_CONNECTED_06(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     ASSERT(is_connected_iam_graph(&graph));
@@ -378,8 +351,7 @@ TEST IS_CONNECTED_06(void) {
 }
 
 TEST IS_CONNECTED_07(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -387,7 +359,7 @@ TEST IS_CONNECTED_07(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     ASSERT(is_connected_iam_graph(&graph));
@@ -398,8 +370,7 @@ TEST IS_CONNECTED_07(void) {
 }
 
 TEST IS_TREE_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -407,7 +378,7 @@ TEST IS_TREE_01(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     ASSERT(is_tree_iam_graph(&graph));
@@ -418,8 +389,7 @@ TEST IS_TREE_01(void) {
 }
 
 TEST IS_TREE_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -427,7 +397,7 @@ TEST IS_TREE_02(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     ASSERT(is_tree_iam_graph(&graph));
@@ -438,8 +408,7 @@ TEST IS_TREE_02(void) {
 }
 
 TEST IS_TREE_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -447,7 +416,7 @@ TEST IS_TREE_03(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     ASSERT(is_tree_iam_graph(&graph));
@@ -458,8 +427,7 @@ TEST IS_TREE_03(void) {
 }
 
 TEST IS_TREE_04(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     // claw tree graph
     /*
@@ -474,9 +442,9 @@ TEST IS_TREE_04(void) {
     }
 
     int const edge = 42;
-    insert_weight_iam_graph(&graph, 0, 1, &edge);
-    insert_weight_iam_graph(&graph, 1, 2, &edge);
-    insert_weight_iam_graph(&graph, 1, 3, &edge);
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 1, 3, &edge);
 
     ASSERT(is_tree_iam_graph(&graph));
 
@@ -486,8 +454,7 @@ TEST IS_TREE_04(void) {
 }
 
 TEST IS_TREE_05(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     // caterpillar tree graph
     /*
@@ -502,25 +469,25 @@ TEST IS_TREE_05(void) {
     }
 
     int const edge = 42;
-    insert_weight_iam_graph(&graph, 0, 1, &edge);
-    insert_weight_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
 
-    insert_weight_iam_graph(&graph, 3, 4, &edge);
-    insert_weight_iam_graph(&graph, 4, 5, &edge);
+    insert_edge_iam_graph(&graph, 3, 4, &edge);
+    insert_edge_iam_graph(&graph, 4, 5, &edge);
 
-    insert_weight_iam_graph(&graph, 6, 7, &edge);
-    insert_weight_iam_graph(&graph, 7, 8, &edge);
+    insert_edge_iam_graph(&graph, 6, 7, &edge);
+    insert_edge_iam_graph(&graph, 7, 8, &edge);
 
-    insert_weight_iam_graph(&graph,  9, 10, &edge);
-    insert_weight_iam_graph(&graph, 10, 11, &edge);
+    insert_edge_iam_graph(&graph,  9, 10, &edge);
+    insert_edge_iam_graph(&graph, 10, 11, &edge);
 
-    insert_weight_iam_graph(&graph, 12, 13, &edge);
-    insert_weight_iam_graph(&graph, 13, 14, &edge);
+    insert_edge_iam_graph(&graph, 12, 13, &edge);
+    insert_edge_iam_graph(&graph, 13, 14, &edge);
 
-    insert_weight_iam_graph(&graph,  1,  4, &edge);
-    insert_weight_iam_graph(&graph,  4,  7, &edge);
-    insert_weight_iam_graph(&graph,  7, 10, &edge);
-    insert_weight_iam_graph(&graph, 10, 13, &edge);
+    insert_edge_iam_graph(&graph,  1,  4, &edge);
+    insert_edge_iam_graph(&graph,  4,  7, &edge);
+    insert_edge_iam_graph(&graph,  7, 10, &edge);
+    insert_edge_iam_graph(&graph, 10, 13, &edge);
 
     ASSERT(is_tree_iam_graph(&graph));
 
@@ -530,8 +497,7 @@ TEST IS_TREE_05(void) {
 }
 
 TEST IS_TREE_06(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     // triangle graph
     /*
@@ -544,9 +510,9 @@ TEST IS_TREE_06(void) {
     }
 
     int const edge = 42;
-    insert_weight_iam_graph(&graph, 0, 1, &edge);
-    insert_weight_iam_graph(&graph, 1, 2, &edge);
-    insert_weight_iam_graph(&graph, 2, 0, &edge);
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 2, 0, &edge);
 
     ASSERT_FALSE(is_tree_iam_graph(&graph));
 
@@ -556,8 +522,7 @@ TEST IS_TREE_06(void) {
 }
 
 TEST IS_TREE_07(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     // square graph
     /*
@@ -570,10 +535,10 @@ TEST IS_TREE_07(void) {
     }
 
     int const edge = 42;
-    insert_weight_iam_graph(&graph, 0, 1, &edge);
-    insert_weight_iam_graph(&graph, 1, 2, &edge);
-    insert_weight_iam_graph(&graph, 2, 3, &edge);
-    insert_weight_iam_graph(&graph, 3, 0, &edge);
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 2, 3, &edge);
+    insert_edge_iam_graph(&graph, 3, 0, &edge);
 
     ASSERT_FALSE(is_tree_iam_graph(&graph));
 
@@ -583,8 +548,7 @@ TEST IS_TREE_07(void) {
 }
 
 TEST IS_TREE_08(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     // square graph
     /*
@@ -597,11 +561,11 @@ TEST IS_TREE_08(void) {
     }
 
     int const edge = 42;
-    insert_weight_iam_graph(&graph, 0, 1, &edge);
-    insert_weight_iam_graph(&graph, 1, 2, &edge);
-    insert_weight_iam_graph(&graph, 2, 3, &edge);
-    insert_weight_iam_graph(&graph, 3, 4, &edge);
-    insert_weight_iam_graph(&graph, 4, 0, &edge);
+    insert_edge_iam_graph(&graph, 0, 1, &edge);
+    insert_edge_iam_graph(&graph, 1, 2, &edge);
+    insert_edge_iam_graph(&graph, 2, 3, &edge);
+    insert_edge_iam_graph(&graph, 3, 4, &edge);
+    insert_edge_iam_graph(&graph, 4, 0, &edge);
 
     ASSERT_FALSE(is_tree_iam_graph(&graph));
 
@@ -611,8 +575,7 @@ TEST IS_TREE_08(void) {
 }
 
 TEST INSERT_VERTEX_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -624,8 +587,7 @@ TEST INSERT_VERTEX_01(void) {
 }
 
 TEST INSERT_VERTEX_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -637,8 +599,7 @@ TEST INSERT_VERTEX_02(void) {
 }
 
 TEST INSERT_VERTEX_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -650,17 +611,16 @@ TEST INSERT_VERTEX_03(void) {
 }
 
 TEST REMOVE_VERTEX_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
-    for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
+    for (int i = 0; i < 1 - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     int vertex = -1;
     while (graph.vertex_length) {
         vertex = -1;
-        remove_vertex_iam_graph(&graph, 0, &vertex, intdst, NULL);
+        remove_vertex_iam_graph(&graph, graph.vertex_length / 2, &vertex, intdst, NULL);
         ASSERT_NEQ(-1, vertex);
     }
 
@@ -670,8 +630,7 @@ TEST REMOVE_VERTEX_01(void) {
 }
 
 TEST REMOVE_VERTEX_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -690,8 +649,7 @@ TEST REMOVE_VERTEX_02(void) {
 }
 
 TEST REMOVE_VERTEX_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -710,8 +668,7 @@ TEST REMOVE_VERTEX_03(void) {
 }
 
 TEST REMOVE_VERTEX_04(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -729,8 +686,7 @@ TEST REMOVE_VERTEX_04(void) {
 }
 
 TEST REMOVE_VERTEX_05(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -748,8 +704,7 @@ TEST REMOVE_VERTEX_05(void) {
 }
 
 TEST REMOVE_VERTEX_06(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -767,8 +722,7 @@ TEST REMOVE_VERTEX_06(void) {
 }
 
 TEST REMOVE_VERTEX_07(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -786,8 +740,7 @@ TEST REMOVE_VERTEX_07(void) {
 }
 
 TEST REMOVE_VERTEX_08(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -805,8 +758,7 @@ TEST REMOVE_VERTEX_08(void) {
 }
 
 TEST REMOVE_VERTEX_09(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -824,8 +776,7 @@ TEST REMOVE_VERTEX_09(void) {
 }
 
 TEST GET_VERTEX_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -843,8 +794,7 @@ TEST GET_VERTEX_01(void) {
 }
 
 TEST GET_VERTEX_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -862,8 +812,7 @@ TEST GET_VERTEX_02(void) {
 }
 
 TEST GET_VERTEX_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -881,8 +830,7 @@ TEST GET_VERTEX_03(void) {
 }
 
 TEST GET_VERTEX_04(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -898,8 +846,7 @@ TEST GET_VERTEX_04(void) {
 }
 
 TEST GET_VERTEX_05(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -915,8 +862,7 @@ TEST GET_VERTEX_05(void) {
 }
 
 TEST GET_VERTEX_06(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -932,8 +878,7 @@ TEST GET_VERTEX_06(void) {
 }
 
 TEST INSERT_EDGE_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -942,7 +887,7 @@ TEST INSERT_EDGE_01(void) {
     int const edge = 42;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK - 1; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
         }
     }
 
@@ -952,8 +897,7 @@ TEST INSERT_EDGE_01(void) {
 }
 
 TEST INSERT_EDGE_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -962,7 +906,7 @@ TEST INSERT_EDGE_02(void) {
     int const edge = 42;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
         }
     }
 
@@ -972,8 +916,7 @@ TEST INSERT_EDGE_02(void) {
 }
 
 TEST INSERT_EDGE_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -982,7 +925,7 @@ TEST INSERT_EDGE_03(void) {
     int const edge = 42;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK + 1; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
         }
     }
 
@@ -992,8 +935,7 @@ TEST INSERT_EDGE_03(void) {
 }
 
 TEST REMOVE_EDGE_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1002,7 +944,7 @@ TEST REMOVE_EDGE_01(void) {
     int edge = 1;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK - 1; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
             edge++;
         }
     }
@@ -1011,7 +953,7 @@ TEST REMOVE_EDGE_01(void) {
     for (size_t i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK - 1; ++j) {
             int got = -1;
-            remove_weight_iam_graph(&graph, i, j, &got);
+            remove_edge_iam_graph(&graph, i, j, &got);
             ASSERT_EQ(edge, got);
             edge++;
         }
@@ -1023,8 +965,7 @@ TEST REMOVE_EDGE_01(void) {
 }
 
 TEST REMOVE_EDGE_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1033,7 +974,7 @@ TEST REMOVE_EDGE_02(void) {
     int edge = 1;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
             edge++;
         }
     }
@@ -1042,7 +983,7 @@ TEST REMOVE_EDGE_02(void) {
     for (size_t i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK; ++j) {
             int got = -1;
-            remove_weight_iam_graph(&graph, i, j, &got);
+            remove_edge_iam_graph(&graph, i, j, &got);
             ASSERT_EQ(edge, got);
             edge++;
         }
@@ -1054,8 +995,7 @@ TEST REMOVE_EDGE_02(void) {
 }
 
 TEST REMOVE_EDGE_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1064,7 +1004,7 @@ TEST REMOVE_EDGE_03(void) {
     int edge = 1;
     for (size_t i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK + 1; ++j) {
-            insert_weight_iam_graph(&graph, i, j, &edge);
+            insert_edge_iam_graph(&graph, i, j, &edge);
             edge++;
         }
     }
@@ -1073,7 +1013,7 @@ TEST REMOVE_EDGE_03(void) {
     for (size_t i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         for (size_t j = i + 1; j < IAM_GRAPH_CHUNK + 1; ++j) {
             int got = -1;
-            remove_weight_iam_graph(&graph, i, j, &got);
+            remove_edge_iam_graph(&graph, i, j, &got);
             ASSERT_EQ(edge, got);
             edge++;
         }
@@ -1085,8 +1025,7 @@ TEST REMOVE_EDGE_03(void) {
 }
 
 TEST REMOVE_EDGE_04(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1094,14 +1033,14 @@ TEST REMOVE_EDGE_04(void) {
 
     int edge = 1;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
         edge++;
     }
 
     edge = 1;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
         int got = -1;
-        remove_weight_iam_graph(&graph, i - 1, i, &got);
+        remove_edge_iam_graph(&graph, i - 1, i, &got);
         ASSERT_EQ(edge, got);
         edge++;
     }
@@ -1112,8 +1051,7 @@ TEST REMOVE_EDGE_04(void) {
 }
 
 TEST REMOVE_EDGE_05(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1121,14 +1059,14 @@ TEST REMOVE_EDGE_05(void) {
 
     int edge = 1;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
         edge++;
     }
 
     edge = 1;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
         int got = -1;
-        remove_weight_iam_graph(&graph, i - 1, i, &got);
+        remove_edge_iam_graph(&graph, i - 1, i, &got);
         ASSERT_EQ(edge, got);
         edge++;
     }
@@ -1139,8 +1077,7 @@ TEST REMOVE_EDGE_05(void) {
 }
 
 TEST REMOVE_EDGE_06(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1148,14 +1085,14 @@ TEST REMOVE_EDGE_06(void) {
 
     int edge = 1;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
         edge++;
     }
 
     edge = 1;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
         int got = -1;
-        remove_weight_iam_graph(&graph, i - 1, i, &got);
+        remove_edge_iam_graph(&graph, i - 1, i, &got);
         ASSERT_EQ(edge, got);
         edge++;
     }
@@ -1166,15 +1103,14 @@ TEST REMOVE_EDGE_06(void) {
 }
 
 TEST CONTAINS_EDGE_01(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
-        ASSERT_FALSE(contains_weight_iam_graph(&graph, i - 1, i));
+        ASSERT_FALSE(contains_edge_iam_graph(&graph, i - 1, i));
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -1183,15 +1119,14 @@ TEST CONTAINS_EDGE_01(void) {
 }
 
 TEST CONTAINS_EDGE_02(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
-        ASSERT_FALSE(contains_weight_iam_graph(&graph, i - 1, i));
+        ASSERT_FALSE(contains_edge_iam_graph(&graph, i - 1, i));
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -1200,15 +1135,14 @@ TEST CONTAINS_EDGE_02(void) {
 }
 
 TEST CONTAINS_EDGE_03(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
-        ASSERT_FALSE(contains_weight_iam_graph(&graph, i - 1, i));
+        ASSERT_FALSE(contains_edge_iam_graph(&graph, i - 1, i));
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -1217,8 +1151,7 @@ TEST CONTAINS_EDGE_03(void) {
 }
 
 TEST CONTAINS_EDGE_04(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1226,11 +1159,11 @@ TEST CONTAINS_EDGE_04(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
-        ASSERT(contains_weight_iam_graph(&graph, i - 1, i));
+        ASSERT(contains_edge_iam_graph(&graph, i - 1, i));
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -1239,8 +1172,7 @@ TEST CONTAINS_EDGE_04(void) {
 }
 
 TEST CONTAINS_EDGE_05(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1248,11 +1180,11 @@ TEST CONTAINS_EDGE_05(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
-        ASSERT(contains_weight_iam_graph(&graph, i - 1, i));
+        ASSERT(contains_edge_iam_graph(&graph, i - 1, i));
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -1261,8 +1193,7 @@ TEST CONTAINS_EDGE_05(void) {
 }
 
 TEST CONTAINS_EDGE_06(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1270,11 +1201,11 @@ TEST CONTAINS_EDGE_06(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
-        ASSERT(contains_weight_iam_graph(&graph, i - 1, i));
+        ASSERT(contains_edge_iam_graph(&graph, i - 1, i));
     }
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
@@ -1283,8 +1214,7 @@ TEST CONTAINS_EDGE_06(void) {
 }
 
 TEST CONTAINS_EDGE_07(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK - 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1292,15 +1222,15 @@ TEST CONTAINS_EDGE_07(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK - 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     int removed = -1;
     size_t const index_one = ((IAM_GRAPH_CHUNK - 1) / 2) - 1;
     size_t const index_two = ((IAM_GRAPH_CHUNK - 1) / 2);
-    remove_weight_iam_graph(&graph, index_one, index_two, &removed);
+    remove_edge_iam_graph(&graph, index_one, index_two, &removed);
 
-    ASSERT_FALSE(contains_weight_iam_graph(&graph, index_one, index_two));
+    ASSERT_FALSE(contains_edge_iam_graph(&graph, index_one, index_two));
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -1308,8 +1238,7 @@ TEST CONTAINS_EDGE_07(void) {
 }
 
 TEST CONTAINS_EDGE_08(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1317,15 +1246,15 @@ TEST CONTAINS_EDGE_08(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     int removed = -1;
     size_t const index_one = ((IAM_GRAPH_CHUNK) / 2) - 1;
     size_t const index_two = ((IAM_GRAPH_CHUNK) / 2);
-    remove_weight_iam_graph(&graph, index_one, index_two, &removed);
+    remove_edge_iam_graph(&graph, index_one, index_two, &removed);
 
-    ASSERT_FALSE(contains_weight_iam_graph(&graph, index_one, index_two));
+    ASSERT_FALSE(contains_edge_iam_graph(&graph, index_one, index_two));
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -1333,8 +1262,7 @@ TEST CONTAINS_EDGE_08(void) {
 }
 
 TEST CONTAINS_EDGE_09(void) {
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < IAM_GRAPH_CHUNK + 1; ++i) {
         insert_vertex_iam_graph(&graph, &i);
@@ -1342,15 +1270,15 @@ TEST CONTAINS_EDGE_09(void) {
 
     int const edge = 42;
     for (size_t i = 1; i < IAM_GRAPH_CHUNK + 1; ++i) {
-        insert_weight_iam_graph(&graph, i - 1, i, &edge);
+        insert_edge_iam_graph(&graph, i - 1, i, &edge);
     }
 
     int removed = -1;
     size_t const index_one = ((IAM_GRAPH_CHUNK + 1) / 2) - 1;
     size_t const index_two = ((IAM_GRAPH_CHUNK + 1) / 2);
-    remove_weight_iam_graph(&graph, index_one, index_two, &removed);
+    remove_edge_iam_graph(&graph, index_one, index_two, &removed);
 
-    ASSERT_FALSE(contains_weight_iam_graph(&graph, index_one, index_two));
+    ASSERT_FALSE(contains_edge_iam_graph(&graph, index_one, index_two));
 
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
@@ -1360,39 +1288,38 @@ TEST CONTAINS_EDGE_09(void) {
 TEST DIJKSTRA_01(void) {
     // GRAPH SOURCE: https://www.youtube.com/watch?v=CmIQ29cUGiE
 
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < DIJKSTRA_01_SIZE; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     int const edges[] = { 2, 5, 3, 7, 1, 4, 3, 4, 1, 1, 3, };
-    insert_weight_iam_graph(&graph, 0, 1, edges +  0);
-    insert_weight_iam_graph(&graph, 0, 3, edges +  1);
-    insert_weight_iam_graph(&graph, 0, 5, edges +  2);
+    insert_edge_iam_graph(&graph, 0, 1, edges +  0);
+    insert_edge_iam_graph(&graph, 0, 3, edges +  1);
+    insert_edge_iam_graph(&graph, 0, 5, edges +  2);
 
-    insert_weight_iam_graph(&graph, 1, 2, edges +  3);
-    insert_weight_iam_graph(&graph, 1, 4, edges +  4);
-    insert_weight_iam_graph(&graph, 1, 5, edges +  5);
+    insert_edge_iam_graph(&graph, 1, 2, edges +  3);
+    insert_edge_iam_graph(&graph, 1, 4, edges +  4);
+    insert_edge_iam_graph(&graph, 1, 5, edges +  5);
 
-    insert_weight_iam_graph(&graph, 2, 4, edges +  6);
-    insert_weight_iam_graph(&graph, 2, 6, edges +  7);
+    insert_edge_iam_graph(&graph, 2, 4, edges +  6);
+    insert_edge_iam_graph(&graph, 2, 6, edges +  7);
 
-    insert_weight_iam_graph(&graph, 3, 4, edges +  8);
-    insert_weight_iam_graph(&graph, 3, 6, edges +  9);
+    insert_edge_iam_graph(&graph, 3, 4, edges +  8);
+    insert_edge_iam_graph(&graph, 3, 6, edges +  9);
 
-    insert_weight_iam_graph(&graph, 4, 6, edges + 10);
+    insert_edge_iam_graph(&graph, 4, 6, edges + 10);
 
     int zero = 0, inf = INT_MAX;
-    table_s table = compose_table(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, intdst, NULL, &zero, &inf);
+    table_s table = compose_table(sizeof(int), intcpy, NULL, &zero, &inf);
 
-    dijkstra_iam_graph(&graph, &table, 0, IAM_SPECIAL);
+    dijkstra_iam_graph(&graph, &table, 0, IAM_GRAPH_SPECIAL, intcmp, NULL, intsum, NULL);
 
     int const costs[DIJKSTRA_01_SIZE] = { 0, 2, 6, 4, 3, 3, 5 };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_01_SIZE * sizeof(int));
 
-    size_t const previous[DIJKSTRA_01_SIZE] = { IAM_SPECIAL, 0, 4, 4, 1, 0, 3 };
+    size_t const previous[DIJKSTRA_01_SIZE] = { IAM_GRAPH_SPECIAL, 0, 4, 4, 1, 0, 3 };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_01_SIZE * sizeof(size_t));
 
     destroy_iam_table(&table);
@@ -1404,44 +1331,43 @@ TEST DIJKSTRA_01(void) {
 TEST DIJKSTRA_02(void) {
     // GRAPH SOURCE: https://www.youtube.com/watch?v=5GT5hYzjNoo
 
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < DIJKSTRA_02_SIZE; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     int const edges[] = { 8, 2, 5, 2, 13, 2, 5, 1, 6, 3, 1, 2, 3, 6 };
-    insert_weight_iam_graph(&graph, 0, 1, edges +  0);
-    insert_weight_iam_graph(&graph, 0, 2, edges +  1);
-    insert_weight_iam_graph(&graph, 0, 3, edges +  2);
+    insert_edge_iam_graph(&graph, 0, 1, edges +  0);
+    insert_edge_iam_graph(&graph, 0, 2, edges +  1);
+    insert_edge_iam_graph(&graph, 0, 3, edges +  2);
 
-    insert_weight_iam_graph(&graph, 1, 3, edges +  3);
-    insert_weight_iam_graph(&graph, 1, 5, edges +  4);
+    insert_edge_iam_graph(&graph, 1, 3, edges +  3);
+    insert_edge_iam_graph(&graph, 1, 5, edges +  4);
 
-    insert_weight_iam_graph(&graph, 2, 3, edges +  5);
-    insert_weight_iam_graph(&graph, 2, 4, edges +  6);
+    insert_edge_iam_graph(&graph, 2, 3, edges +  5);
+    insert_edge_iam_graph(&graph, 2, 4, edges +  6);
 
-    insert_weight_iam_graph(&graph, 3, 4, edges +  7);
-    insert_weight_iam_graph(&graph, 3, 5, edges +  8);
-    insert_weight_iam_graph(&graph, 3, 6, edges +  9);
+    insert_edge_iam_graph(&graph, 3, 4, edges +  7);
+    insert_edge_iam_graph(&graph, 3, 5, edges +  8);
+    insert_edge_iam_graph(&graph, 3, 6, edges +  9);
 
-    insert_weight_iam_graph(&graph, 4, 6, edges + 10);
+    insert_edge_iam_graph(&graph, 4, 6, edges + 10);
 
-    insert_weight_iam_graph(&graph, 5, 6, edges + 11);
-    insert_weight_iam_graph(&graph, 5, 7, edges + 12);
+    insert_edge_iam_graph(&graph, 5, 6, edges + 11);
+    insert_edge_iam_graph(&graph, 5, 7, edges + 12);
 
-    insert_weight_iam_graph(&graph, 6, 7, edges + 13);
+    insert_edge_iam_graph(&graph, 6, 7, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    table_s table = compose_table(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, intdst, NULL, &zero, &inf);
+    table_s table = compose_table(sizeof(int), intcpy, NULL, &zero, &inf);
 
-    dijkstra_iam_graph(&graph, &table, 0, IAM_SPECIAL);
+    dijkstra_iam_graph(&graph, &table, 0, IAM_GRAPH_SPECIAL, intcmp, NULL, intsum, NULL);
 
     int const costs[DIJKSTRA_02_SIZE] = { 0, 6, 2, 4, 5, 8, 6, 11, };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_02_SIZE * sizeof(int));
 
-    size_t const previous[DIJKSTRA_02_SIZE] = { IAM_SPECIAL, 3, 0, 2, 3, 6, 4, 5, };
+    size_t const previous[DIJKSTRA_02_SIZE] = { IAM_GRAPH_SPECIAL, 3, 0, 2, 3, 6, 4, 5, };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_02_SIZE * sizeof(size_t));
 
     destroy_iam_table(&table);
@@ -1453,45 +1379,44 @@ TEST DIJKSTRA_02(void) {
 TEST DIJKSTRA_03(void) {
     // GRAPH SOURCE: https://www.youtube.com/watch?v=5GT5hYzjNoo
 
-    int none = 0;
-    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int), intcmp, NULL, &none);
+    iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     for (int i = 0; i < DIJKSTRA_03_SIZE; ++i) {
         insert_vertex_iam_graph(&graph, &i);
     }
 
     int const edges[] = { 4, 8, 8, 11, 7, 4, 2, 9, 14, 10, 2, 1, 6, 7 };
-    insert_weight_iam_graph(&graph, 0, 1, edges +  0);
-    insert_weight_iam_graph(&graph, 0, 7, edges +  1);
+    insert_edge_iam_graph(&graph, 0, 1, edges +  0);
+    insert_edge_iam_graph(&graph, 0, 7, edges +  1);
 
-    insert_weight_iam_graph(&graph, 1, 2, edges +  2);
-    insert_weight_iam_graph(&graph, 1, 7, edges +  3);
+    insert_edge_iam_graph(&graph, 1, 2, edges +  2);
+    insert_edge_iam_graph(&graph, 1, 7, edges +  3);
 
-    insert_weight_iam_graph(&graph, 2, 3, edges +  4);
-    insert_weight_iam_graph(&graph, 2, 5, edges +  5);
-    insert_weight_iam_graph(&graph, 2, 8, edges +  6);
+    insert_edge_iam_graph(&graph, 2, 3, edges +  4);
+    insert_edge_iam_graph(&graph, 2, 5, edges +  5);
+    insert_edge_iam_graph(&graph, 2, 8, edges +  6);
 
-    insert_weight_iam_graph(&graph, 3, 4, edges +  7);
-    insert_weight_iam_graph(&graph, 3, 5, edges +  8);
+    insert_edge_iam_graph(&graph, 3, 4, edges +  7);
+    insert_edge_iam_graph(&graph, 3, 5, edges +  8);
 
-    insert_weight_iam_graph(&graph, 4, 5, edges +  9);
+    insert_edge_iam_graph(&graph, 4, 5, edges +  9);
 
-    insert_weight_iam_graph(&graph, 5, 6, edges + 10);
+    insert_edge_iam_graph(&graph, 5, 6, edges + 10);
 
-    insert_weight_iam_graph(&graph, 6, 7, edges + 11);
-    insert_weight_iam_graph(&graph, 6, 8, edges + 12);
+    insert_edge_iam_graph(&graph, 6, 7, edges + 11);
+    insert_edge_iam_graph(&graph, 6, 8, edges + 12);
 
-    insert_weight_iam_graph(&graph, 7, 8, edges + 13);
+    insert_edge_iam_graph(&graph, 7, 8, edges + 13);
 
     int zero = 0, inf = INT_MAX;
-    table_s table = compose_table(sizeof(int), intcmp, NULL, intcpy, NULL, intsum, NULL, intdst, NULL, &zero, &inf);
+    table_s table = compose_table(sizeof(int), intcpy, NULL, &zero, &inf);
 
-    dijkstra_iam_graph(&graph, &table, 0, IAM_SPECIAL);
+    dijkstra_iam_graph(&graph, &table, 0, IAM_GRAPH_SPECIAL, intcmp, NULL, intsum, NULL);
 
     int const costs[DIJKSTRA_03_SIZE] = { 0, 4, 12, 19, 21, 11, 9, 8, 14, };
     ASSERT_MEM_EQ(costs, table.costs, DIJKSTRA_03_SIZE * sizeof(int));
 
-    size_t const previous[DIJKSTRA_03_SIZE] = { IAM_SPECIAL, 0, 1, 2, 5, 6, 7, 0, 2, };
+    size_t const previous[DIJKSTRA_03_SIZE] = { IAM_GRAPH_SPECIAL, 0, 1, 2, 5, 6, 7, 0, 2, };
     ASSERT_MEM_EQ(previous, table.previous, DIJKSTRA_03_SIZE * sizeof(size_t));
 
     destroy_iam_table(&table);
