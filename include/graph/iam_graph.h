@@ -17,10 +17,11 @@
 /// @brief Infinte adjacency matrix graph data structure.
 typedef struct infinite_adjacency_matrix_graph {
     char * vertices;
-    char * edges; // dense array
-    size_t * sparse, * dense, * degrees; // sparse edge index array
+    char * edges; // dense edge array
+    size_t * sparse, * dense; // sparse + dense set index array
+    size_t * degrees; // vertex degrees lookup table
     size_t vertex_size, edge_size; // sizes of single vertex and edge
-    size_t vertex_length, edge_length, capacity;
+    size_t vertex_length, edge_length, vertex_capacity, edge_capacity;
     memory_s const * allocator;
 } iam_graph_s;
 

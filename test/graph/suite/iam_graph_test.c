@@ -18,7 +18,7 @@ TEST CREATE_01(void) {
     iam_graph_s graph = create_iam_graph(sizeof(int), sizeof(int));
 
     ASSERT_NEQ(NULL, graph.allocator);
-    ASSERT_EQ(0, graph.capacity);
+    ASSERT_EQ(0, graph.vertex_capacity);
     ASSERT_NEQ(0, graph.edge_size);
     ASSERT_NEQ(0, graph.vertex_size);
     ASSERT_EQ(NULL, graph.edges);
@@ -35,7 +35,7 @@ TEST DESTROY_01(void) {
     destroy_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     ASSERT_EQ(NULL, graph.allocator);
-    ASSERT_EQ(0, graph.capacity);
+    ASSERT_EQ(0, graph.vertex_capacity);
     ASSERT_EQ(0, graph.edge_size);
     ASSERT_EQ(0, graph.vertex_size);
     ASSERT_EQ(NULL, graph.edges);
@@ -50,7 +50,7 @@ TEST CLEAR_01(void) {
     clear_iam_graph(&graph, intdst, NULL, intdst, NULL);
 
     ASSERT_NEQ(NULL, graph.allocator);
-    ASSERT_EQ(0, graph.capacity);
+    ASSERT_EQ(0, graph.vertex_capacity);
     ASSERT_NEQ(0, graph.edge_size);
     ASSERT_NEQ(0, graph.vertex_size);
     ASSERT_EQ(NULL, graph.edges);

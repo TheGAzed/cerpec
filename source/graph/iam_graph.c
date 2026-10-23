@@ -13,12 +13,22 @@ struct visited_list_array {
     size_t head, * next, * prev;
 };
 
-/// @brief Resize function for graph.
+/// @brief Resize vertex function for graph.
 /// @param graph Graph to resize.
 /// @param size New size to resize into.
-void _iam_graph_resize(iam_graph_s * const graph, size_t const size);
+void _iam_graph_vertex_resize(iam_graph_s * const graph, size_t const size);
 
-void _initialize_table(table_s * const table, iam_graph_s const * const graph, void const * const infinite, bool const is_self);
+/// @brief Resize edge function for graph.
+/// @param graph Graph to resize.
+/// @param size New size to resize into.
+void _iam_graph_edge_resize(iam_graph_s * const graph, size_t const size);
+
+/// @brief Helper function to initialize graph lookup table for algorithms.
+/// @param table Table to initialize.
+/// @param graph Graph to initialize table based on.
+/// @param cost Initial cost of each table vertex.
+/// @param is_self 'true' if vertex' previous is vertex, 'false' if previous is 'IAM_GRAPH_SPECIAL'.
+void _initialize_table(table_s * const table, iam_graph_s const * const graph, void const * const cost, bool const is_self);
 
 /// @brief Find parent helper funtion for union set function used in Kruskal's MST algorithm.
 /// @param table Kruskal table structure to for parent.
@@ -33,17 +43,20 @@ size_t _find_parent(table_s const * const table, size_t const vertex);
 /// @param destination Destination vertex idnex to union.
 /// @param increment Increment function pointer to increment source parent's rank.
 /// @param ai Increment function pointer arguments.
-/// @param compare
-/// @param ac
-void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * const ai, compare_fn
-                const compare, void * const ac);
+/// @param compare Compare source and destination costs for union set function.
+/// @param ac Arguments for compare function pointer.
+void _union_set(table_s const * const table, size_t const source, size_t const destination, set_fn const increment, void * const ai, compare_fn const compare, void * const ac);
 
+/// @brief Sets the special 'visited' bitwise list to visited
+/// @param visited Doubly linked bitwise list.
+/// @param index Vertex index to set to visited.
 void _set_visited(struct visited_list_array * const visited, size_t const index);
 
 iam_graph_s create_iam_graph(size_t const vertex_size, size_t const edge_size) {
     error(vertex_size && "Parameter can't be zero.");
     error(edge_size && "Parameter can't be zero.");
 
+    // only set neccesary edge and vertex plus default allocator
     return (iam_graph_s) {
         .vertex_size = vertex_size, .edge_size = edge_size, .allocator = &standard,
     };
@@ -53,6 +66,7 @@ iam_graph_s make_iam_graph(size_t const vertex_size, size_t const edge_size, mem
     error(vertex_size && "Parameter can't be zero.");
     error(edge_size && "Parameter can't be zero.");
 
+    // only set neccesary edge and vertex plus default allocator
     return (iam_graph_s) {
         .vertex_size = vertex_size, .edge_size = edge_size, .allocator = allocator,
     };
@@ -67,20 +81,26 @@ void destroy_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, v
     valid(graph->vertex_size && "Edge size can't be zero.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    for (size_t i = 0; i < graph->vertex_length; ++i) {
-        destroy_vertex(graph->vertices + (i * graph->vertex_size), adv);
+    // for each vertex in array destroy vertex value
+    size_t const v_size = graph->vertex_size;
+    for (char * v = graph->vertices; v < (graph->vertices + (graph->vertex_length * v_size)); v += v_size) {
+        destroy_vertex(v, adv);
     }
 
-    for (size_t i = 0; i < graph->edge_length; ++i) {
-        destroy_edge(graph->edges + (i * graph->edge_size), ade);
+    // for each edge in array destroy edge value (edges are stored continously thanks to sparse set)
+    size_t const e_size = graph->edge_size;
+    for (char * e = graph->edges; e < (graph->edges + (graph->edge_length * e_size)); e += e_size) {
+        destroy_edge(e, ade);
     }
 
+    // free up all allocated array
     graph->allocator->free(graph->vertices, graph->allocator->arg);
     graph->allocator->free(graph->edges, graph->allocator->arg);
     graph->allocator->free(graph->sparse, graph->allocator->arg);
     graph->allocator->free(graph->dense, graph->allocator->arg);
     graph->allocator->free(graph->degrees, graph->allocator->arg);
 
+    // make graph invalid by setting all its values to zero
     memset(graph, 0, sizeof(iam_graph_s));
 }
 
@@ -93,22 +113,29 @@ void clear_iam_graph(iam_graph_s * const graph, set_fn const destroy_vertex, voi
     valid(graph->vertex_size && "Edge size can't be zero.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    for (size_t i = 0; i < graph->vertex_length; ++i) {
-        destroy_vertex(graph->vertices + (i * graph->vertex_size), adv);
+    // for each vertex in array destroy vertex value
+    size_t const v_size = graph->vertex_size;
+    for (char * v = graph->vertices; v < (graph->vertices + (graph->vertex_length * v_size)); v += v_size) {
+        destroy_vertex(v, adv);
     }
 
-    for (size_t i = 0; i < graph->edge_length; ++i) {
-        destroy_edge(graph->edges + (i * graph->edge_size), ade);
+    // for each edge in array destroy edge value (edges are stored continously thanks to sparse set)
+    size_t const e_size = graph->edge_size;
+    for (char * e = graph->edges; e < (graph->edges + (graph->edge_length * e_size)); e += e_size) {
+        destroy_edge(e, ade);
     }
 
+    // free up all allocated array
     graph->allocator->free(graph->vertices, graph->allocator->arg);
     graph->allocator->free(graph->edges, graph->allocator->arg);
     graph->allocator->free(graph->sparse, graph->allocator->arg);
     graph->allocator->free(graph->dense, graph->allocator->arg);
     graph->allocator->free(graph->degrees, graph->allocator->arg);
 
-    graph->capacity = graph->vertex_length = 0;
+    // only set the neccesasy properties to zero/null to keep graph valid
+    graph->vertex_capacity = graph->vertex_length = graph->edge_length = 0;
     graph->vertices = graph->edges = NULL;
+    graph->sparse = graph->dense = graph->degrees = NULL;
 }
 
 iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_vertex, void * const acv, copy_fn const copy_edge, void * const ace) {
@@ -120,38 +147,44 @@ iam_graph_s copy_iam_graph(iam_graph_s const * const graph, copy_fn const copy_v
     valid(graph->vertex_size && "Edge size can't be zero.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    size_t const edge_capacity = (graph->capacity * (graph->capacity - 1)) / 2;
+    size_t const edge_capacity = (graph->vertex_capacity * (graph->vertex_capacity - 1)) / 2; // calculate edge capacity from graph's
+    // create replica structure with allocated values
     iam_graph_s const replica = {
-        .capacity = graph->capacity,
+        .vertex_capacity = graph->vertex_capacity,
         .vertex_size = graph->vertex_size, .edge_size = graph->edge_size,
         .edge_length = graph->edge_length, .vertex_length = graph->vertex_length,
 
+        // sparse, dense a,d edges are of size 'edge_capacity'
         .edges = graph->allocator->alloc(edge_capacity * graph->edge_size, graph->allocator->arg),
         .sparse = graph->allocator->alloc(edge_capacity * sizeof(size_t), graph->allocator->arg),
         .dense = graph->allocator->alloc(edge_capacity * sizeof(size_t), graph->allocator->arg),
 
-        .vertices = graph->allocator->alloc(graph->capacity * graph->vertex_size, graph->allocator->arg),
-        .degrees = graph->allocator->alloc(graph->capacity * sizeof(size_t), graph->allocator->arg),
+        // vertices and degrees are of size (vertex) capacity
+        .vertices = graph->allocator->alloc(graph->vertex_capacity * graph->vertex_size, graph->allocator->arg),
+        .degrees = graph->allocator->alloc(graph->vertex_capacity * sizeof(size_t), graph->allocator->arg),
 
         .allocator = graph->allocator,
     };
-    error((!replica.capacity || replica.vertices) && "Memory allocation failed.");
-    error((!replica.capacity || replica.dense) && "Memory allocation failed.");
+    error((!replica.vertex_capacity || replica.vertices) && "Memory allocation failed.");
+    error((!replica.vertex_capacity || replica.degrees) && "Memory allocation failed.");
+    error((!edge_capacity || replica.dense) && "Memory allocation failed.");
+    error((!edge_capacity || replica.sparse) && "Memory allocation failed.");
     error((!edge_capacity || replica.edges) && "Memory allocation failed.");
 
-    // memory copy degrees
-    memcpy(replica.degrees, graph->degrees, replica.capacity * sizeof(size_t));
-    // function copy each vertex
+    // memory copy all vertex degrees
+    memcpy(replica.degrees, graph->degrees, replica.vertex_capacity * sizeof(size_t));
+    // function copy each vertex to replica
     for (size_t i = 0; i < graph->vertex_length; ++i) {
         copy_vertex(replica.vertices + (i * replica.vertex_size), graph->vertices + (i * graph->vertex_size), acv);
     }
 
-    size_t const max_edge_length = (graph->vertex_length * (graph->vertex_length - 1)) / 2;
-    memcpy(replica.sparse, graph->sparse, max_edge_length * sizeof(size_t));
+    // copy all the element in sparse set to preserve invalid/uninitialized array indexes
+    memcpy(replica.sparse, graph->sparse, edge_capacity * sizeof(size_t));
+    // copy only the elements up to replica.edge_length, since they're tightly packed and don't include
+    // invalid access values like the sparse array
     memcpy(replica.dense, graph->dense, replica.edge_length * sizeof(size_t));
     for (size_t i = 0; i < replica.edge_length; ++i) {
-        void const * edge = graph->edges + (i * graph->edge_size);
-        copy_vertex(replica.edges + (i * replica.edge_size), edge, ace);
+        copy_vertex(replica.edges + (i * replica.edge_size), graph->edges + (i * graph->edge_size), ace);
     }
 
     return replica;
@@ -366,9 +399,9 @@ size_t insert_vertex_iam_graph(iam_graph_s * const graph, void const * const ver
     valid(graph->vertex_size && "Edge size can't be zero.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    if (graph->vertex_length == graph->capacity) {
+    if (graph->vertex_length == graph->vertex_capacity) {
         size_t const capacity = graph->vertex_length ? graph->vertex_length * CERPEC_FACTOR : IAM_GRAPH_CHUNK;
-        _iam_graph_resize(graph, capacity);
+        _iam_graph_vertex_resize(graph, capacity);
     }
 
     graph->degrees[graph->vertex_length] = 0;
@@ -413,6 +446,12 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
             graph->sparse[temp] = start_index;
             graph->sparse[start_e] = IAM_GRAPH_SPECIAL;
             memmove(edge, graph->edges + (graph->edge_length * graph->edge_size), graph->edge_size);
+
+            // shrink graph if elements fit into smaller memory chunk
+            if (graph->edge_length <= graph->edge_capacity / CERPEC_FACTOR &&
+                (graph->edge_length > IAM_GRAPH_CHUNK || !graph->edge_length)) {
+                _iam_graph_edge_resize(graph, graph->edge_length);
+            }
         }
         // if i-th vertex is not equal to 'v' ('v' and last vertex don't share the edge), then move last's edge
         // weight to removed 'v''s edge places throught redirecting the sparse set
@@ -432,9 +471,9 @@ size_t remove_vertex_iam_graph(iam_graph_s * const graph, size_t const index, vo
     memmove(removed, graph->vertices + (graph->vertex_length * graph->vertex_size), graph->vertex_size);
 
     // shrink graph if elements fit into smaller memory chunk
-    if (graph->vertex_length <= graph->capacity / CERPEC_FACTOR &&
+    if (graph->vertex_length <= graph->vertex_capacity / CERPEC_FACTOR &&
         (graph->vertex_length > IAM_GRAPH_CHUNK || !graph->vertex_length)) {
-        _iam_graph_resize(graph, graph->vertex_length);
+        _iam_graph_vertex_resize(graph, graph->vertex_length);
     }
 
     // if last index was removed return an invalid index, else return the last vertex' index before it was moved
@@ -472,6 +511,11 @@ void insert_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
     size_t const dense_index = graph->sparse[start_row + minimum];
     error(IAM_GRAPH_SPECIAL == dense_index);
 
+    if (graph->edge_length == graph->edge_capacity) {
+        size_t const capacity = graph->edge_length ? graph->edge_length * CERPEC_FACTOR : IAM_GRAPH_CHUNK;
+        _iam_graph_edge_resize(graph, capacity);
+    }
+
     graph->sparse[start_row + minimum] = graph->edge_length;
     graph->dense[graph->edge_length] = start_row + minimum;
     memcpy(graph->edges + (graph->edge_length * graph->edge_size), weight, graph->edge_size);
@@ -507,6 +551,12 @@ void remove_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
     graph->sparse[temp] = dense_index;
     graph->sparse[start_row + minimum] = IAM_GRAPH_SPECIAL;
     memmove(edge, graph->edges + (graph->edge_length * graph->edge_size), graph->edge_size);
+
+    // shrink graph if elements fit into smaller memory chunk
+    if (graph->edge_length <= graph->edge_capacity / CERPEC_FACTOR &&
+        (graph->edge_length > IAM_GRAPH_CHUNK || !graph->edge_length)) {
+        _iam_graph_edge_resize(graph, graph->edge_length);
+    }
 }
 
 bool contains_edge_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two) {
@@ -950,9 +1000,9 @@ iam_graph_s subgraph_iam_graph(table_s const * const table, copy_fn const copy_v
     valid(graph->vertex_size && "Edge size can't be zero.");
     valid(graph->allocator && "Allocator can't be NULL.");
 
-    size_t const edge_capacity = (graph->capacity * (graph->capacity - 1)) / 2;
+    size_t const edge_capacity = (graph->vertex_capacity * (graph->vertex_capacity - 1)) / 2;
     iam_graph_s const subgraph = {
-        .capacity = graph->capacity, .allocator = graph->allocator,
+        .vertex_capacity = graph->vertex_capacity, .allocator = graph->allocator,
         .vertex_size = graph->vertex_size, .edge_size = graph->edge_size,
         .edge_length = graph->edge_length, .vertex_length = graph->vertex_length,
 
@@ -960,11 +1010,11 @@ iam_graph_s subgraph_iam_graph(table_s const * const table, copy_fn const copy_v
         .sparse = graph->allocator->alloc(edge_capacity * sizeof(size_t), graph->allocator->arg),
         .dense = graph->allocator->alloc(edge_capacity * sizeof(size_t), graph->allocator->arg),
 
-        .vertices = graph->allocator->alloc(graph->capacity * graph->vertex_size, graph->allocator->arg),
-        .degrees = graph->allocator->alloc(graph->capacity * sizeof(size_t), graph->allocator->arg),
+        .vertices = graph->allocator->alloc(graph->vertex_capacity * graph->vertex_size, graph->allocator->arg),
+        .degrees = graph->allocator->alloc(graph->vertex_capacity * sizeof(size_t), graph->allocator->arg),
     };
-    error((!subgraph.capacity || subgraph.vertices) && "Memory allocation failed.");
-    error((!subgraph.capacity || subgraph.dense) && "Memory allocation failed.");
+    error((!subgraph.vertex_capacity || subgraph.vertices) && "Memory allocation failed.");
+    error((!subgraph.vertex_capacity || subgraph.dense) && "Memory allocation failed.");
     error((!edge_capacity || subgraph.edges) && "Memory allocation failed.");
 
     // create vertex copies and subgraph edge copies based on existing cost
@@ -1228,25 +1278,29 @@ void each_vertex_dfs_iam_graph(iam_graph_s const * const graph, size_t const sta
     destroy_fbitwise_set(&visited);
 }
 
-void _iam_graph_resize(iam_graph_s * const graph, size_t const size) {
+void _iam_graph_vertex_resize(iam_graph_s * const graph, size_t const size) {
     // calculate old and new edge capacity to only set expanded edges to non
-    size_t const old_edge_capacity = (graph->capacity * (graph->capacity - 1)) / 2;
+    size_t const old_edge_capacity = (graph->vertex_capacity * (graph->vertex_capacity - 1)) / 2;
     size_t const new_edge_capacity = (size * (size - 1)) / 2;
 
-    graph->capacity = size;
+    graph->vertex_capacity = size;
 
     // resize edge pointer (special case)
-    graph->sparse = graph->allocator->realloc(graph->sparse, new_edge_capacity * sizeof(size_t),   graph->allocator->arg);
-    graph->dense  = graph->allocator->realloc(graph->dense,  new_edge_capacity * sizeof(size_t),   graph->allocator->arg);
-    graph->edges  = graph->allocator->realloc(graph->edges,  new_edge_capacity * graph->edge_size, graph->allocator->arg);
     // make expanded edges non-edge (ignored if new capacity shrank)
+    graph->sparse = graph->allocator->realloc(graph->sparse, new_edge_capacity * sizeof(size_t), graph->allocator->arg);
     for (size_t i = old_edge_capacity; i < new_edge_capacity; ++i) {
-        graph->sparse[i] = graph->dense[i] = IAM_GRAPH_SPECIAL;
+        graph->sparse[i] = IAM_GRAPH_SPECIAL;
     }
 
     // resize vertecies, edges, sparse edges and degrees pointers
     graph->vertices = graph->allocator->realloc(graph->vertices, size * graph->vertex_size, graph->allocator->arg);
-    graph->degrees = graph->allocator->realloc(graph->degrees, size * sizeof(size_t), graph->allocator->arg);
+    graph->degrees  = graph->allocator->realloc(graph->degrees, size * sizeof(size_t), graph->allocator->arg);
+}
+
+void _iam_graph_edge_resize(iam_graph_s * const graph, size_t const size) {
+    graph->edge_capacity = size;
+    graph->dense = graph->allocator->realloc(graph->dense, size * sizeof(size_t),   graph->allocator->arg);
+    graph->edges = graph->allocator->realloc(graph->edges, size * graph->edge_size, graph->allocator->arg);
 }
 
 size_t _find_parent(table_s const * const table, size_t const vertex) {
@@ -1289,7 +1343,7 @@ void _set_visited(struct visited_list_array * const visited, size_t const index)
     visited->next[visited->prev[index]] = visited->next[index];
 }
 
-void _initialize_table(table_s * const table, iam_graph_s const * const graph, void const * const infinite, bool const is_self) {
+void _initialize_table(table_s * const table, iam_graph_s const * const graph, void const * const cost, bool const is_self) {
     table->graph = graph;
     table->costs = graph->allocator->alloc(graph->vertex_length * table->size, graph->allocator->arg);
     error((!graph->vertex_length || table->costs) && "Memory allocation failed.");
@@ -1297,7 +1351,7 @@ void _initialize_table(table_s * const table, iam_graph_s const * const graph, v
     error((!graph->vertex_length || table->previous) && "Memory allocation failed.");
 
     for (size_t i = 0; i < graph->vertex_length; ++i) {
-        memcpy(table->costs + (i * table->size), infinite, table->size);
+        memcpy(table->costs + (i * table->size), cost, table->size);
         table->previous[i] = is_self ? i : IAM_GRAPH_SPECIAL;
     }
 }
