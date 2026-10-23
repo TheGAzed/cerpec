@@ -178,7 +178,7 @@ void insert_isc_hash_map(isc_hash_map_s * const map, void const * const key, voi
     // resize (expand) if load factor was exceeded
     double const load = (double)(map->length) / (double)(map->capacity);
     if (!map->capacity || load >= ISC_HASH_MAP_LOAD) {
-        size_t const capacity = map->length ? map->length * CERPEC_FACTOR : ISC_HASH_MAP_CHUNK;
+        size_t const capacity = map->capacity ? map->capacity * CERPEC_FACTOR : ISC_HASH_MAP_CHUNK;
         _isc_hash_table_resize(map, capacity);
     }
 
@@ -477,22 +477,31 @@ void _isc_hash_table_resize(isc_hash_map_s * const table, size_t const size) {
 }
 
 void _isc_hash_map_fill_hole(isc_hash_map_s const * const map, size_t const hole) {
-    if (NIL == map->prev[map->length]) {
-        size_t const index = map->hashes[map->length] % map->capacity;
-        map->head[index] = hole;
-    }
+    // removed nasty 1 in 100'000 bug thinks to DeepSeek
+    // (yeah, it's over, LLM's won)
 
+    // detach hole from its bucket list
     if (NIL == map->prev[hole]) {
-        size_t const index = map->hashes[hole] % map->capacity;
-        map->head[index] = map->next[hole];
+        map->head[map->hashes[hole] % map->capacity] = map->next[hole];
+    } else {
+        map->next[map->prev[hole]] = map->next[hole];
+    }
+    if (NIL != map->next[hole]) {
+        map->prev[map->next[hole]] = map->prev[hole];
     }
 
-    // cut current removed node's siblings from itself
-    if (NIL != map->prev[hole]) { map->next[map->prev[hole]] = map->next[hole]; }
-    if (NIL != map->next[hole]) { map->prev[map->next[hole]] = map->prev[hole]; }
+    // removing the tail element: no relocation needed
+    if (hole == map->length) { return; }
 
-    // cut current removed node from its siblings
-    map->next[hole] = map->prev[hole] = hole;
+    // redirect last element's siblings to its new location (hole)
+    if (NIL == map->prev[map->length]) {
+        map->head[map->hashes[map->length] % map->capacity] = hole;
+    } else {
+        map->next[map->prev[map->length]] = hole;
+    }
+    if (NIL != map->next[map->length]) {
+        map->prev[map->next[map->length]] = hole;
+    }
 
     // replace element at current index with popped last element like in a stack
     memmove(map->keys + (hole * map->key_size), map->keys + (map->length * map->key_size), map->key_size);
@@ -500,8 +509,4 @@ void _isc_hash_map_fill_hole(isc_hash_map_s const * const map, size_t const hole
     map->hashes[hole] = map->hashes[map->length];
     map->next[hole] = map->next[map->length];
     map->prev[hole] = map->prev[map->length];
-
-    // redirect array's last swapped node's siblings to hole
-    if (NIL != map->next[map->length]) { map->prev[map->next[map->length]] = hole; }
-    if (NIL != map->prev[map->length]) { map->next[map->prev[map->length]] = hole; }
 }

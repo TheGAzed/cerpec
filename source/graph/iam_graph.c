@@ -492,6 +492,7 @@ void get_vertex_iam_graph(iam_graph_s const * const graph, size_t const index, v
 
 void insert_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, size_t const index_two, void const * const weight) {
     error(graph && "Parameter can't be NULL.");
+    error(index_one != index_two && "Parameters can't be equal.");
 
     valid(graph->edge_size && "Edge size can't be zero.");
     valid(graph->vertex_size && "Edge size can't be zero.");
@@ -524,6 +525,7 @@ void insert_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
 
 void remove_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, size_t const index_two, void * const buffer) {
     error(graph && "Parameter can't be NULL.");
+    error(index_one != index_two && "Parameters can't be equal.");
 
     valid(graph->edge_size && "Edge size can't be zero.");
     valid(graph->vertex_size && "Edge size can't be zero.");
@@ -542,6 +544,7 @@ void remove_edge_iam_graph(iam_graph_s * const graph, size_t const index_one, si
 
     size_t const dense_index = graph->sparse[start_row + minimum];
     error(IAM_GRAPH_SPECIAL != dense_index);
+
     void * edge = graph->edges + (dense_index * graph->edge_size);
     memcpy(buffer, edge, graph->edge_size);
     graph->edge_length--;
@@ -572,7 +575,7 @@ bool contains_edge_iam_graph(iam_graph_s const * const graph, size_t const index
     size_t const start_row = (maximum * (maximum - 1)) / 2;
     size_t const dense_index = graph->sparse[start_row + minimum];
 
-    return (IAM_GRAPH_SPECIAL != dense_index);
+    return (minimum != maximum) && (IAM_GRAPH_SPECIAL != dense_index);
 }
 
 size_t get_edge_iam_graph(iam_graph_s const * const graph, size_t const index_one, size_t const index_two, void * const buffer) {
