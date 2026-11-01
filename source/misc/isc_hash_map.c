@@ -6,9 +6,9 @@
 #define NIL (size_t)(-1)
 
 /// Resizes (reallocates) table parameter arrays based on changed capacity.
-/// @param table Structure to resize.
+/// @param map Structure to resize.
 /// @param size New size.
-void _isc_hash_table_resize(isc_hash_map_s * const table, size_t const size);
+void _isc_hash_map_resize(isc_hash_map_s * const map, size_t const size);
 
 /// @brief Fills hole/empty node index with last array-based node and fixes/redirects siblings.
 /// @param map Strcuture to fill.
@@ -179,7 +179,7 @@ void insert_isc_hash_map(isc_hash_map_s * const map, void const * const key, voi
     double const load = (double)(map->length) / (double)(map->capacity);
     if (!map->capacity || load >= ISC_HASH_MAP_LOAD) {
         size_t const capacity = map->capacity ? map->capacity * CERPEC_FACTOR : ISC_HASH_MAP_CHUNK;
-        _isc_hash_table_resize(map, capacity);
+        _isc_hash_map_resize(map, capacity);
     }
 
     // calculate hash values and index in array
@@ -257,7 +257,7 @@ void remove_isc_hash_map(isc_hash_map_s * const map, void const * const key, voi
 
         // resize (expand) if map can contain a smaller capacity of elements
         if (map->length <= map->capacity / CERPEC_FACTOR && (map->length > ISC_HASH_MAP_CHUNK || !map->length)) {
-            _isc_hash_table_resize(map, map->length);
+            _isc_hash_map_resize(map, map->length);
         }
 
         return; // return to avoid errorion and termination at the end of function if element wasn't found
@@ -372,7 +372,7 @@ INSERT:
     double const load = (double)(map->length) / (double)(map->capacity);
     if (!map->capacity || load >= ISC_HASH_MAP_LOAD) {
         size_t const capacity = map->length ? map->length * CERPEC_FACTOR : ISC_HASH_MAP_CHUNK;
-        _isc_hash_table_resize(map, capacity);
+        _isc_hash_map_resize(map, capacity);
     }
 
     size_t const index = hash % map->capacity;
@@ -436,43 +436,43 @@ void each_value_isc_hash_map(isc_hash_map_s const * const map, manage_fn const m
     }
 }
 
-void _isc_hash_table_resize(isc_hash_map_s * const table, size_t const size) {
-    // set table to new resized parameters
-    table->capacity = size;
+void _isc_hash_map_resize(isc_hash_map_s * const map, size_t const size) {
+    // set map to new resized parameters
+    map->capacity = size;
 
-    table->head = table->allocator->realloc(table->head, size * sizeof(size_t), table->allocator->arg);
-    error((!table->capacity || table->head) && "Memory allocation failed.");
+    map->head = map->allocator->realloc(map->head, size * sizeof(size_t), map->allocator->arg);
+    error((!map->capacity || map->head) && "Memory allocation failed.");
 
-    table->next = table->allocator->realloc(table->next, size * sizeof(size_t), table->allocator->arg);
-    error((!table->capacity || table->next) && "Memory allocation failed.");
+    map->next = map->allocator->realloc(map->next, size * sizeof(size_t), map->allocator->arg);
+    error((!map->capacity || map->next) && "Memory allocation failed.");
 
-    table->prev = table->allocator->realloc(table->prev, size * sizeof(size_t), table->allocator->arg);
-    error((!table->capacity || table->prev) && "Memory allocation failed.");
+    map->prev = map->allocator->realloc(map->prev, size * sizeof(size_t), map->allocator->arg);
+    error((!map->capacity || map->prev) && "Memory allocation failed.");
 
-    table->keys = table->allocator->realloc(table->keys, size * table->key_size, table->allocator->arg);
-    error((!table->capacity || table->keys) && "Memory allocation failed.");
+    map->keys = map->allocator->realloc(map->keys, size * map->key_size, map->allocator->arg);
+    error((!map->capacity || map->keys) && "Memory allocation failed.");
 
-    table->values = table->allocator->realloc(table->values, size * table->value_size, table->allocator->arg);
-    error((!table->capacity || table->values) && "Memory allocation failed.");
+    map->values = map->allocator->realloc(map->values, size * map->value_size, map->allocator->arg);
+    error((!map->capacity || map->values) && "Memory allocation failed.");
 
-    table->hashes = table->allocator->realloc(table->hashes, size * sizeof(size_t), table->allocator->arg);
-    error((!table->capacity || table->hashes) && "Memory allocation failed.");
+    map->hashes = map->allocator->realloc(map->hashes, size * sizeof(size_t), map->allocator->arg);
+    error((!map->capacity || map->hashes) && "Memory allocation failed.");
 
-    for (size_t i = 0; i < table->capacity; ++i) { table->head[i] = NIL; }
+    for (size_t i = 0; i < map->capacity; ++i) { map->head[i] = NIL; }
 
     // reset lists by pushing hashes to their valid list
-    for (size_t i = 0; i < table->length; ++i) {
-        size_t const index = table->hashes[i] % table->capacity;
+    for (size_t i = 0; i < map->length; ++i) {
+        size_t const index = map->hashes[i] % map->capacity;
 
-        size_t const head = table->head[index];
+        size_t const head = map->head[index];
         if (NIL != head) {
-            table->prev[head] = i;
+            map->prev[head] = i;
         }
 
         // node index redirection
-        table->prev[i] = NIL;
-        table->next[i] = head;
-        table->head[index] = i;
+        map->prev[i] = NIL;
+        map->next[i] = head;
+        map->head[index] = i;
     }
 }
 
