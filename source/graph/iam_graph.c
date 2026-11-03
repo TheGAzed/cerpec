@@ -300,13 +300,14 @@ bool is_tree_iam_graph(iam_graph_s const * const graph) {
         }
     }
 
-CLEANUP:
-    size_t const visited_count = visited.length;
-    destroy_fbitwise_set(&visited);
-    destroy_fstack(&stack, voiddst, NULL);
+    CLEANUP: {
+        size_t const visited_count = visited.length;
+        destroy_fbitwise_set(&visited);
+        destroy_fstack(&stack, voiddst, NULL);
 
-    // check if no cycles were detected and if all vertices were visited (graph is connected)
-    return !contains_cycle && (graph->vertex_length == visited_count); // check with count to detect unvisited
+        // check if no cycles were detected and if all vertices were visited (graph is connected)
+        return !contains_cycle && (graph->vertex_length == visited_count); // check with count to detect unvisited
+    }
 }
 
 bool is_cyclic_iam_graph(iam_graph_s const * const graph) {
@@ -963,7 +964,7 @@ void kruskal_iam_graph(iam_graph_s const * const graph, table_s * const table, p
     sort(kruskal_edges, graph->edge_length, as);
 
     // Kruskal's algorithm with sorted edges
-    for (int i = 0; i < graph->edge_length; ++i) {
+    for (size_t i = 0; i < graph->edge_length; ++i) {
         iam_edge_s const smallest = kruskal_edges[i]; // get the next smallest edge from sorted array of edges
 
         size_t const source      = _find_parent(table, smallest.vertices[0]);

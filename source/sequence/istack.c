@@ -174,5 +174,5 @@ void _istack_resize(istack_s * const stack, size_t const size) {
     stack->capacity = size;
 
     stack->elements = stack->allocator->realloc(stack->elements, stack->capacity * stack->size, stack->allocator->arg);
-    error(!stack->capacity || stack->elements && "Memory allocation failed.");
+    error((!stack->capacity || stack->elements) && "Memory allocation failed.");
 }

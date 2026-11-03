@@ -821,7 +821,7 @@ void pre_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, v
     struct irb_tree_stack stack = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arg),
     };
-    error(!tree->length || stack.elements && "Memory allocation failed.");
+    error((!tree->length || stack.elements) && "Memory allocation failed.");
 
     if (tree->length) {
         stack.elements[stack.length++] = tree->root;
@@ -858,7 +858,7 @@ void post_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage, 
     struct irb_tree_stack stack = {
         .length = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arg),
     };
-    error(!tree->length || stack.elements && "Memory allocation failed.");
+    error((!tree->length || stack.elements) && "Memory allocation failed.");
 
     // push root node onto stack and initially save it into variable
     size_t node = tree->root;
@@ -900,7 +900,7 @@ void level_order_irb_tree(irb_tree_s const * const tree, manage_fn const manage,
     struct irb_tree_queue queue = {
         .length = 0, .current = 0, .elements = tree->allocator->alloc(tree->length * sizeof(size_t), tree->allocator->arg),
     };
-    error(!tree->length || queue.elements && "Memory allocation failed.");
+    error((!tree->length || queue.elements) && "Memory allocation failed.");
 
     if (tree->length) { // if tree isn't empty push root node
         queue.elements[queue.current + queue.length++] = tree->root;

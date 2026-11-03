@@ -367,35 +367,36 @@ void set_value_isc_hash_map(isc_hash_map_s * const map, void const * const key, 
         }
     }
 
-INSERT:
-    // resize (expand) if map can't contain new element
-    double const load = (double)(map->length) / (double)(map->capacity);
-    if (!map->capacity || load >= ISC_HASH_MAP_LOAD) {
-        size_t const capacity = map->length ? map->length * CERPEC_FACTOR : ISC_HASH_MAP_CHUNK;
-        _isc_hash_map_resize(map, capacity);
+    INSERT: {
+        // resize (expand) if map can't contain new element
+        double const load = (double)(map->length) / (double)(map->capacity);
+        if (!map->capacity || load >= ISC_HASH_MAP_LOAD) {
+            size_t const capacity = map->length ? map->length * CERPEC_FACTOR : ISC_HASH_MAP_CHUNK;
+            _isc_hash_map_resize(map, capacity);
+        }
+
+        size_t const index = hash % map->capacity;
+
+        size_t const current = map->length; // index of currently inserted element
+
+        // if head has an element then redirect its prev to current
+        size_t const head = map->head[index];
+        if (NIL != head) {
+            map->prev[head] = current;
+        }
+
+        // node index redirection
+        map->prev[current] = NIL;
+        map->next[current] = head;
+        map->head[index] = current;
+
+        // copy element into elements array
+        map->hashes[current] = hash;
+        memcpy(map->keys + (current * map->key_size), key, map->key_size);
+        memcpy(map->values + (current * map->value_size), value, map->value_size);
+
+        map->length++;
     }
-
-    size_t const index = hash % map->capacity;
-
-    size_t const current = map->length; // index of currently inserted element
-
-    // if head has an element then redirect its prev to current
-    size_t const head = map->head[index];
-    if (NIL != head) {
-        map->prev[head] = current;
-    }
-
-    // node index redirection
-    map->prev[current] = NIL;
-    map->next[current] = head;
-    map->head[index] = current;
-
-    // copy element into elements array
-    map->hashes[current] = hash;
-    memcpy(map->keys + (current * map->key_size), key, map->key_size);
-    memcpy(map->values + (current * map->value_size), value, map->value_size);
-
-    map->length++;
 }
 
 void each_key_isc_hash_map(isc_hash_map_s const * const map, manage_fn const manage, void * const am) {

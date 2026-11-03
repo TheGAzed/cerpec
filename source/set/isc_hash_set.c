@@ -60,7 +60,7 @@ isc_hash_set_s make_isc_hash_set(size_t const size, hash_fn const hash, void * c
     error(size && "Parameter can't be zero.");
     error(allocator && "Parameter can't be NULL.");
 
-    return _make_wrapper_isc_hash_set(size, hash, ah, ac, compare, allocator);
+    return _make_wrapper_isc_hash_set(size, hash, ah, compare, ac, allocator);
 }
 
 void destroy_isc_hash_set(isc_hash_set_s * const set, set_fn const destroy, void * const ad) {
