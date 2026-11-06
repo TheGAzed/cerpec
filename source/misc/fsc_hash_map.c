@@ -457,22 +457,28 @@ void each_value_fsc_hash_map(fsc_hash_map_s const * const map, manage_fn const m
 }
 
 void _fsc_hash_map_fill_hole(fsc_hash_map_s const * const map, size_t const hole) {
-    if (NIL == map->prev[map->length]) {
-        size_t const index = map->hashes[map->length] % map->max;
-        map->head[index] = hole;
-    }
-
+    // detach hole from its bucket list
     if (NIL == map->prev[hole]) {
-        size_t const index = map->hashes[hole] % map->max;
-        map->head[index] = map->next[hole];
+        map->head[map->hashes[hole] % map->max] = map->next[hole];
+    } else {
+        map->next[map->prev[hole]] = map->next[hole];
+    }
+    if (NIL != map->next[hole]) {
+        map->prev[map->next[hole]] = map->prev[hole];
     }
 
-    // cut current removed node's siblings from itself
-    if (NIL != map->prev[hole]) { map->next[map->prev[hole]] = map->next[hole]; }
-    if (NIL != map->next[hole]) { map->prev[map->next[hole]] = map->prev[hole]; }
+    // removing the tail element: no relocation needed
+    if (hole == map->length) { return; }
 
-    // cut current removed node from its siblings
-    map->next[hole] = map->prev[hole] = hole;
+    // redirect last element's siblings to its new location (hole)
+    if (NIL == map->prev[map->length]) {
+        map->head[map->hashes[map->length] % map->max] = hole;
+    } else {
+        map->next[map->prev[map->length]] = hole;
+    }
+    if (NIL != map->next[map->length]) {
+        map->prev[map->next[map->length]] = hole;
+    }
 
     // replace element at current index with popped last element like in a stack
     memmove(map->keys + (hole * map->key_size), map->keys + (map->length * map->key_size), map->key_size);
@@ -480,8 +486,4 @@ void _fsc_hash_map_fill_hole(fsc_hash_map_s const * const map, size_t const hole
     map->hashes[hole] = map->hashes[map->length];
     map->next[hole] = map->next[map->length];
     map->prev[hole] = map->prev[map->length];
-
-    // redirect array's last swapped node's siblings to hole
-    if (NIL != map->next[map->length]) { map->prev[map->next[map->length]] = hole; }
-    if (NIL != map->prev[map->length]) { map->next[map->prev[map->length]] = hole; }
 }

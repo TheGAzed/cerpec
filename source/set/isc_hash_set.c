@@ -681,30 +681,32 @@ bool _contains_wrapper_isc_hash_set(isc_hash_set_s const * const set, void const
 }
 
 void _isc_hash_set_fill_hole(isc_hash_set_s const * const set, size_t const hole) {
-    if (NIL == set->prev[set->length]) {
-        size_t const index = set->hashes[set->length] % set->capacity;
-        set->head[index] = hole;
-    }
-
+    // detach hole from its bucket list
     if (NIL == set->prev[hole]) {
-        size_t const index = set->hashes[hole] % set->capacity;
-        set->head[index] = set->next[hole];
+        set->head[set->hashes[hole] % set->capacity] = set->next[hole];
+    } else {
+        set->next[set->prev[hole]] = set->next[hole];
+    }
+    if (NIL != set->next[hole]) {
+        set->prev[set->next[hole]] = set->prev[hole];
     }
 
-    // cut current removed node's siblings from itself
-    if (NIL != set->prev[hole]) { set->next[set->prev[hole]] = set->next[hole]; }
-    if (NIL != set->next[hole]) { set->prev[set->next[hole]] = set->prev[hole]; }
+    // removing the tail element: no relocation needed
+    if (hole == set->length) { return; }
 
-    // cut current removed node from its siblings
-    set->next[hole] = set->prev[hole] = hole;
+    // redirect last element's siblings to its new location (hole)
+    if (NIL == set->prev[set->length]) {
+        set->head[set->hashes[set->length] % set->capacity] = hole;
+    } else {
+        set->next[set->prev[set->length]] = hole;
+    }
+    if (NIL != set->next[set->length]) {
+        set->prev[set->next[set->length]] = hole;
+    }
 
     // replace element at current index with popped last element like in a stack
     memmove(set->elements + (hole * set->size), set->elements + (set->length * set->size), set->size);
     set->hashes[hole] = set->hashes[set->length];
     set->next[hole] = set->next[set->length];
     set->prev[hole] = set->prev[set->length];
-
-    // redirect array's last swapped node's siblings to hole
-    if (NIL != set->next[set->length]) { set->prev[set->next[set->length]] = hole; }
-    if (NIL != set->prev[set->length]) { set->next[set->prev[set->length]] = hole; }
 }

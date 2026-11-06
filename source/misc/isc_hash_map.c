@@ -478,9 +478,6 @@ void _isc_hash_map_resize(isc_hash_map_s * const map, size_t const size) {
 }
 
 void _isc_hash_map_fill_hole(isc_hash_map_s const * const map, size_t const hole) {
-    // removed nasty 1 in 100'000 bug thinks to DeepSeek
-    // (yeah, it's over, LLM's won)
-
     // detach hole from its bucket list
     if (NIL == map->prev[hole]) {
         map->head[map->hashes[hole] % map->capacity] = map->next[hole];
